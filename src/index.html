@@ -1,0 +1,122 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>WAM Open Studio 2.0</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.png">
+	<link rel="stylesheet" href="style/style.css">
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<body>
+	<div class="app">
+		<div class="controls-bar">
+			
+			<a class="menu-item main" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<img src="icons/list.svg">	
+			</a>
+			<div class="dropdown-menu dropright" aria-labelledby="dropdownMenuButton">
+				<a class="dropdown-item" id="save-project">Save Project</a>
+				<a class="dropdown-item" id="import-project">Import Project</a>
+
+				<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add Demo Songs</a>
+				<div class="dropdown-menu" aria-labelledby="dropdownSubMenuButton">
+					<a class="dropdown-item" id="song-1">Admiral Crumple - Keeps Flowing</a>
+					<a class="dropdown-item" id="song-2">Londres - Appelle</a>
+					<a class="dropdown-item" id="song-3">Monopist Guitar Song</a>
+					<a class="dropdown-item" id="song-4">Street Noise - Revelation</a>
+					<a class="dropdown-item" id="song-5">Tarte à la cerise</a>
+				</div>
+
+			</div>
+			<div id="automation-btn" class="menu-item">
+				<img src="/icons/sliders2-vertical.svg">
+			</div>
+			<div id="play-btn" class="menu-item">
+				<span class="mytooltip">Play</span>
+				<img src="/icons/play-fill.svg" id="play-img">
+				<img src="/icons/pause-fill.svg" id="pause-img" hidden>	
+			</div>
+			<div id="back-btn" class="menu-item">
+				<span class="mytooltip">Restart</span>
+				<img src="/icons/skip-start-fill.svg">
+			</div>
+			<div id="loop-btn" class="menu-item">
+				<span class="mytooltip">Loop</span>
+				<img src="/icons/repeat.svg">
+			</div>
+			<div id="record-btn" class="menu-item">
+				<span class="mytooltip">Record</span>
+				<img src="icons/record-fill.svg">
+			</div>
+			<div class="timer-item noselect">
+				<div id="timer" class="timer">
+					00:00:00:00
+				</div>
+			</div>
+			<div id="mute-btn" class="menu-item">
+				<span class="mytooltip">Mute</span>
+				<img id="unmute-img" src="icons/volume-up-fill.svg">
+				<img id="mute-img" src="icons/volume-mute-fill.svg" hidden>
+			</div>
+
+			<div class="slider-menu">
+				<div class="icon">
+					<img src="icons/volume-down-fill.svg">
+				</div>
+				<input type="range" class="form-range" id="global-volume-slider">
+				<div class="icon">
+					<img src="icons/volume-up2-fill.svg">
+				</div>
+			</div>
+		</div>
+	
+		<div class="editors">
+	
+			<div class="main-editors">
+				<div class="track-container" id="track-container">
+					<div class="track-container-header">
+						<div class="icon">
+							<img src="icons/file-earmark-music-fill.svg">
+						</div>
+						<div class="text-icon">
+							TRACKS
+						</div>
+					</div>
+
+				
+					
+					<div id="new-track" class="new-track">
+						<div class="new-track-text">
+							New track
+						</div>	
+						<div class="icon">
+							<img src="icons/plus-square-fill.svg">
+						</div>
+						
+					</div>
+				</div>
+				<div class="test">
+					<div id="playhead" class="playhead">
+						<input type="range" class="playhead-range" id="playhead-range">	
+					</div>
+					<div class="editor" id="editor">
+						
+						<!-- <canvas id="pixi-canvas"></canvas> -->
+					</div>
+				</div>
+			</div>
+			<div class="rack">
+				
+			</div>
+		</div>
+	</div>
+
+	<noscript>Please enable JavaScript in your web browser to view this page.</noscript>
+
+</body>
+
+</html
