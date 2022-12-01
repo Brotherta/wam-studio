@@ -28,6 +28,7 @@ export default class Host {
         this.playhead = 0;
         
         this.gainNode = this.audioCtx.createGain()
+        this.setVolume(0.5);    
         this.gainNode.connect(this.audioCtx.destination);
     }
 

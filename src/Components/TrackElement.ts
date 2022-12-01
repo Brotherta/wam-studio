@@ -185,10 +185,12 @@ template.innerHTML = /*html*/`
 export default class TrackElement extends HTMLElement {
 
     trackId: number | undefined;
+    name: string;
 
     constructor() {
         super();
         this.attachShadow({mode: "open"});
+        this.name = "";
     }
 
     connectedCallback() {
@@ -228,7 +230,7 @@ export default class TrackElement extends HTMLElement {
     }
 
     defineTrackNameListener() {
-        this.trackNameInput.value = `Track ${this.trackId}`;
+        this.trackNameInput.value = this.name;
 
         this.trackNameInput.addEventListener("keyup", (ev: KeyboardEvent) => {
             if (ev.code === "Enter" && ev.target !== null) {
@@ -237,4 +239,24 @@ export default class TrackElement extends HTMLElement {
             }
         });
     }
+
+    mute() {
+        this.muteBtn.style.color = "red";
+    }
+    unmute() {
+        this.muteBtn.style.color = "grey"
+    }
+
+    solo() {
+        this.soloBtn.style.color = "lightgreen";
+    }
+    unsolo() {
+        this.soloBtn.style.color = "grey";
+    }
+
+    setName(arg0: string) {
+        this.trackNameInput.value = arg0;
+    }
+
+
 }

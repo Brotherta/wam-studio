@@ -27,9 +27,8 @@ const getProcessor = (moduleId: string) => {
             if (e.data.audio) {
                 this.audio = e.data.audio;
             }
-            else if (e.data.position) {
-                this.playhead = e.data.position;
-                this.port.postMessage({playhead: this.playhead});
+            else if (e.data.playhead) {
+                this.playhead = e.data.playhead;
             }
             else if (e.data.removeAudio) {
                 this.audio = undefined;

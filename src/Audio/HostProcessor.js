@@ -3,7 +3,7 @@
 const audioWorkletGlobalScope = globalThis;
 
 const { registerProcessor } = audioWorkletGlobalScope;
-const PLAYHEAD_COUNT_MAX = 8;
+const PLAYHEAD_COUNT_MAX = 4;
 
 
 
@@ -38,6 +38,9 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
         this.port.onmessage = (e) => {
             if (e.data.audio) {
                 this.audio = e.data.audio;
+            }
+            if (e.data.playhead) {
+                this.playhead = e.data.playhead;
             }
         };
     }

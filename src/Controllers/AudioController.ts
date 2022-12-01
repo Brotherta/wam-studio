@@ -6,7 +6,7 @@ export interface SongInfo {
     songs: string[];
 }
 
-export default class MenuController {
+export default class AudioController {
 
     app: App;
     audioCtx: AudioContext;
@@ -16,8 +16,9 @@ export default class MenuController {
     looping: boolean = false;
     muted: boolean = false;
     recording: boolean = false;
+    pauseInterval = false;
 
-    timerInterval: NodeJS.Timer | undefined
+    timerInterval: NodeJS.Timer | undefined;
 
     constructor(app: App) {
         this.app = app;
@@ -45,8 +46,10 @@ export default class MenuController {
             let newPos = this.app.host.playhead;
             if (lastPos !== newPos) {
                 lastPos = newPos;
-                this.app.menuView.updateTimer(newPos);
-                this.app.canvasView.movePlayhead(newPos);
+                if (!this.pauseInterval) {
+                    this.app.canvasView.movePlayhead(newPos);
+                    this.app.menuView.updateTimer(newPos);
+                }
             }
         }, 1000/60)
     }
@@ -66,8 +69,10 @@ export default class MenuController {
 
     defineVolumeListener() {
         this.menuView.volumeSlider.oninput = () => {
-            console.log(`Volume slider : TODO value : ${this.menuView.volumeSlider.value}`);
-            let value = parseInt(this.menuView.volumeSlider.value) / 10;
+            
+            let value = parseInt(this.menuView.volumeSlider.value) / 100;
+            console.log(value);
+            
             this.app.host.setVolume(value);
         }
     }
@@ -110,7 +115,7 @@ export default class MenuController {
 
     defineBackListener() {
         this.menuView.backBtn.onclick = () => {
-            
+            this.app.audios.jumpTo(1);
         }
     }
 
@@ -238,4 +243,13 @@ export default class MenuController {
             this.app.trackController.addNewTrackList(newTrackList)
         };
     }
+
+    pauseUpdateInterval() {
+        this.pauseInterval = true;
+    }
+
+    resumeUpdateInteravel() {
+        this.pauseInterval = false;
+    }
+
 }

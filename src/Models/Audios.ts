@@ -3,8 +3,9 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import WamEventDestination from "../Audio/WAM/WamEventDestination";
 import TrackElement from "../Components/TrackElement";
-import { SongInfo } from "../Controllers/MenuController";
+import { SongInfo } from "../Controllers/AudioController";
 import { audioCtx } from "../index";
+import { RATIO_MILLS_BY_PX, SAMPLE_RATE } from "../Utils";
 import Track from "./Track";
 
 export default class Audios {
@@ -35,16 +36,14 @@ export default class Audios {
             let response = await fetch(`${path}/${songs[i]}`);
             let audioArrayBuffer = await response.arrayBuffer();
             let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
-            console.log("duration : "+ audioBuffer.duration);
-            
 
             let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
 
             node.setAudio(operableAudioBuffer.toArray());
-            node.connect(this.app.host.gainNode);
 
             // @ts-ignore
             let track = this.newTrack(node);
+            track.element.name = songs[i];
             newTrack.push(track);
         }
         return newTrack;
@@ -55,6 +54,9 @@ export default class Audios {
         trackElement.trackId = this.trackIdCount;
 
         let track = new Track(this.trackIdCount, trackElement, node);
+
+        track.gainNode.connect(this.app.host.gainNode);
+
         this.trackList.push(track);
         
         this.trackIdCount++;
@@ -70,8 +72,48 @@ export default class Audios {
     }
 
     jumpTo(pos: number) {
-        console.log("pos :", pos);
+        this.app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * SAMPLE_RATE
         
+        this.trackList.forEach((track) => {
+            track.node.port.postMessage({playhead: this.app.host.playhead+1})
+        });
+
+        this.app.host.hostNode?.port.postMessage({playhead: this.app.host.playhead+1});
     }
 
+    unsetSolo(trackToUnsolo: Track) {
+        let isHostSolo = false;
+
+        this.trackList.forEach(track => {
+            if (track.isSolo){
+                isHostSolo = true;
+            }
+        });
+
+        if (!isHostSolo) {
+            this.trackList.forEach(track => {
+                if (!track.isSolo) {
+                    if (track.isMuted) {
+                        track.muteSolo();
+                    }
+                    else {
+                        track.unmute();
+                    }
+                }
+            });
+        } else {
+            trackToUnsolo.muteSolo();
+        }
+    }
+
+    setSolo(trackToSolo: Track) {
+        this.trackList.forEach((track) => {
+            if (track !== trackToSolo && !track.isSolo) {
+                track.muteSolo();
+            }
+        });
+        if (!trackToSolo.isMuted) {
+            trackToSolo.unmute();
+        }
+    }
 }

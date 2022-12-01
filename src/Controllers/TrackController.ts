@@ -54,11 +54,28 @@ export default class TrackController {
         }
 
         track.element.soloBtn.onclick = () => {
-            console.log("Solo btn: TODO");
+            track.isSolo = !track.isSolo;
+
+            if (track.isSolo) {
+                this.app.audios.setSolo(track);
+                track.element.solo();
+            }
+            else {
+                this.app.audios.unsetSolo(track);
+                track.element.unsolo();
+            }
         }
 
         track.element.muteBtn.onclick = () => {
-            console.log("Mute btn: TODO");
+            if (track.isMuted) {
+                track.unmute();
+                track.element.unmute();
+            }
+            else {
+                track.mute();
+                track.element.mute();
+            }
+            track.isMuted = !track.isMuted;
         }
 
         track.element.volumeSlider.oninput = () => {

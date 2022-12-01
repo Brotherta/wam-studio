@@ -1,5 +1,5 @@
 import MenuView from "./Views/MenuView";
-import MenuController from "./Controllers/MenuController";
+import AudioController from "./Controllers/AudioController";
 import CanvasController from "./Controllers/CanvasController";
 import TrackController from "./Controllers/TrackController";
 
@@ -12,7 +12,7 @@ import PlayheadController from "./Controllers/PlayheadController";
 
 export default class App {
     
-    audioController: MenuController;
+    audioController: AudioController;
     canvasController: CanvasController;
     trackController: TrackController;
     playheadController: PlayheadController;
@@ -32,7 +32,7 @@ export default class App {
         this.trackView = new TrackView();
         this.canvasView = new CanvasView();
 
-        this.audioController = new MenuController(this);
+        this.audioController = new AudioController(this);
         this.canvasController = new CanvasController(this);
         this.trackController = new TrackController(this);
         this.playheadController = new PlayheadController(this);
