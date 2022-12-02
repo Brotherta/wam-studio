@@ -27,7 +27,7 @@ export default class Audios {
         let number = songInfo.number;
         let songs = songInfo.songs;
         
-        let newTrack = [];
+        let newTracks = [];
 
         for (let i = 0; i < number; i++) {
             let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
@@ -42,14 +42,15 @@ export default class Audios {
             node.setAudio(operableAudioBuffer.toArray());
 
             // @ts-ignore
-            let track = this.newTrack(node);
+            let track = this.createTrack(node);
+            track.addBuffer(operableAudioBuffer);
             track.element.name = songs[i];
-            newTrack.push(track);
+            newTracks.push(track);
         }
-        return newTrack;
+        return newTracks;
     }
 
-    newTrack(node: WamAudioWorkletNode) {
+    createTrack(node: WamAudioWorkletNode) {
         let trackElement = document.createElement("track-element") as TrackElement;
         trackElement.trackId = this.trackIdCount;
 

@@ -1,22 +1,30 @@
 import { Application, Graphics } from "pixi.js"
-import { MAX_DURATION_SEC, RATIO_MILLS_BY_PX, SAMPLE_RATE } from "../Utils";
+import Track from "../../Models/Track";
+import { MAX_DURATION_SEC, RATIO_MILLS_BY_PX, SAMPLE_RATE } from "../../Utils";
+import WaveFormView from "./WaveFormView";
 
 export default class CanvasView {
 
-    canvas: Application
+    pixiApp: Application
     editor = document.getElementById("editor") as HTMLDivElement;
     playheadRange = document.getElementById("playhead-range") as HTMLInputElement;
     playhead = document.getElementById("playhead") as HTMLDivElement;
+    trackContainer = document.getElementById("track-container") as HTMLDivElement;
+
+    waveforms: WaveFormView[];
 
     width = (MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX;
-    height = 1000;
+    height = this.trackContainer.scrollHeight - 35;
 
     playheadLine: Graphics | undefined
 
     constructor(){
-        this.canvas = new Application({width: this.width, height: this.height, backgroundColor: 0x121213})
-        this.editor.appendChild(this.canvas.view);
-        
+        this.pixiApp = new Application({width: this.width, height: this.height, backgroundColor: 0x121213})
+        this.editor.appendChild(this.pixiApp.view);
+        this.waveforms = [];
+
+        this.pixiApp.stage.sortableChildren = true;
+
         this.initPlayhead();
     }
 
@@ -36,7 +44,8 @@ export default class CanvasView {
             .lineStyle(1, 0xFFFFFF, 1)
             .moveTo(0, 0)
             .lineTo(0, this.height);
-        this.canvas.stage.addChild(this.playheadLine);
+        this.playheadLine.zIndex = 20;
+        this.pixiApp.stage.addChild(this.playheadLine);
     }
 
     
@@ -54,5 +63,24 @@ export default class CanvasView {
     getXfromPlayhead(playhead: number) {
         let millis = (playhead / SAMPLE_RATE) * 1000;
         return millis / RATIO_MILLS_BY_PX;
+    }
+
+    addWaveForm(track: Track) {
+        let wave = new WaveFormView(this.pixiApp);
+        
+        wave.setTrack(track);
+        this.waveforms.push(wave);
+    }
+
+    removeWaveForm(track: Track) {
+        let wave = this.waveforms.find(wave => wave.trackId === track.id);
+        let index = this.waveforms.indexOf(wave!);
+
+        wave!.destroy();
+        this.waveforms.splice(index, 1);
+    }
+
+    resizeCanvas() {
+        this.pixiApp.renderer.resize(this.pixiApp.renderer.width, this.trackContainer.scrollHeight - 35)
     }
 }

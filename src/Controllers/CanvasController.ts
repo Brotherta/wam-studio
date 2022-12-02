@@ -1,6 +1,6 @@
-import CanvasView from "../Views/CanvasView";
+import CanvasView from "../Views/Canvas/CanvasView";
 import App from "../App";
-
+import Track from "../Models/Track";
 
 export default class CanvasController {
 
@@ -12,4 +12,13 @@ export default class CanvasController {
         this.app = app;
     }
 
+    addWaveFormToTrack(track: Track) {
+        this.canvas.addWaveForm(track);
+        this.canvas.resizeCanvas();
+    }
+
+    removeWafeFormOfTrack(track: Track) {
+        this.canvas.removeWaveForm(track);
+        this.canvas.resizeCanvas();
+    }
 }

@@ -39,6 +39,7 @@ export default class TrackController {
                 const element = tracks[track];
                 
                 this.app.trackController.addNewTrackInit(element);
+                this.app.canvasController.addWaveFormToTrack(element);
             }
         }
     }
@@ -46,6 +47,7 @@ export default class TrackController {
     removeTrack(track: Track) {
         this.trackView.removeTrack(track.element);
         this.app.audios.removeTrack(track);
+        this.app.canvasController.removeWafeFormOfTrack(track);
     }
 
     defineTrackListener(track: Track) {

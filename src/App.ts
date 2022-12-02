@@ -6,7 +6,7 @@ import TrackController from "./Controllers/TrackController";
 import TrackView from "./Views/TrackView";
 import { makeDivScrollSync } from "./Controllers/StaticController";
 import Audios from "./Models/Audios";
-import CanvasView from "./Views/CanvasView";
+import CanvasView from "./Views/Canvas/CanvasView";
 import Host from "./Models/Host";
 import PlayheadController from "./Controllers/PlayheadController";
 

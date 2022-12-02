@@ -18,7 +18,7 @@ export default class PlayheadController {
                 parseInt(this.app.canvasView.playheadRange.value)
             );
         };
-
+        
         this.app.canvasView.playheadRange.onmousedown = () => {
             this.app.audioController.pauseUpdateInterval();
         }
@@ -30,12 +30,9 @@ export default class PlayheadController {
             
             if (x < 0) x = 0;
             
-            console.log("POS X: "+x);
             this.app.audios.jumpTo(x);
             this.app.canvasView.movePlayheadLine(x);
             this.app.audioController.resumeUpdateInteravel();
         }
-
-      
     }
 }

@@ -1,4 +1,5 @@
 import { audioCtx } from "..";
+import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import TrackElement from "../Components/TrackElement";
 
@@ -17,6 +18,7 @@ export default class Track {
 
     isMuted: boolean = false;
     isSolo: boolean = false;
+    audioBuffer: OperableAudioBuffer | undefined;
 
 
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode) {
@@ -29,6 +31,10 @@ export default class Track {
         this.gainNode.gain.value = 0.5;
         this.pannerNode = audioCtx.createPanner();
         this.node.connect(this.pannerNode).connect(this.gainNode);
+    }
+
+    addBuffer(operableAudioBuffer: OperableAudioBuffer) {
+        this.audioBuffer = operableAudioBuffer;
     }
 
     setVolume(value: number) {

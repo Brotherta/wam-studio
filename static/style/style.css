@@ -11,7 +11,7 @@ html, body {
 }
 
 body {
-    scrollbar-color: rgb(107, 107, 107) rgb(44, 44, 44);
+    scrollbar-color: rgb(107, 107, 107) #2c2c2c;
     scrollbar-width: auto;
 }
 
@@ -203,6 +203,8 @@ div::-webkit-scrollbar-thumb:hover {
     justify-content: flex-start;
     align-items: center;
     cursor: default;
+    max-width: 212px;
+    min-width: 212px;
 }
 
 .timer {
