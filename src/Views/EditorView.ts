@@ -1,6 +1,6 @@
 import {Application} from "pixi.js";
-import WaveFormView from "./Canvas/WaveFormView";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
+import WaveFormView from "./WaveFormView";
+import {HEIGHT_TRACK, MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
 import PlayheadView from "./PlayheadView";
 import Track from "../Models/Track";
 
@@ -39,6 +39,9 @@ export default class EditorView {
 
         wave!.destroy();
         this.waveforms.splice(index, 1);
+        for (let i = index; i < this.waveforms.length; i++) {
+            this.waveforms[i].position.y -= HEIGHT_TRACK;
+        }
     }
 
     resizeCanvas() {

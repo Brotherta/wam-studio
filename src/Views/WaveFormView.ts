@@ -1,6 +1,6 @@
 import { Application, Container, Graphics } from "pixi.js";
-import Track from "../../Models/Track";
-import { HEIGHT_TRACK, OFFSET_FIRST_TRACK, RATIO_MILLS_BY_PX } from "../../Utils";
+import Track from "../Models/Track";
+import { HEIGHT_TRACK, OFFSET_FIRST_TRACK, RATIO_MILLS_BY_PX } from "../Utils";
 
 
 export default class WaveFormView extends Container {
