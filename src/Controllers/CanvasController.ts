@@ -2,6 +2,9 @@ import CanvasView from "../Views/Canvas/CanvasView";
 import App from "../App";
 import Track from "../Models/Track";
 
+/**
+ * Controller for the canvas view. This controller is responsible for adding and removing waveforms from the canvas.
+ */
 export default class CanvasController {
 
     canvas: CanvasView;

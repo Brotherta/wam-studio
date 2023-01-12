@@ -1,6 +1,8 @@
 import App from "../App";
 
-
+/**
+ * Controller for the playhead. This controller is responsible for updating the playhead position and jumping to a specific position.
+ */
 export default class PlayheadController {
 
     app: App
@@ -13,11 +15,6 @@ export default class PlayheadController {
     }
 
     defineControllers() {
-        this.app.canvasView.playheadRange.oninput = () => {
-            this.app.canvasView.movePlayheadLine(
-                parseInt(this.app.canvasView.playheadRange.value)
-            );
-        };
         
         this.app.canvasView.playheadRange.onmousedown = () => {
             this.app.audioController.pauseUpdateInterval();
@@ -31,7 +28,6 @@ export default class PlayheadController {
             if (x < 0) x = 0;
             
             this.app.audios.jumpTo(x);
-            this.app.canvasView.movePlayheadLine(x);
             this.app.audioController.resumeUpdateInteravel();
         }
     }

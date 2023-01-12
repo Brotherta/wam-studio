@@ -4,7 +4,10 @@ import AudioPlayerNode from "../Audio/AudioNode";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import { MAX_DURATION_SEC, SAMPLE_RATE } from "../Utils";
 
-
+/**
+ * Host class that contains the master track.
+ * It is used to control the global volume and the playhead.
+ */
 export default class Host {
 
     app: App;
@@ -32,6 +35,10 @@ export default class Host {
         this.gainNode.connect(this.audioCtx.destination);
     }
 
+    /**
+     * Initialize the host node. It is used to control the global volume and the playhead.
+     * It is asynchronous because it needs to load the WAM SDK and the AudioPlayerNode.
+     */
     async initWAM() {
         const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
         const {default: AudioPlayerNode} = await import("../Audio/AudioNode");
@@ -53,18 +60,27 @@ export default class Host {
         }
     }
 
-
-
+    /**
+     * Set the global volume of the host.
+     * 
+     * @param value the new global volume
+     */
     setVolume(value: number) {
         this.globalVolume = value;
         this.gainNode.gain.value = this.globalVolume;
     }
 
+    /**
+     * Mute the host. It save the old global volume and set the global volume to 0.
+     */
     muteHost() {
         this.oldGlobalVolume = this.globalVolume;
         this.setVolume(0);
     }
 
+    /**
+     * Unmute the host. It set the global volume to the old global volume.
+     */
     unmuteHost() {
         this.setVolume(this.oldGlobalVolume);
     }

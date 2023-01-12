@@ -2,6 +2,9 @@ import Track from "../Models/Track";
 import TrackView from "../Views/TrackView";
 import App from "../App";
 
+/**
+ * Controller for the track view. This controller is responsible for adding and removing tracks from the track view.
+ */
 export default class TrackController {
     
     app: App;
@@ -20,19 +23,23 @@ export default class TrackController {
         }
     }
 
-    // addNewTrack() {
-    //     let track = this.app.audios.newTrack();
-    //     this.trackView.addTrack(track.element);
-    //     this.trackView.changeColor(track);
-    //     this.defineTrackListener(track);
-    // }
-
+    /**
+     * It adds a new track to the track view. the color of the track is also changed.
+     * It also defines the listeners for the track.
+     * 
+     * @param track Track to be added to the track view.
+     */
     addNewTrackInit(track: Track) {
         this.trackView.addTrack(track.element);
         this.trackView.changeColor(track);
         this.defineTrackListener(track); 
     }
 
+    /**
+     * Used to add a list of tracks to the track view. It calls the addNewTrackInit() for each track.
+     * 
+     * @param tracks List of tracks to be added to the track view.
+     */
     addNewTrackList(tracks: Track[]) {
         for (const track in tracks) {
             if (Object.prototype.hasOwnProperty.call(tracks, track)) {
@@ -44,6 +51,11 @@ export default class TrackController {
         }
     }
 
+    /**
+     * Removes a track from the track view. It also removes the track from the audio controller.
+     * 
+     * @param track Track to be removed from the track view.
+     */
     removeTrack(track: Track) {
         this.trackView.removeTrack(track.element);
         this.app.audios.removeTrack(track);

@@ -10,6 +10,9 @@ import CanvasView from "./Views/Canvas/CanvasView";
 import Host from "./Models/Host";
 import PlayheadController from "./Controllers/PlayheadController";
 
+/**
+ * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
+ */
 export default class App {
     
     audioController: AudioController;
@@ -40,6 +43,9 @@ export default class App {
         makeDivScrollSync();
     }
 
+    /**
+     * Initialize the master track for the host.
+     */
     async initHost() {
         await this.host.initWAM()
     }

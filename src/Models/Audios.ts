@@ -8,6 +8,10 @@ import { audioCtx } from "../index";
 import { RATIO_MILLS_BY_PX, SAMPLE_RATE } from "../Utils";
 import Track from "./Track";
 
+/**
+ * Model for the audios buffers stored in each tracks. 
+ * It contains the list of tracks and the audio context.
+ */
 export default class Audios {
 
     app: App;
@@ -23,6 +27,14 @@ export default class Audios {
         this.trackIdCount = 1;
     }
     
+    /**
+     * Create a new TrackView for all files given in parameters with the given information. Fetching audio files and initialize
+     * the audio nodes and the canvas.
+     * 
+     * @param path the path to the audio files
+     * @param songInfo the object containing the number of files and the names of the files
+     * @returns the new tracks that have been created
+     */
     async newTrackWithAudio(path: String, songInfo: SongInfo) {    
         let number = songInfo.number;
         let songs = songInfo.songs;
@@ -50,6 +62,12 @@ export default class Audios {
         return newTracks;
     }
 
+    /**
+     * Create a new TrackView with the given audio node. Initialize the audio nodes and the canvas.
+     *  
+     * @param node 
+     * @returns the created track
+     */
     createTrack(node: WamAudioWorkletNode) {
         let trackElement = document.createElement("track-element") as TrackElement;
         trackElement.trackId = this.trackIdCount;
@@ -64,6 +82,11 @@ export default class Audios {
         return track;
     }
 
+    /**
+     * Remove the given track from the track list and disconnect the audio node.
+     * 
+     * @param track the track to remove
+     */
     removeTrack(track: Track) {
         let trackIndex = this.trackList.indexOf(track);
         this.trackList.splice(trackIndex, 1);  
@@ -72,6 +95,11 @@ export default class Audios {
         track.node.disconnect();
     }
 
+    /**
+     * Jump to the given position in px.
+     * 
+     * @param pos the position in px
+     */
     jumpTo(pos: number) {
         this.app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * SAMPLE_RATE
         
@@ -81,6 +109,12 @@ export default class Audios {
 
         this.app.host.hostNode?.port.postMessage({playhead: this.app.host.playhead+1});
     }
+
+    /**
+     * Mute or unmute all tracks except the given one.
+     * 
+     * @param trackToUnsolo the track to unsolo.
+     */
 
     unsetSolo(trackToUnsolo: Track) {
         let isHostSolo = false;
@@ -107,6 +141,11 @@ export default class Audios {
         }
     }
 
+    /**
+     * Mute all tracks except the given one.
+     * 
+     * @param trackToSolo the track to solo.
+     */
     setSolo(trackToSolo: Track) {
         this.trackList.forEach((track) => {
             if (track !== trackToSolo && !track.isSolo) {
@@ -117,4 +156,6 @@ export default class Audios {
             trackToSolo.unmute();
         }
     }
+
+
 }

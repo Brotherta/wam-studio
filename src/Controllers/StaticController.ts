@@ -3,6 +3,9 @@ const editorDiv = document.getElementById("editor") as HTMLDivElement;
 const playhead = document.getElementById("playhead") as HTMLDivElement;
 
 
+/**
+ * This function makes the track div and the editor div scroll synchronously.
+ */
 function makeDivScrollSync2() {
     
     let active: EventTarget | undefined = undefined;
@@ -28,6 +31,9 @@ function makeDivScrollSync2() {
     })
 }
 
+/**
+ * This function makes the track div and the editor div scroll synchronously.
+ */
 function makeDivScrollSync() {
     let active: EventTarget | undefined = undefined;
 

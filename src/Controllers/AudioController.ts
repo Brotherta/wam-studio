@@ -1,11 +1,18 @@
 import MenuView from "../Views/MenuView";
 import App from "../App";
 
+/**
+ * Interface for the song info. Number is the number of the song and songs is the list of songs.
+ */
 export interface SongInfo {
     number: number;
     songs: string[];
 }
 
+/**
+ * Class to control the audio. It contains all the listeners for the audio controls.
+ * It also contains the audio context and the list of tracks. It is used to play, pause, record, mute, loop, etc.
+ */
 export default class AudioController {
 
     app: App;
@@ -28,6 +35,9 @@ export default class AudioController {
         this.defineControls();
     }
 
+    /**
+     * Define all the listeners for the audio controls.
+     */
     defineControls() {
         this.defineAutomationListener();
         this.definePlayListener();
@@ -40,6 +50,10 @@ export default class AudioController {
         this.defineTimerListener();
     } 
 
+    /**
+     * Define the listener for the timer.
+     * It updates the playhead position and the timer.
+     */
     defineTimerListener() {
         let lastPos = this.app.host.playhead;
         this.timerInterval = setInterval(() => {
@@ -54,6 +68,10 @@ export default class AudioController {
         }, 1000/60)
     }
 
+    /**
+     * Define the listener for the mute button.
+     * It mutes or unmutes the host.
+     */
     defineMuteListener() {
         this.menuView.muteBtn.onclick = () => {
             if (this.muted) {
@@ -67,6 +85,9 @@ export default class AudioController {
         }
     }
 
+    /**
+     * Define the listener for the volume slider. It controls the volume of the host.
+     */
     defineVolumeListener() {
         this.menuView.volumeSlider.oninput = () => {
             
@@ -77,6 +98,9 @@ export default class AudioController {
         }
     }
 
+    /**
+     * Define the listener for the loop button. It loops or unloops the host.
+     */
     defineLoopListener() {
         this.menuView.loopBtn.onclick = () => {
             if (this.looping) {
@@ -100,6 +124,9 @@ export default class AudioController {
         }
     }
 
+    /**
+     * TODO : Not implemented yet.
+     */
     defineRecordListener() {
         this.menuView.recordBtn.onclick = () => {
             if (this.recording) {
@@ -113,12 +140,19 @@ export default class AudioController {
         }
     }
 
+    /**
+     * Define the listener for the back button. It goes back to the first beat.
+     * 
+     */
     defineBackListener() {
         this.menuView.backBtn.onclick = () => {
             this.app.audios.jumpTo(1);
         }
     }
 
+    /**
+     * Define the listener for the play button. It plays or pauses the host.
+     */
     definePlayListener() {
         this.menuView.playBtn.onclick = () => {
             if (this.playing) {
@@ -145,13 +179,19 @@ export default class AudioController {
             this.menuView.pressPlayButton(this.playing);
         }
     }
-
+    
+    /**
+     * TODO : Not implemented yet.
+     */
     defineAutomationListener() {
         this.menuView.automationBtn.onclick = () => {
             console.log("Automation Button : TODO");
         }
     }
 
+    /**
+     * Define the listeners for the demo songs in the menu.
+     */
     defineSongsDemoListener() {
         this.menuView.song1.onclick = async () => { 
             let newTrackList = await this.app.audios.newTrackWithAudio( 
@@ -244,10 +284,16 @@ export default class AudioController {
         };
     }
 
+    /**
+     * Pause the timer interval. Used when the user is jumping to a specific beat.
+     */
     pauseUpdateInterval() {
         this.pauseInterval = true;
     }
 
+    /**
+     * Resume the timer interval. Used when the user is jumping to a specific beat.
+     */
     resumeUpdateInteravel() {
         this.pauseInterval = false;
     }
