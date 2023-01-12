@@ -1,27 +1,27 @@
-import CanvasView from "../Views/Canvas/CanvasView";
 import App from "../App";
 import Track from "../Models/Track";
+import EditorView from "../Views/EditorView";
 
 /**
  * Controller for the canvas view. This controller is responsible for adding and removing waveforms from the canvas.
  */
-export default class CanvasController {
+export default class EditorController {
 
-    canvas: CanvasView;
+    editor: EditorView;
     app: App;
 
     constructor(app: App) {
-        this.canvas = app.canvasView;
+        this.editor = app.editorView;
         this.app = app;
     }
 
     addWaveFormToTrack(track: Track) {
-        this.canvas.addWaveForm(track);
-        this.canvas.resizeCanvas();
+        this.editor.addWaveForm(track);
+        this.editor.resizeCanvas();
     }
 
     removeWafeFormOfTrack(track: Track) {
-        this.canvas.removeWaveForm(track);
-        this.canvas.resizeCanvas();
+        this.editor.removeWaveForm(track);
+        this.editor.resizeCanvas();
     }
 }

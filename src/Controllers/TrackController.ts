@@ -46,7 +46,7 @@ export default class TrackController {
                 const element = tracks[track];
                 
                 this.app.trackController.addNewTrackInit(element);
-                this.app.canvasController.addWaveFormToTrack(element);
+                this.app.editorController.addWaveFormToTrack(element);
             }
         }
     }
@@ -58,8 +58,8 @@ export default class TrackController {
      */
     removeTrack(track: Track) {
         this.trackView.removeTrack(track.element);
-        this.app.audios.removeTrack(track);
-        this.app.canvasController.removeWafeFormOfTrack(track);
+        this.app.tracks.removeTrack(track);
+        this.app.editorController.removeWafeFormOfTrack(track);
     }
 
     defineTrackListener(track: Track) {
@@ -71,11 +71,11 @@ export default class TrackController {
             track.isSolo = !track.isSolo;
 
             if (track.isSolo) {
-                this.app.audios.setSolo(track);
+                this.app.tracks.setSolo(track);
                 track.element.solo();
             }
             else {
-                this.app.audios.unsetSolo(track);
+                this.app.tracks.unsetSolo(track);
                 track.element.unsolo();
             }
         }

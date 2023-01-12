@@ -1,4 +1,4 @@
-import MenuView from "../Views/MenuView";
+import HostView from "../Views/HostView";
 import App from "../App";
 
 /**
@@ -13,11 +13,11 @@ export interface SongInfo {
  * Class to control the audio. It contains all the listeners for the audio controls.
  * It also contains the audio context and the list of tracks. It is used to play, pause, record, mute, loop, etc.
  */
-export default class AudioController {
+export default class HostController {
 
     app: App;
     audioCtx: AudioContext;
-    menuView: MenuView;
+    hostView: HostView;
 
     playing: boolean = false;
     looping: boolean = false;
@@ -29,8 +29,8 @@ export default class AudioController {
 
     constructor(app: App) {
         this.app = app;
-        this.menuView = app.menuView;
-        this.audioCtx = app.audios.audioCtx;
+        this.hostView = app.hostView;
+        this.audioCtx = app.tracks.audioCtx;
         
         this.defineControls();
     }
@@ -61,8 +61,8 @@ export default class AudioController {
             if (lastPos !== newPos) {
                 lastPos = newPos;
                 if (!this.pauseInterval) {
-                    this.app.canvasView.movePlayhead(newPos);
-                    this.app.menuView.updateTimer(newPos);
+                    this.app.editorView.playhead.movePlayhead(newPos);
+                    this.app.hostView.updateTimer(newPos);
                 }
             }
         }, 1000/60)
@@ -73,7 +73,7 @@ export default class AudioController {
      * It mutes or unmutes the host.
      */
     defineMuteListener() {
-        this.menuView.muteBtn.onclick = () => {
+        this.hostView.muteBtn.onclick = () => {
             if (this.muted) {
                 this.app.host.unmuteHost();
             }
@@ -81,7 +81,7 @@ export default class AudioController {
                 this.app.host.muteHost();
             }
             this.muted = !this.muted;
-            this.menuView.pressMuteButton(this.muted);
+            this.hostView.pressMuteButton(this.muted);
         }
     }
 
@@ -89,9 +89,9 @@ export default class AudioController {
      * Define the listener for the volume slider. It controls the volume of the host.
      */
     defineVolumeListener() {
-        this.menuView.volumeSlider.oninput = () => {
+        this.hostView.volumeSlider.oninput = () => {
             
-            let value = parseInt(this.menuView.volumeSlider.value) / 100;
+            let value = parseInt(this.hostView.volumeSlider.value) / 100;
             console.log(value);
             
             this.app.host.setVolume(value);
@@ -102,9 +102,9 @@ export default class AudioController {
      * Define the listener for the loop button. It loops or unloops the host.
      */
     defineLoopListener() {
-        this.menuView.loopBtn.onclick = () => {
+        this.hostView.loopBtn.onclick = () => {
             if (this.looping) {
-                this.app.audios.trackList.forEach((track) => {
+                this.app.tracks.trackList.forEach((track) => {
                     //@ts-ignore
                     track.node.parameters.get("loop").value = 0;
                 });
@@ -112,7 +112,7 @@ export default class AudioController {
                 this.app.host.hostNode.parameters.get("loop").value = 0;
             }
             else {
-                this.app.audios.trackList.forEach((track) => {
+                this.app.tracks.trackList.forEach((track) => {
                     //@ts-ignore
                     track.node.parameters.get("loop").value = 1;
                 });
@@ -120,7 +120,7 @@ export default class AudioController {
                 this.app.host.hostNode.parameters.get("loop").value = 1;
             }
             this.looping = !this.looping;
-            this.menuView.pressLoopButton(this.looping);
+            this.hostView.pressLoopButton(this.looping);
         }
     }
 
@@ -128,7 +128,7 @@ export default class AudioController {
      * TODO : Not implemented yet.
      */
     defineRecordListener() {
-        this.menuView.recordBtn.onclick = () => {
+        this.hostView.recordBtn.onclick = () => {
             if (this.recording) {
                 // TODO: change processor
             }
@@ -136,7 +136,7 @@ export default class AudioController {
                 // TODO
             }
             this.recording = !this.recording;
-            this.menuView.pressRecordingButton(this.recording); 
+            this.hostView.pressRecordingButton(this.recording);
         }
     }
 
@@ -145,8 +145,8 @@ export default class AudioController {
      * 
      */
     defineBackListener() {
-        this.menuView.backBtn.onclick = () => {
-            this.app.audios.jumpTo(1);
+        this.hostView.backBtn.onclick = () => {
+            this.app.tracks.jumpTo(1);
         }
     }
 
@@ -154,9 +154,9 @@ export default class AudioController {
      * Define the listener for the play button. It plays or pauses the host.
      */
     definePlayListener() {
-        this.menuView.playBtn.onclick = () => {
+        this.hostView.playBtn.onclick = () => {
             if (this.playing) {
-                this.app.audios.trackList.forEach((track) => {
+                this.app.tracks.trackList.forEach((track) => {
                     //@ts-ignore
                     track.node.parameters.get("playing").value = 0;
                     clearInterval(this.timerInterval!!);
@@ -166,7 +166,7 @@ export default class AudioController {
                 this.audioCtx.suspend();
             }
             else {
-                this.app.audios.trackList.forEach((track) => {
+                this.app.tracks.trackList.forEach((track) => {
                     //@ts-ignore
                     track.node.parameters.get("playing").value = 1;
                     this.defineTimerListener();
@@ -176,7 +176,7 @@ export default class AudioController {
                 this.audioCtx.resume();
             }
             this.playing = !this.playing;
-            this.menuView.pressPlayButton(this.playing);
+            this.hostView.pressPlayButton(this.playing);
         }
     }
     
@@ -184,7 +184,7 @@ export default class AudioController {
      * TODO : Not implemented yet.
      */
     defineAutomationListener() {
-        this.menuView.automationBtn.onclick = () => {
+        this.hostView.automationBtn.onclick = () => {
             console.log("Automation Button : TODO");
         }
     }
@@ -193,8 +193,8 @@ export default class AudioController {
      * Define the listeners for the demo songs in the menu.
      */
     defineSongsDemoListener() {
-        this.menuView.song1.onclick = async () => { 
-            let newTrackList = await this.app.audios.newTrackWithAudio( 
+        this.hostView.song1.onclick = async () => {
+            let newTrackList = await this.app.tracks.newTrackWithAudio(
                 "/songs/AdmiralCrumple_KeepsFlowing", 
                 {
                     number: 9,
@@ -213,8 +213,8 @@ export default class AudioController {
             ); 
             this.app.trackController.addNewTrackList(newTrackList)
         };
-        this.menuView.song2.onclick  = async () => { 
-            let newTrackList = await this.app.audios.newTrackWithAudio( 
+        this.hostView.song2.onclick  = async () => {
+            let newTrackList = await this.app.tracks.newTrackWithAudio(
                 "/songs/Londres Appelle",
                 {
                     number: 6,
@@ -230,8 +230,8 @@ export default class AudioController {
             ); 
             this.app.trackController.addNewTrackList(newTrackList)
         };
-        this.menuView.song3.onclick = async () => { 
-            let newTrackList = await this.app.audios.newTrackWithAudio( 
+        this.hostView.song3.onclick = async () => {
+            let newTrackList = await this.app.tracks.newTrackWithAudio(
                 "/songs/Monopiste", 
                 {
                     number: 1,
@@ -242,8 +242,8 @@ export default class AudioController {
             ); 
             this.app.trackController.addNewTrackList(newTrackList)
         };
-        this.menuView.song4.onclick = async () => { 
-            let newTrackList = await this.app.audios.newTrackWithAudio( 
+        this.hostView.song4.onclick = async () => {
+            let newTrackList = await this.app.tracks.newTrackWithAudio(
                 "/songs/Street Noise - Revelations", 
                 {
                     number: 11,
@@ -265,8 +265,8 @@ export default class AudioController {
             ); 
             this.app.trackController.addNewTrackList(newTrackList)
         };
-        this.menuView.song5.onclick = async () => { 
-            let newTrackList = await this.app.audios.newTrackWithAudio( 
+        this.hostView.song5.onclick = async () => {
+            let newTrackList = await this.app.tracks.newTrackWithAudio(
                 "/songs/Tarte a la cerise", 
                 {
                     number: 6,

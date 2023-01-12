@@ -1,6 +1,6 @@
 import { SAMPLE_RATE } from "../Utils";
 
-export default class MenuView {
+export default class HostView {
 
     automationBtn = document.getElementById("automation-btn") as HTMLDivElement;
     playBtn = document.getElementById("play-btn") as HTMLDivElement;

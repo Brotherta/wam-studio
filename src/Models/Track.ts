@@ -40,8 +40,6 @@ export default class Track {
     setVolume(value: number) {
         this.volume = value;
         this.gainNode.gain.value = this.volume;
-        console.log(this.gainNode.gain.value);
-        
     }
 
     mute() {

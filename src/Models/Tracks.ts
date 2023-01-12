@@ -3,7 +3,7 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import WamEventDestination from "../Audio/WAM/WamEventDestination";
 import TrackElement from "../Components/TrackElement";
-import { SongInfo } from "../Controllers/AudioController";
+import { SongInfo } from "../Controllers/HostController";
 import { audioCtx } from "../index";
 import { RATIO_MILLS_BY_PX, SAMPLE_RATE } from "../Utils";
 import Track from "./Track";
@@ -12,7 +12,7 @@ import Track from "./Track";
  * Model for the audios buffers stored in each tracks. 
  * It contains the list of tracks and the audio context.
  */
-export default class Audios {
+export default class Tracks {
 
     app: App;
 

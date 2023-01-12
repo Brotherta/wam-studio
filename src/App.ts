@@ -1,50 +1,50 @@
-import MenuView from "./Views/MenuView";
-import AudioController from "./Controllers/AudioController";
-import CanvasController from "./Controllers/CanvasController";
+import HostView from "./Views/HostView";
+import HostController from "./Controllers/HostController";
+import EditorController from "./Controllers/EditorController";
 import TrackController from "./Controllers/TrackController";
 
 import TrackView from "./Views/TrackView";
 import { makeDivScrollSync } from "./Controllers/StaticController";
-import Audios from "./Models/Audios";
-import CanvasView from "./Views/Canvas/CanvasView";
+import Tracks from "./Models/Tracks";
 import Host from "./Models/Host";
 import PlayheadController from "./Controllers/PlayheadController";
 import PluginsController from "./Controllers/PluginsController";
 import PluginsView from "./Views/PluginsView";
 import Plugins from "./Models/Plugins";
+import EditorView from "./Views/EditorView";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
  */
 export default class App {
     
-    audioController: AudioController;
-    canvasController: CanvasController;
+    hostController: HostController;
+    editorController: EditorController;
     trackController: TrackController;
     playheadController: PlayheadController;
     pluginsController: PluginsController;
 
-    menuView: MenuView;
+    hostView: HostView;
     trackView: TrackView;
-    canvasView: CanvasView;
+    editorView: EditorView;
     pluginsView: PluginsView;
 
-    audios: Audios;
+    tracks: Tracks;
     host: Host;
     plugins: Plugins;
 
     constructor() {
-        this.audios = new Audios(this);
+        this.tracks = new Tracks(this);
         this.host = new Host(this);
         this.plugins = new Plugins();
 
-        this.menuView = new MenuView();
+        this.hostView = new HostView();
         this.trackView = new TrackView();
-        this.canvasView = new CanvasView();
         this.pluginsView = new PluginsView();
+        this.editorView = new EditorView();
 
-        this.audioController = new AudioController(this);
-        this.canvasController = new CanvasController(this);
+        this.hostController = new HostController(this);
+        this.editorController = new EditorController(this);
         this.trackController = new TrackController(this);
         this.playheadController = new PlayheadController(this);
         this.pluginsController = new PluginsController(this);
