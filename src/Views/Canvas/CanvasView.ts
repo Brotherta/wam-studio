@@ -57,7 +57,6 @@ export default class CanvasView {
         let x = this.getXfromPlayhead(playhead);
         this.playheadRange.value = `${x}`;
         this.movePlayheadLine(x);
-
     }
 
     getXfromPlayhead(playhead: number) {
