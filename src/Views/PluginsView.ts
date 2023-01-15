@@ -5,6 +5,7 @@ export default class PluginsView {
     resizeBtn = document.getElementById("resize-btn") as HTMLDivElement;
     maxMinBtn = document.getElementById("min-max-btn") as HTMLDivElement;
     rack = document.getElementById("rack") as HTMLDivElement;
+    newPlugin = document.getElementById("add-plugins") as HTMLDivElement;
 
     maxHeight: number;
     minHeight: number;

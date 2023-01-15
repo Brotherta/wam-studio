@@ -1,24 +1,24 @@
 import Track from "../Models/Track";
-import TrackView from "../Views/TrackView";
+import TracksView from "../Views/TracksView";
 import App from "../App";
 
 /**
  * Controller for the track view. This controller is responsible for adding and removing tracks from the track view.
  */
-export default class TrackController {
+export default class TracksController {
     
     app: App;
-    trackView: TrackView;
+    tracksView: TracksView;
 
     constructor(app: App) {
         this.app = app;
-        this.trackView = this.app.trackView;
+        this.tracksView = this.app.tracksView;
 
         this.defineNewtrackCallback();
     }
 
     defineNewtrackCallback() {
-        this.trackView.newTrackDiv.onclick = () => {
+        this.tracksView.newTrackDiv.onclick = () => {
             // this.addNewTrack();
         }
     }
@@ -30,8 +30,8 @@ export default class TrackController {
      * @param track Track to be added to the track view.
      */
     addNewTrackInit(track: Track) {
-        this.trackView.addTrack(track.element);
-        this.trackView.changeColor(track);
+        this.tracksView.addTrack(track.element);
+        this.tracksView.changeColor(track);
         this.defineTrackListener(track); 
     }
 
@@ -45,7 +45,7 @@ export default class TrackController {
             if (Object.prototype.hasOwnProperty.call(tracks, track)) {
                 const element = tracks[track];
                 
-                this.app.trackController.addNewTrackInit(element);
+                this.app.tracksController.addNewTrackInit(element);
                 this.app.editorController.addWaveFormToTrack(element);
             }
         }
@@ -57,12 +57,16 @@ export default class TrackController {
      * @param track Track to be removed from the track view.
      */
     removeTrack(track: Track) {
-        this.trackView.removeTrack(track.element);
+        this.tracksView.removeTrack(track.element);
         this.app.tracks.removeTrack(track);
         this.app.editorController.removeWafeFormOfTrack(track);
     }
 
     defineTrackListener(track: Track) {
+        track.element.addEventListener("click", () => {
+            this.app.pluginsController.selectTrack(track);
+        })
+
         track.element.closeBtn.onclick = () => {
             this.removeTrack(track);
         }
@@ -101,7 +105,8 @@ export default class TrackController {
         }
 
         track.element.color.onclick = () => {
-            this.trackView.changeColor(track);
+            this.tracksView.changeColor(track);
+            this.app.editorView.changeWaveFormColor(track);
         }
     }
 

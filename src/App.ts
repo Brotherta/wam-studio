@@ -1,16 +1,15 @@
 import HostView from "./Views/HostView";
 import HostController from "./Controllers/HostController";
 import EditorController from "./Controllers/EditorController";
-import TrackController from "./Controllers/TrackController";
+import TracksController from "./Controllers/TracksController";
 
-import TrackView from "./Views/TrackView";
+import TracksView from "./Views/TracksView";
 import { makeDivScrollSync } from "./Controllers/StaticController";
 import Tracks from "./Models/Tracks";
 import Host from "./Models/Host";
 import PlayheadController from "./Controllers/PlayheadController";
 import PluginsController from "./Controllers/PluginsController";
 import PluginsView from "./Views/PluginsView";
-import Plugins from "./Models/Plugins";
 import EditorView from "./Views/EditorView";
 
 /**
@@ -20,32 +19,30 @@ export default class App {
     
     hostController: HostController;
     editorController: EditorController;
-    trackController: TrackController;
+    tracksController: TracksController;
     playheadController: PlayheadController;
     pluginsController: PluginsController;
 
     hostView: HostView;
-    trackView: TrackView;
+    tracksView: TracksView;
     editorView: EditorView;
     pluginsView: PluginsView;
 
     tracks: Tracks;
     host: Host;
-    plugins: Plugins;
 
     constructor() {
         this.tracks = new Tracks(this);
         this.host = new Host(this);
-        this.plugins = new Plugins();
 
         this.hostView = new HostView();
-        this.trackView = new TrackView();
+        this.tracksView = new TracksView();
         this.pluginsView = new PluginsView();
         this.editorView = new EditorView();
 
         this.hostController = new HostController(this);
         this.editorController = new EditorController(this);
-        this.trackController = new TrackController(this);
+        this.tracksController = new TracksController(this);
         this.playheadController = new PlayheadController(this);
         this.pluginsController = new PluginsController(this);
 

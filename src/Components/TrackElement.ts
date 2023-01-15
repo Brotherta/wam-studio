@@ -258,5 +258,11 @@ export default class TrackElement extends HTMLElement {
         this.trackNameInput.value = arg0;
     }
 
+    select() {
+        this.style.borderColor = "lightgray";
+    }
 
+    unSelect() {
+        this.style.borderColor = "black";
+    }
 }

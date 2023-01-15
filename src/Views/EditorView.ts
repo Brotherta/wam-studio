@@ -47,4 +47,10 @@ export default class EditorView {
     resizeCanvas() {
         this.pixiApp.renderer.resize(this.pixiApp.renderer.width, this.trackContainer.scrollHeight - 35)
     }
+
+    changeWaveFormColor(track: Track) {
+        let wave = this.waveforms.find(wave => wave.trackId === track.id);
+
+        wave?.drawWave(track);
+    }
 }

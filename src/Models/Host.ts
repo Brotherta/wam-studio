@@ -23,6 +23,7 @@ export default class Host {
     gainNode: GainNode;
     
     constructor(app: App) {
+
         this.app = app;
         this.audioCtx = audioCtx;
         this.globalVolume = 0.5;

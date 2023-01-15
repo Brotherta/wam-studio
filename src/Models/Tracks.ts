@@ -28,7 +28,7 @@ export default class Tracks {
     }
     
     /**
-     * Create a new TrackView for all files given in parameters with the given information. Fetching audio files and initialize
+     * Create a new TracksView for all files given in parameters with the given information. Fetching audio files and initialize
      * the audio nodes and the canvas.
      * 
      * @param path the path to the audio files
@@ -63,7 +63,7 @@ export default class Tracks {
     }
 
     /**
-     * Create a new TrackView with the given audio node. Initialize the audio nodes and the canvas.
+     * Create a new TracksView with the given audio node. Initialize the audio nodes and the canvas.
      *  
      * @param node 
      * @returns the created track

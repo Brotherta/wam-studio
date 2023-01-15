@@ -10,7 +10,7 @@ function getRandomColor() {
     return color;
 }
 
-export default class TrackView {
+export default class TracksView {
 
     trackContainerDiv: HTMLDivElement = document.getElementById("track-container") as HTMLDivElement;
     newTrackDiv: HTMLDivElement = document.getElementById("new-track") as HTMLDivElement;

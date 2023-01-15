@@ -2,6 +2,7 @@ import { audioCtx } from "..";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import TrackElement from "../Components/TrackElement";
+import AudioPlugin from "./AudioPlugin";
 
 export default class Track {
 
@@ -19,6 +20,7 @@ export default class Track {
     isMuted: boolean = false;
     isSolo: boolean = false;
     audioBuffer: OperableAudioBuffer | undefined;
+    plugin: AudioPlugin;
 
 
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode) {

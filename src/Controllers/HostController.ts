@@ -211,7 +211,7 @@ export default class HostController {
                     ]
                 }
             ); 
-            this.app.trackController.addNewTrackList(newTrackList)
+            this.app.tracksController.addNewTrackList(newTrackList)
         };
         this.hostView.song2.onclick  = async () => {
             let newTrackList = await this.app.tracks.newTrackWithAudio(
@@ -228,7 +228,7 @@ export default class HostController {
                     ]
                 }
             ); 
-            this.app.trackController.addNewTrackList(newTrackList)
+            this.app.tracksController.addNewTrackList(newTrackList)
         };
         this.hostView.song3.onclick = async () => {
             let newTrackList = await this.app.tracks.newTrackWithAudio(
@@ -240,7 +240,7 @@ export default class HostController {
                     ]
                 }
             ); 
-            this.app.trackController.addNewTrackList(newTrackList)
+            this.app.tracksController.addNewTrackList(newTrackList)
         };
         this.hostView.song4.onclick = async () => {
             let newTrackList = await this.app.tracks.newTrackWithAudio(
@@ -263,7 +263,7 @@ export default class HostController {
                     ]
                 }
             ); 
-            this.app.trackController.addNewTrackList(newTrackList)
+            this.app.tracksController.addNewTrackList(newTrackList)
         };
         this.hostView.song5.onclick = async () => {
             let newTrackList = await this.app.tracks.newTrackWithAudio(
@@ -280,7 +280,7 @@ export default class HostController {
                     ]
                 }
             ); 
-            this.app.trackController.addNewTrackList(newTrackList)
+            this.app.tracksController.addNewTrackList(newTrackList)
         };
     }
 
