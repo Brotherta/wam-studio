@@ -1,3 +1,4 @@
+import Track from "../Models/Track";
 
 
 export default class PluginsView {
@@ -6,6 +7,7 @@ export default class PluginsView {
     maxMinBtn = document.getElementById("min-max-btn") as HTMLDivElement;
     rack = document.getElementById("rack") as HTMLDivElement;
     newPlugin = document.getElementById("add-plugins") as HTMLDivElement;
+    mount = document.getElementById("mount") as HTMLDivElement;
 
     maxHeight: number;
     minHeight: number;
@@ -94,5 +96,19 @@ export default class PluginsView {
         let icon = document.getElementById("min-max-btn-icon") as HTMLImageElement;
         icon.src = "icons/chevron-compact-up.svg";
         this.rack.style.minHeight = this.minHeight+"px";
+    }
+
+    hideNew() {
+        this.newPlugin.hidden = true;
+    }
+
+    showNew() {
+        this.newPlugin.hidden = false;
+        this.mount.innerHTML = '';
+    }
+
+    showPlugins(track: Track) {
+        this.mount.innerHTML = '';
+        this.mount.appendChild(track.plugin.dom);
     }
 }

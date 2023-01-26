@@ -12,7 +12,7 @@ export default class Track {
 
     node: WamAudioWorkletNode;
     gainNode: GainNode;
-    pannerNode: PannerNode;
+    pannerNode: StereoPannerNode;
 
     volume: number = 0.50;
     oldVolume: number = 0.50;
@@ -31,7 +31,7 @@ export default class Track {
 
         this.gainNode = audioCtx.createGain();
         this.gainNode.gain.value = 0.5;
-        this.pannerNode = audioCtx.createPanner();
+        this.pannerNode = audioCtx.createStereoPanner();
         this.node.connect(this.pannerNode).connect(this.gainNode);
     }
 
@@ -55,5 +55,9 @@ export default class Track {
 
     muteSolo() {
         this.setVolume(0);
+    }
+
+    setBalance(value: number) {
+        this.pannerNode.pan.value = value;
     }
 }

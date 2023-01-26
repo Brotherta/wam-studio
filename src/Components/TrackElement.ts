@@ -167,7 +167,7 @@ template.innerHTML = /*html*/`
         <div class="letter-icon">
             L
         </div>
-        <input type="range" class="form-range tracko" id="balance-slider">
+        <input type="range" min="-1" max="1" step=".1" value="0" class="form-range tracko" id="balance-slider">
         <div class="letter-icon">
             R
         </div>

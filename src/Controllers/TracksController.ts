@@ -97,11 +97,17 @@ export default class TracksController {
         }
 
         track.element.volumeSlider.oninput = () => {
-            console.log("Volume change: TODO");
+            let value = parseInt(track.element.volumeSlider.value) / 100;
+            console.log(value);
+
+            track.setVolume(value);
         }
 
         track.element.balanceSlider.oninput = () => {
-            console.log("Balance change: TODO");
+            let value = parseFloat(track.element.balanceSlider.value);
+            console.log(value);
+
+            track.setBalance(value);
         }
 
         track.element.color.onclick = () => {
@@ -110,4 +116,15 @@ export default class TracksController {
         }
     }
 
+    connectPlugin(track: Track) {
+        track.node.disconnect(track.pannerNode);
+        track.node
+            .connect(track.plugin.instance._audioNode)
+            .connect(track.pannerNode);
+    }
+
+    disconnectPlugin(track: Track) {
+        track.node.disconnect(track.plugin.instance._audioNode);
+        track.node.connect(track.pannerNode);
+    }
 }

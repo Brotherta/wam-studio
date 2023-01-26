@@ -1,6 +1,7 @@
 import App from "../App";
 import Track from "../Models/Track";
 import Host from "../Models/Host";
+import AudioPlugin from "../Models/AudioPlugin";
 
 
 export default class PluginsController {
@@ -29,8 +30,13 @@ export default class PluginsController {
     }
 
     defineNewPluginBtnListener() {
-        this.app.pluginsView.newPlugin.addEventListener("click", () => {
-            console.log("new plugin !")
+        this.app.pluginsView.newPlugin.addEventListener("click", async () => {
+            if (this.selectedTrack != undefined) {
+                this.app.pluginsView.hideNew();
+                await this.createPlugin();
+                this.app.tracksController.connectPlugin(this.selectedTrack);
+                this.selectPlugins();
+            }
         });
     }
 
@@ -38,11 +44,31 @@ export default class PluginsController {
         if (this.selectedTrack == undefined) {
             this.selectedTrack = track;
             this.selectedTrack.element.select();
+            this.selectPlugins();
         }
         else if (this.selectedTrack.id !== track.id) {
             this.selectedTrack.element.unSelect();
             this.selectedTrack = track;
             this.selectedTrack.element.select();
+            this.selectPlugins();
         }
+    }
+
+    selectPlugins() {
+        if (this.selectedTrack == undefined) {
+            this.app.pluginsView.hideNew();
+        }
+        else if (this.selectedTrack.plugin == undefined) {
+            this.app.pluginsView.showNew();
+        }
+        else {
+            this.app.pluginsView.showPlugins(this.selectedTrack);
+        }
+    }
+
+    async createPlugin() {
+        let plugin = new AudioPlugin(this.app);
+        await plugin.initPlugin();
+        this.selectedTrack!.plugin = plugin;
     }
 }
