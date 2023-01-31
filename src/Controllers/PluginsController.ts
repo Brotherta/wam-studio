@@ -58,16 +58,19 @@ export default class PluginsController {
                 this.removePlugins(this.selectedTrack);
             }
         });
+
         this.app.pluginsView.showPlugin.addEventListener("click", () => {
             this.app.pluginsView.showHidePlugin();
             this.app.pluginsView.hideShowPlugin();
             this.app.pluginsView.showFloatingWindow();
         });
+
         this.app.pluginsView.hidePlugin.addEventListener("click", () => {
             this.app.pluginsView.showShowPlugin();
             this.app.pluginsView.hideHidePlugin();
             this.app.pluginsView.hideFloatingWindow();
         });
+
         this.app.pluginsView.closeWindowButton.addEventListener("click", () => {
             this.app.pluginsView.showShowPlugin();
             this.app.pluginsView.hideHidePlugin();
