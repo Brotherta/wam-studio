@@ -58,12 +58,20 @@ export default class Host extends Track {
         
         this.hostNode = new AudioPlayerNode(this.audioCtx, 2);
         this.hostNode.setAudio(operableAudioBuffer.toArray());
+        this.app.hostController.initVuMeter();
 
         this.hostNode.port.onmessage = ev => {
             if (ev.data.playhead) {
                 this.playhead = ev.data.playhead;
             }
+            else if (ev.data.volume) {
+                let vol = ev.data.volume;
+                let sensitivity = 2.3;
+                this.app.hostController.vuMeter.update(Math.abs(vol) * sensitivity);
+            }
+
         }
+        this.gainNode.connect(this.hostNode);
     }
 
     /**

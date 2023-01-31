@@ -248,16 +248,13 @@ div::-webkit-scrollbar-thumb:hover {
 }
 
 .slider-menu {
-    border-left: solid 1px rgb(111, 111, 111);
-    border-right: solid 1px rgb(111, 111, 111);
-    padding-left: 12px;
-    padding-right: 12px;
     display: flex;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center; 
-    min-width: 225px;
-    max-width: 225px;
+    min-width: 160px;
+    max-width: 160px;
+    margin-top: 20px;
 }
 
 .icon {
@@ -430,7 +427,11 @@ track-element {
     background: rgb(23, 23, 26);
     border: 1px solid black;
     margin-top: 1px;
-    margin-bottom: 1px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
 }
 
 #header-main-track {
@@ -441,4 +442,15 @@ track-element {
     flex-wrap: nowrap;
 }
 
+.vu-meter {
+    margin-top: 20px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
 
+#vu-meter{
+    border: 1px solid #313131;
+    border-radius: 3px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+}

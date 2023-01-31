@@ -14,6 +14,8 @@ export default class HostView {
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
 
+    vuMeterCanvas = document.getElementById("vu-meter") as HTMLCanvasElement;
+
 
     song1 = document.getElementById("song-1") as HTMLAnchorElement;
     song2 = document.getElementById("song-2") as HTMLAnchorElement;

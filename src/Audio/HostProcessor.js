@@ -4,7 +4,7 @@ const audioWorkletGlobalScope = globalThis;
 
 const { registerProcessor } = audioWorkletGlobalScope;
 const PLAYHEAD_COUNT_MAX = 4;
-
+const COUNT_BLOCK = 8;
 
 
 class AudioPlayerProcessor extends AudioWorkletProcessor {
@@ -31,6 +31,7 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
     audio = [];
     playhead = 0;
     playheadCount = 0;
+    blockCount = 0;
     
     constructor(options) {
         super(options);
@@ -69,7 +70,20 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             this.port.postMessage({playhead: this.playhead});
             this.playheadCount = 0;
         }
+        this.calculateMax(inputs[0][0])
         return true;
+    }
+
+    calculateMax(output) {
+        for (let i = 0; i < output.length; i++) {
+            this.max = Math.max(this.max, output[i]);
+        }
+        this.blockCount++;
+        if (this.blockCount >= COUNT_BLOCK) {
+            this.port.postMessage({volume: this.max});
+            this.max = 0;
+            this.blockCount = 0;
+        }
     }
 }
 
