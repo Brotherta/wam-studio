@@ -7,6 +7,7 @@ import { SongInfo } from "../Controllers/HostController";
 import { audioCtx } from "../index";
 import { RATIO_MILLS_BY_PX, SAMPLE_RATE } from "../Utils";
 import Track from "./Track";
+import AudioPlugin from "./AudioPlugin";
 
 /**
  * Model for the audios buffers stored in each tracks. 
@@ -73,7 +74,7 @@ export default class Tracks {
         trackElement.trackId = this.trackIdCount;
 
         let track = new Track(this.trackIdCount, trackElement, node);
-
+        track.plugin  = new AudioPlugin(this.app);
         track.gainNode.connect(this.app.host.gainNode);
 
         this.trackList.push(track);

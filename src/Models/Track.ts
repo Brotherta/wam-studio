@@ -22,12 +22,15 @@ export default class Track {
     audioBuffer: OperableAudioBuffer | undefined;
     plugin: AudioPlugin;
 
+    removed: boolean
+
 
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode) {
         this.id = id;
         this.element = element;
         this.color = "";
         this.node = node;
+        this.removed = false;
 
         this.gainNode = audioCtx.createGain();
         this.gainNode.gain.value = 0.5;

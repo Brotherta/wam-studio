@@ -57,6 +57,7 @@ export default class TracksController {
      * @param track Track to be removed from the track view.
      */
     removeTrack(track: Track) {
+        this.app.pluginsController.removePlugins(track);
         this.tracksView.removeTrack(track.element);
         this.app.tracks.removeTrack(track);
         this.app.editorController.removeWafeFormOfTrack(track);
@@ -64,10 +65,13 @@ export default class TracksController {
 
     defineTrackListener(track: Track) {
         track.element.addEventListener("click", () => {
-            this.app.pluginsController.selectTrack(track);
+            if (!track.removed) {
+                this.app.pluginsController.selectTrack(track);
+            }
         })
 
         track.element.closeBtn.onclick = () => {
+            track.removed = true;
             this.removeTrack(track);
         }
 
@@ -98,15 +102,11 @@ export default class TracksController {
 
         track.element.volumeSlider.oninput = () => {
             let value = parseInt(track.element.volumeSlider.value) / 100;
-            console.log(value);
-
             track.setVolume(value);
         }
 
         track.element.balanceSlider.oninput = () => {
             let value = parseFloat(track.element.balanceSlider.value);
-            console.log(value);
-
             track.setBalance(value);
         }
 
@@ -119,12 +119,15 @@ export default class TracksController {
     connectPlugin(track: Track) {
         track.node.disconnect(track.pannerNode);
         track.node
-            .connect(track.plugin.instance._audioNode)
+            .connect(track.plugin.instance!._audioNode)
             .connect(track.pannerNode);
     }
 
     disconnectPlugin(track: Track) {
-        track.node.disconnect(track.plugin.instance._audioNode);
-        track.node.connect(track.pannerNode);
+        if (track.plugin.initialized) {
+            console.log("coucou");
+            track.node.disconnect(track.plugin.instance!._audioNode);
+            track.node.connect(track.pannerNode);
+        }
     }
 }

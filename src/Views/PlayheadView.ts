@@ -39,7 +39,6 @@ export default class PlayheadView {
         this.pixiApp.stage.addChild(this.playheadLine);
     }
 
-
     movePlayheadLine(x: number) {
         this.playheadLine!!.position.x = x;
     }
@@ -54,6 +53,4 @@ export default class PlayheadView {
         let millis = (playhead / SAMPLE_RATE) * 1000;
         return millis / RATIO_MILLS_BY_PX;
     }
-
-
 }

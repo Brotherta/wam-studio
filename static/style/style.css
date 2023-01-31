@@ -129,6 +129,8 @@ div::-webkit-scrollbar-thumb:hover {
     height: 100%;
     overflow-y: scroll;
     margin-top: 24px;
+    display: flex;
+    flex-direction: row;
 }
 
 .editor {
@@ -389,3 +391,52 @@ track-element {
     position: absolute;
     right: 30px;
 }
+
+#resizableWindow {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    z-index: 20;
+    border: 1px solid #000;
+    background: #212529;
+}
+
+#header {
+    height: 30px;
+    background-color: #3b4046;
+    cursor: move;
+    color: lightgrey;
+    padding-bottom: 5px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+#title {
+    float: left;
+    margin: 2px 10px;
+}
+
+#closeButtonResizeWindow {
+    float: right;
+    margin: 2px 10px;
+}
+
+#mount {
+    padding: 10px;
+}
+
+#main-track {
+    min-width: 161px;
+    background: rgb(23, 23, 26);
+    border: 1px solid black;
+}
+
+#header-main-track {
+    min-width: 161px;
+    border-right: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+

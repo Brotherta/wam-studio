@@ -92,8 +92,6 @@ export default class HostController {
         this.hostView.volumeSlider.oninput = () => {
             
             let value = parseInt(this.hostView.volumeSlider.value) / 100;
-            console.log(value);
-            
             this.app.host.setVolume(value);
         }
     }
