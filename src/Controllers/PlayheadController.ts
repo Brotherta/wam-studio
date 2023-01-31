@@ -18,13 +18,17 @@ export default class PlayheadController {
         this.movingPlayhead = false;
     }
 
+    /**
+     * Define all the listeners for the playhead.
+     */
     defineControllers() {
-        
+        // Add a listener for the playhead range, so when the mouse is down, the playhead is not moving.
         this.app.editorView.playhead.playheadRange.onmousedown = () => {
             this.app.hostController.pauseUpdateInterval();
             this.movingPlayhead = true;
         }
 
+        // Add a listener for the playhead range, so when the mouse is up, it jumps to the position of the playhead.
         this.app.editorView.playhead.playheadRange.onmouseup = (e: MouseEvent) => {
             // @ts-ignore
             let left = e.target!.getBoundingClientRect().left;
@@ -37,6 +41,7 @@ export default class PlayheadController {
             this.movingPlayhead = false;
         }
 
+        // Add a listener for the playhead range, so when the mouse is moving, it moves the playhead.
         this.app.editorView.playhead.playheadRange.onmousemove = (e) => {
             if (this.movingPlayhead) {
                 // @ts-ignore

@@ -1,7 +1,9 @@
 import {WebAudioModule} from "@webaudiomodules/sdk";
 import App from "../App";
 
-
+/**
+ * Class that represents a plugin.
+ */
 export default class AudioPlugin {
 
     instance: WebAudioModule | undefined;
@@ -14,6 +16,9 @@ export default class AudioPlugin {
         this.initialized = false;
     }
 
+    /**
+     * Initialize the plugin by loading the WAM script and creating the instance.
+     */
     async initPlugin() {
         //@ts-ignore
         const {default: WAM} = await import(/* webpackIgnore: true */"https://wam-bank.vidalmazuy.fr/src/index.js");
@@ -23,6 +28,9 @@ export default class AudioPlugin {
         this.initialized = true;
     }
 
+    /**
+     * Unload the plugin by destroying the instance and the GUI.
+     */
     unloadPlugin() {
         if (this.initialized) {
             // @ts-ignore

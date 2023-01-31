@@ -11,6 +11,10 @@ class AudioPlayerNode extends AudioWorkletNode {
         });
     }
 
+    /**
+     * Send the audio to the audio worklet.
+     * @param audio
+     */
     setAudio(audio: Float32Array[]) {
         this.port.postMessage({audio});
     }

@@ -1,5 +1,8 @@
 import { SAMPLE_RATE } from "../Utils";
 
+/**
+ * Class responsible for the host view. It displays the host controls and the host track.
+ */
 export default class HostView {
 
     automationBtn = document.getElementById("automation-btn") as HTMLDivElement;
@@ -18,11 +21,21 @@ export default class HostView {
     song4 = document.getElementById("song-4") as HTMLAnchorElement;
     song5 = document.getElementById("song-5") as HTMLAnchorElement;
 
+    /**
+     * Update the timer of the host view.
+     *
+     * @param pos current pos of the playhead. It is used to calculate the time.
+     */
     updateTimer(pos: number) {
         let millseconds = (pos / SAMPLE_RATE) * 1000;
         this.timer.innerHTML = this.millisToMinutesAndSeconds(millseconds);
     }
 
+    /**
+     * Convert milliseconds to minutes and seconds.
+     *
+     * @param millis milliseconds to convert
+     */
     millisToMinutesAndSeconds(millis: number) {
         const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, millis)),
             parts = [
@@ -33,6 +46,10 @@ export default class HostView {
         return parts.map(s => String(s).padStart(2, '0')).join(':') + "." + String(d.getMilliseconds()).padStart(3, '0');
     }
 
+    /**
+     * Change the icon of the play button when the user press it.
+     * @param playing
+     */
     pressPlayButton(playing: boolean) {
         let imgPlay = document.getElementById("play-img") as HTMLImageElement;
         let imgPause = document.getElementById("pause-img") as HTMLImageElement;
@@ -49,6 +66,10 @@ export default class HostView {
         }
     }
 
+    /**
+     * Change the icon of the loop button when the user press it.
+     * @param looping
+     */
     pressLoopButton(looping: boolean) {
         let tooltip = this.loopBtn.firstElementChild as HTMLSpanElement;
 
@@ -62,6 +83,10 @@ export default class HostView {
         }
     }
 
+    /**
+     * Change the icon of the record button when the user press it.
+     * @param recording
+     */
     pressRecordingButton(recording: boolean) {
         let tooltip = this.recordBtn.firstElementChild as HTMLSpanElement;
 
@@ -75,6 +100,10 @@ export default class HostView {
         }
     }
 
+    /**
+     * Change the icon of the mute button when the user press it.
+     * @param muted
+     */
     pressMuteButton(muted: boolean) {
         let imgUnmute = document.getElementById("unmute-img") as HTMLImageElement;
         let imgMute = document.getElementById("mute-img") as HTMLImageElement;

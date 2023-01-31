@@ -15,11 +15,19 @@ export default class EditorController {
         this.app = app;
     }
 
+    /**
+     * Add the according waveform to the track in the canvas. It also resizes the canvas.
+     * @param track
+     */
     addWaveFormToTrack(track: Track) {
         this.editor.addWaveForm(track);
         this.editor.resizeCanvas();
     }
 
+    /**
+     * Remove the according waveform from the track in the canvas. It also resizes the canvas.
+     * @param track
+     */
     removeWafeFormOfTrack(track: Track) {
         this.editor.removeWaveForm(track);
         this.editor.resizeCanvas();

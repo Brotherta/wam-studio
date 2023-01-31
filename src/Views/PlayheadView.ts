@@ -1,6 +1,9 @@
 import {Application, Graphics} from "pixi.js";
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX, SAMPLE_RATE} from "../Utils";
 
+/**
+ * Class responsible for displaying the playhead. It is a line that moves on the canvas.
+ */
 export default class PlayheadView {
 
     pixiApp: Application
@@ -19,6 +22,9 @@ export default class PlayheadView {
         this.initPlayhead();
     }
 
+    /**
+     * Initialize the playhead. Set the width of the playhead and the playhead range.
+     */
     initPlayhead() {
         console.log(this.width);
 
@@ -30,6 +36,9 @@ export default class PlayheadView {
         this.playheadRange.style.width = `${this.width}`;
     }
 
+    /**
+     * Draw the playhead line. Called once when the playhead is initialized.
+     */
     drawPlayhead() {
         this.playheadLine = new Graphics()
             .lineStyle(1, 0xFFFFFF, 1)
@@ -39,16 +48,30 @@ export default class PlayheadView {
         this.pixiApp.stage.addChild(this.playheadLine);
     }
 
+    /**
+     * Move the playhead line to the given x position.
+     * @param x
+     */
     movePlayheadLine(x: number) {
         this.playheadLine!!.position.x = x;
     }
 
+    /**
+     * Move the playhead line to the given playhead position.
+     * @param playhead
+     */
     movePlayhead(playhead: number) {
         let x = this.getXfromPlayhead(playhead);
         this.playheadRange.value = `${x}`;
         this.movePlayheadLine(x);
     }
 
+    /**
+     * Get the x position from the given playhead position.
+     * Calculated with the ratio between the milliseconds and the pixels and the sample rate.
+     *
+     * @param playhead
+     */
     getXfromPlayhead(playhead: number) {
         let millis = (playhead / SAMPLE_RATE) * 1000;
         return millis / RATIO_MILLS_BY_PX;

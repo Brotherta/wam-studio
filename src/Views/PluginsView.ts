@@ -33,6 +33,9 @@ export default class PluginsView {
         this.maximize();
     }
 
+    /**
+     * Minimize the rack to the minimum height and change the icon to maximize.
+     */
     resize() {
         // this.resizeBtn.addEventListener("mousedown", (e) => {
         //     this.minHeight = 25;
@@ -79,6 +82,9 @@ export default class PluginsView {
         })
     }
 
+    /**
+     * Add the event listener to the button that maximizes and minimizes the rack.
+     */
     controlRackWindow() {
         this.maximized = true;
         this.maxMinBtn.addEventListener("click", () => {
@@ -93,83 +99,120 @@ export default class PluginsView {
         });
     }
 
+    /**
+     * Maximize the rack to the maximum height and change the icon to minimize.
+     */
     maximize() {
         let icon = document.getElementById("min-max-btn-icon") as HTMLImageElement;
         icon.src = "icons/chevron-compact-down.svg";
         this.rack.style.minHeight = this.currentSize + "px";
     }
 
+    /**
+     * Minimize the rack to the minimum height and change the icon to maximize.
+     */
     minimize() {
         let icon = document.getElementById("min-max-btn-icon") as HTMLImageElement;
         icon.src = "icons/chevron-compact-up.svg";
         this.rack.style.minHeight = this.minHeight+"px";
     }
 
+    /**
+     * Remove the plugin's view from the DOM and mount the current track's plugin's view.
+     * @param track
+     */
     showPlugins(track: Track) {
         this.deletePluginView()
         this.mount.appendChild(track.plugin.dom);
     }
 
+    /**
+     * Remove the plugin's view from the DOM.
+     */
     deletePluginView() {
         this.mount.innerHTML = '';
     }
 
+    /**
+     * Hide the new plugins button.
+     */
     hideNew() {
         this.newPlugin.hidden = true;
     }
 
+    /**
+     * Show the new plugins button.
+     */
     showNew() {
         this.newPlugin.hidden = false;
     }
 
     /**
-     * Show and Hide the floating plugin's view
+     * Show the floating window with the plugin's view.
      */
     showFloatingWindow() {
         this.floating.hidden = false;
     }
 
+    /**
+     * Hide the floating window with the plugin's view.
+     */
     hideFloatingWindow() {
         this.floating.hidden = true;
     }
 
     /**
-     * Show and Hide the button that shows the plugin's view
+     * Show the show plugin button.
      */
     showShowPlugin() {
         this.showPlugin.hidden = false;
     }
 
+    /**
+     * Hide the show plugin button.
+     */
     hideShowPlugin() {
         this.showPlugin.hidden = true;
     }
 
     /**
-     * Show and Hide the button that hides the plugin's view
+     * Show the hide plugin button.
      */
     showHidePlugin() {
         this.hidePlugin.hidden = false;
     }
 
+    /**
+     * Hide the hide plugin button.
+     */
     hideHidePlugin() {
         this.hidePlugin.hidden = true;
     }
 
     /**
-     * Show and Hide buttons to remove the current plugin.
+     * Show the remove plugin button.
      */
     showRemovePlugin() {
         this.removePlugin.hidden = false;
     }
 
+    /**
+     * Hide the remove plugin button.
+     */
     hideRemovePlugin() {
         this.removePlugin.hidden = true;
     }
 
+    /**
+     * Select the main track and set the border to lightgrey.
+     */
     selectHost() {
         this.mainTrack.style.border = "1px solid lightgrey";
     }
 
+    /**
+     * Unselect the main track and set the border to black.
+     */
     unselectHost() {
         this.mainTrack.style.border = "1px solid black";
     }

@@ -2,7 +2,10 @@ import { Application, Container, Graphics } from "pixi.js";
 import Track from "../Models/Track";
 import { HEIGHT_TRACK, OFFSET_FIRST_TRACK, RATIO_MILLS_BY_PX } from "../Utils";
 
-
+/**
+ * Class that is responsible for the view of the waveforms.
+ * It is responsible for drawing the waveforms and updating the position of the waveforms.
+ */
 export default class WaveFormView extends Container {
     pixiApp: Application;
     
@@ -23,7 +26,12 @@ export default class WaveFormView extends Container {
         this.trackId = -1
     }
 
-
+    /**
+     * Set the track id of the waveform according to the track id of the track.
+     * Initialize the waveform.
+     * According to the track id, the waveform is drawn at the correct position.
+     * @param track
+     */
     setTrack(track: Track) {
         let top = Math.round(track.element.getBoundingClientRect().top - OFFSET_FIRST_TRACK);
         let pos = top/HEIGHT_TRACK;
@@ -36,6 +44,9 @@ export default class WaveFormView extends Container {
         this.drawWave(track);
     }
 
+    /**
+     * Draw the background of the waveform.
+     */
     setBackground() {
         let background = new Graphics();
         background.beginFill(0x2c2c2c);
@@ -45,6 +56,10 @@ export default class WaveFormView extends Container {
         console.log(this.children);
     }
 
+    /**
+     * Draw the waveform of the track.
+     * @param track
+     */
     drawWave(track: Track) {
         let duration = track.audioBuffer!.duration * 1000; 
         let width = duration / RATIO_MILLS_BY_PX;

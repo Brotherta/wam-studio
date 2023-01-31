@@ -5,6 +5,9 @@ import PlayheadView from "./PlayheadView";
 import Track from "../Models/Track";
 
 
+/**
+ * The editor view is responsible for displaying the waveforms and the playhead.
+ */
 export default class EditorView {
 
     pixiApp: Application
@@ -26,6 +29,10 @@ export default class EditorView {
         this.pixiApp.stage.sortableChildren = true;
     }
 
+    /**
+     * Add a waveform into the canvas fot the given track and update the position of the other waveforms.
+     * @param track
+     */
     addWaveForm(track: Track) {
         let wave = new WaveFormView(this.pixiApp);
 
@@ -33,6 +40,10 @@ export default class EditorView {
         this.waveforms.push(wave);
     }
 
+    /**
+     * Remove the waveform from the canvas for the given track and update the position of the other waveforms.
+     * @param track
+     */
     removeWaveForm(track: Track) {
         let wave = this.waveforms.find(wave => wave.trackId === track.id);
         let index = this.waveforms.indexOf(wave!);
@@ -44,10 +55,17 @@ export default class EditorView {
         }
     }
 
+    /**
+     * Resize the canvas when the window is resized.
+     */
     resizeCanvas() {
         this.pixiApp.renderer.resize(this.pixiApp.renderer.width, this.trackContainer.scrollHeight - 35)
     }
 
+    /**
+     * Change the color of the waveform for the given track.
+     * @param track
+     */
     changeWaveFormColor(track: Track) {
         let wave = this.waveforms.find(wave => wave.trackId === track.id);
 

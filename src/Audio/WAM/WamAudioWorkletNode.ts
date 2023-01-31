@@ -25,10 +25,17 @@ export default class WamAudioWorkletNode extends WamNode {
             });
     }
 
+    /**
+     * Send the audio to the audio worklet.
+     * @param audio
+     */
     setAudio(audio: Float32Array[]) {
         this.port.postMessage({audio});
     }
 
+    /**
+     * Remove the audio from the audio worklet.
+     */
     removeAudio() {
         this.port.postMessage({"removeAudio": true})
     }

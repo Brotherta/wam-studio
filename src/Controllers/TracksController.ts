@@ -65,6 +65,10 @@ export default class TracksController {
         this.app.editorController.removeWafeFormOfTrack(track);
     }
 
+    /**
+     * Defines the listeners for the track. It defines the listeners for the close, solo, mute, volume and balance sliders.
+     * @param track
+     */
     defineTrackListener(track: Track) {
         track.element.addEventListener("click", () => {
             if (!track.removed) {
@@ -118,6 +122,10 @@ export default class TracksController {
         }
     }
 
+    /**
+     * Connects the plugin to the track. If the track is the host, it connects the plugin to the host gain node.
+     * @param track
+     */
     connectPlugin(track: Track) {
         if (track.id === -1) {
             let host = track as Host;
@@ -134,6 +142,10 @@ export default class TracksController {
         }
     }
 
+    /**
+     * Disconnects the plugin from the track. If the track is the host, it disconnects the plugin from the host gain node.
+     * @param track
+     */
     disconnectPlugin(track: Track) {
         if (track.plugin.initialized && track.id === -1) {
             let host = track as Host;

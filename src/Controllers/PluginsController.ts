@@ -2,7 +2,10 @@ import App from "../App";
 import Track from "../Models/Track";
 import Host from "../Models/Host";
 
-
+/**
+ * Controller for the plugins view. This controller is responsible for selecting and removing plugins.
+ * It also defines the listeners for the plugins view.
+ */
 export default class PluginsController {
     app: App;
 
@@ -23,14 +26,23 @@ export default class PluginsController {
         this.defineNewPluginBtnListener();
     }
 
+    /**
+     * define the listeners when the window is resized.
+     */
     defineResizeListener() {
         this.app.pluginsView.resize();
     }
 
+    /**
+     * Define the listeners for the minimize and maximize buttons.
+     */
     defineMinimizeMaximizeListener() {
         this.app.pluginsView.controlRackWindow();
     }
 
+    /**
+     * Define the listeners for all the buttons in the plugins view.
+     */
     defineNewPluginBtnListener() {
         this.app.pluginsView.newPlugin.addEventListener("click", async () => {
             if (this.selectedTrack != undefined) {
@@ -63,6 +75,10 @@ export default class PluginsController {
         })
     }
 
+    /**
+     * Select the clicked track and show the plugins of the track.
+     * @param track
+     */
     selectTrack(track: Track) {
         if (this.selectedTrack === undefined) {
             this.selectedTrack = track;
@@ -78,6 +94,9 @@ export default class PluginsController {
         }
     }
 
+    /**
+     * Select the main track and show the plugins of the main track.
+     */
     selectHost() {
         let host = this.app.host;
         if (this.selectedTrack === undefined) {
@@ -93,6 +112,9 @@ export default class PluginsController {
         }
     }
 
+    /**
+     * Select the plugins of the selected track.
+     */
     selectPlugins() {
         if (this.selectedTrack === undefined) {
             this.hideAllControllers();
@@ -116,6 +138,9 @@ export default class PluginsController {
         }
     }
 
+    /**
+     * Hide all the controllers in the plugins view.
+     */
     hideAllControllers() {
         this.app.pluginsView.hideNew();
         this.app.pluginsView.hideFloatingWindow();
@@ -124,6 +149,10 @@ export default class PluginsController {
         this.app.pluginsView.hideHidePlugin();
     }
 
+    /**
+     * Remove the plugins of the given track.
+     * @param track
+     */
     removePlugins(track: Track) {
         if (this.selectedTrack === track) {
             this.selectedTrack = undefined;
