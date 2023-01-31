@@ -1,7 +1,6 @@
 import App from "../App";
 import Track from "../Models/Track";
 import Host from "../Models/Host";
-// import AudioPlugin from "../Models/AudioPlugin";
 
 
 export default class PluginsController {
@@ -72,8 +71,24 @@ export default class PluginsController {
         }
         else if (this.selectedTrack.id !== track.id) {
             this.selectedTrack.element.unSelect();
+            this.app.pluginsView.unselectHost();
             this.selectedTrack = track;
             this.selectedTrack.element.select();
+            this.selectPlugins();
+        }
+    }
+
+    selectHost() {
+        let host = this.app.host;
+        if (this.selectedTrack === undefined) {
+            this.selectedTrack = host;
+            this.app.pluginsView.selectHost();
+            this.selectPlugins();
+        }
+        else if (this.selectedTrack.id !== host.id) {
+            this.selectedTrack.element.unSelect();
+            this.selectedTrack = host;
+            this.app.pluginsView.selectHost();
             this.selectPlugins();
         }
     }
@@ -87,9 +102,16 @@ export default class PluginsController {
             this.app.pluginsView.showNew();
         }
         else {
-            this.hideAllControllers();
             this.app.pluginsView.showPlugins(this.selectedTrack);
-            this.app.pluginsView.showShowPlugin();
+            if (this.app.pluginsView.floating.hidden) {
+                this.hideAllControllers();
+                this.app.pluginsView.showShowPlugin();
+            }
+            else {
+                this.hideAllControllers();
+                this.app.pluginsView.showFloatingWindow();
+                this.app.pluginsView.showHidePlugin();
+            }
             this.app.pluginsView.showRemovePlugin();
         }
     }

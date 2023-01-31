@@ -13,6 +13,7 @@ export default class PluginsView {
     hidePlugin = document.getElementById("hide-pedalboard") as HTMLDivElement;
     removePlugin = document.getElementById("remove-plugins") as HTMLDivElement;
     closeWindowButton = document.getElementById("closeButtonResizeWindow") as HTMLDivElement;
+    mainTrack = document.getElementById("main-track") as HTMLDivElement;
 
     maxHeight: number;
     minHeight: number;
@@ -21,7 +22,7 @@ export default class PluginsView {
     originalMouseY: number;
     event: MouseEvent;
 
-    private dragging: boolean;
+    // private dragging: boolean;
     private maximized: boolean;
     private currentSize: number;
 
@@ -33,41 +34,41 @@ export default class PluginsView {
     }
 
     resize() {
-        this.resizeBtn.addEventListener("mousedown", (e) => {
-            this.minHeight = 25;
-            this.maxHeight = document.body.getBoundingClientRect().height * 3/4;
-            this.dragging = true;
-            let rackDiv = this.rack;
-            this.originalHeight = parseFloat(getComputedStyle(rackDiv, null).getPropertyValue('height').replace("px",''));
-            this.originalY = rackDiv.getBoundingClientRect().top;
-            this.originalMouseY = e.pageY;
-            this.event = e;
-        });
-
-        document.body.addEventListener("mouseup", () => {
-            if (this.dragging) {
-                this.dragging = false;
-                this.currentSize = parseFloat(getComputedStyle(this.rack, null).getPropertyValue('height').replace("px",''));
-            }
-        });
-
-        document.body.addEventListener("mousemove", (e) => {
-            if (this.dragging) {
-                let height = this.originalHeight - (e.pageY - this.originalMouseY);
-                if (height < this.maxHeight) {
-                    this.rack.style.minHeight = height+"px";
-                }
-
-                if (height < this.minHeight) {
-                    this.minimize();
-                }
-                else {
-                    this.maximized = true;
-                    let icon = document.getElementById("min-max-btn-icon") as HTMLImageElement;
-                    icon.src = "icons/chevron-compact-down.svg";
-                }
-            }
-        });
+        // this.resizeBtn.addEventListener("mousedown", (e) => {
+        //     this.minHeight = 25;
+        //     this.maxHeight = document.body.getBoundingClientRect().height * 3/4;
+        //     this.dragging = true;
+        //     let rackDiv = this.rack;
+        //     this.originalHeight = parseFloat(getComputedStyle(rackDiv, null).getPropertyValue('height').replace("px",''));
+        //     this.originalY = rackDiv.getBoundingClientRect().top;
+        //     this.originalMouseY = e.pageY;
+        //     this.event = e;
+        // });
+        //
+        // document.body.addEventListener("mouseup", () => {
+        //     if (this.dragging) {
+        //         this.dragging = false;
+        //         this.currentSize = parseFloat(getComputedStyle(this.rack, null).getPropertyValue('height').replace("px",''));
+        //     }
+        // });
+        //
+        // document.body.addEventListener("mousemove", (e) => {
+        //     if (this.dragging) {
+        //         let height = this.originalHeight - (e.pageY - this.originalMouseY);
+        //         if (height < this.maxHeight) {
+        //             this.rack.style.minHeight = height+"px";
+        //         }
+        //
+        //         if (height < this.minHeight) {
+        //             this.minimize();
+        //         }
+        //         else {
+        //             this.maximized = true;
+        //             let icon = document.getElementById("min-max-btn-icon") as HTMLImageElement;
+        //             icon.src = "icons/chevron-compact-down.svg";
+        //         }
+        //     }
+        // });
 
         window.addEventListener("resize", () => {
             this.maxHeight = document.body.getBoundingClientRect().height * 3/4;
@@ -79,7 +80,7 @@ export default class PluginsView {
     }
 
     controlRackWindow() {
-        this.maximized = false;
+        this.maximized = true;
         this.maxMinBtn.addEventListener("click", () => {
             if (this.maximized) {
                 this.minimize();
@@ -163,5 +164,13 @@ export default class PluginsView {
 
     hideRemovePlugin() {
         this.removePlugin.hidden = true;
+    }
+
+    selectHost() {
+        this.mainTrack.style.border = "1px solid lightgrey";
+    }
+
+    unselectHost() {
+        this.mainTrack.style.border = "1px solid black";
     }
 }

@@ -1,6 +1,5 @@
 import { audioCtx } from "..";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import TrackElement from "../Components/TrackElement";
 import AudioPlugin from "./AudioPlugin";
 
@@ -10,7 +9,7 @@ export default class Track {
     element: TrackElement
     color: string;
 
-    node: WamAudioWorkletNode;
+    node: any;
     gainNode: GainNode;
     pannerNode: StereoPannerNode;
 
@@ -24,8 +23,7 @@ export default class Track {
 
     removed: boolean
 
-
-    constructor(id: number, element: TrackElement, node: WamAudioWorkletNode) {
+    constructor(id: number, element: TrackElement, node: any) {
         this.id = id;
         this.element = element;
         this.color = "";
@@ -35,7 +33,9 @@ export default class Track {
         this.gainNode = audioCtx.createGain();
         this.gainNode.gain.value = 0.5;
         this.pannerNode = audioCtx.createStereoPanner();
-        this.node.connect(this.pannerNode).connect(this.gainNode);
+        if (this.node !== undefined) {
+            this.node.connect(this.pannerNode).connect(this.gainNode);
+        }
     }
 
     addBuffer(operableAudioBuffer: OperableAudioBuffer) {

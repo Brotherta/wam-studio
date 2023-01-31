@@ -1,6 +1,8 @@
 import Track from "../Models/Track";
 import TracksView from "../Views/TracksView";
 import App from "../App";
+import Host from "../Models/Host";
+import {audioCtx} from "../index";
 
 /**
  * Controller for the track view. This controller is responsible for adding and removing tracks from the track view.
@@ -117,15 +119,28 @@ export default class TracksController {
     }
 
     connectPlugin(track: Track) {
-        track.node.disconnect(track.pannerNode);
-        track.node
-            .connect(track.plugin.instance!._audioNode)
-            .connect(track.pannerNode);
+        if (track.id === -1) {
+            let host = track as Host;
+            host.gainNode.disconnect(audioCtx.destination);
+            host.gainNode
+                .connect(host.plugin.instance!._audioNode)
+                .connect(host.audioCtx.destination);
+        }
+        else {
+            track.node.disconnect(track.pannerNode);
+            track.node
+                .connect(track.plugin.instance!._audioNode)
+                .connect(track.pannerNode);
+        }
     }
 
     disconnectPlugin(track: Track) {
-        if (track.plugin.initialized) {
-            console.log("coucou");
+        if (track.plugin.initialized && track.id === -1) {
+            let host = track as Host;
+            host.gainNode.disconnect(host.plugin.instance!._audioNode);
+            host.gainNode.connect(host.audioCtx.destination);
+        }
+        else if (track.plugin.initialized) {
             track.node.disconnect(track.plugin.instance!._audioNode);
             track.node.connect(track.pannerNode);
         }

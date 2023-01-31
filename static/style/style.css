@@ -429,6 +429,8 @@ track-element {
     min-width: 161px;
     background: rgb(23, 23, 26);
     border: 1px solid black;
+    margin-top: 1px;
+    margin-bottom: 1px;
 }
 
 #header-main-track {

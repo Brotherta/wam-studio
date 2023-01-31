@@ -48,6 +48,9 @@ export default class HostController {
         this.defineMuteListener();
         this.defineSongsDemoListener();
         this.defineTimerListener();
+        this.app.pluginsView.mainTrack.addEventListener("click", () => {
+            this.app.pluginsController.selectHost();
+        });
     } 
 
     /**

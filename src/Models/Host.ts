@@ -3,12 +3,15 @@ import App from "../App";
 import AudioPlayerNode from "../Audio/AudioNode";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import { MAX_DURATION_SEC, SAMPLE_RATE } from "../Utils";
+import Track from "./Track";
+import TrackElement from "../Components/TrackElement";
+import AudioPlugin from "./AudioPlugin";
 
 /**
  * Host class that contains the master track.
  * It is used to control the global volume and the playhead.
  */
-export default class Host {
+export default class Host extends Track {
 
     app: App;
     audioCtx: AudioContext;
@@ -20,16 +23,18 @@ export default class Host {
     playhead: number;
 
     hostNode: AudioPlayerNode | undefined;
-    gainNode: GainNode;
+    override gainNode: GainNode;
     
     constructor(app: App) {
-
+        super(-1, new TrackElement(), undefined);
         this.app = app;
         this.audioCtx = audioCtx;
         this.globalVolume = 0.5;
         this.oldGlobalVolume = 0.0;
         this.timer = 0;
         this.playhead = 0;
+
+        this.plugin = new AudioPlugin(app);
         
         this.gainNode = this.audioCtx.createGain()
         this.setVolume(0.5);    
@@ -66,7 +71,7 @@ export default class Host {
      * 
      * @param value the new global volume
      */
-    setVolume(value: number) {
+    override setVolume(value: number) {
         this.globalVolume = value;
         this.gainNode.gain.value = this.globalVolume;
     }
