@@ -20,9 +20,26 @@ export default class TracksController {
     }
 
     defineNewtrackCallback() {
-        this.tracksView.newTrackDiv.onclick = () => {
-            // this.addNewTrack();
-        }
+        this.tracksView.newTrackDiv.addEventListener('click', () => {
+           this.tracksView.newTrackInput.click();
+        });
+        this.tracksView.newTrackInput.addEventListener('change', (e) => {
+            // @ts-ignore
+            for (let i = 0; i < e.target.files.length; i++) {
+                // @ts-ignore
+                let file = e.target.files[i];
+                if (file !== undefined) {
+                    this.app.tracks.newTrackWithFile(file)
+                        .then(track => {
+                            if (track !== undefined) {
+                                this.addNewTrackInit(track);
+                                this.app.editorController.addWaveFormToTrack(track);
+                            }
+                        });
+                }
+
+            }
+        });
     }
 
     /**
