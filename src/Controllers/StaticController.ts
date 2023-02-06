@@ -10,7 +10,7 @@ function makeDivScrollSync2() {
     
     let active: EventTarget | undefined = undefined;
 
-    let offset = playhead.offsetLeft
+    let offset = 0;
     playhead.style.zIndex = "1";
     trackDiv.style.zIndex = "2";
 

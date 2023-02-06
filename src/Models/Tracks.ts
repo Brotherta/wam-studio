@@ -5,7 +5,7 @@ import WamEventDestination from "../Audio/WAM/WamEventDestination";
 import TrackElement from "../Components/TrackElement";
 import { SongInfo } from "../Controllers/HostController";
 import { audioCtx } from "../index";
-import { RATIO_MILLS_BY_PX, SAMPLE_RATE } from "../Utils";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX, SAMPLE_RATE} from "../Utils";
 import Track from "./Track";
 import AudioPlugin from "./AudioPlugin";
 
@@ -61,6 +61,40 @@ export default class Tracks {
             newTracks.push(track);
         }
         return newTracks;
+    }
+
+    /**
+     * Create the track with the given file. It verifies the type of the file and then create the track.
+     *
+     * It returns undefined if the file is not an audio file and if the duration of the file is too long.
+     *
+     * @param file
+     */
+    async newTrackWithFile(file: File) {
+        if (file.type === "audio/mpeg" || file.type === "audio/wav" || file.type === "audio/mp3") {
+            let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
+            let node = wamInstance.audioNode as WamAudioWorkletNode;
+
+            let audioArrayBuffer = await file.arrayBuffer();
+            let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
+            if (audioBuffer.duration > MAX_DURATION_SEC) {
+                console.warn("Audio file too long, max duration is " + MAX_DURATION_SEC + " seconds");
+                return undefined;
+            }
+            let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+
+            node.setAudio(operableAudioBuffer.toArray());
+
+            // @ts-ignore
+            let track = this.createTrack(node);
+            track.addBuffer(operableAudioBuffer);
+            track.element.name = file.name;
+            return track;
+        }
+        else {
+            console.warn("File type not supported");
+            return undefined;
+        }
     }
 
     /**

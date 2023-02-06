@@ -13,6 +13,7 @@ export default class EditorController {
     constructor(app: App) {
         this.editor = app.editorView;
         this.app = app;
+        this.defineDragAndDrop();
     }
 
     /**
@@ -31,5 +32,37 @@ export default class EditorController {
     removeWafeFormOfTrack(track: Track) {
         this.editor.removeWaveForm(track);
         this.editor.resizeCanvas();
+    }
+
+    /**
+     * Defines the drag and drop functionality for the editor.
+     * It adds the dropped files to the track view.
+     */
+    defineDragAndDrop() {
+        ["dragenter", "dragover"].forEach(eventName => {
+           window.addEventListener(eventName, () => {
+               this.app.editorView.dragCover.hidden = false;
+           });
+        });
+
+        ["drop", "dragleave"].forEach(eventName => {
+            this.app.editorView.dragCover.addEventListener(eventName, () => {
+                this.app.editorView.dragCover.hidden = true;
+            });
+        });
+
+        window.addEventListener("drop", (e) => {
+            let files = e.dataTransfer!.files;
+            console.table(files);
+            ([...files]).forEach(file => {
+                this.app.tracks.newTrackWithFile(file)
+                    .then(track => {
+                        if (track !== undefined) {
+                            this.app.tracksController.addNewTrackInit(track);
+                            this.app.editorController.addWaveFormToTrack(track);
+                        }
+                    });
+            });
+        });
     }
 }

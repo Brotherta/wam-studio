@@ -43,10 +43,11 @@ export default class TracksController {
      * @param tracks List of tracks to be added to the track view.
      */
     addNewTrackList(tracks: Track[]) {
+        console.log("tracks ?" + tracks)
         for (const track in tracks) {
+            console.log("track ?" + track);
             if (Object.prototype.hasOwnProperty.call(tracks, track)) {
                 const element = tracks[track];
-                
                 this.app.tracksController.addNewTrackInit(element);
                 this.app.editorController.addWaveFormToTrack(element);
             }

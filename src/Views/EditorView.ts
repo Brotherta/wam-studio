@@ -13,6 +13,7 @@ export default class EditorView {
     pixiApp: Application
     editor = document.getElementById("editor") as HTMLDivElement;
     trackContainer = document.getElementById("track-container") as HTMLDivElement;
+    dragCover = document.getElementById("drag-cover") as HTMLDivElement;
 
     waveforms: WaveFormView[];
     playhead: PlayheadView;
@@ -27,6 +28,16 @@ export default class EditorView {
         this.playhead = new PlayheadView(this.pixiApp);
 
         this.pixiApp.stage.sortableChildren = true;
+        this.defineDragNDrop();
+    }
+
+    defineDragNDrop() {
+        ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+            window.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
     }
 
     /**

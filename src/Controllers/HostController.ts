@@ -330,7 +330,6 @@ class VuMeter {
     }
 
     update(value: number) {
-        console.log(value)
         value = Math.min(value, 1);
         this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
         this.ctx.fillRect(0, 0, value*this.canvas.width, this.canvas.height);

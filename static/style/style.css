@@ -144,6 +144,7 @@ div::-webkit-scrollbar-thumb:hover {
     width: 100%;
     display: flex;
     overflow: hidden;
+    position: relative;
 }
 
 .playhead {
@@ -453,4 +454,26 @@ track-element {
     border: 1px solid #313131;
     border-radius: 3px;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+}
+
+#drag-cover {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    z-index: 999;
+    background-color: rgba(255,255,255,0.3);
+}
+
+#drag-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 143px;
+    min-height: 80px;
+    margin: 8px;
 }
