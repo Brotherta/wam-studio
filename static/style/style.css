@@ -79,7 +79,7 @@ div::-webkit-scrollbar-thumb:hover {
 }
 
 .track-container {
-    min-width: 161px;
+    min-width: 200px;
     display: flex;
     flex-direction: column;
     border-right: 1px solid black;
@@ -95,7 +95,7 @@ div::-webkit-scrollbar-thumb:hover {
 .track-container-header {
     position: absolute;
     min-height: 25px;
-    min-width: 159px;
+    min-width: 198px;
     border-bottom: 1px solid rgb(0, 0, 0);
     background-color: var(--head-color);
     display: flex;
@@ -103,6 +103,7 @@ div::-webkit-scrollbar-thumb:hover {
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
+    z-index: 1;
 }
 
 .rack-container-header {
@@ -253,7 +254,7 @@ div::-webkit-scrollbar-thumb:hover {
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center; 
-    min-width: 160px;
+    min-width: 170px;
     max-width: 160px;
     margin-top: 20px;
 }
@@ -294,7 +295,7 @@ div::-webkit-scrollbar-thumb:hover {
 track-element {
     display: flex;
     width: 100%;
-    min-height: 90px;
+    min-height: 130px;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
@@ -323,8 +324,8 @@ track-element {
     align-items: center;
     flex-direction: column;
     flex-wrap: nowrap;
-    width: 143px;
-    min-height: 80px;
+    width: 181px;
+    min-height: 90px;
     margin: 8px;
     background: transparent;
 }
@@ -424,7 +425,7 @@ track-element {
 }
 
 #main-track {
-    min-width: 161px;
+    min-width: 200px;
     background: rgb(23, 23, 26);
     border: 1px solid black;
     margin-top: 1px;
@@ -436,7 +437,7 @@ track-element {
 }
 
 #header-main-track {
-    min-width: 161px;
+    min-width: 200px;
     border-right: 1px solid black;
     display: flex;
     flex-direction: row;
@@ -476,4 +477,38 @@ track-element {
     width: 143px;
     min-height: 80px;
     margin: 8px;
+}
+
+.form-range {
+    transform: scale(1.5);
+    width: 90px !important;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+#special-controls-container {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+    display: flex;
+    background-color: #121213;
+    overflow-y: scroll;
+    padding-top: 25px;
+    padding-bottom: 106px;
+    top: 0px;
+}
+
+control-element {
+    width: 100%;
+    min-height: 130px;
+    background-color: rgb(44, 44, 44);
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
+    align-items: center;
 }

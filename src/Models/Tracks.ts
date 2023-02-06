@@ -2,7 +2,7 @@ import App from "../App";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import WamEventDestination from "../Audio/WAM/WamEventDestination";
-import TrackElement from "../Components/TrackElement";
+import TrackElement from "../Views/Components/TrackElement";
 import { SongInfo } from "../Controllers/HostController";
 import { audioCtx } from "../index";
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX, SAMPLE_RATE} from "../Utils";

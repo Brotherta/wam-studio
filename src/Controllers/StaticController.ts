@@ -1,7 +1,7 @@
 const trackDiv = document.getElementById("track-container") as HTMLDivElement;
 const editorDiv = document.getElementById("editor") as HTMLDivElement;
 const playhead = document.getElementById("playhead") as HTMLDivElement;
-
+const specialControl = document.getElementById("special-controls-container") as HTMLDivElement;
 
 /**
  * This function makes the track div and the editor div scroll synchronously.
@@ -40,17 +40,17 @@ function makeDivScrollSync() {
     trackDiv.addEventListener("mouseenter", function(e: Event) {
         active = e.target as EventTarget;
     })
-    editorDiv.addEventListener("mouseenter", function(e: Event) {
+    specialControl.addEventListener("mouseenter", function(e: Event) {
         active = e.target as EventTarget;
     })
 
     trackDiv.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;
-        editorDiv.scrollTop = trackDiv.scrollTop;
+        specialControl.scrollTop = trackDiv.scrollTop;
     })   
-    editorDiv.addEventListener("scroll", function(e: Event) {
+    specialControl.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;
-        trackDiv.scrollTop = editorDiv.scrollTop;
+        trackDiv.scrollTop = specialControl.scrollTop;
     })
     makeDivScrollSync2();
 }

@@ -34,6 +34,7 @@ export default class TracksController {
                             if (track !== undefined) {
                                 this.addNewTrackInit(track);
                                 this.app.editorController.addWaveFormToTrack(track);
+                                this.app.specialsController.addSpecialControlToTrack(track);
                             }
                         });
                 }
@@ -60,13 +61,12 @@ export default class TracksController {
      * @param tracks List of tracks to be added to the track view.
      */
     addNewTrackList(tracks: Track[]) {
-        console.log("tracks ?" + tracks)
         for (const track in tracks) {
-            console.log("track ?" + track);
             if (Object.prototype.hasOwnProperty.call(tracks, track)) {
                 const element = tracks[track];
                 this.app.tracksController.addNewTrackInit(element);
                 this.app.editorController.addWaveFormToTrack(element);
+                this.app.specialsController.addSpecialControlToTrack(element);
             }
         }
     }
@@ -81,6 +81,7 @@ export default class TracksController {
         this.tracksView.removeTrack(track.element);
         this.app.tracks.removeTrack(track);
         this.app.editorController.removeWafeFormOfTrack(track);
+        this.app.specialsController.removeSpecialControlFromTrack(track);
     }
 
     /**

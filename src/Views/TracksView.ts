@@ -1,4 +1,4 @@
-import TrackElement from "../Components/TrackElement";
+import TrackElement from "./Components/TrackElement";
 import Track from "../Models/Track";
 
 function getRandomColor() {

@@ -11,6 +11,7 @@ import PlayheadController from "./Controllers/PlayheadController";
 import PluginsController from "./Controllers/PluginsController";
 import PluginsView from "./Views/PluginsView";
 import EditorView from "./Views/EditorView";
+import ControlsController from "./Controllers/ControlsController";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -22,6 +23,7 @@ export default class App {
     tracksController: TracksController;
     playheadController: PlayheadController;
     pluginsController: PluginsController;
+    specialsController: ControlsController;
 
     hostView: HostView;
     tracksView: TracksView;
@@ -45,6 +47,7 @@ export default class App {
         this.tracksController = new TracksController(this);
         this.playheadController = new PlayheadController(this);
         this.pluginsController = new PluginsController(this);
+        this.specialsController = new ControlsController(this);
 
         makeDivScrollSync();
     }

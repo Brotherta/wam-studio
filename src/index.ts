@@ -1,11 +1,16 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
-import TrackElement from './Components/TrackElement';
+import TrackElement from './Views/Components/TrackElement';
+import ControlElement from "./Views/Components/ControlElement";
 
 customElements.define(
     "track-element",
     TrackElement
+);
+customElements.define(
+    "control-element",
+    ControlElement
 );
 
 const audioCtx = new AudioContext();

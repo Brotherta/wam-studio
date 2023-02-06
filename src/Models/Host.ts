@@ -4,7 +4,7 @@ import AudioPlayerNode from "../Audio/AudioNode";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import { MAX_DURATION_SEC, SAMPLE_RATE } from "../Utils";
 import Track from "./Track";
-import TrackElement from "../Components/TrackElement";
+import TrackElement from "../Views/Components/TrackElement";
 import AudioPlugin from "./AudioPlugin";
 
 /**

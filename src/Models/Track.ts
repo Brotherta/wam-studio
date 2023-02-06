@@ -1,6 +1,6 @@
 import { audioCtx } from "..";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import TrackElement from "../Components/TrackElement";
+import TrackElement from "../Views/Components/TrackElement";
 import AudioPlugin from "./AudioPlugin";
 
 export default class Track {

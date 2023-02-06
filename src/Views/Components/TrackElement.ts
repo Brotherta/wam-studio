@@ -4,8 +4,8 @@ template.innerHTML = /*html*/`
 
 <style>
 .icon {
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 23px;
+    padding-right: 23px;
     -webkit-touch-callout: none; /* iOS Safari */
       -webkit-user-select: none; /* Safari */
        -khtml-user-select: none; /* Konqueror HTML */
@@ -38,7 +38,7 @@ template.innerHTML = /*html*/`
     flex-wrap: nowrap;
     justify-content: space-around;
     align-items: center;
-    min-height: 24px;
+    min-height: 30px;
     font-family: Helvetica, monospace;
     color: pink;
 }
@@ -49,7 +49,7 @@ template.innerHTML = /*html*/`
     flex-wrap: nowrap;
     justify-content: space-around;
     align-items: center; 
-    max-height: 20px;
+    min-height: 30px;
 }
 
 .track-balance {
@@ -58,7 +58,7 @@ template.innerHTML = /*html*/`
     flex-wrap: nowrap;
     justify-content: space-around;
     align-items: center;
-    max-height: 20px;
+    min-height: 30px;
 }
 
 .track-controls {
@@ -68,16 +68,17 @@ template.innerHTML = /*html*/`
     justify-content: space-around;
     align-items: center;
     width: 100%;
-    max-height: 20px;
+    min-height: 30px;
 }
 
 .track-name {
     color: lightgrey;
     font-familiy: Helvetica, monospace;
     font-weight: bold;
-    max-width: 118px;
-    min-width: 118px;
+    max-width: 146px;
+    min-width: 146px;
     overflow: hidden;
+    font-size: large;
     text-overflow: ellipsis;
     transition: all 2s linear;
     text-align: center;
@@ -108,13 +109,14 @@ template.innerHTML = /*html*/`
 }
 
 .form-range.tracko {
-    width: 80px !important;
+    width: 90px !important;
+    transform: scale(1.5);
 }
 
 .letter-icon {
     color: lightgrey;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 28px;
+    padding-right: 28px;
     font-size: 15px;
     font-weight: bold;
     -webkit-touch-callout: none; /* iOS Safari */
@@ -126,10 +128,10 @@ template.innerHTML = /*html*/`
 }
 
 .mute-icon, .solo-icon {
-    color: grey;
+    color: black;
     padding-left: 10px;
     padding-right: 10px;
-    font-size: 15px;
+    font-size: 17px;
     font-weight: bold;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -137,10 +139,12 @@ template.innerHTML = /*html*/`
        -moz-user-select: none; /* Old versions of Firefox */
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none;  
+    background-color: lightgrey;
+    border-radius: 5px;
 }
 
 .mute-icon:hover, .solo-icon:hover {
-    color: lightgrey;
+    background-color: #afafaf;
     cursor: pointer;
 }
 
@@ -173,8 +177,8 @@ template.innerHTML = /*html*/`
         </div>
     </div>
     <div class="track-controls">
-        <div id="mute-btn" class="mute-icon">M</div>
-        <div id="solo-btn" class="solo-icon">S</div>
+        <div id="mute-btn" class="mute-icon">Mute</div>
+        <div id="solo-btn" class="solo-icon">Solo</div>
     </div>
 </div>
 <div id="color-div" class="track-color">
@@ -242,16 +246,20 @@ export default class TrackElement extends HTMLElement {
 
     mute() {
         this.muteBtn.style.color = "red";
+        this.muteBtn.style.backgroundColor = "#767373";
     }
     unmute() {
-        this.muteBtn.style.color = "grey"
+        this.muteBtn.style.color = "black"
+        this.muteBtn.style.backgroundColor = "";
     }
 
     solo() {
-        this.soloBtn.style.color = "lightgreen";
+        this.soloBtn.style.color = "#78ff82";
+        this.soloBtn.style.backgroundColor = "#767373";
     }
     unsolo() {
-        this.soloBtn.style.color = "grey";
+        this.soloBtn.style.color = "black";
+        this.soloBtn.style.backgroundColor = "";
     }
 
     setName(arg0: string) {

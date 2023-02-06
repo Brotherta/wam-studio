@@ -60,6 +60,7 @@ export default class EditorController {
                         if (track !== undefined) {
                             this.app.tracksController.addNewTrackInit(track);
                             this.app.editorController.addWaveFormToTrack(track);
+                            this.app.specialsController.addSpecialControlToTrack(track);
                         }
                     });
             });
