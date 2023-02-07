@@ -64,7 +64,7 @@ export default class Host extends Track {
             if (ev.data.playhead) {
                 this.playhead = ev.data.playhead;
             }
-            else if (ev.data.volume) {
+            else if (ev.data.volume >= 0) {
                 let vol = ev.data.volume;
                 let sensitivity = 2.3;
                 this.app.hostController.vuMeter.update(Math.abs(vol) * sensitivity);
