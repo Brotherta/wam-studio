@@ -75,15 +75,22 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
     }
 
     calculateMax(output) {
-        for (let i = 0; i < output.length; i++) {
-            this.max = Math.max(this.max, output[i]);
+        if (output !== undefined) {
+            for (let i = 0; i < output.length; i++) {
+                this.max = Math.max(this.max, output[i]);
+            }
+            this.blockCount++;
         }
-        this.blockCount++;
+        else {
+            this.max = 0;
+            this.blockCount++;
+        }
         if (this.blockCount >= COUNT_BLOCK) {
             this.port.postMessage({volume: this.max});
             this.max = 0;
             this.blockCount = 0;
         }
+
     }
 }
 
