@@ -71,7 +71,7 @@ export default class Tracks {
      * @param file
      */
     async newTrackWithFile(file: File) {
-        if (file.type === "audio/ogg" || file.type === "audio/wav" || file.type === "audio/mp3") {
+        if (file.type === "audio/ogg" || file.type === "audio/wav" || file.type === "audio/mpeg") {
             let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
             let node = wamInstance.audioNode as WamAudioWorkletNode;
 
