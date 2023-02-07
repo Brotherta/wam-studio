@@ -20,12 +20,13 @@ export default class ControlsController {
         element.id = "control-" + track.id;
         let control = new SpecialsControls(track.id, element);
         this.controls.push(control);
-
+        this.app.controlsView.addControl(control.element);
     }
 
     removeSpecialControlFromTrack(track: Track) {
         let index = this.controls.findIndex(control => control.trackId === track.id);
         this.controls.splice(index, 1);
+        this.app.controlsView.removeControl(track.id);
     }
 
 
