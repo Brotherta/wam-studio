@@ -15,4 +15,5 @@ export const MAX_DURATION_SEC = time; // 10 minutes
 export const RATIO_MILLS_BY_PX = 50; // 50 ms / pixels
 
 export const HEIGHT_TRACK = 130; // track 90px height
+
 export const OFFSET_FIRST_TRACK = 73 // Offset of the first track element in the host.

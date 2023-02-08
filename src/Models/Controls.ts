@@ -1,13 +1,23 @@
-import ControlElement from "../Views/Components/ControlElement";
+import Control from "./Control";
+import App from "../App";
 
 
-export default class ControlsController {
+export default class Controls {
 
-    trackId: number;
-    element: ControlElement;
+    controls: Control[];
+    app: App;
 
-    constructor(trackId: number, element: ControlElement) {
-        this.trackId = trackId;
-        this.element = element;
+    constructor(app: App) {
+        this.app = app;
+        this.controls = [];
+    }
+
+    addControl(control: Control) {
+        this.controls.push(control);
+    }
+
+    removeControl(trackId: number) {
+        let index = this.controls.findIndex(control => control.trackId === trackId);
+        this.controls.splice(index, 1);
     }
 }

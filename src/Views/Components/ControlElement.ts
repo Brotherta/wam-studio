@@ -32,6 +32,7 @@ template.innerHTML = /*html*/`
     font-size: 15px;
 }
 
+
 </style>
 
 <div class="control-item">
@@ -46,8 +47,7 @@ template.innerHTML = /*html*/`
     <label class="special-control-value">100</label>
 </div>
 
-<button type="button" class="btn btn-light">Advanced</button>
-
+<button type="button" class="btn btn-light adv-btn">Advanced</button>
 `
 
 export default class ControlElement extends HTMLElement {

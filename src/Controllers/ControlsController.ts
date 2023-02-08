@@ -1,33 +1,34 @@
 import App from "../App";
-import SpecialsControls from "../Models/Controls";
+import Control from "../Models/Control";
 import Track from "../Models/Track";
 import ControlElement from "../Views/Components/ControlElement";
+import AdvancedElement from "../Views/Components/AdvancedElement";
 
 
 export default class ControlsController {
 
     app: App;
-    controls: SpecialsControls[];
 
     constructor(app: App) {
         this.app = app;
-        this.controls = [];
     }
 
     addSpecialControlToTrack(track: Track) {
-        let element = document.createElement('control-element') as ControlElement;
-        element.trackId = track.id;
-        element.id = "control-" + track.id;
-        let control = new SpecialsControls(track.id, element);
-        this.controls.push(control);
-        this.app.controlsView.addControl(control.element);
+        let controlElement = document.createElement('control-element') as ControlElement;
+        controlElement.trackId = track.id;
+        controlElement.id = "control-" + track.id;
+
+        let advancedElement = document.createElement('advanced-element') as AdvancedElement;
+        advancedElement.id = "advanced-" + track.id;
+
+        let control = new Control(track.id, controlElement, advancedElement);
+        this.app.controls.addControl(control);
+        this.app.controlsView.addControl(control.controlElement);
     }
 
     removeSpecialControlFromTrack(track: Track) {
-        let index = this.controls.findIndex(control => control.trackId === track.id);
-        this.controls.splice(index, 1);
+        this.app.controls.removeControl(track.id);
         this.app.controlsView.removeControl(track.id);
+        this.app.controlsView.closeAdvanced();
     }
-
-
 }

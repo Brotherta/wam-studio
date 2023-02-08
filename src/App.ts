@@ -13,6 +13,7 @@ import PluginsView from "./Views/PluginsView";
 import EditorView from "./Views/EditorView";
 import ControlsController from "./Controllers/ControlsController";
 import ControlsView from "./Views/ControlsView";
+import Controls from "./Models/Controls";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -34,10 +35,12 @@ export default class App {
 
     tracks: Tracks;
     host: Host;
+    controls: Controls;
 
     constructor() {
         this.tracks = new Tracks(this);
         this.host = new Host(this);
+        this.controls = new Controls(this);
 
         this.hostView = new HostView();
         this.tracksView = new TracksView();
