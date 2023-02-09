@@ -114,5 +114,4 @@ class DraggableWindow {
 // @ts-ignore
 const draggableWindow = new DraggableWindow(header, resizableWindow);
 
-
 export { makeDivScrollSync }
