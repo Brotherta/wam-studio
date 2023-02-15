@@ -33,6 +33,7 @@ export default class TracksController {
                         .then(track => {
                             if (track !== undefined) {
                                 this.addNewTrackInit(track);
+                                this.app.automationView.addAutomationBpf(track.id);
                                 this.app.editorController.addWaveFormToTrack(track);
                             }
                         });
@@ -66,6 +67,7 @@ export default class TracksController {
             if (Object.prototype.hasOwnProperty.call(tracks, track)) {
                 const element = tracks[track];
                 this.app.tracksController.addNewTrackInit(element);
+                this.app.automationView.addAutomationBpf(element.id);
                 this.app.editorController.addWaveFormToTrack(element);
             }
         }
@@ -81,6 +83,7 @@ export default class TracksController {
         this.tracksView.removeTrack(track.element);
         this.app.tracks.removeTrack(track);
         this.app.editorController.removeWafeFormOfTrack(track);
+        this.app.automationView.removeAutomationBpf(track.id);
     }
 
     /**

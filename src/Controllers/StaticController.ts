@@ -4,10 +4,12 @@ const playhead = document.getElementById("playhead") as HTMLDivElement;
 
 const header = document.getElementById("header") as HTMLElement;
 const resizableWindow = document.getElementById("resizableWindow") as HTMLElement;
+const automationController = document.getElementById("automation-container") as HTMLElement;
 
 /**
  * This function makes the track div and the editor div scroll synchronously.
  */
+
 function makeDivScrollSync2() {
     
     let active: EventTarget | undefined = undefined;
@@ -45,15 +47,26 @@ function makeDivScrollSync() {
     editorDiv.addEventListener("mouseenter", function(e: Event) {
         active = e.target as EventTarget;
     })
+    automationController.addEventListener("mouseenter", function(e: Event) {
+        active = e.target as EventTarget;
+    })
 
     trackDiv.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;
         editorDiv.scrollTop = trackDiv.scrollTop;
+        automationController.scrollTop = trackDiv.scrollTop;
     })   
     editorDiv.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;
         trackDiv.scrollTop = editorDiv.scrollTop;
+        automationController.scrollTop = editorDiv.scrollTop;
     })
+    automationController.addEventListener("scroll", function(e: Event) {
+        if (e.target !== active) return;
+        trackDiv.scrollTop = automationController.scrollTop;
+        editorDiv.scrollTop = automationController.scrollTop;
+    })
+
     makeDivScrollSync2();
 }
 

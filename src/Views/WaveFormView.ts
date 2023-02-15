@@ -24,6 +24,10 @@ export default class WaveFormView extends Container {
         this.zIndex = 0;
 
         this.trackId = -1
+        this.interactive = true;
+        this.on("click", () => {
+            console.log("click on wave !");
+        })
     }
 
     /**

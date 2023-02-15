@@ -43,7 +43,14 @@ export default class AutomationController {
                     // @ts-ignore
                     params[param].nodeId,
                     () => {
-                        console.log("click on " + param);
+                        console.log("Click on "+param);
+                        let bpf = track.automations.getBpfOfparam(param);
+                        if (bpf !== undefined) {
+                            this.app.automationView.mountBpf(track.id, bpf);
+                        }
+                        else {
+                            console.warn("There is no bpf associated with the track "+track.id);
+                        }
                     }
                 );
             }

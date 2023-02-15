@@ -50,7 +50,7 @@ export default class BPF extends HTMLElement {
             } = svg.getBoundingClientRect();
             // left += 0.025 * width;
             // top += 0.025 * height;
-            width *= 0.95;
+            // width *= 0.95;
             height *= 0.95;
             const normalizedX = (e.clientX - left) / width;
             const normalizedY = 1 - (e.clientY - top) / height;
@@ -97,7 +97,7 @@ export default class BPF extends HTMLElement {
             } = svg.getBoundingClientRect();
             // left += 0.025 * width;
             // top += 0.025 * height;
-            width *= 0.95;
+            // width *= 0.95;
             height *= 0.95;
             if (e.altKey) {
                 const i = +line.getAttribute('values');
@@ -186,7 +186,7 @@ export default class BPF extends HTMLElement {
             // top += 0.025 * height;
             // left += width;
             // top += height;
-            width *= 0.95;
+            // width *= 0.95;
             height *= 0.95;
             const i = +circle.getAttribute('values');
             const limits = [
@@ -235,7 +235,7 @@ export default class BPF extends HTMLElement {
         this._root = this.attachShadow({mode: 'open'});
         this._svg = this._root.ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'svg');
         this._svg.setAttribute('width', '100%');
-        this._svg.setAttribute('height', '104px');
+        this._svg.setAttribute('height', '90px');
         this._svg.style.backgroundColor = 'none';
         this._svg.style.zIndex = 10;
         this._svg.addEventListener('mousemove', this.handleMouseMove);
@@ -339,8 +339,8 @@ export default class BPF extends HTMLElement {
             const x = `${point[0] * 100}%`;
             const y = `${(1 - point[1]) * 100}%`;
             const textAnchor = point[0] < 0.5 ? 'start' : 'end';
-            const textX = `${point[0] * 100 + (point[0] < 0.5 ? 2 : -2)}%`;
-            const textY = `${(1 - point[1]) * 100 + (point[1] < 0.5 ? -2 : 8)}%`;
+            const textX = `${point[0] * 100 + (point[0] < 0.5 ? 0.5 : -0.5)}%`;
+            const textY = `${(1 - point[1]) * 100 + (point[1] < 0.5 ? -8 : 15)}%`;
             /** @type {CSSStyleDeclaration} */
             const textStyle = {
                 userSelect: 'none',
@@ -398,8 +398,8 @@ export default class BPF extends HTMLElement {
             const x = `${point[0] * 100}%`;
             const y = `${(1 - point[1]) * 100}%`;
             const textAnchor = point[0] < 0.5 ? 'start' : 'end';
-            const textX = `${point[0] * 100 + (point[0] < 0.5 ? 2 : -2)}%`;
-            const textY = `${(1 - point[1]) * 100 + (point[1] < 0.5 ? -2 : 8)}%`;
+            const textX = `${point[0] * 100 + (point[0] < 0.5 ? 0.5 : -0.5)}%`;
+            const textY = `${(1 - point[1]) * 100 + (point[1] < 0.5 ? -8 : 15)}%`;
             /** @type {CSSStyleDeclaration} */
             const textStyle = {
                 userSelect: 'none',

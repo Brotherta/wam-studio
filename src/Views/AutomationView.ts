@@ -5,6 +5,7 @@ export default class AutomationView {
 
     automationMenu = document.getElementById("automation-menu") as HTMLDivElement;
     itemList = document.getElementById("list-automation") as HTMLElement;
+    automationContainer = document.getElementById("automation-container") as HTMLDivElement;
 
     openAutomationMenu(track: Track) {
         let trackElement = track.element;
@@ -33,4 +34,23 @@ export default class AutomationView {
         this.automationMenu.appendChild(this.itemList);
     }
 
+    addAutomationBpf(trackId: number) {
+        let automationLocation = document.createElement("div");
+        automationLocation.className = "automation-location";
+        automationLocation.id = "automation-"+ trackId;
+        this.automationContainer.appendChild(automationLocation);
+    }
+
+    removeAutomationBpf(trackId: number) {
+        document.getElementById(`automation-${trackId}`)?.remove();
+    }
+
+    mountBpf(trackId: number, bpf: any) {
+        let location = document.getElementById(`automation-${trackId}`);
+        if (location !== null) {
+            location.classList.add("event-active");
+            location.innerHTML = '';
+            location.appendChild(bpf);
+        }
+    }
 }

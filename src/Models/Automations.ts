@@ -1,5 +1,6 @@
 // @ts-ignore
 import BPF from "../Utils/BPF"
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
 
 export default class Automations {
 
@@ -17,7 +18,21 @@ export default class Automations {
             let index = this.bpfList.findIndex((bpf) => bpf.paramId === param);
 
             if (index == -1) { // new parameter
-                newBpf.push(this.createBpf(param));
+                let bpf = document.createElement("bpf-automation");
+                let {minValue, maxValue} = _params[param];
+                // @ts-ignore
+                bpf.paramId = param;
+                bpf.style.position = "relative";
+                bpf.setAttribute('min', minValue);
+                bpf.setAttribute('max', maxValue);
+                let defaultValue = (maxValue - minValue) / 2;
+                bpf.setAttribute('default', defaultValue.toString());
+                bpf.setAttribute('domain', MAX_DURATION_SEC.toString());
+                // @ts-ignore
+                bpf.setSizeBPF((MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX)
+                console.log("new bpf for ", param);
+
+                newBpf.push(bpf);
             }
             else { // existing parameter, it already exists
                 recordUpdated[index] = 1;
@@ -30,11 +45,12 @@ export default class Automations {
         console.table(this.bpfList);
     }
 
-    createBpf(param: any) {
-        let bpf = document.createElement("bpf-automation");
-        // @ts-ignore
-        bpf.paramId = param;
-        console.log("new bpf for ", param);
-        return bpf;
+
+    getBpfOfparam(param: string) {
+        let index = this.bpfList.findIndex((bpf) => bpf.paramId === param);
+        if (index != -1) {
+            return this.bpfList[index];
+        }
+        else return undefined;
     }
 }
