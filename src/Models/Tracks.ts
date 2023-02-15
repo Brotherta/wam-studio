@@ -36,10 +36,10 @@ export default class Tracks {
      * @param songInfo the object containing the number of files and the names of the files
      * @returns the new tracks that have been created
      */
-    async newTrackWithAudio(path: String, songInfo: SongInfo) {    
+    async newTrackWithAudio(path: String, songInfo: SongInfo) {
         let number = songInfo.number;
         let songs = songInfo.songs;
-        
+
         let newTracks = [];
 
         for (let i = 0; i < number; i++) {
@@ -155,7 +155,7 @@ export default class Tracks {
         let isHostSolo = false;
 
         this.trackList.forEach(track => {
-            if (track.isSolo){
+            if (track.isSolo) {
                 isHostSolo = true;
             }
         });

@@ -138,6 +138,10 @@ export default class TracksController {
             this.tracksView.changeColor(track);
             this.app.editorView.changeWaveFormColor(track);
         }
+        track.element.automationBtn.onclick = async (e) => {
+            await this.app.automationController.openAutomationMenu(track);
+            e.stopImmediatePropagation();
+        }
     }
 
     /**

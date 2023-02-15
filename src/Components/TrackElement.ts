@@ -144,6 +144,18 @@ template.innerHTML = /*html*/`
     cursor: pointer;
 }
 
+.control {
+    padding-left: 10px;
+    padding-right: 10px;
+    color: grey;
+}
+
+.control:hover {
+    /*filter: invert(100%) sepia(0%) saturate(2190%) hue-rotate(165deg) brightness(89%) contrast(86%);*/
+    filter: invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+    cursor: pointer;
+}
+
 </style>
 
 <div class="track-utils">
@@ -175,6 +187,12 @@ template.innerHTML = /*html*/`
     <div class="track-controls">
         <div id="mute-btn" class="mute-icon">M</div>
         <div id="solo-btn" class="solo-icon">S</div>
+        <div id="arm" class="control">
+            <img src="icons/mic-fill.svg">
+        </div>
+        <div id="automation" class="control">
+            <img src="icons/graph_6.svg">
+        </div>
     </div>
 </div>
 <div id="color-div" class="track-color">
@@ -228,6 +246,11 @@ export default class TrackElement extends HTMLElement {
     get color() {
         return this.shadowRoot?.getElementById("color-div") as HTMLDivElement;
     }
+
+    get automationBtn() {
+        return this.shadowRoot?.getElementById("automation") as HTMLDivElement;
+    }
+
 
     defineTrackNameListener() {
         this.trackNameInput.value = this.name;

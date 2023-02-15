@@ -2,6 +2,7 @@ import { audioCtx } from "..";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import TrackElement from "../Components/TrackElement";
 import AudioPlugin from "./AudioPlugin";
+import Automations from "./Automations";
 
 export default class Track {
 
@@ -21,6 +22,7 @@ export default class Track {
     audioBuffer: OperableAudioBuffer | undefined;
     plugin: AudioPlugin;
 
+    automations: Automations;
     removed: boolean
 
     constructor(id: number, element: TrackElement, node: any) {
@@ -29,6 +31,7 @@ export default class Track {
         this.color = "";
         this.node = node;
         this.removed = false;
+        this.automations = new Automations();
 
         this.gainNode = audioCtx.createGain();
         this.gainNode.gain.value = 0.5;

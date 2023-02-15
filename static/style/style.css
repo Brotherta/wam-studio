@@ -477,3 +477,37 @@ track-element {
     min-height: 80px;
     margin: 8px;
 }
+
+#automation-menu {
+    position: absolute;
+    background-color: rgba(70, 70, 70, 0.61);
+    max-height: 200px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow-y: auto;
+    border-radius: 5px;
+}
+
+.automation-item {
+    width: 100%;
+    background-color: rgba(70, 70, 70, 0.61);
+    color: lightgray;
+}
+.automation-item:hover {
+    background-color: rgba(98, 97, 97, 0.61);
+    cursor: pointer;
+}
+
+li {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul {
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style-type: none;
+}

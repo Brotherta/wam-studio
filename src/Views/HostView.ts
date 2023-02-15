@@ -14,6 +14,8 @@ export default class HostView {
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
 
+    controlsBar = document.getElementById("controls-bar") as HTMLDivElement;
+
     vuMeterCanvas = document.getElementById("vu-meter") as HTMLCanvasElement;
 
 
