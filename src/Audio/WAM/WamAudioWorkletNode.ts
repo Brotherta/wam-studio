@@ -3,15 +3,12 @@ import {addFunctionModule, WamNode} from "@webaudiomodules/sdk";
 import getProcessor from "./WamProcessor";
 
 export default class WamAudioWorkletNode extends WamNode {
-    
 
-    
     static override async addModules(audioCtx: AudioContext, moduleId: any) {
         const {audioWorklet} = audioCtx;
         await super.addModules(audioCtx, moduleId);
         await addFunctionModule(audioWorklet, getProcessor, moduleId);
     }
-
 
     constructor(module: WebAudioModule) {
         super(module,

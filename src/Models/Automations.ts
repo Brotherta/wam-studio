@@ -2,6 +2,9 @@
 import BPF from "../Utils/BPF"
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
 
+/**
+ * Model for the automations stored in each track.
+ */
 export default class Automations {
 
     bpfList: BPF[];
@@ -10,6 +13,15 @@ export default class Automations {
         this.bpfList = [];
     }
 
+    /**
+     * Update the list of automations with the new parameters given in parameters.
+     *
+     * If a parameter already exists, it is not updated.
+     * If a parameter doesn't exist, it is created.
+     * If a parameter doesn't exist anymore, it is removed.
+     *
+     * @param _params the current parameters of the plugin in the track.
+     */
     updateAutomation(_params: any) {
         let recordUpdated = new Array(this.bpfList.length).fill(0);
 
@@ -45,11 +57,19 @@ export default class Automations {
         console.table(this.bpfList);
     }
 
+    /**
+     * Clear the curves of the automation.
+     *
+     * @param params the current parameters of the plugin in the track.
+     */
     clearAllAutomation(params: any) {
         this.removeAutomation();
         this.updateAutomation(params);
     }
 
+    /**
+     * Remove all the automations and clear the bpf list.
+     */
     removeAutomation() {
         for (let bpfListElement of this.bpfList) {
             bpfListElement.remove();
@@ -57,6 +77,12 @@ export default class Automations {
         this.bpfList = [];
     }
 
+    /**
+     * Get the bpf associated with the parameter.
+     *
+     * @param param the parameter id to get the bpf.
+     * @returns the bpf associated with the parameter.
+     */
     getBpfOfparam(param: string) {
         let index = this.bpfList.findIndex((bpf) => bpf.paramID === param);
         if (index != -1) {

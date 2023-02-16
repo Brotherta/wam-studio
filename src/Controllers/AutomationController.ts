@@ -3,6 +3,9 @@ import Track from "../Models/Track";
 import {SAMPLE_RATE} from "../Utils";
 
 
+/**
+ * Controller for the automation menu. This controller is responsible for applying all the automations to the tracks.
+ */
 export default class AutomationController {
 
     app: App;
@@ -13,12 +16,19 @@ export default class AutomationController {
         this.definesEvents();
     }
 
+    /**
+     * Apply all the automations to the track and open the automation menu.
+     * @param track
+     */
     async openAutomationMenu(track: Track) {
         await this.getAllAutomations(track);
         this.app.automationView.openAutomationMenu(track);
         this.automationOpened = true;
     }
 
+    /**
+     * Define all the listeners for the automation menu.
+     */
     definesEvents() {
         window.addEventListener("click", (e) => {
             if (e.target === this.app.automationView.automationMenu ) return;
@@ -38,6 +48,11 @@ export default class AutomationController {
         });
     }
 
+    /**
+     * Get all the parameters of the associated plugin and create the automation menu.
+     *
+     * @param track
+     */
     async getAllAutomations(track: Track) {
         let plugin = track.plugin;
         if (plugin.initialized) {
@@ -73,6 +88,10 @@ export default class AutomationController {
         }
     }
 
+    /**
+     * Apply all the automations of each track.
+     * It takes in account the playhead position and the time of the host.
+     */
     applyAllAutomations() {
         let tracks = this.app.tracks.trackList;
         let playhead = this.app.host.playhead;
@@ -105,6 +124,15 @@ export default class AutomationController {
         }
     }
 
+    /**
+     * Get the starting point of the automation according to the current time of the host.
+     *
+     * @param totalDuration The duration of the automation in ms.
+     * @param currentTime The current time of the host in ms.
+     * @param totalPoint The total number of points of the automation.
+     *
+     * @returns The index of the starting point.
+     */
     getStartingPoint(totalDuration: number, currentTime: number, totalPoint: number) {
         let point = (totalPoint * currentTime) / totalDuration;
         let integPoint = Math.floor(point);
