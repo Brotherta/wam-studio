@@ -53,4 +53,12 @@ export default class AutomationView {
             location.appendChild(bpf);
         }
     }
+
+    hideBpf(trackId: number) {
+        let location = document.getElementById(`automation-${trackId}`);
+        if (location !== null) {
+            location.classList.remove("event-active");
+            location.innerHTML = '';
+        }
+    }
 }

@@ -1,5 +1,6 @@
 import App from "../App";
 import Track from "../Models/Track";
+import {SAMPLE_RATE} from "../Utils";
 
 
 export default class AutomationController {
@@ -9,13 +10,13 @@ export default class AutomationController {
 
     constructor(app: App) {
         this.app = app;
+        this.definesEvents();
     }
 
     async openAutomationMenu(track: Track) {
         await this.getAllAutomations(track);
         this.app.automationView.openAutomationMenu(track);
         this.automationOpened = true;
-        this.definesEvents();
     }
 
     definesEvents() {
@@ -26,6 +27,15 @@ export default class AutomationController {
                 this.automationOpened = false;
             }
         });
+        this.app.pluginsView.removePlugin.addEventListener("click", () => {
+            let track = this.app.pluginsController.selectedTrack;
+            if (track != undefined) {
+                track.automations.removeAutomation();
+                track.automations.updateAutomation([]);
+                this.app.automationView.clearMenu();
+                this.app.automationView.hideBpf(track.id);
+            }
+        });
     }
 
     async getAllAutomations(track: Track) {
@@ -34,16 +44,21 @@ export default class AutomationController {
             let params = await plugin.instance?._audioNode.getParameterInfo();
             track.automations.updateAutomation(params);
             this.app.automationView.clearMenu();
+
             this.app.automationView.createItem("Hide Automation", "hide-automation", () => {
-                console.log("click on hide automation");
+                this.app.automationView.hideBpf(track.id);
             });
+            this.app.automationView.createItem("Clear All Automations", "clear-all", () => {
+                this.app.automationView.hideBpf(track.id);
+                track.automations.clearAllAutomation(params);
+                track.plugin.instance?._audioNode.clearEvents();
+            })
             for (let param in params) {
                 this.app.automationView.createItem(
                     param,
                     // @ts-ignore
                     params[param].nodeId,
                     () => {
-                        console.log("Click on "+param);
                         let bpf = track.automations.getBpfOfparam(param);
                         if (bpf !== undefined) {
                             this.app.automationView.mountBpf(track.id, bpf);
@@ -56,6 +71,46 @@ export default class AutomationController {
             }
 
         }
+    }
+
+    applyAllAutomations() {
+        let tracks = this.app.tracks.trackList;
+        let playhead = this.app.host.playhead;
+        let time = (playhead / SAMPLE_RATE) * 1000;
+
+        for (let track of tracks) {
+            track.plugin.instance?._audioNode.clearEvents();
+            let automation = track.automations;
+            let events = [];
+            for (let bpf of automation.bpfList) {
+                let point = bpf.lastPoint;
+                if (point == null) {
+                    continue;
+                }
+                let list = [];
+                for (let x = 0; x < point[0]; x += 0.1) {
+                    list.push(bpf.getYfromX(x));
+                }
+                let start = this.getStartingPoint(point[0]*1000, time, list.length);
+                let paramID = bpf.paramID;
+                let t = 0;
+                for (let i = start; i < list.length; i++) {
+                    events.push({ type: 'wam-automation', data: { id: paramID, value: list[i] }, time: this.app.host.audioCtx.currentTime + t })
+                    t += 0.1;
+                }
+            }
+            events.sort((a, b) => a.time - b.time);
+            // @ts-ignore
+            track.plugin.instance?._audioNode.scheduleEvents(...events);
+        }
+    }
+
+    getStartingPoint(totalDuration: number, currentTime: number, totalPoint: number) {
+        let point = (totalPoint * currentTime) / totalDuration;
+        let integPoint = Math.floor(point);
+        let frac = point - integPoint;
+        if (frac < 0.5) return integPoint;
+        else return integPoint+1;
     }
 }
 

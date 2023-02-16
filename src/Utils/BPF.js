@@ -32,6 +32,7 @@ export default class BPF extends HTMLElement {
             texts: [], ghostText: undefined, circles: [], ghostCircle: undefined, lines: [], linesEvents: [],
         };
 
+
         this.handleMouseMove = () => {
             this.setState({ghostPoint: undefined});
         };
@@ -278,6 +279,13 @@ export default class BPF extends HTMLElement {
         if (rangeMin > rangeMax) [rangeMin, rangeMax] = [rangeMax, rangeMin];
         const rangeInterval = rangeMax - rangeMin;
         return rangeInterval ? (defaultValue - rangeMin) / rangeInterval : 0.5;
+    }
+
+    get lastPoint() {
+        if (this.state.points.length > 0) {
+            return this.state.points[this.state.points.length-1];
+        }
+        return null;
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

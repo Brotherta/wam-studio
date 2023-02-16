@@ -39,6 +39,7 @@ export default class PlayheadController {
             this.app.tracks.jumpTo(x);
             this.app.hostController.resumeUpdateInteravel();
             this.movingPlayhead = false;
+            this.app.automationController.applyAllAutomations();
         }
 
         // Add a listener for the playhead range, so when the mouse is moving, it moves the playhead.

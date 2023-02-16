@@ -125,9 +125,9 @@ export default class Tracks {
     removeTrack(track: Track) {
         let trackIndex = this.trackList.indexOf(track);
         this.trackList.splice(trackIndex, 1);  
-        track.node.removeAudio();
-        track.node.disconnectEvents();
-        track.node.disconnect();
+        track.node!.removeAudio();
+        track.node!.disconnectEvents();
+        track.node!.disconnect();
     }
 
     /**
@@ -139,7 +139,7 @@ export default class Tracks {
         this.app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * SAMPLE_RATE
         
         this.trackList.forEach((track) => {
-            track.node.port.postMessage({playhead: this.app.host.playhead+1})
+            track.node!.port.postMessage({playhead: this.app.host.playhead+1})
         });
 
         this.app.host.hostNode?.port.postMessage({playhead: this.app.host.playhead+1});

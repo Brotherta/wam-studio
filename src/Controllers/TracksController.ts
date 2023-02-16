@@ -160,8 +160,8 @@ export default class TracksController {
                 .connect(host.audioCtx.destination);
         }
         else {
-            track.node.disconnect(track.pannerNode);
-            track.node
+            track.node!.disconnect(track.pannerNode);
+            track.node!
                 .connect(track.plugin.instance!._audioNode)
                 .connect(track.pannerNode);
         }
@@ -178,8 +178,8 @@ export default class TracksController {
             host.gainNode.connect(host.audioCtx.destination);
         }
         else if (track.plugin.initialized) {
-            track.node.disconnect(track.plugin.instance!._audioNode);
-            track.node.connect(track.pannerNode);
+            track.node!.disconnect(track.plugin.instance!._audioNode);
+            track.node!.connect(track.pannerNode);
         }
     }
 }

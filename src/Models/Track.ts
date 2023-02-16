@@ -3,6 +3,7 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import TrackElement from "../Components/TrackElement";
 import AudioPlugin from "./AudioPlugin";
 import Automations from "./Automations";
+import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 
 export default class Track {
 
@@ -10,7 +11,7 @@ export default class Track {
     element: TrackElement
     color: string;
 
-    node: any;
+    node: WamAudioWorkletNode | undefined;
     gainNode: GainNode;
     pannerNode: StereoPannerNode;
 
@@ -25,7 +26,7 @@ export default class Track {
     automations: Automations;
     removed: boolean
 
-    constructor(id: number, element: TrackElement, node: any) {
+    constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;
         this.element = element;
         this.color = "";

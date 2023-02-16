@@ -41,7 +41,6 @@ export default class HostController {
      * Define all the listeners for the audio controls.
      */
     defineControls() {
-        this.defineAutomationListener();
         this.definePlayListener();
         this.defineBackListener();
         this.defineRecordListener();
@@ -150,6 +149,7 @@ export default class HostController {
     defineBackListener() {
         this.hostView.backBtn.onclick = () => {
             this.app.tracks.jumpTo(1);
+            this.app.automationController.applyAllAutomations();
         }
     }
 
@@ -169,6 +169,7 @@ export default class HostController {
                 this.audioCtx.suspend();
             }
             else {
+                this.app.automationController.applyAllAutomations();
                 this.app.tracks.trackList.forEach((track) => {
                     //@ts-ignore
                     track.node.parameters.get("playing").value = 1;
@@ -180,15 +181,6 @@ export default class HostController {
             }
             this.playing = !this.playing;
             this.hostView.pressPlayButton(this.playing);
-        }
-    }
-    
-    /**
-     * TODO : Not implemented yet.
-     */
-    defineAutomationListener() {
-        this.hostView.automationBtn.onclick = () => {
-            console.log("Automation Button : TODO");
         }
     }
 

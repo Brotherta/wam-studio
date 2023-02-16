@@ -15,13 +15,13 @@ export default class Automations {
 
         let newBpf = [];
         for (let param in _params) {
-            let index = this.bpfList.findIndex((bpf) => bpf.paramId === param);
+            let index = this.bpfList.findIndex((bpf) => bpf.paramID === param);
 
             if (index == -1) { // new parameter
-                let bpf = document.createElement("bpf-automation");
+                let bpf = document.createElement("bpf-automation") as BPF;
                 let {minValue, maxValue} = _params[param];
                 // @ts-ignore
-                bpf.paramId = param;
+                bpf.paramID = param;
                 bpf.style.position = "relative";
                 bpf.setAttribute('min', minValue);
                 bpf.setAttribute('max', maxValue);
@@ -45,9 +45,20 @@ export default class Automations {
         console.table(this.bpfList);
     }
 
+    clearAllAutomation(params: any) {
+        this.removeAutomation();
+        this.updateAutomation(params);
+    }
+
+    removeAutomation() {
+        for (let bpfListElement of this.bpfList) {
+            bpfListElement.remove();
+        }
+        this.bpfList = [];
+    }
 
     getBpfOfparam(param: string) {
-        let index = this.bpfList.findIndex((bpf) => bpf.paramId === param);
+        let index = this.bpfList.findIndex((bpf) => bpf.paramID === param);
         if (index != -1) {
             return this.bpfList[index];
         }
