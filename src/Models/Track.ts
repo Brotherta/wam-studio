@@ -38,7 +38,7 @@ export default class Track {
         this.removed = false;
         this.automations = new Automations();
         this.regions = [];
-        this.modified = false;
+        this.modified = true;
 
         this.gainNode = audioCtx.createGain();
         this.gainNode.gain.value = 0.5;
@@ -122,6 +122,8 @@ export default class Track {
 
     updateBuffer(context: AudioContext) {
         console.log("Updating buffer...")
+        this.modified = false;
+        if (this.regions.length === 0) return;
 
         let opBuffer: OperableAudioBuffer | undefined = undefined;
 
@@ -156,7 +158,6 @@ export default class Track {
                 currentTime += duration;
             }
         }
-        this.modified = false;
         this.audioBuffer = opBuffer;
         this.node?.setAudio(this.audioBuffer!.toArray());
     }

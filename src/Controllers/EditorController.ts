@@ -39,9 +39,10 @@ export default class EditorController {
                 this.app.tracks.newTrackWithFile(file)
                     .then(track => {
                         if (track !== undefined) {
-                            this.app.tracksController.addNewTrackInit(track);
-                            this.app.automationView.addAutomationBpf(track.id);
-                            this.app.waveFormController.addWaveformToTrack(track);
+                            this.app.tracksController.initTrackComponents(track);
+                            // this.app.tracksController.addNewTrackInit(track);
+                            // this.app.automationView.addAutomationBpf(track.id);
+                            // this.app.waveFormController.addWaveformToTrack(track);
                         }
                     });
             });

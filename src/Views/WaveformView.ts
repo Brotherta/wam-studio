@@ -19,7 +19,7 @@ export default class WaveformView extends Container{
     initialX: number;
     initialY: number;
     originalX: number;
-    movingRegion: RegionView;
+    movingRegion: RegionView | undefined;
 
     constructor(pixiApp: Application, track: Track) {
         super();
@@ -79,16 +79,22 @@ export default class WaveformView extends Container{
     }
 
     moveRegion(x: number, _y: number) {
-        let deltaX = x - this.initialX;
-        let move = this.originalX + deltaX;
+        if (this.movingRegion !== undefined) {
+            let deltaX = x - this.initialX;
+            let move = this.originalX + deltaX;
 
-        if (move < 0) {
-            deltaX = -this.originalX;
-        }
-        if (move +this.movingRegion.width > this.myWidth) {
-            deltaX = this.myWidth - this.movingRegion.width - this.originalX;
-        }
+            if (move < 0) {
+                deltaX = -this.originalX;
+            }
+            if (move + this.movingRegion.width > this.myWidth) {
+                deltaX = this.myWidth - this.movingRegion.width - this.originalX;
+            }
 
-        this.movingRegion.position.x = Math.round(this.originalX + deltaX);
+            this.movingRegion.position.x = Math.round(this.originalX + deltaX);
+        }
+    }
+
+    stopMovingRegion() {
+        this.movingRegion = undefined;
     }
 }

@@ -16,30 +16,15 @@ export default class TracksController {
         this.app = app;
         this.tracksView = this.app.tracksView;
 
-        this.defineNewtrackCallback();
+        this.defineNewTrackCallback();
     }
 
-    defineNewtrackCallback() {
+    defineNewTrackCallback() {
         this.tracksView.newTrackDiv.addEventListener('click', () => {
-           this.tracksView.newTrackInput.click();
-        });
-        this.tracksView.newTrackInput.addEventListener('change', (e) => {
-            // @ts-ignore
-            for (let i = 0; i < e.target.files.length; i++) {
-                // @ts-ignore
-                let file = e.target.files[i];
-                if (file !== undefined) {
-                    this.app.tracks.newTrackWithFile(file)
-                        .then(track => {
-                            if (track !== undefined) {
-                                this.addNewTrackInit(track);
-                                this.app.automationView.addAutomationBpf(track.id);
-                                this.app.waveFormController.addWaveformToTrack(track);
-                            }
-                        });
-                }
-
-            }
+            this.app.tracks.newEmptyTrack()
+                .then(track => {
+                    this.initTrackComponents(track);
+                });
         });
     }
 
@@ -64,11 +49,18 @@ export default class TracksController {
         for (const track in tracks) {
             if (Object.prototype.hasOwnProperty.call(tracks, track)) {
                 const element = tracks[track];
-                this.app.tracksController.addNewTrackInit(element);
-                this.app.automationView.addAutomationBpf(element.id);
-                this.app.waveFormController.addWaveformToTrack(element);
+                this.initTrackComponents(element);
+                // this.app.tracksController.addNewTrackInit(element);
+                // this.app.automationView.addAutomationBpf(element.id);
+                // this.app.waveFormController.addWaveformToTrack(element);
             }
         }
+    }
+
+    initTrackComponents(track: Track) {
+        this.app.tracksController.addNewTrackInit(track);
+        this.app.automationView.addAutomationBpf(track.id);
+        this.app.waveFormController.addWaveformToTrack(track);
     }
 
     /**

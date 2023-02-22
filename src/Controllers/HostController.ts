@@ -49,6 +49,7 @@ export default class HostController {
         this.defineMuteListener();
         this.defineSongsDemoListener();
         this.defineTimerListener();
+        this.defineImportSongListener();
         this.app.pluginsView.mainTrack.addEventListener("click", () => {
             this.app.pluginsController.selectHost();
         });
@@ -296,6 +297,31 @@ export default class HostController {
 
     initVuMeter() {
         this.vuMeter = new VuMeter(this.app.hostView.vuMeterCanvas, 30, 157);
+    }
+
+    defineImportSongListener() {
+        this.hostView.importSongs.addEventListener('click', () => {
+            this.hostView.newTrackInput.click();
+        });
+        this.hostView.newTrackInput.addEventListener('change', (e) => {
+            // @ts-ignore
+            for (let i = 0; i < e.target.files.length; i++) {
+                // @ts-ignore
+                let file = e.target.files[i];
+                if (file !== undefined) {
+                    this.app.tracks.newTrackWithFile(file)
+                        .then(track => {
+                            if (track !== undefined) {
+                                this.app.tracksController.initTrackComponents(track);
+                                // this.app.tracksController.addNewTrackInit(track);
+                                // this.app.automationView.addAutomationBpf(track.id);
+                                // this.app.waveFormController.addWaveformToTrack(track);
+                            }
+                        });
+                }
+
+            }
+        });
     }
 }
 

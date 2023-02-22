@@ -66,10 +66,16 @@ export default class RegionsController {
             }
         });
         regionView.on("pointerup", (_e) => {
-            this.stopMovingRegion(regionView, region);
+            if (this.isMovingRegion) {
+                this.stopMovingRegion(regionView, region);
+                waveFormView.stopMovingRegion();
+            }
         });
         regionView.on("pointerupoutside", (_e) => {
-            this.stopMovingRegion(regionView, region);
+            if (this.isMovingRegion) {
+                this.stopMovingRegion(regionView, region);
+                waveFormView.stopMovingRegion();
+            }
         });
     }
 

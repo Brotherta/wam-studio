@@ -63,6 +63,15 @@ export default class Tracks {
         return newTracks;
     }
 
+    async newEmptyTrack() {
+        let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
+        let node = wamInstance.audioNode as WamAudioWorkletNode;
+
+        let track = this.createTrack(node);
+        track.element.name = `Track ${track.id}`;
+        return track;
+    }
+
     /**
      * Create the track with the given file. It verifies the type of the file and then create the track.
      *

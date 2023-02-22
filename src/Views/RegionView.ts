@@ -26,6 +26,7 @@ export default class RegionView extends Container {
     }
 
     initRegion(color: string, region: Region) {
+        this.position.x = region.start / RATIO_MILLS_BY_PX;
         this.drawWave(color, region);
         this.drawBackground();
     }
