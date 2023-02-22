@@ -171,6 +171,7 @@ export default class HostController {
             else {
                 this.app.automationController.applyAllAutomations();
                 this.app.tracks.trackList.forEach((track) => {
+                    if (track.modified) track.updateBuffer(this.audioCtx);
                     //@ts-ignore
                     track.node.parameters.get("playing").value = 1;
                     this.defineTimerListener();
@@ -296,7 +297,6 @@ export default class HostController {
     initVuMeter() {
         this.vuMeter = new VuMeter(this.app.hostView.vuMeterCanvas, 30, 157);
     }
-
 }
 
 

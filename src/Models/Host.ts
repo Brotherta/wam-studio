@@ -5,7 +5,7 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import { MAX_DURATION_SEC, SAMPLE_RATE } from "../Utils";
 import Track from "./Track";
 import TrackElement from "../Components/TrackElement";
-import AudioPlugin from "./AudioPlugin";
+import Plugin from "./Plugin";
 
 /**
  * Host class that contains the master track.
@@ -34,7 +34,7 @@ export default class Host extends Track {
         this.timer = 0;
         this.playhead = 0;
 
-        this.plugin = new AudioPlugin(app);
+        this.plugin = new Plugin(app);
         
         this.gainNode = this.audioCtx.createGain()
         this.setVolume(0.5);    

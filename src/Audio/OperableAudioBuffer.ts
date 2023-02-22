@@ -84,6 +84,33 @@ class OperableAudioBuffer extends AudioBuffer {
         }
         return channelData;
     }
+
+    shiftRegion(from: number, to: number, shift: number) {
+        const {numberOfChannels} = this;
+
+        // if shift left and it goes out of bound
+        if (shift < 0 && from + shift < 0) throw new Error("Shifted region out of bound");
+
+        // if shift right, and it goes out of bound then fill with 0
+        else if (to + shift > this.length) {
+            console.log("Shifted region out of bound, fill with 0");
+            let offset = to + shift - this.length;
+            console.log("offset: ", offset)
+            for (let i = 0; i < numberOfChannels; i++) {
+                const channel = this.getChannelData(i);
+                for (let j = this.length; j < offset; j++) {
+                    channel[j] = 0;
+                }
+            }
+        }
+
+        for (let i = 0; i < numberOfChannels; i++) {
+            const channel = this.getChannelData(i);
+            for (let j = from; j < to; j++) {
+                channel[j - shift] = channel[j];
+            }
+        }
+    }
 }
 
 export default OperableAudioBuffer;

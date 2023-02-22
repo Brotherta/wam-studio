@@ -7,7 +7,7 @@ import { SongInfo } from "../Controllers/HostController";
 import { audioCtx } from "../index";
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX, SAMPLE_RATE} from "../Utils";
 import Track from "./Track";
-import AudioPlugin from "./AudioPlugin";
+import Plugin from "./Plugin";
 
 /**
  * Model for the audios buffers stored in each tracks. 
@@ -108,7 +108,7 @@ export default class Tracks {
         trackElement.trackId = this.trackIdCount;
 
         let track = new Track(this.trackIdCount, trackElement, node);
-        track.plugin  = new AudioPlugin(this.app);
+        track.plugin  = new Plugin(this.app);
         track.gainNode.connect(this.app.host.gainNode);
 
         this.trackList.push(track);
@@ -137,6 +137,7 @@ export default class Tracks {
      */
     jumpTo(pos: number) {
         this.app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * SAMPLE_RATE
+        console.log("playhead: " + this.app.host.playhead);
         
         this.trackList.forEach((track) => {
             track.node!.port.postMessage({playhead: this.app.host.playhead+1})
@@ -193,4 +194,7 @@ export default class Tracks {
     }
 
 
+    getTrack(trackId: number) {
+        return this.trackList.find(track => track.id === trackId);
+    }
 }

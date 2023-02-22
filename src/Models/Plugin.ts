@@ -4,7 +4,7 @@ import App from "../App";
 /**
  * Class that represents a plugin.
  */
-export default class AudioPlugin {
+export default class Plugin {
 
     instance: WebAudioModule | undefined;
     dom: Element;
