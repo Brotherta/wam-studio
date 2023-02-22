@@ -172,7 +172,8 @@ export default class HostController {
             else {
                 this.app.automationController.applyAllAutomations();
                 this.app.tracks.trackList.forEach((track) => {
-                    if (track.modified) track.updateBuffer(this.audioCtx);
+                    if (track.modified) track.updateBuffer(this.audioCtx, this.app.host.playhead);
+
                     //@ts-ignore
                     track.node.parameters.get("playing").value = 1;
                     this.defineTimerListener();
@@ -313,9 +314,6 @@ export default class HostController {
                         .then(track => {
                             if (track !== undefined) {
                                 this.app.tracksController.initTrackComponents(track);
-                                // this.app.tracksController.addNewTrackInit(track);
-                                // this.app.automationView.addAutomationBpf(track.id);
-                                // this.app.waveFormController.addWaveformToTrack(track);
                             }
                         });
                 }

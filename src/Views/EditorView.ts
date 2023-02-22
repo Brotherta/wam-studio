@@ -90,7 +90,11 @@ export default class EditorView {
         });
     }
 
-    getWaveForm(trackId: number) {
+    getWaveFormViewById(trackId: number) {
         return this.waveforms.find(wave => wave.trackId === trackId);
+    }
+
+    getWaveformView(y: number) {
+        return this.waveforms.find(wave => y >= wave.position.y && y <= wave.position.y + HEIGHT_TRACK);
     }
 }

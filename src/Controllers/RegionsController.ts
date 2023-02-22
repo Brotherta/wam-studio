@@ -4,6 +4,7 @@ import Region from "../Models/Region";
 import RegionView from "../Views/RegionView";
 import WaveformView from "../Views/WaveformView";
 import {RATIO_MILLS_BY_PX} from "../Utils";
+import {InteractionEvent} from "pixi.js";
 
 
 export default class RegionsController {
@@ -63,30 +64,63 @@ export default class RegionsController {
         regionView.on("pointermove", (_e) => {
             if (this.isMovingRegion) {
                 waveFormView.moveRegion(_e.data.global.x, _e.data.global.y);
+                region.updateStart(regionView.position.x * RATIO_MILLS_BY_PX);
+                this.updateWaveformRegion(_e.data.global.y, region, regionView, waveFormView);
             }
         });
         regionView.on("pointerup", (_e) => {
-            if (this.isMovingRegion) {
-                this.stopMovingRegion(regionView, region);
-                waveFormView.stopMovingRegion();
-            }
+            this.stopMovingRegion(regionView, region, waveFormView, _e);
+
         });
         regionView.on("pointerupoutside", (_e) => {
-            if (this.isMovingRegion) {
-                this.stopMovingRegion(regionView, region);
-                waveFormView.stopMovingRegion();
-            }
+            this.stopMovingRegion(regionView, region, waveFormView, _e);
         });
     }
 
-    stopMovingRegion(regionView: RegionView, region: Region) {
-        this.isMovingRegion = false;
-        let track = this.app.tracks.getTrack(region.trackId);
-        if (track == undefined) {
+    stopMovingRegion(regionView: RegionView, region: Region, waveFormView: WaveformView, _e: InteractionEvent) {
+        if (this.isMovingRegion) {
+            this.isMovingRegion = false;
+            let track = this.app.tracks.getTrack(region.trackId);
+            if (track == undefined) {
+                throw new Error("Track not found");
+            }
+            region.updateStart(regionView.position.x * RATIO_MILLS_BY_PX);
+            track.modified = true;
+            waveFormView.stopMovingRegion();
+        }
+    }
+
+    updateWaveformRegion(y: number, _region: Region, _regionView: RegionView, _waveFormView: WaveformView) {
+        if (y < 0) y = 0;
+        if (_regionView !== _waveFormView.movingRegion) return;
+        let newWaveformView = this.app.editorView.getWaveformView(y);
+        if (newWaveformView !== _waveFormView && newWaveformView != undefined) {
+            this.moveRegionToWaveform(_region, _regionView, _waveFormView, newWaveformView);
+        }
+    }
+
+    moveRegionToWaveform(_region: Region, regionView: RegionView, oldWaveformView: WaveformView, newWaveformView: WaveformView) {
+        let oldTrack = this.app.tracks.getTrack(oldWaveformView.trackId);
+        let newTrack = this.app.tracks.getTrack(newWaveformView.trackId);
+        if (oldTrack == undefined || newTrack == undefined) {
             throw new Error("Track not found");
         }
-        region.updateStart(regionView.position.x * RATIO_MILLS_BY_PX);
-        track.modified = true;
+
+        _region.trackId = newTrack.id;
+        oldTrack.modified = true;
+        newTrack.modified = true;
+
+        oldWaveformView.removeRegionView(regionView);
+        let newRegionView = newWaveformView.createRegionView(_region);
+        this.app.regionsController.defineRegionListeners(_region, newRegionView, newWaveformView);
+
+        oldTrack.removeRegion(_region.id);
+        newTrack.addRegion(_region);
+
+        if (this.isMovingRegion) {
+            this.selectRegion(newRegionView);
+            newWaveformView.propagateMove(newRegionView, oldWaveformView)
+        }
     }
 
 }

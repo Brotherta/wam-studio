@@ -5,6 +5,7 @@ import Plugin from "./Plugin";
 import Automations from "./Automations";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import Region from "./Region";
+import {NUM_CHANNELS, SAMPLE_RATE} from "../Utils";
 
 export default class Track {
 
@@ -120,10 +121,14 @@ export default class Track {
         this.regions = this.regions.filter(region => region.id !== regionId);
     }
 
-    updateBuffer(context: AudioContext) {
-        console.log("Updating buffer...")
+    updateBuffer(context: AudioContext, playhead: number) {
+        console.log("Updating buffer... of track " + this.id)
         this.modified = false;
-        if (this.regions.length === 0) return;
+        if (this.regions.length === 0) {
+            this.audioBuffer = undefined;
+            this.node?.setAudio([new Float32Array()]);
+            return;
+        }
 
         let opBuffer: OperableAudioBuffer | undefined = undefined;
 
@@ -137,7 +142,8 @@ export default class Track {
 
             if (start > currentTime) {
                 console.log("Empty buffer: " + (start - currentTime) + "ms");
-                let emptyBuffer = context.createBuffer(this.audioBuffer!.numberOfChannels, (start - currentTime) * this.audioBuffer!.sampleRate / 1000, this.audioBuffer!.sampleRate);
+
+                let emptyBuffer = context.createBuffer(NUM_CHANNELS, (start - currentTime) * SAMPLE_RATE / 1000, SAMPLE_RATE);
                 let emptyOpBuffer = Object.setPrototypeOf(emptyBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
                 if (opBuffer == undefined) {
                     opBuffer = emptyOpBuffer;
@@ -160,5 +166,6 @@ export default class Track {
         }
         this.audioBuffer = opBuffer;
         this.node?.setAudio(this.audioBuffer!.toArray());
+        this.node?.port.postMessage({playhead: playhead});
     }
 }

@@ -40,9 +40,6 @@ export default class EditorController {
                     .then(track => {
                         if (track !== undefined) {
                             this.app.tracksController.initTrackComponents(track);
-                            // this.app.tracksController.addNewTrackInit(track);
-                            // this.app.automationView.addAutomationBpf(track.id);
-                            // this.app.waveFormController.addWaveformToTrack(track);
                         }
                     });
             });

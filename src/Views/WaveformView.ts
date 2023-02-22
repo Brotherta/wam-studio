@@ -19,6 +19,7 @@ export default class WaveformView extends Container{
     initialX: number;
     initialY: number;
     originalX: number;
+    originalY: number;
     movingRegion: RegionView | undefined;
 
     constructor(pixiApp: Application, track: Track) {
@@ -65,6 +66,15 @@ export default class WaveformView extends Container{
         return regionView;
     }
 
+    removeRegionView(regionView: RegionView) {
+        if (this.movingRegion === regionView) {
+            this.movingRegion = undefined;
+        }
+        let index = this.regionViews.indexOf(regionView);
+        this.regionViews.splice(index, 1);
+        this.removeChild(regionView);
+    }
+
     _drawBackground() {
         this.background.beginFill(0x2c2c2c);
         this.background.lineStyle({width: 1,color: 0x000000});
@@ -75,6 +85,7 @@ export default class WaveformView extends Container{
         this.initialX = initialX;
         this.originalX = regionView.x;
         this.initialY = initialY;
+        this.originalY = regionView.y;
         this.movingRegion = regionView;
     }
 
@@ -96,5 +107,13 @@ export default class WaveformView extends Container{
 
     stopMovingRegion() {
         this.movingRegion = undefined;
+    }
+
+    propagateMove(regionView: RegionView, oldWaveformView: WaveformView) {
+        this.initialX = oldWaveformView.initialX;
+        this.originalX = oldWaveformView.originalX;
+        this.initialY = oldWaveformView.initialY;
+        this.originalY = oldWaveformView.originalY;
+        this.movingRegion = regionView;
     }
 }

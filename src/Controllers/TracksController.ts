@@ -50,9 +50,6 @@ export default class TracksController {
             if (Object.prototype.hasOwnProperty.call(tracks, track)) {
                 const element = tracks[track];
                 this.initTrackComponents(element);
-                // this.app.tracksController.addNewTrackInit(element);
-                // this.app.automationView.addAutomationBpf(element.id);
-                // this.app.waveFormController.addWaveformToTrack(element);
             }
         }
     }
