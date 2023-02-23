@@ -13,6 +13,8 @@ import PluginsView from "./Views/PluginsView";
 import EditorView from "./Views/EditorView";
 import AutomationController from "./Controllers/AutomationController";
 import AutomationView from "./Views/AutomationView";
+import RegionsController from "./Controllers/RegionsController";
+import WaveformController from "./Controllers/WaveformController";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -25,6 +27,7 @@ export default class App {
     playheadController: PlayheadController;
     pluginsController: PluginsController;
     automationController: AutomationController;
+    waveFormController: WaveformController;
 
     hostView: HostView;
     tracksView: TracksView;
@@ -34,6 +37,7 @@ export default class App {
 
     tracks: Tracks;
     host: Host;
+    regionsController: RegionsController;
 
     constructor() {
         this.tracks = new Tracks(this);
@@ -51,6 +55,8 @@ export default class App {
         this.playheadController = new PlayheadController(this);
         this.pluginsController = new PluginsController(this);
         this.automationController = new AutomationController(this);
+        this.waveFormController = new WaveformController(this);
+        this.regionsController = new RegionsController(this);
 
         makeDivScrollSync();
     }

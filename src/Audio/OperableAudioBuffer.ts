@@ -45,7 +45,11 @@ class OperableAudioBuffer extends AudioBuffer {
      * @returns {[OperableAudioBuffer, OperableAudioBuffer]}
      */
     split(from: number) {
-        if (from >= this.length || from <= 0) throw new RangeError("Split point is out of bound");
+        if (from < 0) throw new RangeError("Split point is out of bound");
+        if (from >= this.length || from == 0) {
+            return [this, null];
+        }
+
         const {length, sampleRate, numberOfChannels} = this;
         const buffer1 = new OperableAudioBuffer({length: from, numberOfChannels, sampleRate});
         const buffer2 = new OperableAudioBuffer({length: length - from, numberOfChannels, sampleRate});
@@ -83,6 +87,31 @@ class OperableAudioBuffer extends AudioBuffer {
             }
         }
         return channelData;
+    }
+
+    static mix(buffer1: OperableAudioBuffer, buffer2: OperableAudioBuffer) {
+        let srcBuffer;
+        let dstBuffer;
+        if (buffer1.numberOfChannels >= buffer2.numberOfChannels) {
+            dstBuffer = buffer1;
+            srcBuffer = buffer2;
+        }
+        else {
+            dstBuffer = buffer2;
+            srcBuffer = buffer1;
+        }
+        const {length, numberOfChannels} = dstBuffer;
+
+        for (let channel = 0; channel < numberOfChannels; channel++) {
+            let nbChannelSrc = channel;
+            const dstChannel = dstBuffer.getChannelData(channel);
+            if (channel >= srcBuffer.numberOfChannels) nbChannelSrc--;
+            const srcChannel = srcBuffer.getChannelData(nbChannelSrc);
+            for (let i = 0; i < length; i++) {
+                dstChannel[i] = srcChannel[i] + dstChannel[i]
+            }
+        }
+        return dstBuffer;
     }
 }
 

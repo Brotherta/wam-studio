@@ -25,6 +25,10 @@ export default class HostView {
     song4 = document.getElementById("song-4") as HTMLAnchorElement;
     song5 = document.getElementById("song-5") as HTMLAnchorElement;
 
+    importSongs = document.getElementById("import-songs") as HTMLInputElement;
+    newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
+
+
     /**
      * Update the timer of the host view.
      *

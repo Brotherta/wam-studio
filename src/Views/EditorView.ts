@@ -1,8 +1,8 @@
 import {Application} from "pixi.js";
-import WaveFormView from "./WaveFormView";
 import {HEIGHT_TRACK, MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
 import PlayheadView from "./PlayheadView";
 import Track from "../Models/Track";
+import WaveformView from "./WaveformView";
 
 
 /**
@@ -15,7 +15,8 @@ export default class EditorView {
     trackContainer = document.getElementById("track-container") as HTMLDivElement;
     dragCover = document.getElementById("drag-cover") as HTMLDivElement;
 
-    waveforms: WaveFormView[];
+    waveforms: WaveformView[];
+
     playhead: PlayheadView;
 
     width = (MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX;
@@ -44,11 +45,11 @@ export default class EditorView {
      * Add a waveform into the canvas fot the given track and update the position of the other waveforms.
      * @param track
      */
-    addWaveForm(track: Track) {
-        let wave = new WaveFormView(this.pixiApp);
-
-        wave.setTrack(track);
+    createWaveformView(track: Track) {
+        let wave = new WaveformView(this.pixiApp, track);
         this.waveforms.push(wave);
+        this.resizeCanvas();
+        return wave;
     }
 
     /**
@@ -64,6 +65,7 @@ export default class EditorView {
         for (let i = index; i < this.waveforms.length; i++) {
             this.waveforms[i].position.y -= HEIGHT_TRACK;
         }
+        this.resizeCanvas();
     }
 
     /**
@@ -78,8 +80,23 @@ export default class EditorView {
      * @param track
      */
     changeWaveFormColor(track: Track) {
-        let wave = this.waveforms.find(wave => wave.trackId === track.id);
+        let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
+        if (waveFormView !== undefined) {
+            waveFormView.color = track.color;
+            waveFormView.regionViews.forEach(regionView => {
+                let region = track.getRegion(regionView.id);
+                if (region !== undefined) {
+                    regionView.drawWave(track.color, region);
+                }
+            });
+        }
+    }
 
-        wave?.drawWave(track);
+    getWaveFormViewById(trackId: number) {
+        return this.waveforms.find(wave => wave.trackId === trackId);
+    }
+
+    getWaveformView(y: number) {
+        return this.waveforms.find(wave => y >= wave.position.y && y <= wave.position.y + HEIGHT_TRACK);
     }
 }

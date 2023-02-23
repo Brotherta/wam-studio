@@ -1,5 +1,4 @@
 import App from "../App";
-import Track from "../Models/Track";
 import EditorView from "../Views/EditorView";
 
 /**
@@ -14,24 +13,6 @@ export default class EditorController {
         this.editor = app.editorView;
         this.app = app;
         this.defineDragAndDrop();
-    }
-
-    /**
-     * Add the according waveform to the track in the canvas. It also resizes the canvas.
-     * @param track
-     */
-    addWaveFormToTrack(track: Track) {
-        this.editor.addWaveForm(track);
-        this.editor.resizeCanvas();
-    }
-
-    /**
-     * Remove the according waveform from the track in the canvas. It also resizes the canvas.
-     * @param track
-     */
-    removeWafeFormOfTrack(track: Track) {
-        this.editor.removeWaveForm(track);
-        this.editor.resizeCanvas();
     }
 
     /**
@@ -58,9 +39,7 @@ export default class EditorController {
                 this.app.tracks.newTrackWithFile(file)
                     .then(track => {
                         if (track !== undefined) {
-                            this.app.tracksController.addNewTrackInit(track);
-                            this.app.automationView.addAutomationBpf(track.id);
-                            this.app.editorController.addWaveFormToTrack(track);
+                            this.app.tracksController.initTrackComponents(track);
                         }
                     });
             });
