@@ -60,7 +60,7 @@ export default class RegionView extends Container {
 
     drawBackground(color: number = 0x000000) {
         this.background.clear();
-        this.background.beginFill(0x2c2c2c);
+        this.background.beginFill(0xffffff, 0.2);
         this.background.lineStyle({width: 1, color: color});
         this.background.drawRect(0, 0, this.width, HEIGHT_TRACK-1);
     }

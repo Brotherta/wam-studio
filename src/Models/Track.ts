@@ -140,12 +140,12 @@ export default class Track {
             let start = region.start; // in milliseconds
             let duration = region.duration * 1000; // in milliseconds
 
-            if (start > currentTime) {
+            if (start > currentTime) { // No buffer until the current time
                 console.log("Empty buffer: " + (start - currentTime) + "ms");
 
                 let emptyBuffer = context.createBuffer(NUM_CHANNELS, (start - currentTime) * SAMPLE_RATE / 1000, SAMPLE_RATE);
                 let emptyOpBuffer = Object.setPrototypeOf(emptyBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-                if (opBuffer == undefined) {
+                if (opBuffer == undefined) { // First empty buffer
                     opBuffer = emptyOpBuffer;
                 }
                 else {
@@ -153,15 +153,44 @@ export default class Track {
                 }
                 currentTime = start;
             }
-            if (start === currentTime) {
+            if (start === currentTime) { // Buffer is at the current time
                 console.log("Region buffer: " + duration + "ms");
-                if (opBuffer == undefined) {
+                if (opBuffer == undefined) { // First buffer
                     opBuffer = region.buffer;
                 }
                 else {
                     opBuffer = opBuffer.concat(region.buffer);
                 }
                 currentTime += duration;
+            }
+            else if (start < currentTime) { // Overlap of the buffer with the last one
+                console.log("Overlap Region buffer: " + duration + "ms");
+                let overlap = currentTime - start;
+
+                // slice the overlap of the last buffer and the current one
+                let overlapSample = Math.floor(overlap * SAMPLE_RATE / 1000);
+                let buffers = opBuffer!.split(opBuffer!.length - overlapSample);
+                let buffers2 = region.buffer.split(overlapSample);
+
+                opBuffer = buffers[0]!;
+                let currentBuffer = buffers2[1];
+
+                let lastOverlapBuffer = buffers[1];
+                let currentOverlapBuffer = buffers2[0];
+
+                // mix the overlap of the last buffer and the current one
+                if (lastOverlapBuffer !== null) {
+                    lastOverlapBuffer = OperableAudioBuffer.mix(lastOverlapBuffer, currentOverlapBuffer!);
+                }
+                else {
+                    lastOverlapBuffer = currentOverlapBuffer!;
+                }
+
+                opBuffer = opBuffer.concat(lastOverlapBuffer);
+                if (currentBuffer !== null) {
+                    opBuffer = opBuffer.concat(currentBuffer);
+                }
+                currentTime = start + duration;
             }
         }
         this.audioBuffer = opBuffer;

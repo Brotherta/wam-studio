@@ -45,7 +45,11 @@ class OperableAudioBuffer extends AudioBuffer {
      * @returns {[OperableAudioBuffer, OperableAudioBuffer]}
      */
     split(from: number) {
-        if (from >= this.length || from <= 0) throw new RangeError("Split point is out of bound");
+        if (from < 0) throw new RangeError("Split point is out of bound");
+        if (from >= this.length || from == 0) {
+            return [this, null];
+        }
+
         const {length, sampleRate, numberOfChannels} = this;
         const buffer1 = new OperableAudioBuffer({length: from, numberOfChannels, sampleRate});
         const buffer2 = new OperableAudioBuffer({length: length - from, numberOfChannels, sampleRate});
@@ -85,31 +89,29 @@ class OperableAudioBuffer extends AudioBuffer {
         return channelData;
     }
 
-    shiftRegion(from: number, to: number, shift: number) {
-        const {numberOfChannels} = this;
+    static mix(buffer1: OperableAudioBuffer, buffer2: OperableAudioBuffer) {
+        let srcBuffer;
+        let dstBuffer;
+        if (buffer1.numberOfChannels >= buffer2.numberOfChannels) {
+            dstBuffer = buffer1;
+            srcBuffer = buffer2;
+        }
+        else {
+            dstBuffer = buffer2;
+            srcBuffer = buffer1;
+        }
+        const {length, numberOfChannels} = dstBuffer;
 
-        // if shift left and it goes out of bound
-        if (shift < 0 && from + shift < 0) throw new Error("Shifted region out of bound");
-
-        // if shift right, and it goes out of bound then fill with 0
-        else if (to + shift > this.length) {
-            console.log("Shifted region out of bound, fill with 0");
-            let offset = to + shift - this.length;
-            console.log("offset: ", offset)
-            for (let i = 0; i < numberOfChannels; i++) {
-                const channel = this.getChannelData(i);
-                for (let j = this.length; j < offset; j++) {
-                    channel[j] = 0;
-                }
+        for (let channel = 0; channel < numberOfChannels; channel++) {
+            let nbChannelSrc = channel;
+            const dstChannel = dstBuffer.getChannelData(channel);
+            if (channel >= srcBuffer.numberOfChannels) nbChannelSrc--;
+            const srcChannel = srcBuffer.getChannelData(nbChannelSrc);
+            for (let i = 0; i < length; i++) {
+                dstChannel[i] = srcChannel[i] + dstChannel[i]
             }
         }
-
-        for (let i = 0; i < numberOfChannels; i++) {
-            const channel = this.getChannelData(i);
-            for (let j = from; j < to; j++) {
-                channel[j - shift] = channel[j];
-            }
-        }
+        return dstBuffer;
     }
 }
 

@@ -81,13 +81,15 @@ export default class EditorView {
      */
     changeWaveFormColor(track: Track) {
         let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
-
-        waveFormView?.regionViews.forEach(regionView => {
-            let region = track.getRegion(regionView.id);
-            if (region !== undefined) {
-                regionView.drawWave(track.color, region);
-            }
-        });
+        if (waveFormView !== undefined) {
+            waveFormView.color = track.color;
+            waveFormView.regionViews.forEach(regionView => {
+                let region = track.getRegion(regionView.id);
+                if (region !== undefined) {
+                    regionView.drawWave(track.color, region);
+                }
+            });
+        }
     }
 
     getWaveFormViewById(trackId: number) {
