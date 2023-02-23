@@ -116,4 +116,8 @@ export default class WaveformView extends Container{
         this.originalY = oldWaveformView.originalY;
         this.movingRegion = regionView;
     }
+
+    getRegionView(regionId: number) {
+        return this.regionViews.find(regionView => regionView.id === regionId);
+    }
 }

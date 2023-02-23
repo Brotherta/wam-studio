@@ -37,6 +37,29 @@ export default class RegionsController {
                 this.deselectRegion();
             }
         });
+        // On delete key pressed, delete the selected region
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Delete" && this.selectedRegion !== undefined) {
+                this.deleteRegion(this.selectedRegion.id, this.selectedRegion.trackId);
+            }
+        });
+    }
+
+    deleteRegion(regionId: number, trackId: number) {
+        let track = this.app.tracks.getTrack(trackId);
+        if (track === undefined) throw new Error("Track not found");
+        let waveformView = this.app.editorView.getWaveFormViewById(track.id);
+        if (waveformView === undefined) throw new Error("Waveform not found");
+        let region = track.getRegion(regionId);
+        if (region === undefined) throw new Error("Region not found");
+        let regionView = waveformView.getRegionView(regionId);
+        if (regionView === undefined) throw new Error("RegionView not found");
+
+        waveformView.removeRegionView(regionView);
+        track.removeRegion(region.id);
+        if (this.selectedRegion === regionView) {
+            this.deselectRegion();
+        }
     }
 
     selectRegion(region: RegionView) {
@@ -87,6 +110,7 @@ export default class RegionsController {
             region.updateStart(regionView.position.x * RATIO_MILLS_BY_PX);
             track.modified = true;
             waveFormView.stopMovingRegion();
+            track.updateBuffer(this.app.host.audioCtx, this.app.host.playhead);
         }
     }
 
