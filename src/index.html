@@ -13,7 +13,7 @@
 
 <body>
 	<div class="app">
-		<div class="controls-bar">
+		<div class="controls-bar" id="controls-bar">
 			
 			<a class="menu-item main" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<img src="icons/list.svg">	
@@ -21,6 +21,8 @@
 			<div class="dropdown-menu dropright" aria-labelledby="dropdownMenuButton">
 				<a class="dropdown-item" id="save-project">Save Project</a>
 				<a class="dropdown-item" id="import-project">Import Project</a>
+				<a class="dropdown-item" id="import-songs">Import Song files</a>
+				<input id="new-track-input" type="file" accept=".mp3, .wav, .ogg" multiple style="display: none">
 
 				<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add Demo Songs</a>
 				<div class="dropdown-menu" aria-labelledby="dropdownSubMenuButton">
@@ -82,7 +84,6 @@
 				
 					
 					<div id="new-track" class="new-track">
-						<input id="new-track-input" type="file", accept=".mp3, .wav, .ogg" multiple style="display: none">
 						<div class="new-track-text">
 							New track
 						</div>	
@@ -91,13 +92,26 @@
 						</div>
 						
 					</div>
+
+					<div id="automation-menu" hidden>
+						<ul>
+							<li class="automation-item" id="hide-automation">Hide Automation</li>
+							<li class="automation-item" id="option1">Option 1</li>
+							<li class="automation-item" id="option2">Option 2</li>
+							<li class="automation-item">Option 3</li>
+						</ul>
+					</div>
 				</div>
 				<div class="test">
 					<div id="playhead" class="playhead">
-						<input type="range" class="playhead-range" id="playhead-range">	
+						<input type="range" class="playhead-range" id="playhead-range">
 					</div>
 					<div class="editor" id="editor">
 						<!-- <canvas id="pixi-canvas"></canvas> -->
+
+						<div id="automation-container">
+						</div>
+
 
 						<!-- STANFORD CONTAINER COMPONENT !!-->
 						<div id="special-controls-container">
@@ -137,7 +151,7 @@
 							<img src="icons/sliders.svg">
 						</div>
 						<div class="text-icon">
-							MAIN TRACK
+							MASTER TRACK
 						</div>
 					</div>
 

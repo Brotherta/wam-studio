@@ -74,6 +74,12 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
         return true;
     }
 
+    /**
+     * Calculate the max volume of the audio buffer.
+     * It will send the max volume to the main thread every COUNT_BLOCK blocks.
+     *
+     * @param output {Float32Array} The audio buffer.
+     */
     calculateMax(output) {
         if (output !== undefined) {
             for (let i = 0; i < output.length; i++) {

@@ -22,6 +22,23 @@ const getProcessor = (moduleId: string) => {
             super(options);
         }
 
+        static get parameterDescriptors() {
+            return [
+                {
+                    name: "playing",
+                    minValue: 0,
+                    maxValue: 1,
+                    defaultValue: 0,
+                },
+                {
+                    name: "loop",
+                    minValue: 0,
+                    maxValue: 1,
+                    defaultValue: 0,
+                }
+            ];
+        }
+
         async _onMessage(e: any) {
             await super._onMessage(e);
             if (e.data.audio) {
@@ -35,27 +52,16 @@ const getProcessor = (moduleId: string) => {
             }
         }
 
-        static get parameterDescriptors() {
-            return [
-                {
-                    name: "playing",
-                    minValue: 0,
-                    maxValue: 1,
-                    defaultValue: 0,
-                },
-                {
-                    name: "loop",
-                    minValue: 0,
-                    maxValue: 1,
-                    defaultValue: 0, 
-                }
-            ];
+        _processEvent(event) {
+            this.emitEvents(event);
         }
 
         _process() {}
 
         // @ts-ignore
         process(inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>) {
+            super.process(inputs, outputs, parameters);
+
             if (!this.audio) return true;
             // console.log("play");
             

@@ -16,30 +16,15 @@ export default class TracksController {
         this.app = app;
         this.tracksView = this.app.tracksView;
 
-        this.defineNewtrackCallback();
+        this.defineNewTrackCallback();
     }
 
-    defineNewtrackCallback() {
+    defineNewTrackCallback() {
         this.tracksView.newTrackDiv.addEventListener('click', () => {
-           this.tracksView.newTrackInput.click();
-        });
-        this.tracksView.newTrackInput.addEventListener('change', (e) => {
-            // @ts-ignore
-            for (let i = 0; i < e.target.files.length; i++) {
-                // @ts-ignore
-                let file = e.target.files[i];
-                if (file !== undefined) {
-                    this.app.tracks.newTrackWithFile(file)
-                        .then(track => {
-                            if (track !== undefined) {
-                                this.addNewTrackInit(track);
-                                this.app.editorController.addWaveFormToTrack(track);
-                                this.app.specialsController.addSpecialControlToTrack(track);
-                            }
-                        });
-                }
-
-            }
+            this.app.tracks.newEmptyTrack()
+                .then(track => {
+                    this.initTrackComponents(track);
+                });
         });
     }
 
@@ -64,11 +49,15 @@ export default class TracksController {
         for (const track in tracks) {
             if (Object.prototype.hasOwnProperty.call(tracks, track)) {
                 const element = tracks[track];
-                this.app.tracksController.addNewTrackInit(element);
-                this.app.editorController.addWaveFormToTrack(element);
-                this.app.specialsController.addSpecialControlToTrack(element);
+                this.initTrackComponents(element);
             }
         }
+    }
+
+    initTrackComponents(track: Track) {
+        this.app.tracksController.addNewTrackInit(track);
+        this.app.automationView.addAutomationBpf(track.id);
+        this.app.waveFormController.addWaveformToTrack(track);
     }
 
     /**
@@ -82,6 +71,8 @@ export default class TracksController {
         this.app.tracks.removeTrack(track);
         this.app.editorController.removeWafeFormOfTrack(track);
         this.app.specialsController.removeSpecialControlFromTrack(track);
+        this.app.waveFormController.removeWaveformOfTrack(track);
+        this.app.automationView.removeAutomationBpf(track.id);
     }
 
     /**
@@ -139,6 +130,10 @@ export default class TracksController {
             this.tracksView.changeColor(track);
             this.app.editorView.changeWaveFormColor(track);
         }
+        track.element.automationBtn.onclick = async (e) => {
+            await this.app.automationController.openAutomationMenu(track);
+            e.stopImmediatePropagation();
+        }
     }
 
     /**
@@ -154,8 +149,8 @@ export default class TracksController {
                 .connect(host.audioCtx.destination);
         }
         else {
-            track.node.disconnect(track.pannerNode);
-            track.node
+            track.node!.disconnect(track.pannerNode);
+            track.node!
                 .connect(track.plugin.instance!._audioNode)
                 .connect(track.pannerNode);
         }
@@ -172,8 +167,8 @@ export default class TracksController {
             host.gainNode.connect(host.audioCtx.destination);
         }
         else if (track.plugin.initialized) {
-            track.node.disconnect(track.plugin.instance!._audioNode);
-            track.node.connect(track.pannerNode);
+            track.node!.disconnect(track.plugin.instance!._audioNode);
+            track.node!.connect(track.pannerNode);
         }
     }
 }

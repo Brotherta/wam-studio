@@ -157,12 +157,12 @@ export default class PluginsController {
      * @param track
      */
     removePlugins(track: Track) {
-        if (this.selectedTrack === track) {
-            this.selectedTrack = undefined;
-            this.selectPlugins();
-        }
+        track.plugin.instance?._audioNode.clearEvents();
         this.app.tracksController.disconnectPlugin(track);
         track.plugin.unloadPlugin();
         this.app.pluginsView.deletePluginView();
+        if (this.selectedTrack === track) {
+            this.selectPlugins();
+        }
     }
 }

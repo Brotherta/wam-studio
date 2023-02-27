@@ -1,4 +1,5 @@
 export const SAMPLE_RATE = 48000;
+export const NUM_CHANNELS = 2;
 
 let time = 600; // 10 minutes
 

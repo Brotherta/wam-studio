@@ -6,6 +6,7 @@ const specialControl = document.getElementById("special-controls-container") as 
 
 const header = document.getElementById("header") as HTMLElement;
 const resizableWindow = document.getElementById("resizableWindow") as HTMLElement;
+const automationController = document.getElementById("automation-container") as HTMLElement;
 
 const advancedHeader = document.getElementById("advanced-header") as HTMLElement;
 const advancedResizableWindow = document.getElementById("advanced-window") as HTMLElement;
@@ -13,6 +14,7 @@ const advancedResizableWindow = document.getElementById("advanced-window") as HT
 /**
  * This function makes the track div and the editor div scroll synchronously.
  */
+
 function makeDivScrollSync2() {
     
     let active: EventTarget | undefined = undefined;
@@ -50,15 +52,28 @@ function makeDivScrollSync() {
     specialControl.addEventListener("mouseenter", function(e: Event) {
         active = e.target as EventTarget;
     })
+    automationController.addEventListener("mouseenter", function(e: Event) {
+        active = e.target as EventTarget;
+    })
 
     trackDiv.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;
         specialControl.scrollTop = trackDiv.scrollTop;
-    })   
+        editorDiv.scrollTop = trackDiv.scrollTop;
+        automationController.scrollTop = trackDiv.scrollTop;
+    })
     specialControl.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;
         trackDiv.scrollTop = specialControl.scrollTop;
+        trackDiv.scrollTop = editorDiv.scrollTop;
+        automationController.scrollTop = editorDiv.scrollTop;
     })
+    automationController.addEventListener("scroll", function(e: Event) {
+        if (e.target !== active) return;
+        trackDiv.scrollTop = automationController.scrollTop;
+        editorDiv.scrollTop = automationController.scrollTop;
+    })
+
     makeDivScrollSync2();
 }
 
@@ -118,6 +133,7 @@ class DraggableWindow {
 
 // @ts-ignore
 const draggableWindow = new DraggableWindow(header, resizableWindow);
+
 // @ts-ignore
 const draggableWindowAdvanced = new DraggableWindow(advancedHeader, advancedResizableWindow);
 

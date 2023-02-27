@@ -14,6 +14,7 @@ export default class PluginsView {
     removePlugin = document.getElementById("remove-plugins") as HTMLDivElement;
     closeWindowButton = document.getElementById("closeButtonResizeWindow") as HTMLDivElement;
     mainTrack = document.getElementById("main-track") as HTMLDivElement;
+    pluginsDiv = document.getElementById("plugins") as HTMLDivElement;
 
     maxHeight: number;
     minHeight: number;

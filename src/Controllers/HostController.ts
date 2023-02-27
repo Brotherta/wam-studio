@@ -41,7 +41,6 @@ export default class HostController {
      * Define all the listeners for the audio controls.
      */
     defineControls() {
-        this.defineAutomationListener();
         this.definePlayListener();
         this.defineBackListener();
         this.defineRecordListener();
@@ -50,6 +49,7 @@ export default class HostController {
         this.defineMuteListener();
         this.defineSongsDemoListener();
         this.defineTimerListener();
+        this.defineImportSongListener();
         this.app.pluginsView.mainTrack.addEventListener("click", () => {
             this.app.pluginsController.selectHost();
         });
@@ -150,6 +150,7 @@ export default class HostController {
     defineBackListener() {
         this.hostView.backBtn.onclick = () => {
             this.app.tracks.jumpTo(1);
+            this.app.automationController.applyAllAutomations();
         }
     }
 
@@ -169,7 +170,10 @@ export default class HostController {
                 this.audioCtx.suspend();
             }
             else {
+                this.app.automationController.applyAllAutomations();
                 this.app.tracks.trackList.forEach((track) => {
+                    if (track.modified) track.updateBuffer(this.audioCtx, this.app.host.playhead);
+
                     //@ts-ignore
                     track.node.parameters.get("playing").value = 1;
                     this.defineTimerListener();
@@ -180,15 +184,6 @@ export default class HostController {
             }
             this.playing = !this.playing;
             this.hostView.pressPlayButton(this.playing);
-        }
-    }
-    
-    /**
-     * TODO : Not implemented yet.
-     */
-    defineAutomationListener() {
-        this.hostView.automationBtn.onclick = () => {
-            console.log("Automation Button : TODO");
         }
     }
 
@@ -305,6 +300,27 @@ export default class HostController {
         this.vuMeter = new VuMeter(this.app.hostView.vuMeterCanvas, 30, 157);
     }
 
+    defineImportSongListener() {
+        this.hostView.importSongs.addEventListener('click', () => {
+            this.hostView.newTrackInput.click();
+        });
+        this.hostView.newTrackInput.addEventListener('change', (e) => {
+            // @ts-ignore
+            for (let i = 0; i < e.target.files.length; i++) {
+                // @ts-ignore
+                let file = e.target.files[i];
+                if (file !== undefined) {
+                    this.app.tracks.newTrackWithFile(file)
+                        .then(track => {
+                            if (track !== undefined) {
+                                this.app.tracksController.initTrackComponents(track);
+                            }
+                        });
+                }
+
+            }
+        });
+    }
 }
 
 

@@ -7,7 +7,7 @@ import { SongInfo } from "../Controllers/HostController";
 import { audioCtx } from "../index";
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX, SAMPLE_RATE} from "../Utils";
 import Track from "./Track";
-import AudioPlugin from "./AudioPlugin";
+import Plugin from "./Plugin";
 
 /**
  * Model for the audios buffers stored in each tracks. 
@@ -36,10 +36,10 @@ export default class Tracks {
      * @param songInfo the object containing the number of files and the names of the files
      * @returns the new tracks that have been created
      */
-    async newTrackWithAudio(path: String, songInfo: SongInfo) {    
+    async newTrackWithAudio(path: String, songInfo: SongInfo) {
         let number = songInfo.number;
         let songs = songInfo.songs;
-        
+
         let newTracks = [];
 
         for (let i = 0; i < number; i++) {
@@ -61,6 +61,15 @@ export default class Tracks {
             newTracks.push(track);
         }
         return newTracks;
+    }
+
+    async newEmptyTrack() {
+        let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
+        let node = wamInstance.audioNode as WamAudioWorkletNode;
+
+        let track = this.createTrack(node);
+        track.element.name = `Track ${track.id}`;
+        return track;
     }
 
     /**
@@ -108,7 +117,7 @@ export default class Tracks {
         trackElement.trackId = this.trackIdCount;
 
         let track = new Track(this.trackIdCount, trackElement, node);
-        track.plugin  = new AudioPlugin(this.app);
+        track.plugin  = new Plugin(this.app);
         track.gainNode.connect(this.app.host.gainNode);
 
         this.trackList.push(track);
@@ -125,9 +134,9 @@ export default class Tracks {
     removeTrack(track: Track) {
         let trackIndex = this.trackList.indexOf(track);
         this.trackList.splice(trackIndex, 1);  
-        track.node.removeAudio();
-        track.node.disconnectEvents();
-        track.node.disconnect();
+        track.node!.removeAudio();
+        track.node!.disconnectEvents();
+        track.node!.disconnect();
     }
 
     /**
@@ -137,9 +146,10 @@ export default class Tracks {
      */
     jumpTo(pos: number) {
         this.app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * SAMPLE_RATE
+        console.log("playhead: " + this.app.host.playhead);
         
         this.trackList.forEach((track) => {
-            track.node.port.postMessage({playhead: this.app.host.playhead+1})
+            track.node!.port.postMessage({playhead: this.app.host.playhead+1})
         });
 
         this.app.host.hostNode?.port.postMessage({playhead: this.app.host.playhead+1});
@@ -155,7 +165,7 @@ export default class Tracks {
         let isHostSolo = false;
 
         this.trackList.forEach(track => {
-            if (track.isSolo){
+            if (track.isSolo) {
                 isHostSolo = true;
             }
         });
@@ -193,4 +203,7 @@ export default class Tracks {
     }
 
 
+    getTrack(trackId: number) {
+        return this.trackList.find(track => track.id === trackId);
+    }
 }

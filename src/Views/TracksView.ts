@@ -18,7 +18,6 @@ export default class TracksView {
 
     trackContainerDiv: HTMLDivElement = document.getElementById("track-container") as HTMLDivElement;
     newTrackDiv: HTMLDivElement = document.getElementById("new-track") as HTMLDivElement;
-    newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
 
     constructor() {
         // TODO
