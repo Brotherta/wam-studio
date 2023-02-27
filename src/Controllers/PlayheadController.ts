@@ -1,5 +1,6 @@
 import App from "../App";
-import {RATIO_MILLS_BY_PX, SAMPLE_RATE} from "../Utils";
+import {RATIO_MILLS_BY_PX} from "../Utils";
+import {audioCtx} from "../index";
 
 /**
  * Controller for the playhead. This controller is responsible for updating the playhead position and jumping to a specific position.
@@ -50,7 +51,7 @@ export default class PlayheadController {
                 let x = e.clientX - left
 
                 if (x < 0) x = 0;
-                let pos = (x * RATIO_MILLS_BY_PX) /1000 * SAMPLE_RATE
+                let pos = (x * RATIO_MILLS_BY_PX) /1000 * audioCtx.sampleRate
                 this.app.editorView.playhead.movePlayheadLine(x);
                 this.app.hostView.updateTimer(pos);
             }

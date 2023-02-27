@@ -1,8 +1,8 @@
-import { SAMPLE_RATE } from "../Utils";
-
 /**
  * Class responsible for the host view. It displays the host controls and the host track.
  */
+import {audioCtx} from "../index";
+
 export default class HostView {
 
     automationBtn = document.getElementById("automation-btn") as HTMLDivElement;
@@ -35,7 +35,7 @@ export default class HostView {
      * @param pos current pos of the playhead. It is used to calculate the time.
      */
     updateTimer(pos: number) {
-        let millseconds = (pos / SAMPLE_RATE) * 1000;
+        let millseconds = (pos / audioCtx.sampleRate) * 1000;
         this.timer.innerHTML = this.millisToMinutesAndSeconds(millseconds);
     }
 

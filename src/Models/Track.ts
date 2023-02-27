@@ -5,7 +5,7 @@ import Plugin from "./Plugin";
 import Automations from "./Automations";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import Region from "./Region";
-import {NUM_CHANNELS, SAMPLE_RATE} from "../Utils";
+import {NUM_CHANNELS} from "../Utils";
 
 export default class Track {
 
@@ -130,6 +130,7 @@ export default class Track {
             return;
         }
 
+        let sampleRate = context.sampleRate;
         let opBuffer: OperableAudioBuffer | undefined = undefined;
 
         this.regions = this.regions.sort((a, b) => a.start - b.start);
@@ -143,7 +144,7 @@ export default class Track {
             if (start > currentTime) { // No buffer until the current time
                 console.log("Empty buffer: " + (start - currentTime) + "ms");
 
-                let emptyBuffer = context.createBuffer(NUM_CHANNELS, (start - currentTime) * SAMPLE_RATE / 1000, SAMPLE_RATE);
+                let emptyBuffer = context.createBuffer(NUM_CHANNELS, (start - currentTime) * sampleRate / 1000, sampleRate);
                 let emptyOpBuffer = Object.setPrototypeOf(emptyBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
                 if (opBuffer == undefined) { // First empty buffer
                     opBuffer = emptyOpBuffer;
@@ -168,7 +169,7 @@ export default class Track {
                 let overlap = currentTime - start;
 
                 // slice the overlap of the last buffer and the current one
-                let overlapSample = Math.floor(overlap * SAMPLE_RATE / 1000);
+                let overlapSample = Math.floor(overlap * sampleRate / 1000);
                 let buffers = opBuffer!.split(opBuffer!.length - overlapSample);
                 let buffers2 = region.buffer.split(overlapSample);
 
