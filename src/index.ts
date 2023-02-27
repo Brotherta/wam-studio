@@ -1,12 +1,10 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
-import TrackElement from './Components/TrackElement';
-// @ts-ignore
 import BPF from './Utils/BPF';
-import TrackElement from './Views/Components/TrackElement';
-import ControlElement from "./Views/Components/ControlElement";
-import AdvancedElement from "./Views/Components/AdvancedElement";
+import TrackElement from './Components/TrackElement';
+import ControlElement from "./Components/ControlElement";
+import AdvancedElement from "./Components/AdvancedElement";
 
 customElements.define(
     "track-element",

@@ -1,5 +1,5 @@
-import ControlElement from "../Views/Components/ControlElement";
-import AdvancedElement from "../Views/Components/AdvancedElement";
+import ControlElement from "../Components/ControlElement";
+import AdvancedElement from "../Components/AdvancedElement";
 
 
 export default class Control {

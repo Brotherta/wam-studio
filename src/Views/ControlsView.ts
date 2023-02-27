@@ -1,4 +1,4 @@
-import ControlElement from "./Components/ControlElement";
+import ControlElement from "../Components/ControlElement";
 
 
 export default class ControlsView {

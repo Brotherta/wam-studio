@@ -58,6 +58,7 @@ export default class TracksController {
         this.app.tracksController.addNewTrackInit(track);
         this.app.automationView.addAutomationBpf(track.id);
         this.app.waveFormController.addWaveformToTrack(track);
+        this.app.specialsController.addSpecialControlToTrack(track);
     }
 
     /**
@@ -69,7 +70,6 @@ export default class TracksController {
         this.app.pluginsController.removePlugins(track);
         this.tracksView.removeTrack(track.element);
         this.app.tracks.removeTrack(track);
-        this.app.editorController.removeWafeFormOfTrack(track);
         this.app.specialsController.removeSpecialControlFromTrack(track);
         this.app.waveFormController.removeWaveformOfTrack(track);
         this.app.automationView.removeAutomationBpf(track.id);

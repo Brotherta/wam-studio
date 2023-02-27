@@ -1,8 +1,8 @@
 import App from "../App";
 import Control from "../Models/Control";
 import Track from "../Models/Track";
-import ControlElement from "../Views/Components/ControlElement";
-import AdvancedElement from "../Views/Components/AdvancedElement";
+import ControlElement from "../Components/ControlElement";
+import AdvancedElement from "../Components/AdvancedElement";
 
 
 export default class ControlsController {

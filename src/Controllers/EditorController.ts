@@ -40,7 +40,6 @@ export default class EditorController {
                     .then(track => {
                         if (track !== undefined) {
                             this.app.tracksController.initTrackComponents(track);
-                            this.app.specialsController.addSpecialControlToTrack(track); // HERE
                         }
                     });
             });
