@@ -17,6 +17,10 @@ module.exports = (env, argv) => {
 
         // Config for your testing server
         devServer: {
+            headers: {
+                "Cross-Origin-Embedder-Policy": "require-corp",
+                "Cross-Origin-Opener-Policy": "same-origin"
+            },
             compress: true,
             static: false,
             client: {

@@ -21,6 +21,7 @@ export default class AutomationController {
      * @param track
      */
     async openAutomationMenu(track: Track) {
+        this.app.automationView.clearMenu();
         await this.getAllAutomations(track);
         this.app.automationView.openAutomationMenu(track);
         this.automationOpened = true;

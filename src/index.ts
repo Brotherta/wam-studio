@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 import TrackElement from './Components/TrackElement';
 // @ts-ignore
-import BPF from './Utils/BPF';
+import BPF from './Components/BPF';
 
 customElements.define(
     "track-element",
