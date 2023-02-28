@@ -1,5 +1,5 @@
 // @ts-ignore
-import BPF from "../Utils/BPF"
+import BPF from "../Components/BPF"
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
 
 /**

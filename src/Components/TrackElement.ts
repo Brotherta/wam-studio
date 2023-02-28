@@ -140,7 +140,6 @@ template.innerHTML = /*html*/`
 }
 
 .mute-icon:hover, .solo-icon:hover {
-    color: lightgrey;
     cursor: pointer;
 }
 
@@ -151,8 +150,6 @@ template.innerHTML = /*html*/`
 }
 
 .control:hover {
-    /*filter: invert(100%) sepia(0%) saturate(2190%) hue-rotate(165deg) brightness(89%) contrast(86%);*/
-    filter: invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
     cursor: pointer;
 }
 
@@ -205,6 +202,10 @@ export default class TrackElement extends HTMLElement {
     trackId: number | undefined;
     name: string;
 
+    isArmed: boolean = false;
+    isSolo: boolean = false;
+    isMuted: boolean = false;
+
     constructor() {
         super();
         this.attachShadow({mode: "open"});
@@ -251,6 +252,10 @@ export default class TrackElement extends HTMLElement {
         return this.shadowRoot?.getElementById("automation") as HTMLDivElement;
     }
 
+    get armBtn() {
+        return this.shadowRoot?.getElementById("arm") as HTMLDivElement;
+    }
+
 
     defineTrackNameListener() {
         this.trackNameInput.value = this.name;
@@ -261,20 +266,64 @@ export default class TrackElement extends HTMLElement {
                 (document.activeElement as HTMLElement).blur();
             }
         });
+
+        this.soloBtn.addEventListener("mouseenter", () => {
+            if (!this.isSolo) {
+                this.soloBtn.style.color = "lightgrey";
+            }
+        });
+        this.soloBtn.addEventListener("mouseleave", () => {
+            if (!this.isSolo) {
+                this.soloBtn.style.color = "grey";
+            }
+        });
+
+        this.muteBtn.addEventListener("mouseenter", () => {
+            if (!this.isMuted) {
+                this.muteBtn.style.color = "lightgrey";
+            }
+        });
+        this.muteBtn.addEventListener("mouseleave", () => {
+            if (!this.isMuted) {
+                this.muteBtn.style.color = "grey";
+            }
+        });
+
+        this.armBtn.addEventListener("mouseenter", () => {
+            if (!this.isArmed) {
+                this.armBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
+            }
+        });
+        this.armBtn.addEventListener("mouseleave", () => {
+            if (!this.isArmed) {
+                this.armBtn.style.filter = "none";
+            }
+        });
+
+        this.automationBtn.addEventListener("mouseenter", () => {
+            this.automationBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
+        });
+        this.automationBtn.addEventListener("mouseleave", () => {
+            this.automationBtn.style.filter = "none";
+        });
     }
 
     mute() {
         this.muteBtn.style.color = "red";
+        this.isMuted = true;
     }
     unmute() {
-        this.muteBtn.style.color = "grey"
+        this.muteBtn.style.color = "lightgrey"
+        this.isMuted = false;
     }
 
     solo() {
         this.soloBtn.style.color = "lightgreen";
+        this.isSolo = true;
     }
     unsolo() {
-        this.soloBtn.style.color = "grey";
+        this.soloBtn.style.color = "lightgrey";
+        this.isSolo = false;
     }
 
     setName(arg0: string) {
@@ -287,5 +336,15 @@ export default class TrackElement extends HTMLElement {
 
     unSelect() {
         this.style.borderColor = "black";
+    }
+
+    arm() {
+        this.armBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
+        this.isArmed = true;
+    }
+
+    unArm() {
+        this.armBtn.style.filter = "none";
+        this.isArmed = false;
     }
 }

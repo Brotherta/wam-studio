@@ -58,6 +58,7 @@ export default class TracksController {
         this.app.tracksController.addNewTrackInit(track);
         this.app.automationView.addAutomationBpf(track.id);
         this.app.waveFormController.addWaveformToTrack(track);
+        this.app.recorderController.addRecordListener(track);
     }
 
     /**
@@ -131,6 +132,9 @@ export default class TracksController {
         track.element.automationBtn.onclick = async (e) => {
             await this.app.automationController.openAutomationMenu(track);
             e.stopImmediatePropagation();
+        }
+        track.element.armBtn.onclick = () => {
+            this.app.recorderController.clickArm(track);
         }
     }
 

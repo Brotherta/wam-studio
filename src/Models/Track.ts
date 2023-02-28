@@ -31,6 +31,11 @@ export default class Track {
     regions: Region[];
     modified: boolean;
 
+    isArmed: boolean = false;
+    worker: Worker | undefined;
+    sab: SharedArrayBuffer;
+    mic: MediaStreamAudioSourceNode;
+
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;
         this.element = element;

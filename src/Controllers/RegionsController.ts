@@ -60,6 +60,7 @@ export default class RegionsController {
         if (this.selectedRegion === regionView) {
             this.deselectRegion();
         }
+        track.modified = true;
     }
 
     selectRegion(region: RegionView) {
