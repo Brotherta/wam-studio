@@ -183,10 +183,13 @@ div::-webkit-scrollbar-thumb:hover {
 }
   
 .playhead-range::-moz-range-thumb {
-    width: 25px; /* Set a specific slider handle width */
-    height: 25px; /* Slider handle height */
-    background: #04AA6D; /* Green background */
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 10px; /* Set a specific slider handle width */
+    height: 20px; /* Slider handle height */
+    background: lightgrey; /* Green background */
     cursor: pointer; /* Cursor on hover */
+    border-bottom-right-radius: 20px 30px;
 }
 
 .track-container::-webkit-scrollbar {

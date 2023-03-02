@@ -46,6 +46,7 @@ const getProcessor = (moduleId: string) => {
         }
 
         async _onMessage(e: any) {
+            console.log(e.data);
             await super._onMessage(e);
             if (e.data.audio) {
                 this.audio = e.data.audio;
@@ -58,11 +59,13 @@ const getProcessor = (moduleId: string) => {
             }
             else if (e.data.arm) {
                 this.arm = true;
-                this.sab = e.data.sab;
                 this._audioWriter = new AudioWriter(new RingBuffer(this.sab, Float32Array));
             }
             else if (e.data.stopRecording) {
                 this.arm = false;
+            }
+            else if (e.data.sab) {
+                this.sab = e.data.sab;
             }
         }
 
@@ -70,14 +73,15 @@ const getProcessor = (moduleId: string) => {
             this.emitEvents(event);
         }
 
-        _process() {}
+        _process() {
+        }
 
         // @ts-ignore
         process(inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>) {
+            console.log("process");
             super.process(inputs, outputs, parameters);
 
             if (!this.audio) return true;
-            // console.log("play");
 
             if (this.arm) {
                 if (inputs[0].length === 0) return true;
@@ -198,6 +202,7 @@ const getProcessor = (moduleId: string) => {
          * buffer will hold.
          */
         constructor(sab, type) {
+
             if (type.BYTES_PER_ELEMENT === undefined) {
                 throw TypeError("Pass a concrete typed array class as second argument");
             }
