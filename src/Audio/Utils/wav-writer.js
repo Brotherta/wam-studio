@@ -50,9 +50,6 @@ onmessage = function (e) {
       this.staging = new Float32Array(e.data.sab.byteLength / 4 / 4 / 2);
       // Attempt to dequeue every 100ms. Making this deadline isn't critical:
       // there's 1 second worth of space in the queue, and we'll be dequeing
-      interval = setInterval(readFromQueue, 100);
-
-      interval2 = setInterval(postCurrentBuffer, 500);
       break;
     }
     case "stopAndDownloadAsWavFile": {
@@ -122,7 +119,8 @@ onmessage = function (e) {
       break;
     }
     case "stopAndSendAsBuffer": {
-
+      clearInterval(interval);
+      clearInterval(interval2);
       // Drain the ring buffer
       while (readFromQueue()) {
         /* empty */
@@ -137,9 +135,10 @@ onmessage = function (e) {
       this.audioBuf = [];
       break;
     }
-    case "terminateWorker": {
-      clearInterval(interval);
-      clearInterval(interval2);
+    case "startWorker": {
+      interval = setInterval(readFromQueue, 100);
+
+      interval2 = setInterval(postCurrentBuffer, 500);
       break;
     }
     default: {

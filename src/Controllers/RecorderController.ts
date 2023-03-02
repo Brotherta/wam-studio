@@ -3,15 +3,17 @@ import Track from "../Models/Track";
 import {URLFromFiles} from "../Audio/Utils/UrlFiles";
 import {audioCtx} from "../index";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-// import {RingBuffer} from "../Audio/Utils/ringbuf";
 
 
 export default class RecorderController {
 
     app: App;
+    mic: MediaStreamAudioSourceNode | undefined;
+    panNode: StereoPannerNode | undefined;
 
     constructor(app: App) {
         this.app = app;
+
     }
 
     addRecordListener(track: Track) {
@@ -24,9 +26,8 @@ export default class RecorderController {
             track.element.unArm();
             if (this.app.hostController.playing) {
                 this.stopRecording(track);
-                track.worker?.postMessage({"terminateWorker": true});
-                track.worker?.terminate();
             }
+            track.worker?.terminate();
             track.node?.port.postMessage({"stopRecording": true});
         }
         else {
@@ -42,19 +43,22 @@ export default class RecorderController {
         track.node?.port.postMessage({
             "arm": true
         });
-        var constraints = {
-            audio: {
-                echoCancellation: false,
-                mozNoiseSuppression: false,
-                mozAutoGainControl: false
-            }
-        };
-        let stream = await navigator.mediaDevices.getUserMedia(constraints);
-        let mic = new MediaStreamAudioSourceNode(audioCtx, {
-            mediaStream: stream
-        });
 
-        track.mic = mic
+        if (this.mic === undefined || this.panNode === undefined) {
+            var constraints = {
+                audio: {
+                    echoCancellation: false,
+                    mozNoiseSuppression: false,
+                    mozAutoGainControl: false
+                }
+            };
+            let stream = await navigator.mediaDevices.getUserMedia(constraints);
+            this.mic = new MediaStreamAudioSourceNode(audioCtx, {
+                mediaStream: stream
+            });
+            this.panNode = audioCtx.createStereoPanner();
+            this.mic.connect(this.panNode);
+        }
     }
 
     async setupWorker(track: Track) {
@@ -75,14 +79,18 @@ export default class RecorderController {
         track.worker?.postMessage({
             command: "stopAndSendAsBuffer"
         });
-        track.mic.disconnect();
+        this.panNode?.disconnect()
     }
 
     startRecording(track: Track, playhead: number) {
-        track.mic.connect(track.pannerNode).connect(track.node!);
+        this.panNode!.connect(track.node!);
 
         let start = (playhead / audioCtx.sampleRate) * 1000;
         let region = this.app.waveFormController.createTemporaryRegion(track, start);
+
+        track.worker?.postMessage({
+            command: "startWorker"
+        });
 
         track.worker!.onmessage = async (e) => {
             switch (e.data.command) {
@@ -106,6 +114,7 @@ export default class RecorderController {
 
                         console.log(audioBuffer);
 
+                        console.log("Update temporary region : " + region.id);
                         this.app.waveFormController.updateTemporaryRegion(region, track, audioBuffer)
                     }
                     break;
