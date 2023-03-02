@@ -17,7 +17,6 @@ customElements.define(
 const audioCtx = new AudioContext();
 audioCtx.suspend();
 const app = new App();
-
 (async () => {
     await app.initHost();
 })();

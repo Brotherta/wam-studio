@@ -1,7 +1,7 @@
 const exports = {};
 
 function readFromQueue() {
-  // Read some float32 pcm from the queue, 
+  // Read some float32 pcm from the queue,
   const samples_read = this._audio_reader.dequeue(this.staging);
 
   if (!samples_read) {
@@ -32,6 +32,7 @@ onmessage = function (e) {
       this._audio_reader = new exports.AudioReader(
         new RingBuffer(e.data.sab, Float32Array)
       );
+      console.log("length" + e.data.sab + " " + e.data.sab.byteLength);
       // The number of channels of the audio stream read from the queue.
       this.channelCount = e.data.channelCount;
       // The sample-rate of the audio stream read from the queue.
@@ -121,8 +122,7 @@ onmessage = function (e) {
       break;
     }
     case "stopAndSendAsBuffer": {
-      clearInterval(interval);
-      clearInterval(interval2);
+
       // Drain the ring buffer
       while (readFromQueue()) {
         /* empty */
@@ -132,6 +132,14 @@ onmessage = function (e) {
         command: "audioBufferFinal",
         buffer: audioBuf,
       });
+      this.pcm = [];
+      // MB
+      this.audioBuf = [];
+      break;
+    }
+    case "terminateWorker": {
+      clearInterval(interval);
+      clearInterval(interval2);
       break;
     }
     default: {

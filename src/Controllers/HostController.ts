@@ -178,7 +178,7 @@ export default class HostController {
                 this.app.tracks.trackList.forEach(async (track) => {
                     if (track.modified) track.updateBuffer(this.audioCtx, this.app.host.playhead);
                     if (track.isArmed) {
-                        await this.app.recorderController.setupRecording(track, this.app.host.playhead);
+                        await this.app.recorderController.startRecording(track, this.app.host.playhead);
                     }
                     //@ts-ignore
                     track.node.parameters.get("playing").value = 1;

@@ -6,6 +6,7 @@ import Automations from "./Automations";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import Region from "./Region";
 import {NUM_CHANNELS} from "../Utils";
+import {RingBuffer} from "../Audio/Utils/ringbuf";
 
 export default class Track {
 
@@ -51,7 +52,10 @@ export default class Track {
         this.pannerNode = audioCtx.createStereoPanner();
         if (this.node !== undefined) {
             this.node.connect(this.pannerNode).connect(this.gainNode);
+            this.sab = RingBuffer.getStorageForCapacity(audioCtx.sampleRate * 2, Float32Array);
+            this.node.port.postMessage({"sab": this.sab});
         }
+
     }
 
     /**
