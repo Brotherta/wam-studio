@@ -20,26 +20,31 @@ export default class EditorController {
      * It adds the dropped files to the track view.
      */
     defineDragAndDrop() {
-        ["dragenter", "dragover"].forEach(eventName => {
-           window.addEventListener(eventName, () => {
+        ["dragenter", "dragstart"].forEach(eventName => {
+           this.editor.editor.addEventListener(eventName, () => {
                this.app.editorView.dragCover.hidden = false;
            });
         });
 
-        ["drop", "dragleave"].forEach(eventName => {
-            this.app.editorView.dragCover.addEventListener(eventName, () => {
-                this.app.editorView.dragCover.hidden = true;
-            });
+
+        this.app.editorView.dragCover.addEventListener("dragleave", () => {
+            this.app.editorView.dragCover.hidden = true;
         });
 
-        window.addEventListener("drop", (e) => {
+        window.ondragend = () => {
+            this.app.editorView.dragCover.hidden = true;
+        }
+
+        this.app.editorView.dragCover.addEventListener("drop", (e) => {
             let files = e.dataTransfer!.files;
+            this.app.editorView.dragCover.hidden = true;
             console.table(files);
             ([...files]).forEach(file => {
                 this.app.tracks.newTrackWithFile(file)
                     .then(track => {
                         if (track !== undefined) {
                             this.app.tracksController.initTrackComponents(track);
+
                         }
                     });
             });
