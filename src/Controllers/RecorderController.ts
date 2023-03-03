@@ -10,10 +10,11 @@ export default class RecorderController {
     app: App;
     mic: MediaStreamAudioSourceNode | undefined;
     panNode: StereoPannerNode | undefined;
+    recording: boolean;
 
     constructor(app: App) {
         this.app = app;
-
+        this.recording = false;
     }
 
     addRecordListener(track: Track) {
@@ -37,6 +38,36 @@ export default class RecorderController {
             await this.setupWorker(track);
             await this.setupRecording(track);
         }
+    }
+
+    clickRecord() {
+        if (this.recording) {
+            for (let track of this.app.tracks.trackList) {
+                if (track.isArmed) {
+                    this.stopRecording(track);
+                }
+            }
+            this.recording = false;
+            this.app.hostController.clickOnPlayButton();
+        }
+        else {
+            let armed = this.app.tracks.trackList.find((e) => e.isArmed);
+            if (armed === undefined) {
+                alert("No track armed");
+                return;
+            }
+
+            this.recording = true;
+            if (!this.app.hostController.playing) {
+                this.app.hostController.clickOnPlayButton();
+            }
+            for (let track of this.app.tracks.trackList) {
+                if (track.isArmed) {
+                    this.startRecording(track, this.app.host.playhead);
+                }
+            }
+        }
+        this.app.hostView.pressRecordingButton(this.recording);
     }
 
     async setupRecording(track: Track) {
@@ -76,13 +107,19 @@ export default class RecorderController {
     }
 
     stopRecording(track: Track) {
+        this.recording = false;
         track.worker?.postMessage({
             command: "stopAndSendAsBuffer"
         });
         this.panNode?.disconnect()
     }
 
+    pauseRecording(track: Track) {
+        console.log("pause recording" + track.id);
+    }
+
     startRecording(track: Track, playhead: number) {
+        this.recording = true;
         this.panNode!.connect(track.node!);
 
         let start = (playhead / audioCtx.sampleRate) * 1000;

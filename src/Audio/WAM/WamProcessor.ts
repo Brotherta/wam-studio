@@ -78,7 +78,6 @@ const getProcessor = (moduleId: string) => {
 
         // @ts-ignore
         process(inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>) {
-            console.log("process");
             super.process(inputs, outputs, parameters);
 
             if (!this.audio) return true;

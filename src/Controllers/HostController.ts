@@ -22,7 +22,6 @@ export default class HostController {
     playing: boolean = false;
     looping: boolean = false;
     muted: boolean = false;
-    recording: boolean = false;
     pauseInterval = false;
 
     timerInterval: NodeJS.Timer | undefined;
@@ -132,14 +131,7 @@ export default class HostController {
      */
     defineRecordListener() {
         this.hostView.recordBtn.onclick = () => {
-            if (this.recording) {
-                // TODO: change processor
-            }
-            else {
-                // TODO
-            }
-            this.recording = !this.recording;
-            this.hostView.pressRecordingButton(this.recording);
+            this.app.recorderController.clickRecord();
         }
     }
 
@@ -159,37 +151,7 @@ export default class HostController {
      */
     definePlayListener() {
         this.hostView.playBtn.onclick = () => {
-            if (this.playing) {
-                this.app.tracks.trackList.forEach((track) => {
-                    //@ts-ignore
-                    track.node.parameters.get("playing").value = 0;
-                    clearInterval(this.timerInterval!!);
-                    if (track.isArmed) {
-                        console.log("stop Recording");
-                        this.app.recorderController.stopRecording(track);
-                    }
-                });
-                //@ts-ignore
-                this.app.host.hostNode.parameters.get("playing").value = 0;
-                this.audioCtx.suspend();
-            }
-            else {
-                this.app.automationController.applyAllAutomations();
-                this.app.tracks.trackList.forEach(async (track) => {
-                    if (track.modified) track.updateBuffer(this.audioCtx, this.app.host.playhead);
-                    if (track.isArmed) {
-                        await this.app.recorderController.startRecording(track, this.app.host.playhead);
-                    }
-                    //@ts-ignore
-                    track.node.parameters.get("playing").value = 1;
-                    this.defineTimerListener();
-                });
-                //@ts-ignore
-                this.app.host.hostNode.parameters.get("playing").value = 1;
-                this.audioCtx.resume();
-            }
-            this.playing = !this.playing;
-            this.hostView.pressPlayButton(this.playing);
+            this.clickOnPlayButton();
         }
     }
 
@@ -326,6 +288,37 @@ export default class HostController {
 
             }
         });
+    }
+
+    clickOnPlayButton() {
+        if (this.playing) {
+            this.app.tracks.trackList.forEach((track) => {
+                //@ts-ignore
+                track.node.parameters.get("playing").value = 0;
+                clearInterval(this.timerInterval!!);
+                if (track.isArmed && this.app.recorderController.recording) {
+                    this.app.recorderController.stopRecording(track);
+                    this.hostView.pressRecordingButton(false);
+                }
+            });
+            //@ts-ignore
+            this.app.host.hostNode.parameters.get("playing").value = 0;
+            this.audioCtx.suspend();
+        }
+        else {
+            this.app.automationController.applyAllAutomations();
+            this.app.tracks.trackList.forEach(async (track) => {
+                if (track.modified) track.updateBuffer(this.audioCtx, this.app.host.playhead);
+                //@ts-ignore
+                track.node.parameters.get("playing").value = 1;
+                this.defineTimerListener();
+            });
+            //@ts-ignore
+            this.app.host.hostNode.parameters.get("playing").value = 1;
+            this.audioCtx.resume();
+        }
+        this.playing = !this.playing;
+        this.hostView.pressPlayButton(this.playing);
     }
 }
 
