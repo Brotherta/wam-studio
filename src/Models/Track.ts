@@ -35,7 +35,8 @@ export default class Track {
     isArmed: boolean = false;
     worker: Worker | undefined;
     sab: SharedArrayBuffer;
-    mic: MediaStreamAudioSourceNode;
+
+    currentBufferRecorded: OperableAudioBuffer | undefined;
 
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;

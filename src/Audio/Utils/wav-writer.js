@@ -148,9 +148,12 @@ onmessage = function (e) {
 };
 
 function postCurrentBuffer() {
-  //console.log("Post message audioBuf");
+  console.log("Post message audioBuf");
   postMessage({
     command: "audioBufferCurrentUpdated",
     buffer: audioBuf,
   });
+  this.pcm = [];
+  // MB
+  this.audioBuf = [];
 }

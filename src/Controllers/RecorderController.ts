@@ -111,6 +111,9 @@ export default class RecorderController {
         track.worker?.postMessage({
             command: "stopAndSendAsBuffer"
         });
+        track.node?.port.postMessage({
+            "stopRecording": true
+        });
         this.panNode?.disconnect()
     }
 
@@ -127,6 +130,10 @@ export default class RecorderController {
 
         track.worker?.postMessage({
             command: "startWorker"
+        });
+
+        track.node?.port.postMessage({
+            "startRecording": true,
         });
 
         track.worker!.onmessage = async (e) => {
@@ -149,9 +156,6 @@ export default class RecorderController {
                             right[i / 2] = pcm[i + 1];
                         }
 
-                        console.log(audioBuffer);
-
-                        console.log("Update temporary region : " + region.id);
                         this.app.waveFormController.updateTemporaryRegion(region, track, audioBuffer)
                     }
                     break;

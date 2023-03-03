@@ -16,7 +16,8 @@ const getProcessor = (moduleId: string) => {
         
         audio: Float32Array[][] | undefined;
         playhead: number = 0;
-        arm: boolean = false;
+        recording: boolean = false;
+
 
         interleaved: Float32Array;
         sab: SharedArrayBuffer;
@@ -58,11 +59,13 @@ const getProcessor = (moduleId: string) => {
                 this.audio = undefined;
             }
             else if (e.data.arm) {
-                this.arm = true;
                 this._audioWriter = new AudioWriter(new RingBuffer(this.sab, Float32Array));
             }
+            else if (e.data.startRecording) {
+                this.recording = true;
+            }
             else if (e.data.stopRecording) {
-                this.arm = false;
+                this.recording = false;
             }
             else if (e.data.sab) {
                 this.sab = e.data.sab;
@@ -82,7 +85,7 @@ const getProcessor = (moduleId: string) => {
 
             if (!this.audio) return true;
 
-            if (this.arm) {
+            if (this.recording) {
                 if (inputs[0].length === 0) return true;
                 if (inputs[0]) {
                     interleave(inputs[0], this.interleaved);

@@ -58,8 +58,9 @@ export default class WaveformController {
         let regionView = waveformView.getRegionView(region.id);
         if (regionView === undefined) throw new Error("RegionView not found");
 
-        region.buffer = buffer;
-        region.duration = buffer.duration;
+        region.buffer = region.buffer.concat(buffer);
+
+        region.duration = region.buffer.duration;
         waveformView.removeRegionView(regionView);
         waveformView!.createRegionView(region);
 
@@ -73,8 +74,9 @@ export default class WaveformController {
         let regionView = waveformView.getRegionView(region.id);
         if (regionView === undefined) throw new Error("RegionView not found");
 
-        region.buffer = buffer;
-        region.duration = buffer.duration;
+        region.buffer = region.buffer.concat(buffer);
+
+        region.duration = region.buffer.duration;
         waveformView.removeRegionView(regionView);
 
         let newRegionView = waveformView!.createRegionView(region);
