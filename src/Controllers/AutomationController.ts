@@ -1,6 +1,6 @@
 import App from "../App";
 import Track from "../Models/Track";
-import {SAMPLE_RATE} from "../Utils";
+import {audioCtx} from "../index";
 
 
 /**
@@ -21,6 +21,7 @@ export default class AutomationController {
      * @param track
      */
     async openAutomationMenu(track: Track) {
+        this.app.automationView.clearMenu();
         await this.getAllAutomations(track);
         this.app.automationView.openAutomationMenu(track);
         this.automationOpened = true;
@@ -95,7 +96,7 @@ export default class AutomationController {
     applyAllAutomations() {
         let tracks = this.app.tracks.trackList;
         let playhead = this.app.host.playhead;
-        let time = (playhead / SAMPLE_RATE) * 1000;
+        let time = (playhead / audioCtx.sampleRate) * 1000;
 
         for (let track of tracks) {
             track.plugin.instance?._audioNode.clearEvents();

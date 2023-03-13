@@ -5,6 +5,9 @@ import BPF from './Utils/BPF';
 import TrackElement from './Components/TrackElement';
 import ControlElement from "./Components/ControlElement";
 import AdvancedElement from "./Components/AdvancedElement";
+import TrackElement from './Components/TrackElement';
+// @ts-ignore
+import BPF from './Components/BPF';
 
 customElements.define(
     "track-element",
@@ -26,7 +29,6 @@ customElements.define(
 const audioCtx = new AudioContext();
 audioCtx.suspend();
 const app = new App();
-
 (async () => {
     await app.initHost();
 })();

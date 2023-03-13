@@ -2,7 +2,7 @@ import { audioCtx } from "..";
 import App from "../App";
 import AudioPlayerNode from "../Audio/AudioNode";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import { MAX_DURATION_SEC, SAMPLE_RATE } from "../Utils";
+import { MAX_DURATION_SEC } from "../Utils";
 import Track from "./Track";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "./Plugin";
@@ -53,7 +53,7 @@ export default class Host extends Track {
         const [hostGroupId] = await initializeWamHost(audioCtx);
         this.hostGroupId = hostGroupId;
 
-        let audio = audioCtx.createBuffer(2, MAX_DURATION_SEC * SAMPLE_RATE, SAMPLE_RATE)
+        let audio = audioCtx.createBuffer(2, MAX_DURATION_SEC * audioCtx.sampleRate, audioCtx.sampleRate)
         const operableAudioBuffer = Object.setPrototypeOf(audio, OperableAudioBuffer.prototype) as OperableAudioBuffer;
         
         this.hostNode = new AudioPlayerNode(this.audioCtx, 2);

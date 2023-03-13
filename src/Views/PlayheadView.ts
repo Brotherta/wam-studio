@@ -1,5 +1,6 @@
 import {Application, Graphics} from "pixi.js";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX, SAMPLE_RATE} from "../Utils";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
+import {audioCtx} from "../index";
 
 /**
  * Class responsible for displaying the playhead. It is a line that moves on the canvas.
@@ -73,7 +74,7 @@ export default class PlayheadView {
      * @param playhead
      */
     getXfromPlayhead(playhead: number) {
-        let millis = (playhead / SAMPLE_RATE) * 1000;
+        let millis = (playhead / audioCtx.sampleRate) * 1000;
         return millis / RATIO_MILLS_BY_PX;
     }
 }

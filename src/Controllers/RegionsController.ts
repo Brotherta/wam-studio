@@ -39,7 +39,7 @@ export default class RegionsController {
         });
         // On delete key pressed, delete the selected region
         document.addEventListener("keydown", (e) => {
-            if (e.key === "Delete" && this.selectedRegion !== undefined) {
+            if ((e.key === "Delete" || e.key === "Backspace") && this.selectedRegion !== undefined) {
                 this.deleteRegion(this.selectedRegion.id, this.selectedRegion.trackId);
             }
         });
@@ -60,6 +60,7 @@ export default class RegionsController {
         if (this.selectedRegion === regionView) {
             this.deselectRegion();
         }
+        track.modified = true;
     }
 
     selectRegion(region: RegionView) {

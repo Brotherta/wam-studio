@@ -5,7 +5,8 @@ import Plugin from "./Plugin";
 import Automations from "./Automations";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import Region from "./Region";
-import {NUM_CHANNELS, SAMPLE_RATE} from "../Utils";
+import {NUM_CHANNELS} from "../Utils";
+import {RingBuffer} from "../Audio/Utils/ringbuf";
 
 export default class Track {
 
@@ -31,6 +32,12 @@ export default class Track {
     regions: Region[];
     modified: boolean;
 
+    isArmed: boolean = false;
+    worker: Worker | undefined;
+    sab: SharedArrayBuffer;
+
+    currentBufferRecorded: OperableAudioBuffer | undefined;
+
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;
         this.element = element;
@@ -46,7 +53,10 @@ export default class Track {
         this.pannerNode = audioCtx.createStereoPanner();
         if (this.node !== undefined) {
             this.node.connect(this.pannerNode).connect(this.gainNode);
+            this.sab = RingBuffer.getStorageForCapacity(audioCtx.sampleRate * 2, Float32Array);
+            this.node.port.postMessage({"sab": this.sab});
         }
+
     }
 
     /**
@@ -130,6 +140,7 @@ export default class Track {
             return;
         }
 
+        let sampleRate = context.sampleRate;
         let opBuffer: OperableAudioBuffer | undefined = undefined;
 
         this.regions = this.regions.sort((a, b) => a.start - b.start);
@@ -143,7 +154,7 @@ export default class Track {
             if (start > currentTime) { // No buffer until the current time
                 console.log("Empty buffer: " + (start - currentTime) + "ms");
 
-                let emptyBuffer = context.createBuffer(NUM_CHANNELS, (start - currentTime) * SAMPLE_RATE / 1000, SAMPLE_RATE);
+                let emptyBuffer = context.createBuffer(NUM_CHANNELS, (start - currentTime) * sampleRate / 1000, sampleRate);
                 let emptyOpBuffer = Object.setPrototypeOf(emptyBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
                 if (opBuffer == undefined) { // First empty buffer
                     opBuffer = emptyOpBuffer;
@@ -168,7 +179,7 @@ export default class Track {
                 let overlap = currentTime - start;
 
                 // slice the overlap of the last buffer and the current one
-                let overlapSample = Math.floor(overlap * SAMPLE_RATE / 1000);
+                let overlapSample = Math.floor(overlap * sampleRate / 1000);
                 let buffers = opBuffer!.split(opBuffer!.length - overlapSample);
                 let buffers2 = region.buffer.split(overlapSample);
 

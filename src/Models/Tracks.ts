@@ -5,7 +5,7 @@ import WamEventDestination from "../Audio/WAM/WamEventDestination";
 import TrackElement from "../Components/TrackElement";
 import { SongInfo } from "../Controllers/HostController";
 import { audioCtx } from "../index";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX, SAMPLE_RATE} from "../Utils";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
 import Track from "./Track";
 import Plugin from "./Plugin";
 
@@ -80,7 +80,7 @@ export default class Tracks {
      * @param file
      */
     async newTrackWithFile(file: File) {
-        if (file.type === "audio/ogg" || file.type === "audio/wav" || file.type === "audio/mpeg") {
+        if (file.type === "audio/ogg" || file.type === "audio/wav" || file.type === "audio/mpeg" || file.type === "audio/x-wav") {
             let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
             let node = wamInstance.audioNode as WamAudioWorkletNode;
 
@@ -145,7 +145,7 @@ export default class Tracks {
      * @param pos the position in px
      */
     jumpTo(pos: number) {
-        this.app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * SAMPLE_RATE
+        this.app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * audioCtx.sampleRate
         console.log("playhead: " + this.app.host.playhead);
         
         this.trackList.forEach((track) => {
