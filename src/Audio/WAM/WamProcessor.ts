@@ -47,7 +47,6 @@ const getProcessor = (moduleId: string) => {
         }
 
         async _onMessage(e: any) {
-            console.log(e.data);
             await super._onMessage(e);
             if (e.data.audio) {
                 this.audio = e.data.audio;

@@ -1,13 +1,13 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
-import BPF from './Utils/BPF';
 import TrackElement from './Components/TrackElement';
-import ControlElement from "./Components/ControlElement";
-import AdvancedElement from "./Components/AdvancedElement";
-import TrackElement from './Components/TrackElement';
+import TrackControlElement from "./Components/TrackControlElement";
+import AdvancedControlElement from "./Components/AdvancedControlElement";
 // @ts-ignore
 import BPF from './Components/BPF';
+import BindParameterElement from "./Components/BindParameterElement";
+import TrackBindControlElement from "./Components/TrackBindControlElement";
 
 customElements.define(
     "track-element",
@@ -15,16 +15,24 @@ customElements.define(
 );
 customElements.define(
     "control-element",
-    ControlElement
+    TrackControlElement
 );
 customElements.define(
     "advanced-element",
-    AdvancedElement
+    AdvancedControlElement
 )
 customElements.define(
     "bpf-automation",
     BPF
 );
+customElements.define(
+    "bind-parameter-element",
+    BindParameterElement
+);
+customElements.define(
+    "track-bind-control-element",
+    TrackBindControlElement
+)
 
 const audioCtx = new AudioContext();
 audioCtx.suspend();

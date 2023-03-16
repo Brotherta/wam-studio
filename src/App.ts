@@ -11,9 +11,8 @@ import PlayheadController from "./Controllers/PlayheadController";
 import PluginsController from "./Controllers/PluginsController";
 import PluginsView from "./Views/PluginsView";
 import EditorView from "./Views/EditorView";
-import ControlsController from "./Controllers/ControlsController";
-import ControlsView from "./Views/ControlsView";
-import Controls from "./Models/Controls";
+import TrackControlController from "./Controllers/TrackControlController";
+import TrackControlView from "./Views/TrackControlView";
 import AutomationController from "./Controllers/AutomationController";
 import AutomationView from "./Views/AutomationView";
 import RegionsController from "./Controllers/RegionsController";
@@ -34,39 +33,35 @@ export default class App {
     waveFormController: WaveformController;
     regionsController: RegionsController;
     recorderController: RecorderController;
-    specialsController: ControlsController;
+    trackControlController: TrackControlController;
 
     hostView: HostView;
     tracksView: TracksView;
     editorView: EditorView;
     pluginsView: PluginsView;
     automationView: AutomationView;
-    controlsView: ControlsView;
+    controlsView: TrackControlView;
 
     tracks: Tracks;
     host: Host;
 
-    regionsController: RegionsController;
-    controls: Controls;
-
     constructor() {
         this.tracks = new Tracks(this);
         this.host = new Host(this);
-        this.controls = new Controls(this);
 
         this.hostView = new HostView();
         this.tracksView = new TracksView();
         this.pluginsView = new PluginsView();
         this.editorView = new EditorView();
         this.automationView = new AutomationView();
-        this.controlsView = new ControlsView();
+        this.controlsView = new TrackControlView();
 
         this.hostController = new HostController(this);
         this.editorController = new EditorController(this);
         this.tracksController = new TracksController(this);
         this.playheadController = new PlayheadController(this);
         this.pluginsController = new PluginsController(this);
-        this.specialsController = new ControlsController(this);
+        this.trackControlController = new TrackControlController(this);
         this.automationController = new AutomationController(this);
         this.waveFormController = new WaveformController(this);
         this.regionsController = new RegionsController(this);

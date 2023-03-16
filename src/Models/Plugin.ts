@@ -21,6 +21,7 @@ export default class Plugin {
      */
     async initPlugin() {
         //@ts-ignore
+        // const {default: WAM} = await import(/* webpackIgnore: true */"http://localhost:3008/src/index.js");
         const {default: WAM} = await import(/* webpackIgnore: true */"https://wam-bank.vidalmazuy.fr/src/index.js");
         this.instance = await WAM.createInstance(this.app.host.hostGroupId, this.app.host.audioCtx);
         // @ts-ignore

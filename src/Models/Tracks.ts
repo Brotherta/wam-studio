@@ -146,8 +146,7 @@ export default class Tracks {
      */
     jumpTo(pos: number) {
         this.app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * audioCtx.sampleRate
-        console.log("playhead: " + this.app.host.playhead);
-        
+
         this.trackList.forEach((track) => {
             track.node!.port.postMessage({playhead: this.app.host.playhead+1})
         });

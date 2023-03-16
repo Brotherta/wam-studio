@@ -45,11 +45,16 @@
 				<img src="/icons/play-fill.svg" id="play-img">
 				<img src="/icons/pause-fill.svg" id="pause-img" hidden>
 			</div>
-			<div id="record-btn" class="menu-item">
+			<div id="mute-btn" class="menu-item">
+				<span class="mytooltip">Mute</span>
+				<img id="unmute-img" src="icons/volume-up-fill.svg">
+				<img id="mute-img" src="icons/volume-mute-fill.svg" hidden>
+			</div>
+			<div id="record-btn" class="menu-item" hidden>
 				<span class="mytooltip">Record</span>
 				<img src="icons/record-fill.svg">
 			</div>
-			<div id="loop-btn" class="menu-item">
+			<div id="loop-btn" class="menu-item" hidden>
 				<span class="mytooltip">Loop</span>
 				<img src="/icons/repeat.svg">
 			</div>
@@ -58,15 +63,11 @@
 					00:00:00:00
 				</div>
 			</div>
-			<div id="metro-btn" class="menu-item">
+			<div id="metro-btn" class="menu-item" hidden>
 				<span class="mytooltip">Metronome</span>
 				<i class="metro-icon"></i>
 			</div>
-			<div id="mute-btn" class="menu-item">
-				<span class="mytooltip">Mute</span>
-				<img id="unmute-img" src="icons/volume-up-fill.svg">
-				<img id="mute-img" src="icons/volume-mute-fill.svg" hidden>
-			</div>
+
 		</div>
 	
 		<div class="editors">
@@ -99,7 +100,7 @@
 				</div>
 				<div class="test">
 					<div id="playhead" class="playhead">
-						<input type="range" class="playhead-range" id="playhead-range">
+						<input type="range" class="playhead-range" id="playhead-range" hidden>
 					</div>
 					<div class="editor" id="editor">
 						<!-- <canvas id="pixi-canvas"></canvas> -->
@@ -127,13 +128,13 @@
 					</div>
 				</div>
 
-				<div id="advanced-window" class="resizableWindow" >
+				<div id="advanced-window" class="resizableWindow" hidden>
 					<div id="advanced-header" class="header">
 						<span id="advanced-title" class="title">Advanced Window</span>
 						<button id="advanced-close-button" class="closeButtonResizeWindow">X</button>
 					</div>
 					<div class="mount" id="advanced-mount">
-						<advanced-element></advanced-element>
+
 					</div>
 				</div>
 
@@ -220,7 +221,7 @@
 
 					<div class="resizableWindow" id="resizableWindow" hidden>
 						<div class="header" id="header">
-							<span class="title" id="title">PedalBoard</span>
+							<span class="title">PedalBoard</span>
 							<button class="closeButtonResizeWindow" id="closeButtonResizeWindow">X</button>
 						</div>
 						<div class="mount" id="mount">

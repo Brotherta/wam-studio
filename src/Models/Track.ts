@@ -132,7 +132,6 @@ export default class Track {
     }
 
     updateBuffer(context: AudioContext, playhead: number) {
-        console.log("Updating buffer... of track " + this.id)
         this.modified = false;
         if (this.regions.length === 0) {
             this.audioBuffer = undefined;
@@ -152,7 +151,6 @@ export default class Track {
             let duration = region.duration * 1000; // in milliseconds
 
             if (start > currentTime) { // No buffer until the current time
-                console.log("Empty buffer: " + (start - currentTime) + "ms");
 
                 let emptyBuffer = context.createBuffer(NUM_CHANNELS, (start - currentTime) * sampleRate / 1000, sampleRate);
                 let emptyOpBuffer = Object.setPrototypeOf(emptyBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
@@ -165,7 +163,6 @@ export default class Track {
                 currentTime = start;
             }
             if (start === currentTime) { // Buffer is at the current time
-                console.log("Region buffer: " + duration + "ms");
                 if (opBuffer == undefined) { // First buffer
                     opBuffer = region.buffer;
                 }
@@ -175,7 +172,6 @@ export default class Track {
                 currentTime += duration;
             }
             else if (start < currentTime) { // Overlap of the buffer with the last one
-                console.log("Overlap Region buffer: " + duration + "ms");
                 let overlap = currentTime - start;
 
                 // slice the overlap of the last buffer and the current one

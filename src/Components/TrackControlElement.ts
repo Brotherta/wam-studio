@@ -4,9 +4,9 @@ template.innerHTML = /*html*/`
 
 <style>
 
-.control-item {
+track-bind-control-element {
     height: 100%;
-    width: 200px;
+    min-width: 200px;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -14,10 +14,13 @@ template.innerHTML = /*html*/`
     align-items: center;
     border-left: 1px solid black;
     border-right: 1px solid black;
+    margin-left: 30px;
+
 }
 
 .special-control-slider {
     transform: scale(1.5);
+    width: 125px;
 }
 
 .special-control-label {
@@ -32,25 +35,24 @@ template.innerHTML = /*html*/`
     font-size: 15px;
 }
 
+#controls {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow: auto;
+}
 
 </style>
 
-<div class="control-item">
-    <label class="special-control-label">CLARITY</label>
-    <input class="special-control-slider" type="range">
-    <label class="special-control-value">100</label>
-</div>
+<div id="controls">
 
-<div class="control-item">
-    <label class="special-control-label">WEIGHT</label>
-    <input class="special-control-slider" type="range">
-    <label class="special-control-value">100</label>
 </div>
-
-<button type="button" class="btn btn-light adv-btn">Advanced</button>
 `
 
-export default class ControlElement extends HTMLElement {
+export default class TrackControlElement extends HTMLElement {
 
     trackId: number;
     name: string;
@@ -69,8 +71,8 @@ export default class ControlElement extends HTMLElement {
         }
     }
 
-    get closeBtn() {
-        return this.shadowRoot?.getElementById("close-btn") as HTMLDivElement;
+    get controlsContainer(): HTMLDivElement {
+        return this.shadowRoot?.getElementById("controls") as HTMLDivElement;
     }
 
     defineTrackNameListener() {

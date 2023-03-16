@@ -158,15 +158,26 @@ template.innerHTML = /*html*/`
     cursor: pointer;
 }
 
+#settings-btn:hover {
+    cursor: pointer;
+}
+
 </style>
+
+<link rel="stylesheet" href="/style/icons.css">
 
 <div class="track-utils">
     <div class="track-header">
         <input id="name-input" class="track-name">
-    
+        
+        <div id="settings-btn">
+            <img class="settings-icon">
+        </div>
+        
         <div id="close-btn" class="track-close">
             <img src="/icons/x-circle-fill.svg">
         </div>
+      
     </div>
     <div class="track-volume">
         <div class="icon">
@@ -189,10 +200,10 @@ template.innerHTML = /*html*/`
     <div class="track-controls">
         <div id="mute-btn" class="mute-icon">Mute</div>
         <div id="solo-btn" class="solo-icon">Solo</div>
-        <div id="arm" class="control">
+        <div id="arm" class="control" hidden>
             <img src="icons/mic-fill.svg">
         </div>
-        <div id="automation" class="control">
+        <div id="automation" class="control" hidden>
             <img src="icons/graph_6.svg">
         </div>
     </div>
@@ -223,6 +234,10 @@ export default class TrackElement extends HTMLElement {
             
             this.defineTrackNameListener();
         }
+    }
+
+    get settingsBtn() {
+        return this.shadowRoot?.getElementById("settings-btn") as HTMLDivElement;
     }
 
     get closeBtn() {
@@ -272,25 +287,37 @@ export default class TrackElement extends HTMLElement {
             }
         });
 
+        this.trackNameInput.addEventListener("change", () => {
+            this.name = this.trackNameInput.value;
+        });
+
+        this.settingsBtn.addEventListener("mouseenter", () => {
+            this.settingsBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
+        });
+
+        this.settingsBtn.addEventListener("mouseleave", () => {
+            this.settingsBtn.style.filter = "none";
+        });
+
         this.soloBtn.addEventListener("mouseenter", () => {
             if (!this.isSolo) {
-                this.soloBtn.style.color = "lightgrey";
+                this.soloBtn.style.backgroundColor = "white";
             }
         });
         this.soloBtn.addEventListener("mouseleave", () => {
             if (!this.isSolo) {
-                this.soloBtn.style.color = "grey";
+                this.soloBtn.style.backgroundColor = "lightgrey";
             }
         });
 
         this.muteBtn.addEventListener("mouseenter", () => {
             if (!this.isMuted) {
-                this.muteBtn.style.color = "lightgrey";
+                this.muteBtn.style.backgroundColor = "white";
             }
         });
         this.muteBtn.addEventListener("mouseleave", () => {
             if (!this.isMuted) {
-                this.muteBtn.style.color = "grey";
+                this.muteBtn.style.backgroundColor = "lightgrey";
             }
         });
 
@@ -319,22 +346,19 @@ export default class TrackElement extends HTMLElement {
         this.isMuted = true;
     }
     unmute() {
-        this.muteBtn.style.color = "black"
-        this.muteBtn.style.backgroundColor = "";
-        this.muteBtn.style.color = "lightgrey"
+        this.muteBtn.style.color = "black";
+        this.muteBtn.style.backgroundColor = "white";
         this.isMuted = false;
     }
 
     solo() {
-        this.soloBtn.style.color = "#78ff82";
         this.soloBtn.style.backgroundColor = "#767373";
         this.soloBtn.style.color = "lightgreen";
         this.isSolo = true;
     }
     unsolo() {
         this.soloBtn.style.color = "black";
-        this.soloBtn.style.backgroundColor = "";
-        this.soloBtn.style.color = "lightgrey";
+        this.soloBtn.style.backgroundColor = "white";
         this.isSolo = false;
     }
 

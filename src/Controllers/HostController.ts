@@ -141,7 +141,7 @@ export default class HostController {
      */
     defineBackListener() {
         this.hostView.backBtn.onclick = () => {
-            this.app.tracks.jumpTo(1);
+            this.app.tracks.jumpTo(0);
             this.app.automationController.applyAllAutomations();
         }
     }

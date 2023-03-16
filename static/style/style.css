@@ -423,11 +423,11 @@ track-element {
 
 .closeButtonResizeWindow {
     float: right;
-    margin: 2px 10px;
+    margin: 2px 2px;
 }
 
 .mount {
-    padding: 10px;
+    padding: 3px;
 }
 
 #main-track {
@@ -576,11 +576,11 @@ control-element {
     border-top: 1px solid black;
     border-bottom: 1px solid black;
     border-right: 1px solid black;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-evenly;
-    align-items: center;
+    /*display: flex;*/
+    /*flex-direction: row;*/
+    /*flex-wrap: nowrap;*/
+    /*align-items: center;*/
+    /*overflow: auto;*/
 }
 
 #advanced-window {
