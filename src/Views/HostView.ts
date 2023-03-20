@@ -24,6 +24,7 @@ export default class HostView {
     song3 = document.getElementById("song-3") as HTMLAnchorElement;
     song4 = document.getElementById("song-4") as HTMLAnchorElement;
     song5 = document.getElementById("song-5") as HTMLAnchorElement;
+    song6 = document.getElementById("song-6") as HTMLAnchorElement;
 
     importSongs = document.getElementById("import-songs") as HTMLInputElement;
     newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;

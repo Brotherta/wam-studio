@@ -65,7 +65,7 @@ function makeDivScrollSync() {
     specialControl.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;
         trackDiv.scrollTop = specialControl.scrollTop;
-        trackDiv.scrollTop = editorDiv.scrollTop;
+        // trackDiv.scrollTop = editorDiv.scrollTop;
         automationController.scrollTop = editorDiv.scrollTop;
     })
     automationController.addEventListener("scroll", function(e: Event) {
