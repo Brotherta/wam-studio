@@ -47,13 +47,12 @@ const getProcessor = (moduleId: string) => {
         }
 
         async _onMessage(e: any) {
-            console.log(e.data);
             await super._onMessage(e);
             if (e.data.audio) {
                 this.audio = e.data.audio;
             }
             else if (e.data.playhead) {
-                this.playhead = e.data.playhead;
+                this.playhead = Math.round(e.data.playhead);
             }
             else if (e.data.removeAudio) {
                 this.audio = undefined;
