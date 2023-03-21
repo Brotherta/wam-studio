@@ -289,6 +289,11 @@ div::-webkit-scrollbar-thumb:hover {
     background: rgb(79, 81, 86) !important;
 }
 
+#songs-container {
+    overflow-y: auto;
+    max-height: 350px;
+}
+
 
 .track-container track-element:nth-child(2) {
     margin-top: 25px;

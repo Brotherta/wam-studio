@@ -1,13 +1,6 @@
 import HostView from "../Views/HostView";
 import App from "../App";
-
-/**
- * Interface for the song info. Number is the number of the song and songs is the list of songs.
- */
-export interface SongInfo {
-    number: number;
-    songs: string[];
-}
+import songs from "../../static/songs/songs.json";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -47,6 +40,7 @@ export default class HostController {
         this.defineVolumeListener();
         this.defineMuteListener();
         this.defineTimerListener();
+        this.defineSongs();
         this.defineImportSongListener();
         this.app.pluginsView.mainTrack.addEventListener("click", () => {
             this.app.pluginsController.selectHost();
@@ -154,29 +148,21 @@ export default class HostController {
         }
     }
 
-    // /**
-    //  * Define the listeners for the demo songs in the menu.
-    //  */
-    // defineSongsDemoListener() {
-    //
-    // }
-
-    /**
-     * Pause the timer interval. Used when the user is jumping to a specific beat.
-     */
-    pauseUpdateInterval() {
-        this.pauseInterval = true;
-    }
-
-    /**
-     * Resume the timer interval. Used when the user is jumping to a specific beat.
-     */
-    resumeUpdateInteravel() {
-        this.pauseInterval = false;
-    }
-
-    initVuMeter() {
-        this.vuMeter = new VuMeter(this.app.hostView.vuMeterCanvas, 30, 157);
+    defineSongs() {
+        songs.forEach((song) => {
+            let name = song.name;
+            let el = this.hostView.createNewSongItem(name);
+            el.onclick = () => {
+                for (let trackSong of song.songs) {
+                    this.app.tracks.newTrackUrl(trackSong)
+                        .then(track => {
+                            if (track !== undefined) {
+                                this.app.tracksController.initTrackComponents(track);
+                            }
+                        });
+                }
+            }
+        })
     }
 
     defineImportSongListener() {
@@ -199,6 +185,24 @@ export default class HostController {
 
             }
         });
+    }
+
+    /**
+     * Pause the timer interval. Used when the user is jumping to a specific beat.
+     */
+    pauseUpdateInterval() {
+        this.pauseInterval = true;
+    }
+
+    /**
+     * Resume the timer interval. Used when the user is jumping to a specific beat.
+     */
+    resumeUpdateInteravel() {
+        this.pauseInterval = false;
+    }
+
+    initVuMeter() {
+        this.vuMeter = new VuMeter(this.app.hostView.vuMeterCanvas, 30, 157);
     }
 
     clickOnPlayButton() {
