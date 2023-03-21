@@ -6,6 +6,7 @@ import AdvancedControlElement from "../Components/AdvancedControlElement";
 import Bind from "../Models/Bind";
 import BindParameterElement from "../Components/BindParameterElement";
 import TrackBindControlElement from "../Components/TrackBindControlElement";
+import {getMinMax} from "../Audio/Utils/Normalizer";
 
 
 export default class TrackControlController {
@@ -139,6 +140,13 @@ export default class TrackControlController {
                         if (response) {
                             // @ts-ignore
                             let {minValue, maxValue} = response[parameterBindEl.selected];
+
+                            let MinMax = getMinMax(parameterBindEl.selected);
+                            if (MinMax) {
+                                minValue = MinMax.min;
+                                maxValue = MinMax.max;
+                            }
+
                             parameterBindEl.selectParam(minValue, maxValue);
                         }
                     });
@@ -208,7 +216,16 @@ export default class TrackControlController {
                    // @ts-ignore
                    let response = await track.plugin.instance?._audioNode.getParameterInfo([param]);
                    if (response) {
+
+                       // @ts-ignore
                        let {minValue, maxValue, type} = response[param];
+
+                       let MinMax = getMinMax(param);
+                       if (MinMax) {
+                            minValue = MinMax.min;
+                            maxValue = MinMax.max;
+                       }
+
                        let normalizedValue = this.normalizeValue(value, bindParam.min, bindParam.max, minValue, maxValue, type);
                        let events = [];
                        events.push({ type: 'wam-automation', data: { id: param, value: normalizedValue }, time: this.app.host.audioCtx.currentTime })
@@ -222,7 +239,7 @@ export default class TrackControlController {
 
     normalizeValue(value: string, min: number | undefined, max: number | undefined, minValue: number, maxValue: number, type: string) {
         let nodeRange = maxValue - minValue;
-        let normalizedValue = nodeRange * parseInt(value)/100;
+        let normalizedValue = minValue + (nodeRange * parseFloat(value) / 100);
 
         if (type == "float") {
             normalizedValue = parseFloat(normalizedValue.toFixed(2));
@@ -231,13 +248,11 @@ export default class TrackControlController {
             normalizedValue = Math.round(normalizedValue);
         }
 
-        if (min != undefined && normalizedValue < min) {
-            normalizedValue = min;
-        }
-        else if (max != undefined && normalizedValue > max) {
-            normalizedValue = max;
-        }
+        let istart = minValue ;
+        let istop = maxValue
+        let ostart = (min !== undefined) ? min : minValue;
+        let ostop = (max) !== undefined ? max : maxValue;
 
-        return normalizedValue;
+        return ostart + (ostop - ostart) * ((normalizedValue - istart) / (istop - istart));
     }
 }
