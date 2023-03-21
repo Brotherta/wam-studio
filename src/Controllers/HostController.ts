@@ -208,7 +208,7 @@ export default class HostController {
         });
     }
 
-    clickOnPlayButton() {
+    clickOnPlayButton(stop: boolean = false) {
         if (this.playing) {
             this.app.tracksController.trackList.forEach((track) => {
                 //@ts-ignore
@@ -236,7 +236,7 @@ export default class HostController {
             this.audioCtx.resume();
         }
         this.playing = !this.playing;
-        this.hostView.pressPlayButton(this.playing);
+        this.hostView.pressPlayButton(this.playing, stop);
     }
 }
 

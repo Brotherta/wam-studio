@@ -59,7 +59,7 @@ export default class RecorderController {
 
             this.recording = true;
             if (!this.app.hostController.playing) {
-                this.app.hostController.clickOnPlayButton();
+                this.app.hostController.clickOnPlayButton(true);
             }
             for (let track of this.app.tracksController.trackList) {
                 if (track.isArmed) {

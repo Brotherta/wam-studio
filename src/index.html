@@ -16,9 +16,9 @@
 <body>
 	<div class="app">
 		<div class="controls-bar" id="controls-bar">
-			
+
 			<a class="menu-item main" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				<img src="icons/list.svg">	
+				<i class="menu-icon"></i>
 			</a>
 			<div class="dropdown-menu dropright" aria-labelledby="dropdownMenuButton">
 				<a class="dropdown-item" id="save-project">Save Project</a>
@@ -34,20 +34,19 @@
 			</div>
 			<div id="back-btn" class="menu-item">
 				<span class="mytooltip">Restart</span>
-				<img src="/icons/skip-start-fill.svg">
+				<i class="skip-start-icon"></i>
 			</div>
 			<div id="play-btn" class="menu-item">
 				<span class="mytooltip">Play</span>
-				<img src="/icons/play-fill.svg" id="play-img">
-				<img src="/icons/pause-fill.svg" id="pause-img" hidden>
+				<i class="play-icon" id="play-icon"></i>
 			</div>
 			<div id="record-btn" class="menu-item">
 				<span class="mytooltip">Record</span>
-				<img src="icons/record-fill.svg">
+				<i class="record-icon"></i>
 			</div>
 			<div id="loop-btn" class="menu-item">
 				<span class="mytooltip">Loop</span>
-				<img src="/icons/repeat.svg">
+				<i class="loop-icon"></i>
 			</div>
 			<div class="timer-item noselect">
 				<div id="timer" class="timer">
@@ -60,34 +59,37 @@
 			</div>
 			<div id="mute-btn" class="menu-item">
 				<span class="mytooltip">Mute</span>
-				<img id="unmute-img" src="icons/volume-up-fill.svg">
-				<img id="mute-img" src="icons/volume-mute-fill.svg" hidden>
+				<i class="volume-up-icon" style="width: 30px" id="mute-icon"></i>
+<!--				<img id="unmute-img" src="icons/volume-up-fill.svg">-->
+<!--				<img id="mute-img" src="icons/volume-mute-fill.svg" hidden>-->
 			</div>
 		</div>
-	
+
 		<div class="editors">
-	
+
 			<div class="main-editors">
 				<div class="track-container" id="track-container">
 					<div class="track-container-header">
 						<div class="icon">
-							<img src="icons/file-earmark-music-fill.svg">
+<!--							<img src="icons/file-earmark-music-fill.svg">-->
+							<i class="music-file-icon"></i>
 						</div>
 						<div class="text-icon">
-							TRACKS
+							&nbsp;&nbsp;&nbsp;TRACKS
 						</div>
 					</div>
 
-				
-					
+
+
 					<div id="new-track" class="new-track">
 						<div class="new-track-text">
 							New track
-						</div>	
-						<div class="icon">
-							<img src="icons/plus-square-fill.svg">
 						</div>
-						
+						<div class="icon">
+<!--							<img src="icons/plus-square-fill.svg">-->
+							<i class="plus-icon"></i>
+						</div>
+
 					</div>
 
 					<div id="automation-menu" hidden>
@@ -121,7 +123,8 @@
 				<div class="rack-container-header">
 					<div id="header-main-track">
 						<div class="icon">
-							<img src="icons/sliders.svg">
+<!--							<img src="icons/sliders.svg">-->
+							<i class="sliders-icon"></i>
 						</div>
 						<div class="text-icon">
 							MASTER TRACK
@@ -129,14 +132,15 @@
 					</div>
 
 					<div class="icon">
-						<img src="icons/plugin.svg">
+<!--						<img src="icons/plugin.svg">-->
+						<i class="plugin-icon"></i>
 					</div>
 					<div class="text-icon">
 						PLUGINS
 					</div>
 
 					<div id="min-max-btn">
-						<img id="min-max-btn-icon" src="icons/plugin.svg">
+						<i id="min-max-icon" class="arrow-down-icon"></i>
 					</div>
 
 <!--					<div class="resize-icon" id="resize-btn">-->
@@ -151,11 +155,13 @@
 					<div id="main-track" style="color: #0c85d0">
 						<div class="slider-menu">
 							<div class="icon">
-								<img src="icons/volume-down-fill.svg">
+<!--								<img src="icons/volume-down-fill.svg">-->
+								<i class="volume-down-icon"></i>
 							</div>
 							<input type="range" class="form-range" id="global-volume-slider">
 							<div class="icon">
-								<img src="icons/volume-up2-fill.svg">
+<!--								<img src="icons/volume-up2-fill.svg">-->
+								<i class="volume-up-icon"></i>
 							</div>
 						</div>
 						<div class="vu-meter">
@@ -168,7 +174,7 @@
 							Add Pedalboard
 						</div>
 						<div class="icon">
-							<img src="icons/plus-square-fill.svg">
+							<i class="plus-icon"></i>
 						</div>
 					</div>
 					<div id="remove-plugins" class="new-track">
@@ -176,7 +182,7 @@
 							Remove Pedalboard
 						</div>
 						<div class="icon">
-							<img src="icons/x-square-fill.svg">
+							<i class="close-icon" style="width: 40px"></i>
 						</div>
 					</div>
 					<div id="hide-pedalboard" class="new-track">
@@ -184,7 +190,7 @@
 							Hide Pedalboard
 						</div>
 						<div class="icon">
-							<img src="icons/arrow-down-left-square-fill.svg">
+							<i class="arrow-down-left-icon"></i>
 						</div>
 					</div>
 					<div id="show-pedalboard" class="new-track">
@@ -192,7 +198,7 @@
 							Show Pedalboard
 						</div>
 						<div class="icon">
-							<img src="icons/arrow-up-right-square-fill.svg">
+							<i class="arrow-up-right-icon"></i>
 						</div>
 					</div>
 

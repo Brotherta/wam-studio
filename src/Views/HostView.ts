@@ -14,6 +14,9 @@ export default class HostView {
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
 
+    playIcon = document.getElementById("play-icon") as HTMLDivElement;
+    muteIcon = document.getElementById("mute-icon") as HTMLDivElement;
+
     controlsBar = document.getElementById("controls-bar") as HTMLDivElement;
 
     vuMeterCanvas = document.getElementById("vu-meter") as HTMLCanvasElement;
@@ -53,18 +56,21 @@ export default class HostView {
      * Change the icon of the play button when the user press it.
      * @param playing
      */
-    pressPlayButton(playing: boolean) {
-        let imgPlay = document.getElementById("play-img") as HTMLImageElement;
-        let imgPause = document.getElementById("pause-img") as HTMLImageElement;
+    pressPlayButton(playing: boolean, stop: boolean) {
+        // let imgPlay = document.getElementById("play-img") as HTMLImageElement;
+        // let imgPause = document.getElementById("pause-img") as HTMLImageElement;
         let tooltip = this.playBtn.firstElementChild as HTMLSpanElement;
 
         if (playing) {
-            imgPause.removeAttribute("hidden");
-            imgPlay.setAttribute("hidden", "hidden");
-            tooltip.innerHTML = "Pause";
+            if (stop) {
+                this.playIcon.className = "stop-icon";
+                tooltip.innerHTML = "Stop";
+            } else {
+                this.playIcon.className = "pause-icon";
+                tooltip.innerHTML = "Pause";
+            }
         } else {
-            imgPlay.removeAttribute("hidden");
-            imgPause.setAttribute("hidden", "hidden");
+            this.playIcon.className = "play-icon";
             tooltip.innerHTML = "Play";
         }
     }
@@ -108,17 +114,13 @@ export default class HostView {
      * @param muted
      */
     pressMuteButton(muted: boolean) {
-        let imgUnmute = document.getElementById("unmute-img") as HTMLImageElement;
-        let imgMute = document.getElementById("mute-img") as HTMLImageElement;
         let tooltip = this.muteBtn.firstElementChild as HTMLSpanElement;
 
         if (muted) {
-            imgMute.removeAttribute("hidden");
-            imgUnmute.setAttribute("hidden", "hidden");
+            this.muteIcon.className = "volume-off-icon";
             tooltip.innerHTML = "Unmute";
         } else {
-            imgUnmute.removeAttribute("hidden");
-            imgMute.setAttribute("hidden", "hidden");
+            this.muteIcon.className = "volume-up-icon";
             tooltip.innerHTML = "Mute";
         }
     }

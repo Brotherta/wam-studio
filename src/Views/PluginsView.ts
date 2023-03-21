@@ -15,6 +15,7 @@ export default class PluginsView {
     closeWindowButton = document.getElementById("closeButtonResizeWindow") as HTMLDivElement;
     mainTrack = document.getElementById("main-track") as HTMLDivElement;
     pluginsDiv = document.getElementById("plugins") as HTMLDivElement;
+    minMaxIcon = document.getElementById("min-max-icon") as HTMLImageElement;
 
     maxHeight: number;
     minHeight: number;
@@ -38,42 +39,6 @@ export default class PluginsView {
      * Minimize the rack to the minimum height and change the icon to maximize.
      */
     resize() {
-        // this.resizeBtn.addEventListener("mousedown", (e) => {
-        //     this.minHeight = 25;
-        //     this.maxHeight = document.body.getBoundingClientRect().height * 3/4;
-        //     this.dragging = true;
-        //     let rackDiv = this.rack;
-        //     this.originalHeight = parseFloat(getComputedStyle(rackDiv, null).getPropertyValue('height').replace("px",''));
-        //     this.originalY = rackDiv.getBoundingClientRect().top;
-        //     this.originalMouseY = e.pageY;
-        //     this.event = e;
-        // });
-        //
-        // document.body.addEventListener("mouseup", () => {
-        //     if (this.dragging) {
-        //         this.dragging = false;
-        //         this.currentSize = parseFloat(getComputedStyle(this.rack, null).getPropertyValue('height').replace("px",''));
-        //     }
-        // });
-        //
-        // document.body.addEventListener("mousemove", (e) => {
-        //     if (this.dragging) {
-        //         let height = this.originalHeight - (e.pageY - this.originalMouseY);
-        //         if (height < this.maxHeight) {
-        //             this.rack.style.minHeight = height+"px";
-        //         }
-        //
-        //         if (height < this.minHeight) {
-        //             this.minimize();
-        //         }
-        //         else {
-        //             this.maximized = true;
-        //             let icon = document.getElementById("min-max-btn-icon") as HTMLImageElement;
-        //             icon.src = "icons/chevron-compact-down.svg";
-        //         }
-        //     }
-        // });
-
         window.addEventListener("resize", () => {
             this.maxHeight = document.body.getBoundingClientRect().height * 3/4;
             this.originalHeight = parseFloat(getComputedStyle(this.rack, null).getPropertyValue('height').replace("px",''));
@@ -104,8 +69,7 @@ export default class PluginsView {
      * Maximize the rack to the maximum height and change the icon to minimize.
      */
     maximize() {
-        let icon = document.getElementById("min-max-btn-icon") as HTMLImageElement;
-        icon.src = "icons/chevron-compact-down.svg";
+        this.minMaxIcon.className = "arrow-down-icon";
         this.rack.style.minHeight = this.currentSize + "px";
     }
 
@@ -113,8 +77,7 @@ export default class PluginsView {
      * Minimize the rack to the minimum height and change the icon to maximize.
      */
     minimize() {
-        let icon = document.getElementById("min-max-btn-icon") as HTMLImageElement;
-        icon.src = "icons/chevron-compact-up.svg";
+        this.minMaxIcon.className = "arrow-up-icon";
         this.rack.style.minHeight = this.minHeight+"px";
     }
 

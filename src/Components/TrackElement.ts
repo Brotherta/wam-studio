@@ -155,21 +155,26 @@ template.innerHTML = /*html*/`
 
 </style>
 
+<link rel="stylesheet" href="style/icons.css">
+
 <div class="track-utils">
     <div class="track-header">
         <input id="name-input" class="track-name">
     
         <div id="close-btn" class="track-close">
-            <img src="/icons/x-circle-fill.svg">
+<!--            <img src="/icons/x-circle-fill.svg">-->
+            <i class="close-icon" style="width: 14px"></i>
         </div>
     </div>
     <div class="track-volume">
         <div class="icon">
-            <img src="icons/volume-down-track.svg">
+<!--            <img src="icons/volume-down-track.svg">-->
+            <i class="volume-down-icon" style="width: 20px"></i>
         </div>
         <input type="range" class="form-range tracko" id="volume-slider">
         <div class="icon">
-            <img src="icons/volume-up-track.svg">
+<!--            <img src="icons/volume-up-track.svg">-->
+            <i class="volume-up-icon" style="width: 20px"></i>
         </div>
     </div>
     <div class="track-balance">
@@ -185,10 +190,12 @@ template.innerHTML = /*html*/`
         <div id="mute-btn" class="mute-icon">M</div>
         <div id="solo-btn" class="solo-icon">S</div>
         <div id="arm" class="control">
-            <img src="icons/mic-fill.svg">
+<!--            <img src="icons/mic-fill.svg">-->
+            <i class="mic-icon" style="width: 15px"></i>
         </div>
         <div id="automation" class="control">
-            <img src="icons/graph_6.svg">
+<!--            <img src="icons/graph_6.svg">-->
+            <i class="automation-icon" style="width: 15px"></i>
         </div>
     </div>
 </div>
