@@ -92,6 +92,11 @@ div::-webkit-scrollbar-thumb:hover {
 }
 
 
+#songs-container {
+    overflow-y: auto;
+    max-height: 350px;
+}
+
 .track-container-header {
     position: absolute;
     min-height: 25px;

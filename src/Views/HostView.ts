@@ -18,12 +18,7 @@ export default class HostView {
 
     vuMeterCanvas = document.getElementById("vu-meter") as HTMLCanvasElement;
 
-
-    song1 = document.getElementById("song-1") as HTMLAnchorElement;
-    song2 = document.getElementById("song-2") as HTMLAnchorElement;
-    song3 = document.getElementById("song-3") as HTMLAnchorElement;
-    song4 = document.getElementById("song-4") as HTMLAnchorElement;
-    song5 = document.getElementById("song-5") as HTMLAnchorElement;
+    songsContainer = document.getElementById("songs-container") as HTMLDivElement;
 
     importSongs = document.getElementById("import-songs") as HTMLInputElement;
     newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
@@ -126,5 +121,13 @@ export default class HostView {
             imgMute.setAttribute("hidden", "hidden");
             tooltip.innerHTML = "Mute";
         }
+    }
+
+    createNewSongItem(name: string) {
+        let item = document.createElement("a");
+        item.classList.add("dropdown-item");
+        item.innerHTML = name;
+        this.songsContainer.appendChild(item);
+        return item;
     }
 }

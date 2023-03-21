@@ -3,7 +3,6 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import WamEventDestination from "../Audio/WAM/WamEventDestination";
 import TrackElement from "../Components/TrackElement";
-import { SongInfo } from "../Controllers/HostController";
 import { audioCtx } from "../index";
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
 import Track from "./Track";
@@ -27,41 +26,34 @@ export default class Tracks {
         this.trackList = [];
         this.trackIdCount = 1;
     }
-    
+
     /**
      * Create a new TracksView for all files given in parameters with the given information. Fetching audio files and initialize
      * the audio nodes and the canvas.
-     * 
-     * @param path the path to the audio files
-     * @param songInfo the object containing the number of files and the names of the files
+     *
+     * @param url the url of the audio file
      * @returns the new tracks that have been created
      */
-    async newTrackWithAudio(path: String, songInfo: SongInfo) {
-        let number = songInfo.number;
-        let songs = songInfo.songs;
+    async newTrackUrl(url: string) {
+        let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
+        let node = wamInstance.audioNode as WamAudioWorkletNode;
 
-        let newTracks = [];
+        let response = await fetch(url);
+        let audioArrayBuffer = await response.arrayBuffer();
+        let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
 
-        for (let i = 0; i < number; i++) {
-            let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
-            let node = wamInstance.audioNode as WamAudioWorkletNode;
+        let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
 
-            let response = await fetch(`${path}/${songs[i]}`);
-            let audioArrayBuffer = await response.arrayBuffer();
-            let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
+        node.setAudio(operableAudioBuffer.toArray());
 
-            let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-
-            node.setAudio(operableAudioBuffer.toArray());
-
-            // @ts-ignore
-            let track = this.createTrack(node);
-            track.addBuffer(operableAudioBuffer);
-            track.element.name = songs[i];
-            newTracks.push(track);
-        }
-        return newTracks;
+        // @ts-ignore
+        let track = this.createTrack(node);
+        track.addBuffer(operableAudioBuffer);
+        let urlSplit = url.split("/");
+        track.element.name = urlSplit[urlSplit.length - 1];
+        return track;
     }
+
 
     async newEmptyTrack() {
         let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
