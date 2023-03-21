@@ -1,6 +1,7 @@
 import HostView from "../Views/HostView";
 import App from "../App";
 import songs from "../../static/songs/songs.json"
+import {audioCtx} from "../index";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -24,7 +25,7 @@ export default class HostController {
     constructor(app: App) {
         this.app = app;
         this.hostView = app.hostView;
-        this.audioCtx = app.tracks.audioCtx;
+        this.audioCtx = audioCtx;
         
         this.defineControls();
     }
@@ -59,7 +60,7 @@ export default class HostController {
                 lastPos = newPos;
                 if (!this.pauseInterval) {
                     this.app.editorView.playhead.movePlayhead(newPos);
-                    this.app.hostView.updateTimer(newPos);
+                    this.hostView.updateTimer(newPos);
                 }
             }
         }, 1000/60)
@@ -99,7 +100,7 @@ export default class HostController {
     defineLoopListener() {
         this.hostView.loopBtn.onclick = () => {
             if (this.looping) {
-                this.app.tracks.trackList.forEach((track) => {
+                this.app.tracksController.trackList.forEach((track) => {
                     //@ts-ignore
                     track.node.parameters.get("loop").value = 0;
                 });
@@ -107,7 +108,7 @@ export default class HostController {
                 this.app.host.hostNode.parameters.get("loop").value = 0;
             }
             else {
-                this.app.tracks.trackList.forEach((track) => {
+                this.app.tracksController.trackList.forEach((track) => {
                     //@ts-ignore
                     track.node.parameters.get("loop").value = 1;
                 });
@@ -134,7 +135,7 @@ export default class HostController {
      */
     defineBackListener() {
         this.hostView.backBtn.onclick = () => {
-            this.app.tracks.jumpTo(1);
+            this.app.tracksController.jumpTo(1);
             this.app.automationController.applyAllAutomations();
         }
     }
@@ -157,7 +158,7 @@ export default class HostController {
             let el = this.hostView.createNewSongItem(name);
             el.onclick = () => {
                 for (let trackSong of song.songs) {
-                    this.app.tracks.newTrackUrl(trackSong)
+                    this.app.tracksController.newTrackUrl(trackSong)
                         .then(track => {
                             if (track !== undefined) {
                                 this.app.tracksController.initTrackComponents(track);
@@ -182,7 +183,7 @@ export default class HostController {
     }
 
     initVuMeter() {
-        this.vuMeter = new VuMeter(this.app.hostView.vuMeterCanvas, 30, 157);
+        this.vuMeter = new VuMeter(this.hostView.vuMeterCanvas, 30, 157);
     }
 
     defineImportSongListener() {
@@ -195,7 +196,7 @@ export default class HostController {
                 // @ts-ignore
                 let file = e.target.files[i];
                 if (file !== undefined) {
-                    this.app.tracks.newTrackWithFile(file)
+                    this.app.tracksController.newTrackWithFile(file)
                         .then(track => {
                             if (track !== undefined) {
                                 this.app.tracksController.initTrackComponents(track);
@@ -209,7 +210,7 @@ export default class HostController {
 
     clickOnPlayButton() {
         if (this.playing) {
-            this.app.tracks.trackList.forEach((track) => {
+            this.app.tracksController.trackList.forEach((track) => {
                 //@ts-ignore
                 track.node.parameters.get("playing").value = 0;
                 clearInterval(this.timerInterval!!);
@@ -224,7 +225,7 @@ export default class HostController {
         }
         else {
             this.app.automationController.applyAllAutomations();
-            this.app.tracks.trackList.forEach(async (track) => {
+            this.app.tracksController.trackList.forEach(async (track) => {
                 if (track.modified) track.updateBuffer(this.audioCtx, this.app.host.playhead);
                 //@ts-ignore
                 track.node.parameters.get("playing").value = 1;

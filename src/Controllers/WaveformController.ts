@@ -3,13 +3,17 @@ import Track from "../Models/Track";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import Region from "../Models/Region";
 import {audioCtx} from "../index";
+import EditorView from "../Views/EditorView";
 
 export default class WaveformController {
 
     app: App;
 
+    editorView: EditorView;
+
     constructor(app: App) {
         this.app = app;
+        this.editorView = this.app.editorView;
     }
 
     /**
@@ -17,7 +21,7 @@ export default class WaveformController {
      * @param track
      */
     addWaveformToTrack(track: Track) {
-        let waveformView = this.app.editorView.createWaveformView(track);
+        let waveformView = this.editorView.createWaveformView(track);
         if (track.audioBuffer == undefined) return;
         let region = this.app.regionsController.createRegion(track.id, track.audioBuffer!, 0);
         let regionView = waveformView.createRegionView(region);
@@ -28,7 +32,7 @@ export default class WaveformController {
     }
 
     createWaveform(track: Track, buffer: OperableAudioBuffer, start: number) {
-        let waveformView = this.app.editorView.getWaveFormViewById(track.id);
+        let waveformView = this.editorView.getWaveFormViewById(track.id);
         let region = this.app.regionsController.createRegion(track.id, buffer, start);
         let regionView = waveformView!.createRegionView(region);
 
@@ -44,7 +48,7 @@ export default class WaveformController {
             numberOfChannels: 2
         })
 
-        let waveformView = this.app.editorView.getWaveFormViewById(track.id);
+        let waveformView = this.editorView.getWaveFormViewById(track.id);
         let region = this.app.regionsController.createRegion(track.id, buffer, start);
         waveformView!.createRegionView(region);
 
@@ -52,7 +56,7 @@ export default class WaveformController {
     }
 
     updateTemporaryRegion(region: Region, track: Track, buffer: OperableAudioBuffer) {
-        let waveformView = this.app.editorView.getWaveFormViewById(track.id);
+        let waveformView = this.editorView.getWaveFormViewById(track.id);
         if (waveformView === undefined) throw new Error("Waveform not found");
 
         let regionView = waveformView.getRegionView(region.id);
@@ -68,7 +72,7 @@ export default class WaveformController {
     }
 
     renderTemporaryRegion(region: Region, track: Track, buffer: OperableAudioBuffer) {
-        let waveformView = this.app.editorView.getWaveFormViewById(track.id);
+        let waveformView = this.editorView.getWaveFormViewById(track.id);
         if (waveformView === undefined) throw new Error("Waveform not found");
 
         let regionView = waveformView.getRegionView(region.id);
@@ -90,7 +94,7 @@ export default class WaveformController {
      * @param track
      */
     removeWaveformOfTrack(track: Track) {
-        this.app.editorView.removeWaveForm(track);
-        this.app.editorView.resizeCanvas();
+        this.editorView.removeWaveForm(track);
+        this.editorView.resizeCanvas();
     }
 }

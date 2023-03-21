@@ -1,6 +1,8 @@
 import App from "../App";
 import Track from "../Models/Track";
 import Host from "../Models/Host";
+import {audioCtx} from "../index";
+import PluginsView from "../Views/PluginsView";
 
 /**
  * Controller for the plugins view. This controller is responsible for selecting and removing plugins.
@@ -8,12 +10,14 @@ import Host from "../Models/Host";
  */
 export default class PluginsController {
     app: App;
+    pluginsView: PluginsView;
 
     selectedTrack: Track | undefined;
     hostTrack: Host;
 
     constructor(app: App) {
         this.app = app;
+        this.pluginsView = this.app.pluginsView;
 
         this.hostTrack = this.app.host;
         this.selectedTrack = undefined;
@@ -30,51 +34,51 @@ export default class PluginsController {
      * define the listeners when the window is resized.
      */
     defineResizeListener() {
-        this.app.pluginsView.resize();
+        this.pluginsView.resize();
     }
 
     /**
      * Define the listeners for the minimize and maximize buttons.
      */
     defineMinimizeMaximizeListener() {
-        this.app.pluginsView.controlRackWindow();
+        this.pluginsView.controlRackWindow();
     }
 
     /**
      * Define the listeners for all the buttons in the plugins view.
      */
     defineNewPluginBtnListener() {
-        this.app.pluginsView.newPlugin.addEventListener("click", async () => {
+        this.pluginsView.newPlugin.addEventListener("click", async () => {
             if (this.selectedTrack != undefined) {
-                this.app.pluginsView.hideNew();
+                this.pluginsView.hideNew();
                 await this.selectedTrack.plugin.initPlugin();
-                this.app.tracksController.connectPlugin(this.selectedTrack);
+                this.app.pluginsController.connectPlugin(this.selectedTrack);
                 this.selectPlugins();
             }
         });
 
-        this.app.pluginsView.removePlugin.addEventListener("click", () => {
+        this.pluginsView.removePlugin.addEventListener("click", () => {
             if (this.selectedTrack !== undefined) {
                 this.removePlugins(this.selectedTrack);
             }
         });
 
-        this.app.pluginsView.showPlugin.addEventListener("click", () => {
-            this.app.pluginsView.showHidePlugin();
-            this.app.pluginsView.hideShowPlugin();
-            this.app.pluginsView.showFloatingWindow();
+        this.pluginsView.showPlugin.addEventListener("click", () => {
+            this.pluginsView.showHidePlugin();
+            this.pluginsView.hideShowPlugin();
+            this.pluginsView.showFloatingWindow();
         });
 
-        this.app.pluginsView.hidePlugin.addEventListener("click", () => {
-            this.app.pluginsView.showShowPlugin();
-            this.app.pluginsView.hideHidePlugin();
-            this.app.pluginsView.hideFloatingWindow();
+        this.pluginsView.hidePlugin.addEventListener("click", () => {
+            this.pluginsView.showShowPlugin();
+            this.pluginsView.hideHidePlugin();
+            this.pluginsView.hideFloatingWindow();
         });
 
-        this.app.pluginsView.closeWindowButton.addEventListener("click", () => {
-            this.app.pluginsView.showShowPlugin();
-            this.app.pluginsView.hideHidePlugin();
-            this.app.pluginsView.hideFloatingWindow();
+        this.pluginsView.closeWindowButton.addEventListener("click", () => {
+            this.pluginsView.showShowPlugin();
+            this.pluginsView.hideHidePlugin();
+            this.pluginsView.hideFloatingWindow();
         })
     }
 
@@ -90,7 +94,7 @@ export default class PluginsController {
         }
         else if (this.selectedTrack.id !== track.id) {
             this.selectedTrack.element.unSelect();
-            this.app.pluginsView.unselectHost();
+            this.pluginsView.unselectHost();
             this.selectedTrack = track;
             this.selectedTrack.element.select();
             this.selectPlugins();
@@ -104,13 +108,13 @@ export default class PluginsController {
         let host = this.app.host;
         if (this.selectedTrack === undefined) {
             this.selectedTrack = host;
-            this.app.pluginsView.selectHost();
+            this.pluginsView.selectHost();
             this.selectPlugins();
         }
         else if (this.selectedTrack.id !== host.id) {
             this.selectedTrack.element.unSelect();
             this.selectedTrack = host;
-            this.app.pluginsView.selectHost();
+            this.pluginsView.selectHost();
             this.selectPlugins();
         }
     }
@@ -124,20 +128,20 @@ export default class PluginsController {
         }
         else if (!this.selectedTrack.plugin.initialized) {
             this.hideAllControllers();
-            this.app.pluginsView.showNew();
+            this.pluginsView.showNew();
         }
         else {
-            this.app.pluginsView.showPlugins(this.selectedTrack);
-            if (this.app.pluginsView.floating.hidden) {
+            this.pluginsView.showPlugins(this.selectedTrack);
+            if (this.pluginsView.floating.hidden) {
                 this.hideAllControllers();
-                this.app.pluginsView.showShowPlugin();
+                this.pluginsView.showShowPlugin();
             }
             else {
                 this.hideAllControllers();
-                this.app.pluginsView.showFloatingWindow();
-                this.app.pluginsView.showHidePlugin();
+                this.pluginsView.showFloatingWindow();
+                this.pluginsView.showHidePlugin();
             }
-            this.app.pluginsView.showRemovePlugin();
+            this.pluginsView.showRemovePlugin();
         }
     }
 
@@ -145,11 +149,11 @@ export default class PluginsController {
      * Hide all the controllers in the plugins view.
      */
     hideAllControllers() {
-        this.app.pluginsView.hideNew();
-        this.app.pluginsView.hideFloatingWindow();
-        this.app.pluginsView.hideShowPlugin();
-        this.app.pluginsView.hideRemovePlugin();
-        this.app.pluginsView.hideHidePlugin();
+        this.pluginsView.hideNew();
+        this.pluginsView.hideFloatingWindow();
+        this.pluginsView.hideShowPlugin();
+        this.pluginsView.hideRemovePlugin();
+        this.pluginsView.hideHidePlugin();
     }
 
     /**
@@ -158,11 +162,47 @@ export default class PluginsController {
      */
     removePlugins(track: Track) {
         track.plugin.instance?._audioNode.clearEvents();
-        this.app.tracksController.disconnectPlugin(track);
+        this.app.pluginsController.disconnectPlugin(track);
         track.plugin.unloadPlugin();
-        this.app.pluginsView.deletePluginView();
+        this.pluginsView.deletePluginView();
         if (this.selectedTrack === track) {
             this.selectPlugins();
+        }
+    }
+
+    /**
+     * Connects the plugin to the track. If the track is the host, it connects the plugin to the host gain node.
+     * @param track
+     */
+    connectPlugin(track: Track) {
+        if (track.id === -1) {
+            let host = track as Host;
+            host.gainNode.disconnect(audioCtx.destination);
+            host.gainNode
+                .connect(host.plugin.instance!._audioNode)
+                .connect(host.audioCtx.destination);
+        }
+        else {
+            track.node!.disconnect(track.pannerNode);
+            track.node!
+                .connect(track.plugin.instance!._audioNode)
+                .connect(track.pannerNode);
+        }
+    }
+
+    /**
+     * Disconnects the plugin from the track. If the track is the host, it disconnects the plugin from the host gain node.
+     * @param track
+     */
+    disconnectPlugin(track: Track) {
+        if (track.plugin.initialized && track.id === -1) {
+            let host = track as Host;
+            host.gainNode.disconnect(host.plugin.instance!._audioNode);
+            host.gainNode.connect(host.audioCtx.destination);
+        }
+        else if (track.plugin.initialized) {
+            track.node!.disconnect(track.plugin.instance!._audioNode);
+            track.node!.connect(track.pannerNode);
         }
     }
 }

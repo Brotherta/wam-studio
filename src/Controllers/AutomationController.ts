@@ -1,6 +1,7 @@
 import App from "../App";
 import Track from "../Models/Track";
 import {audioCtx} from "../index";
+import AutomationView from "../Views/AutomationView";
 
 
 /**
@@ -9,10 +10,13 @@ import {audioCtx} from "../index";
 export default class AutomationController {
 
     app: App;
+    automationView: AutomationView;
+
     automationOpened: boolean = false;
 
     constructor(app: App) {
         this.app = app;
+        this.automationView = this.app.automationView;
         this.definesEvents();
     }
 
@@ -21,9 +25,9 @@ export default class AutomationController {
      * @param track
      */
     async openAutomationMenu(track: Track) {
-        this.app.automationView.clearMenu();
+        this.automationView.clearMenu();
         await this.getAllAutomations(track);
-        this.app.automationView.openAutomationMenu(track);
+        this.automationView.openAutomationMenu(track);
         this.automationOpened = true;
     }
 
@@ -32,19 +36,19 @@ export default class AutomationController {
      */
     definesEvents() {
         window.addEventListener("click", (e) => {
-            if (e.target === this.app.automationView.automationMenu ) return;
+            if (e.target === this.automationView.automationMenu ) return;
             if (this.automationOpened) {
-                this.app.automationView.closeAutomationMenu();
+                this.automationView.closeAutomationMenu();
                 this.automationOpened = false;
             }
         });
         this.app.pluginsView.removePlugin.addEventListener("click", () => {
             let track = this.app.pluginsController.selectedTrack;
             if (track != undefined) {
-                track.automations.removeAutomation();
-                track.automations.updateAutomation([]);
-                this.app.automationView.clearMenu();
-                this.app.automationView.hideBpf(track.id);
+                track.automation.removeAutomation();
+                track.automation.updateAutomation([]);
+                this.automationView.clearMenu();
+                this.automationView.hideBpf(track.id);
             }
         });
     }
@@ -58,26 +62,26 @@ export default class AutomationController {
         let plugin = track.plugin;
         if (plugin.initialized) {
             let params = await plugin.instance?._audioNode.getParameterInfo();
-            track.automations.updateAutomation(params);
-            this.app.automationView.clearMenu();
+            track.automation.updateAutomation(params);
+            this.automationView.clearMenu();
 
-            this.app.automationView.createItem("Hide Automation", "hide-automation", () => {
-                this.app.automationView.hideBpf(track.id);
+            this.automationView.createItem("Hide Automation", "hide-automation", () => {
+                this.automationView.hideBpf(track.id);
             });
-            this.app.automationView.createItem("Clear All Automations", "clear-all", () => {
-                this.app.automationView.hideBpf(track.id);
-                track.automations.clearAllAutomation(params);
+            this.automationView.createItem("Clear All Automations", "clear-all", () => {
+                this.automationView.hideBpf(track.id);
+                track.automation.clearAllAutomation(params);
                 track.plugin.instance?._audioNode.clearEvents();
             })
             for (let param in params) {
-                this.app.automationView.createItem(
+                this.automationView.createItem(
                     param,
                     // @ts-ignore
                     params[param].nodeId,
                     () => {
-                        let bpf = track.automations.getBpfOfparam(param);
+                        let bpf = track.automation.getBpfOfparam(param);
                         if (bpf !== undefined) {
-                            this.app.automationView.mountBpf(track.id, bpf);
+                            this.automationView.mountBpf(track.id, bpf);
                         }
                         else {
                             console.warn("There is no bpf associated with the track "+track.id);
@@ -94,13 +98,13 @@ export default class AutomationController {
      * It takes in account the playhead position and the time of the host.
      */
     applyAllAutomations() {
-        let tracks = this.app.tracks.trackList;
+        let tracks = this.app.tracksController.trackList;
         let playhead = this.app.host.playhead;
         let time = (playhead / audioCtx.sampleRate) * 1000;
 
         for (let track of tracks) {
             track.plugin.instance?._audioNode.clearEvents();
-            let automation = track.automations;
+            let automation = track.automation;
             let events = [];
             for (let bpf of automation.bpfList) {
                 let point = bpf.lastPoint;

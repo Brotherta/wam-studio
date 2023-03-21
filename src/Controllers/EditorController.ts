@@ -6,11 +6,11 @@ import EditorView from "../Views/EditorView";
  */
 export default class EditorController {
 
-    editor: EditorView;
+    editorView: EditorView;
     app: App;
 
     constructor(app: App) {
-        this.editor = app.editorView;
+        this.editorView = app.editorView;
         this.app = app;
         this.defineDragAndDrop();
     }
@@ -21,26 +21,26 @@ export default class EditorController {
      */
     defineDragAndDrop() {
         ["dragenter", "dragstart"].forEach(eventName => {
-           this.editor.editor.addEventListener(eventName, () => {
-               this.app.editorView.dragCover.hidden = false;
+           this.editorView.editor.addEventListener(eventName, () => {
+               this.editorView.dragCover.hidden = false;
            });
         });
 
 
-        this.app.editorView.dragCover.addEventListener("dragleave", () => {
-            this.app.editorView.dragCover.hidden = true;
+        this.editorView.dragCover.addEventListener("dragleave", () => {
+            this.editorView.dragCover.hidden = true;
         });
 
         window.ondragend = () => {
-            this.app.editorView.dragCover.hidden = true;
+            this.editorView.dragCover.hidden = true;
         }
 
-        this.app.editorView.dragCover.addEventListener("drop", (e) => {
+        this.editorView.dragCover.addEventListener("drop", (e) => {
             let files = e.dataTransfer!.files;
-            this.app.editorView.dragCover.hidden = true;
+            this.editorView.dragCover.hidden = true;
             console.table(files);
             ([...files]).forEach(file => {
-                this.app.tracks.newTrackWithFile(file)
+                this.app.tracksController.newTrackWithFile(file)
                     .then(track => {
                         if (track !== undefined) {
                             this.app.tracksController.initTrackComponents(track);

@@ -42,7 +42,7 @@ export default class RecorderController {
 
     clickRecord() {
         if (this.recording) {
-            for (let track of this.app.tracks.trackList) {
+            for (let track of this.app.tracksController.trackList) {
                 if (track.isArmed) {
                     this.stopRecording(track);
                 }
@@ -51,7 +51,7 @@ export default class RecorderController {
             this.app.hostController.clickOnPlayButton();
         }
         else {
-            let armed = this.app.tracks.trackList.find((e) => e.isArmed);
+            let armed = this.app.tracksController.trackList.find((e) => e.isArmed);
             if (armed === undefined) {
                 alert("No track armed");
                 return;
@@ -61,7 +61,7 @@ export default class RecorderController {
             if (!this.app.hostController.playing) {
                 this.app.hostController.clickOnPlayButton();
             }
-            for (let track of this.app.tracks.trackList) {
+            for (let track of this.app.tracksController.trackList) {
                 if (track.isArmed) {
                     this.startRecording(track, this.app.host.playhead);
                 }

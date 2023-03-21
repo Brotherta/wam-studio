@@ -5,7 +5,6 @@ import TracksController from "./Controllers/TracksController";
 
 import TracksView from "./Views/TracksView";
 import { makeDivScrollSync } from "./Controllers/StaticController";
-import Tracks from "./Models/Tracks";
 import Host from "./Models/Host";
 import PlayheadController from "./Controllers/PlayheadController";
 import PluginsController from "./Controllers/PluginsController";
@@ -38,12 +37,10 @@ export default class App {
     pluginsView: PluginsView;
     automationView: AutomationView;
 
-    tracks: Tracks;
     host: Host;
 
 
     constructor() {
-        this.tracks = new Tracks(this);
         this.host = new Host(this);
 
         this.hostView = new HostView();

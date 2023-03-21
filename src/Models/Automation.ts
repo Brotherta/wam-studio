@@ -1,11 +1,10 @@
-// @ts-ignore
 import BPF from "../Components/BPF"
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
 
 /**
  * Model for the automations stored in each track.
  */
-export default class Automations {
+export default class Automation {
 
     bpfList: BPF[];
 

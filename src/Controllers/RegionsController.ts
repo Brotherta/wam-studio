@@ -5,11 +5,14 @@ import RegionView from "../Views/RegionView";
 import WaveformView from "../Views/WaveformView";
 import {RATIO_MILLS_BY_PX} from "../Utils";
 import {InteractionEvent} from "pixi.js";
+import EditorView from "../Views/EditorView";
 
 
 export default class RegionsController {
 
     app: App;
+    editorView: EditorView;
+
     regionIdCounter: number;
 
     isMovingRegion: boolean = false;
@@ -17,6 +20,8 @@ export default class RegionsController {
 
     constructor(app: App) {
         this.app = app;
+        this.editorView = this.app.editorView;
+
         this.regionIdCounter = 0;
 
         this.definesListeners();
@@ -46,9 +51,9 @@ export default class RegionsController {
     }
 
     deleteRegion(regionId: number, trackId: number) {
-        let track = this.app.tracks.getTrack(trackId);
+        let track = this.app.tracksController.getTrack(trackId);
         if (track === undefined) throw new Error("Track not found");
-        let waveformView = this.app.editorView.getWaveFormViewById(track.id);
+        let waveformView = this.editorView.getWaveFormViewById(track.id);
         if (waveformView === undefined) throw new Error("Waveform not found");
         let region = track.getRegion(regionId);
         if (region === undefined) throw new Error("Region not found");
@@ -104,7 +109,7 @@ export default class RegionsController {
     stopMovingRegion(regionView: RegionView, region: Region, waveFormView: WaveformView, _e: InteractionEvent) {
         if (this.isMovingRegion) {
             this.isMovingRegion = false;
-            let track = this.app.tracks.getTrack(region.trackId);
+            let track = this.app.tracksController.getTrack(region.trackId);
             if (track == undefined) {
                 throw new Error("Track not found");
             }
@@ -118,15 +123,15 @@ export default class RegionsController {
     updateWaveformRegion(y: number, _region: Region, _regionView: RegionView, _waveFormView: WaveformView) {
         if (y < 0) y = 0;
         if (_regionView !== _waveFormView.movingRegion) return;
-        let newWaveformView = this.app.editorView.getWaveformView(y);
+        let newWaveformView = this.editorView.getWaveformView(y);
         if (newWaveformView !== _waveFormView && newWaveformView != undefined) {
             this.moveRegionToWaveform(_region, _regionView, _waveFormView, newWaveformView);
         }
     }
 
     moveRegionToWaveform(_region: Region, regionView: RegionView, oldWaveformView: WaveformView, newWaveformView: WaveformView) {
-        let oldTrack = this.app.tracks.getTrack(oldWaveformView.trackId);
-        let newTrack = this.app.tracks.getTrack(newWaveformView.trackId);
+        let oldTrack = this.app.tracksController.getTrack(oldWaveformView.trackId);
+        let newTrack = this.app.tracksController.getTrack(newWaveformView.trackId);
         if (oldTrack == undefined || newTrack == undefined) {
             throw new Error("Track not found");
         }
