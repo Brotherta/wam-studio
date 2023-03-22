@@ -27,8 +27,6 @@ export default class PlayheadView {
      * Initialize the playhead. Set the width of the playhead and the playhead range.
      */
     initPlayhead() {
-        console.log(this.width);
-
         this.playheadRange.max = `${this.width}`;
         this.playheadRange.min = "0";
         this.playheadRange.step = "1";
