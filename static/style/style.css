@@ -563,5 +563,8 @@ canvas {
     gap: 0.5em;
 }
 
-
-
+.settings-tiny-item-text {
+    font-size: 9px;
+    overflow-wrap: normal;
+    max-width: 300px;
+}

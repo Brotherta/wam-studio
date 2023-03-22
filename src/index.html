@@ -208,17 +208,24 @@
 			</div>
 			<div id="settings-body">
 				<div class="settings-item">
-					<div class="settings-item-text">
-						Calibrate Latency
-					</div>
-					<button type="button">Calibrate</button>
+					<button id="calibration-button" type="button">Calibrate Latency</button>
 				</div>
 
 				<div class="settings-item">
 					<div class="settings-item-text">
-						Manual calibration (ms)
+						Latency Compensation
 					</div>
-					<input type="number" id="manual-latency" name="manual-latency" min="0" max="1000" value="0">
+					<input type="range" id="manual-latency" min="0" max="200" value="0">
+					<label id="latency-label" for="manual-latency">0 ms</label>
+				</div>
+				<div class="settings-item">
+					<div class="settings-tiny-item-text">
+						Latency refers to the duration that your device needs to process the sound picked up by your microphone and transmit it back to your speakers. The extent of this delay is determined by the type of device you are using and any additional hardware such as headphones or external microphones. While it is impossible to entirely eliminate latency, we can assist you in finding ways to deal with it.
+					</div>
+					<br>
+					<div class="settings-tiny-item-text">
+						Here’s a suggestion: Play a drum track while simultaneously recording some music or noise in rhythm. If you observe that the recorded track is out of sync with the drum track, it implies that you need to adjust for latency. You can accomplish this manually by adjusting the latency compensation slider or by using the automatic calibration button.
+					</div>
 				</div>
 			</div>
 		</div>
