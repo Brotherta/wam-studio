@@ -30,7 +30,7 @@
 				<div id="songs-container" class="dropdown-menu" aria-labelledby="dropdownSubMenuButton">
 
 				</div>
-
+				<a class="dropdown-item" id="settings-btn">Settings</a>
 			</div>
 			<div id="back-btn" class="menu-item">
 				<span class="mytooltip">Restart</span>
@@ -60,8 +60,6 @@
 			<div id="mute-btn" class="menu-item">
 				<span class="mytooltip">Mute</span>
 				<i class="volume-up-icon" style="width: 30px" id="mute-icon"></i>
-<!--				<img id="unmute-img" src="icons/volume-up-fill.svg">-->
-<!--				<img id="mute-img" src="icons/volume-mute-fill.svg" hidden>-->
 			</div>
 		</div>
 
@@ -71,7 +69,6 @@
 				<div class="track-container" id="track-container">
 					<div class="track-container-header">
 						<div class="icon">
-<!--							<img src="icons/file-earmark-music-fill.svg">-->
 							<i class="music-file-icon"></i>
 						</div>
 						<div class="text-icon">
@@ -86,7 +83,6 @@
 							New track
 						</div>
 						<div class="icon">
-<!--							<img src="icons/plus-square-fill.svg">-->
 							<i class="plus-icon"></i>
 						</div>
 
@@ -100,7 +96,6 @@
 						<input type="range" class="playhead-range" id="playhead-range">
 					</div>
 					<div class="editor" id="editor">
-						<!-- <canvas id="pixi-canvas"></canvas> -->
 
 						<div id="automation-container">
 						</div>
@@ -112,7 +107,7 @@
 								Upload Songs
 							</div>
 							<div class="icon">
-								<img src="icons/box-arrow-in-down.svg">
+								<i class="upload-icon"></i>
 							</div>
 						</div>
 					</div>
@@ -123,7 +118,6 @@
 				<div class="rack-container-header">
 					<div id="header-main-track">
 						<div class="icon">
-<!--							<img src="icons/sliders.svg">-->
 							<i class="sliders-icon"></i>
 						</div>
 						<div class="text-icon">
@@ -132,7 +126,6 @@
 					</div>
 
 					<div class="icon">
-<!--						<img src="icons/plugin.svg">-->
 						<i class="plugin-icon"></i>
 					</div>
 					<div class="text-icon">
@@ -143,24 +136,16 @@
 						<i id="min-max-icon" class="arrow-down-icon"></i>
 					</div>
 
-<!--					<div class="resize-icon" id="resize-btn">-->
-<!--						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="lightgrey" class="bi bi-arrows-expand" viewBox="0 0 16 16">-->
-<!--							<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8ZM7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2ZM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10Z"/>-->
-<!--						</svg>-->
-<!--					</div>-->
-
 				</div>
 
 				<div id="plugins">
 					<div id="main-track" style="color: #0c85d0">
 						<div class="slider-menu">
 							<div class="icon">
-<!--								<img src="icons/volume-down-fill.svg">-->
 								<i class="volume-down-icon"></i>
 							</div>
 							<input type="range" class="form-range" id="global-volume-slider">
 							<div class="icon">
-<!--								<img src="icons/volume-up2-fill.svg">-->
 								<i class="volume-up-icon"></i>
 							</div>
 						</div>
@@ -201,20 +186,50 @@
 							<i class="arrow-up-right-icon"></i>
 						</div>
 					</div>
-
-					<div id="resizableWindow" hidden>
-						<div id="header">
-							<span id="title">PedalBoard</span>
-							<button id="closeButtonResizeWindow">X</button>
-						</div>
-						<div id="mount">
-
-						</div>
-					</div>
-
 				</div>
 			</div>
 		</div>
+
+
+		<div id="plugin-window" class="floating-window" hidden>
+			<div id="plugin-header" class="header-window">
+				<span class="title">PedalBoard</span>
+				<button id="plugin-close-button" class="close-button">X</button>
+			</div>
+			<div id="mount">
+
+			</div>
+		</div>
+
+		<div id="settings-window" class="floating-window" hidden>
+			<div id="settings-header" class="header-window">
+				<span class="title">Settings</span>
+				<button id="settings-close-button" class="close-button">X</button>
+			</div>
+			<div id="settings-body">
+				<div class="settings-item">
+					<button id="calibration-button" type="button">Calibrate Latency</button>
+				</div>
+
+				<div class="settings-item">
+					<div class="settings-item-text">
+						Latency Compensation
+					</div>
+					<input type="range" id="manual-latency" min="0" max="200" value="0">
+					<label id="latency-label" for="manual-latency">0 ms</label>
+				</div>
+				<div class="settings-item">
+					<div class="settings-tiny-item-text">
+						Latency refers to the duration that your device needs to process the sound picked up by your microphone and transmit it back to your speakers. The extent of this delay is determined by the type of device you are using and any additional hardware such as headphones or external microphones. While it is impossible to entirely eliminate latency, we can assist you in finding ways to deal with it.
+					</div>
+					<br>
+					<div class="settings-tiny-item-text">
+						Here’s a suggestion: Play a drum track while simultaneously recording some music or noise in rhythm. If you observe that the recorded track is out of sync with the drum track, it implies that you need to adjust for latency. You can accomplish this manually by adjusting the latency compensation slider or by using the automatic calibration button.
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</div>
 
 	<noscript>Please enable JavaScript in your web browser to view this page.</noscript>

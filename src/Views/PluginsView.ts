@@ -1,4 +1,5 @@
 import Track from "../Models/Track";
+import {focusWindow} from "../Controllers/StaticController";
 
 
 export default class PluginsView {
@@ -8,21 +9,17 @@ export default class PluginsView {
     rack = document.getElementById("rack") as HTMLDivElement;
     newPlugin = document.getElementById("add-plugins") as HTMLDivElement;
     mount = document.getElementById("mount") as HTMLDivElement;
-    floating = document.getElementById("resizableWindow") as HTMLDivElement;
+    floating = document.getElementById("plugin-window") as HTMLDivElement;
     showPlugin = document.getElementById("show-pedalboard") as HTMLDivElement;
     hidePlugin = document.getElementById("hide-pedalboard") as HTMLDivElement;
     removePlugin = document.getElementById("remove-plugins") as HTMLDivElement;
-    closeWindowButton = document.getElementById("closeButtonResizeWindow") as HTMLDivElement;
+    closeWindowButton = document.getElementById("plugin-close-button") as HTMLDivElement;
     mainTrack = document.getElementById("main-track") as HTMLDivElement;
-    pluginsDiv = document.getElementById("plugins") as HTMLDivElement;
     minMaxIcon = document.getElementById("min-max-icon") as HTMLImageElement;
 
     maxHeight: number;
     minHeight: number;
     originalHeight: number;
-    originalY: number;
-    originalMouseY: number;
-    event: MouseEvent;
 
     // private dragging: boolean;
     private maximized: boolean;
@@ -116,6 +113,7 @@ export default class PluginsView {
      */
     showFloatingWindow() {
         this.floating.hidden = false;
+        focusWindow(this.floating);
     }
 
     /**

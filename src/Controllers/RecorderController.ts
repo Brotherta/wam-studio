@@ -179,8 +179,7 @@ export default class RecorderController {
                             right[i / 2] = pcm[i + 1];
                         }
 
-                        // this.app.waveFormController.createWaveform(track, audioBuffer, start);
-                        this.app.waveFormController.renderTemporaryRegion(region, track, audioBuffer);
+                        this.app.waveFormController.renderTemporaryRegion(region, track, audioBuffer, this.app.host.latency);
                         track.modified = true;
                     }
                     console.log("Terminate worker of track : " + track.id);

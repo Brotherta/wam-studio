@@ -401,7 +401,7 @@ track-element {
     right: 0px;
 }
 
-#resizableWindow {
+.floating-window {
     position: absolute;
     top: 50px;
     left: 50px;
@@ -410,7 +410,7 @@ track-element {
     background: #212529;
 }
 
-#header {
+.header-window {
     height: 30px;
     background-color: #3b4046;
     cursor: move;
@@ -420,12 +420,12 @@ track-element {
     font-weight: bold;
 }
 
-#title {
+.title {
     float: left;
     margin: 2px 10px;
 }
 
-#closeButtonResizeWindow {
+.close-button {
     float: right;
     margin: 2px 10px;
 }
@@ -551,4 +551,20 @@ ul {
 canvas {
     grid-column-start: 1;
     grid-row-start: 1;
+}
+
+#settings-body {
+    color: lightgrey;
+    min-width: 400px;
+    min-height: 300px;
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.settings-tiny-item-text {
+    font-size: 9px;
+    overflow-wrap: normal;
+    max-width: 300px;
 }

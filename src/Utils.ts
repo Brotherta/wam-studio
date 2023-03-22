@@ -3,11 +3,7 @@ export const NUM_CHANNELS = 2;
 let time = 600; // 10 minutes
 
 if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-    console.log("Firefox detected");
     time = 300; // 5 minutes
-}
-else {
-    console.log("Not Firefox");
 }
 
 export const MAX_DURATION_SEC = time; // 10 minutes

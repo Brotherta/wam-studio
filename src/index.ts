@@ -13,12 +13,16 @@ customElements.define(
     "bpf-automation",
     BPF
 );
-
 const audioCtx = new AudioContext();
-audioCtx.suspend();
 const app = new App();
-(async () => {
-    await app.initHost();
-})();
+
+setTimeout(() => {
+
+    // @ts-ignore
+    console.info("Audio Context Output Latency = " + audioCtx.outputLatency + " ms");
+    audioCtx.suspend().then(async () => {
+        await app.initHost();
+    });
+}, 1000);
 
 export { app, audioCtx };
