@@ -71,7 +71,7 @@ export default class WaveformController {
         return region;
     }
 
-    renderTemporaryRegion(region: Region, track: Track, buffer: OperableAudioBuffer) {
+    renderTemporaryRegion(region: Region, track: Track, buffer: OperableAudioBuffer, latency: number) {
         let waveformView = this.editorView.getWaveFormViewById(track.id);
         if (waveformView === undefined) throw new Error("Waveform not found");
 
@@ -79,8 +79,23 @@ export default class WaveformController {
         if (regionView === undefined) throw new Error("RegionView not found");
 
         region.buffer = region.buffer.concat(buffer);
-
         region.duration = region.buffer.duration;
+
+        if (region.start - latency < 0) {
+            let diff = region.start - latency;
+            if (diff >= 0) {
+                region.start = 0;
+            }
+            else {
+                diff = -diff;
+                region.buffer = region.buffer.split(diff * audioCtx.sampleRate / 1000)[1]!;
+                region.duration -= diff / 1000;
+            }
+        }
+        else {
+            region.start -= latency;
+        }
+
         waveformView.removeRegionView(regionView);
 
         let newRegionView = waveformView!.createRegionView(region);

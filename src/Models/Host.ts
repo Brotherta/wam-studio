@@ -22,6 +22,8 @@ export default class Host extends Track {
     timer: number;
     playhead: number;
 
+    latency: number = 0;
+
     hostNode: AudioPlayerNode | undefined;
     override gainNode: GainNode;
     

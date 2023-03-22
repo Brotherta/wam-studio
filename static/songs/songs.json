@@ -2,10 +2,21 @@
   {
     "name": "Fly me to the moon",
     "songs": [
-      "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_BASS.mp3",
-      "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_DRUMS.mp3",
-      "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_GUITAR.mp3",
-      "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_VOCALS.mp3"
+      "https://wam-bank.vidalmazuy.fr/songs/FlyToTheMoon/BASS.mp3",
+      "https://wam-bank.vidalmazuy.fr/songs/FlyToTheMoon/DRUMS.mp3",
+      "https://wam-bank.vidalmazuy.fr/songs/FlyToTheMoon/GUITAR.mp3",
+      "https://wam-bank.vidalmazuy.fr/songs/FlyToTheMoon/VOCALS.mp3"
+    ]
+  },
+  {
+    "name": "Bolz And Knecht - Summertime",
+    "songs": [
+      "https://wam-bank.vidalmazuy.fr/songs/BolzAndKnecht_Summertime/01_SaxophoneMic1.wav",
+      "https://wam-bank.vidalmazuy.fr/songs/BolzAndKnecht_Summertime/02_SaxophoneMic2.wav",
+      "https://wam-bank.vidalmazuy.fr/songs/BolzAndKnecht_Summertime/03_SaxophoneMic3.wav",
+      "https://wam-bank.vidalmazuy.fr/songs/BolzAndKnecht_Summertime/04_AcousticGtrCloseMics.wav",
+      "https://wam-bank.vidalmazuy.fr/songs/BolzAndKnecht_Summertime/05_AcousticGtrFarMics.wav",
+      "https://wam-bank.vidalmazuy.fr/songs/BolzAndKnecht_Summertime/06_AcousticGtrDI.wav"
     ]
   },
   {

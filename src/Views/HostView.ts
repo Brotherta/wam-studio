@@ -25,6 +25,7 @@ export default class HostView {
 
     importSongs = document.getElementById("import-songs") as HTMLInputElement;
     newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
+    settingsBtn = document.getElementById("settings-btn") as HTMLDivElement;
 
 
     /**

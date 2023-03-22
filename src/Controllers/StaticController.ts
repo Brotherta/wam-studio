@@ -2,9 +2,14 @@ const trackDiv = document.getElementById("track-container") as HTMLDivElement;
 const editorDiv = document.getElementById("editor") as HTMLDivElement;
 const playhead = document.getElementById("playhead") as HTMLDivElement;
 
-const header = document.getElementById("header") as HTMLElement;
-const resizableWindow = document.getElementById("resizableWindow") as HTMLElement;
 const automationController = document.getElementById("automation-container") as HTMLElement;
+
+const settingsHeader = document.getElementById("settings-header") as HTMLElement;
+const settingsWindow = document.getElementById("settings-window") as HTMLElement;
+
+const pluginHeader = document.getElementById("plugin-header") as HTMLElement;
+const pluginWindow = document.getElementById("plugin-window") as HTMLElement;
+
 
 /**
  * This function makes the track div and the editor div scroll synchronously.
@@ -124,7 +129,24 @@ class DraggableWindow {
     }
 }
 
-// @ts-ignore
-const draggableWindow = new DraggableWindow(header, resizableWindow);
+function focusWindow(windowToFocus: HTMLElement) {
+    if (windowToFocus === draggableWindow.resizableWindow) {
+        draggableWindow2.resizableWindow.style.zIndex = "99";
+        draggableWindow.resizableWindow.style.zIndex = "100";
+    } else {
+        draggableWindow2.resizableWindow.style.zIndex = "100";
+        draggableWindow.resizableWindow.style.zIndex = "99";
+    }
+}
 
-export { makeDivScrollSync }
+// @ts-ignore
+const draggableWindow = new DraggableWindow(pluginHeader, pluginWindow);
+// @ts-ignore
+const draggableWindow2 = new DraggableWindow(settingsHeader, settingsWindow);
+
+draggableWindow2.resizableWindow.onmousedown = () => { focusWindow(draggableWindow2.resizableWindow) };
+draggableWindow.resizableWindow.onmousedown = () => { focusWindow(draggableWindow.resizableWindow) };
+
+
+
+export { makeDivScrollSync, focusWindow }
