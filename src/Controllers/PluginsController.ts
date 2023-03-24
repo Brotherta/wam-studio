@@ -187,6 +187,10 @@ export default class PluginsController {
             track.node!
                 .connect(track.plugin.instance!._audioNode)
                 .connect(track.pannerNode);
+            if (track.isMonitored) {
+                track.monitorSlitterNode.disconnect(track.pannerNode);
+                track.monitorSlitterNode.connect(track.plugin.instance?._audioNode!);
+            }
         }
     }
 
@@ -203,6 +207,10 @@ export default class PluginsController {
         else if (track.plugin.initialized) {
             track.node!.disconnect(track.plugin.instance!._audioNode);
             track.node!.connect(track.pannerNode);
+            if (track.isMonitored) {
+                track.monitorSlitterNode.disconnect(track.plugin.instance?._audioNode!);
+                track.monitorSlitterNode.connect(track.pannerNode);
+            }
         }
     }
 }

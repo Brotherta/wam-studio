@@ -96,7 +96,6 @@ const getProcessor = (moduleId: string) => {
             }
             else {
                 const bufferSize: number = outputs[0][0].length;
-                const audioLength: number = this.audio[0].length;
 
                 const output: Float32Array[] = outputs[0];
 
@@ -104,6 +103,8 @@ const getProcessor = (moduleId: string) => {
                     const playing = !!(i < parameters.playing.length ? parameters.playing[i] : parameters.playing[0]);
                     const loop = !!(i < parameters.loop.length ? parameters.loop[i] : parameters.loop[0]);
                     if (!playing) continue; // Not playing
+                    const audioLength: number = this.audio[0].length;
+                    //coucou
                     if (this.playhead >= audioLength) { // Play was finished
                         if (loop) this.playhead = 0; // Loop just enabled, reset playhead
                         else continue; // EOF without loop

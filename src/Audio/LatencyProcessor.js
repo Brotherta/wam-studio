@@ -20,7 +20,18 @@ class MeasureProcessor extends AudioWorkletProcessor {
         this.write_idx = 0;
         var self = this;
         this.port.onmessage = function(e) {
-            self.threshold = e.data.threshold;
+            if (e.data.threshold) {
+                self.threshold = e.data.threshold;
+            }
+            else if (e.data.stop) {
+                this.ringbuf = new Float32Array(globalThis.sampleRate);
+                this.write_idx = 0;
+                this.interval = 1 * globalThis.sampleRate;
+                this.remaining = this.interval;
+                this.start = 0;
+                this.tapped = false;
+            }
+
         }
     }
     // record a single sample in the ring buffer

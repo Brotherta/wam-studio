@@ -51,12 +51,13 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
         
         // Initializing the buffer with the given outputs and the audio length.
         const bufferSize = outputs[0][0].length;
-        const audioLength = this.audio[0].length;
 
         for (let i = 0; i < bufferSize; i++) {
             const playing = !!(i < parameters.playing.length ? parameters.playing[i] : parameters.playing[0]);
             const loop = !!(i < parameters.loop.length ? parameters.loop[i] : parameters.loop[0]);
             if (!playing) continue; // Not playing
+            const audioLength = this.audio[0].length;
+
             if (this.playhead >= audioLength) { // Play was finished
                 if (loop) this.playhead = 0; // Loop just enabled, reset playhead
                 else continue; // EOF without loop
