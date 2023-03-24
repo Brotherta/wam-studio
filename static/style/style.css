@@ -305,7 +305,8 @@ div::-webkit-scrollbar-thumb:hover {
 track-element {
     display: flex;
     width: 100%;
-    min-height: 90px;
+    min-height: 100px;
+    max-height: 100px;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;

@@ -18,11 +18,17 @@ export default class Track {
     gainNode: GainNode;
     pannerNode: StereoPannerNode;
 
+    monitorSlitterNode: ChannelSplitterNode;
+    panRecNode: StereoPannerNode;
+    micRecNode: MediaStreamAudioSourceNode | undefined;
+
     volume: number = 0.50;
     oldVolume: number = 0.50;
 
     isMuted: boolean = false;
     isSolo: boolean = false;
+    isMonitored: boolean = false;
+
     audioBuffer: OperableAudioBuffer | undefined;
     plugin: Plugin;
 
@@ -49,6 +55,9 @@ export default class Track {
         this.gainNode = audioCtx.createGain();
         this.gainNode.gain.value = 0.5;
         this.pannerNode = audioCtx.createStereoPanner();
+        this.monitorSlitterNode = audioCtx.createChannelSplitter(2);
+        this.panRecNode = audioCtx.createStereoPanner();
+
         if (this.node !== undefined) {
             this.node.connect(this.pannerNode).connect(this.gainNode);
             this.sab = RingBuffer.getStorageForCapacity(audioCtx.sampleRate * 2, Float32Array);

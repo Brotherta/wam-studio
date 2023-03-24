@@ -5,7 +5,7 @@ const playhead = document.getElementById("playhead") as HTMLDivElement;
 const automationController = document.getElementById("automation-container") as HTMLElement;
 
 const settingsHeader = document.getElementById("settings-header") as HTMLElement;
-const settingsWindow = document.getElementById("settings-window") as HTMLElement;
+const settingsWindow = document.getElementById("latency-window") as HTMLElement;
 
 const pluginHeader = document.getElementById("plugin-header") as HTMLElement;
 const pluginWindow = document.getElementById("plugin-window") as HTMLElement;

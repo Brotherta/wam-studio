@@ -8,8 +8,6 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 export default class RecorderController {
 
     app: App;
-    mic: MediaStreamAudioSourceNode | undefined;
-    panNode: StereoPannerNode | undefined;
     recording: boolean;
 
     constructor(app: App) {
@@ -17,9 +15,7 @@ export default class RecorderController {
         this.recording = false;
     }
 
-    addRecordListener(track: Track) {
-        console.log("add recording track: " + track.id);
-    }
+    // Handlers methods
 
     async clickArm(track: Track) {
         if (track.isArmed) {
@@ -30,6 +26,9 @@ export default class RecorderController {
             }
             track.worker?.terminate();
             track.node?.port.postMessage({"stopRecording": true});
+            if (track.isMonitored) {
+                this.stopMonitoring(track);
+            }
         }
         else {
             track.isArmed = true;
@@ -42,11 +41,7 @@ export default class RecorderController {
 
     clickRecord() {
         if (this.recording) {
-            for (let track of this.app.tracksController.trackList) {
-                if (track.isArmed) {
-                    this.stopRecording(track);
-                }
-            }
+            this.stopRecordingAllTracks();
             this.recording = false;
             this.app.hostController.clickOnPlayButton();
         }
@@ -70,25 +65,61 @@ export default class RecorderController {
         this.app.hostView.pressRecordingButton(this.recording);
     }
 
+    clickMonitoring(track: Track) {
+        if (!track.isMonitored) {
+            this.startMonitoring(track);
+        }
+        else {
+            this.stopMonitoring(track);
+        }
+    }
+
+    startMonitoring(track: Track) {
+        if (track.isArmed) {
+            track.isMonitored = true;
+            track.element.monitorOn();
+            if (track.plugin.initialized) {
+                track.monitorSlitterNode.connect(track.plugin.instance?._audioNode!);
+            } else {
+                track.monitorSlitterNode.connect(track.pannerNode);
+            }
+        }
+    }
+
+    stopMonitoring(track: Track) {
+        track.isMonitored = false;
+        track.element.monitorOff();
+        if (track.plugin.initialized) {
+            track.monitorSlitterNode.disconnect(track.plugin.instance?._audioNode!);
+        }
+        else {
+            track.monitorSlitterNode.disconnect(track.pannerNode);
+        }
+    }
+
+
+    // Setup methods
+
     async setupRecording(track: Track) {
         track.node?.port.postMessage({
             "arm": true
         });
 
-        if (this.mic === undefined || this.panNode === undefined) {
+        if (track.micRecNode === undefined) {
             var constraints = {
                 audio: {
                     echoCancellation: false,
-                    mozNoiseSuppression: false,
-                    mozAutoGainControl: false
+                    noiseSuppression: false,
+                    autoGainControl: false
                 }
             };
             let stream = await navigator.mediaDevices.getUserMedia(constraints);
-            this.mic = new MediaStreamAudioSourceNode(audioCtx, {
+            track.micRecNode = new MediaStreamAudioSourceNode(audioCtx, {
                 mediaStream: stream
             });
-            this.panNode = audioCtx.createStereoPanner();
-            this.mic.connect(this.panNode);
+
+            track.micRecNode.connect(track.monitorSlitterNode)
+                .connect(track.panRecNode);
         }
     }
 
@@ -106,24 +137,19 @@ export default class RecorderController {
         })
     }
 
-    stopRecording(track: Track) {
-        this.recording = false;
-        track.worker?.postMessage({
-            command: "stopAndSendAsBuffer"
-        });
-        track.node?.port.postMessage({
-            "stopRecording": true
-        });
-        this.panNode?.disconnect()
-    }
+    // Recording methods
 
-    pauseRecording(track: Track) {
-        console.log("pause recording" + track.id);
+    stopRecordingAllTracks() {
+        for (let track of this.app.tracksController.trackList) {
+            if (track.isArmed) {
+                this.stopRecording(track);
+            }
+        }
     }
 
     startRecording(track: Track, playhead: number) {
         this.recording = true;
-        this.panNode!.connect(track.node!);
+        track.panRecNode.connect(track.node!);
 
         let start = (playhead / audioCtx.sampleRate) * 1000;
         let region = this.app.waveFormController.createTemporaryRegion(track, start);
@@ -188,5 +214,14 @@ export default class RecorderController {
         }
     }
 
-
+    stopRecording(track: Track) {
+        this.recording = false;
+        track.worker?.postMessage({
+            command: "stopAndSendAsBuffer"
+        });
+        track.node?.port.postMessage({
+            "stopRecording": true
+        });
+        track.panRecNode?.disconnect(track.node!);
+    }
 }

@@ -30,7 +30,7 @@
 				<div id="songs-container" class="dropdown-menu" aria-labelledby="dropdownSubMenuButton">
 
 				</div>
-				<a class="dropdown-item" id="settings-btn">Settings</a>
+				<a class="dropdown-item" id="latency-btn">Latency Compensation</a>
 			</div>
 			<div id="back-btn" class="menu-item">
 				<span class="mytooltip">Restart</span>
@@ -201,9 +201,9 @@
 			</div>
 		</div>
 
-		<div id="settings-window" class="floating-window" hidden>
+		<div id="latency-window" class="floating-window" hidden>
 			<div id="settings-header" class="header-window">
-				<span class="title">Settings</span>
+				<span class="title">Latency Compensation</span>
 				<button id="settings-close-button" class="close-button">X</button>
 			</div>
 			<div id="settings-body">
@@ -212,11 +212,14 @@
 				</div>
 
 				<div class="settings-item">
-					<div class="settings-item-text">
-						Latency Compensation
-					</div>
 					<input type="range" id="manual-latency" min="0" max="200" value="0">
-					<label id="latency-label" for="manual-latency">0 ms</label>
+					<label id="input-latency-label" for="manual-latency">Compensation 0 ms</label>
+					<div id="roundtrip-latency-label" class="settings-item-text">
+						Measured Roundtrip : N/A
+					</div>
+					<div id="output-latency-label" class="settings-item-text">
+						Output Latency : N/A
+					</div>
 				</div>
 				<div class="settings-item">
 					<div class="settings-tiny-item-text">

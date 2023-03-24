@@ -210,18 +210,18 @@ export default class HostController {
 
     clickOnPlayButton(stop: boolean = false) {
         if (this.playing) {
-            this.app.tracksController.trackList.forEach((track) => {
+            for (let track of this.app.tracksController.trackList) {
+                track.plugin.instance?._audioNode.clearEvents();
                 //@ts-ignore
                 track.node.parameters.get("playing").value = 0;
                 clearInterval(this.timerInterval!!);
-                if (track.isArmed && this.app.recorderController.recording) {
-                    this.app.recorderController.stopRecording(track);
-                    this.hostView.pressRecordingButton(false);
-                }
-            });
+            }
+            if (this.app.recorderController.recording) {
+                this.app.recorderController.stopRecordingAllTracks();
+                this.hostView.pressRecordingButton(false);
+            }
             //@ts-ignore
             this.app.host.hostNode.parameters.get("playing").value = 0;
-            this.audioCtx.suspend();
         }
         else {
             this.app.automationController.applyAllAutomations();
@@ -233,7 +233,7 @@ export default class HostController {
             });
             //@ts-ignore
             this.app.host.hostNode.parameters.get("playing").value = 1;
-            this.audioCtx.resume();
+            // this.audioCtx.resume();
         }
         this.playing = !this.playing;
         this.hostView.pressPlayButton(this.playing, stop);

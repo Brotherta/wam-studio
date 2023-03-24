@@ -69,6 +69,7 @@ template.innerHTML = /*html*/`
     align-items: center;
     width: 100%;
     max-height: 20px;
+    padding-top: 10px;
 }
 
 .track-name {
@@ -144,8 +145,8 @@ template.innerHTML = /*html*/`
 }
 
 .control {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
     color: grey;
 }
 
@@ -189,12 +190,13 @@ template.innerHTML = /*html*/`
     <div class="track-controls">
         <div id="mute-btn" class="mute-icon">M</div>
         <div id="solo-btn" class="solo-icon">S</div>
+        <div id="monitoring" class="control">
+            <i class="monitor-icon"></i>
+        </div>
         <div id="arm" class="control">
-<!--            <img src="icons/mic-fill.svg">-->
             <i class="mic-icon" style="width: 15px"></i>
         </div>
         <div id="automation" class="control">
-<!--            <img src="icons/graph_6.svg">-->
             <i class="automation-icon" style="width: 15px"></i>
         </div>
     </div>
@@ -212,6 +214,7 @@ export default class TrackElement extends HTMLElement {
     isArmed: boolean = false;
     isSolo: boolean = false;
     isMuted: boolean = false;
+    isMonitoring: boolean = false;
 
     constructor() {
         super();
@@ -263,6 +266,9 @@ export default class TrackElement extends HTMLElement {
         return this.shadowRoot?.getElementById("arm") as HTMLDivElement;
     }
 
+    get monitoringBtn() {
+        return this.shadowRoot?.getElementById("monitoring") as HTMLDivElement;
+    }
 
     defineTrackNameListener() {
         this.trackNameInput.value = this.name;
@@ -313,6 +319,17 @@ export default class TrackElement extends HTMLElement {
         this.automationBtn.addEventListener("mouseleave", () => {
             this.automationBtn.style.filter = "none";
         });
+
+        this.monitoringBtn.addEventListener("mouseenter", () => {
+            if (!this.isMonitoring) {
+                this.monitoringBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
+            }
+        });
+        this.monitoringBtn.addEventListener("mouseleave", () => {
+            if (!this.isMonitoring) {
+                this.monitoringBtn.style.filter = "none";
+            }
+        });
     }
 
     mute() {
@@ -353,5 +370,15 @@ export default class TrackElement extends HTMLElement {
     unArm() {
         this.armBtn.style.filter = "none";
         this.isArmed = false;
+    }
+
+    monitorOn() {
+        this.monitoringBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
+        this.isMonitoring = true;
+    }
+
+    monitorOff() {
+        this.monitoringBtn.style.filter = "none";
+        this.isMonitoring = false;
     }
 }
