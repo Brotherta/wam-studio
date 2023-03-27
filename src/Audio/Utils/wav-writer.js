@@ -32,7 +32,6 @@ onmessage = function (e) {
       this._audio_reader = new exports.AudioReader(
         new RingBuffer(e.data.sab, Float32Array)
       );
-      console.log("length" + e.data.sab + " " + e.data.sab.byteLength);
       // The number of channels of the audio stream read from the queue.
       this.channelCount = e.data.channelCount;
       // The sample-rate of the audio stream read from the queue.
@@ -125,7 +124,6 @@ onmessage = function (e) {
       while (readFromQueue()) {
         /* empty */
       }
-      console.log("Post message audioBuf");
       postMessage({
         command: "audioBufferFinal",
         buffer: audioBuf,
@@ -148,7 +146,6 @@ onmessage = function (e) {
 };
 
 function postCurrentBuffer() {
-  console.log("Post message audioBuf");
   postMessage({
     command: "audioBufferCurrentUpdated",
     buffer: audioBuf,

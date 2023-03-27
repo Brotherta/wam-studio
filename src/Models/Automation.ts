@@ -41,7 +41,6 @@ export default class Automation {
                 bpf.setAttribute('domain', MAX_DURATION_SEC.toString());
                 // @ts-ignore
                 bpf.setSizeBPF((MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX)
-                console.log("new bpf for ", param);
 
                 newBpf.push(bpf);
             }

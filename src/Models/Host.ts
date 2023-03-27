@@ -39,7 +39,7 @@ export default class Host extends Track {
         this.plugin = new Plugin(app);
         
         this.gainNode = this.audioCtx.createGain()
-        this.setVolume(0.5);    
+        this.setVolume(1);    
         this.gainNode.connect(this.audioCtx.destination);
     }
 

@@ -83,7 +83,6 @@ const getProcessor = (moduleId: string) => {
             super.process(inputs, outputs, parameters);
 
             if (!this.audio) return true;
-
             if (this.recording) {
                 if (inputs[0].length === 0) return true;
                 if (inputs[0]) {
@@ -96,7 +95,6 @@ const getProcessor = (moduleId: string) => {
             }
             else {
                 const bufferSize: number = outputs[0][0].length;
-
                 const output: Float32Array[] = outputs[0];
 
                 for (let i = 0; i < bufferSize; i++) {
@@ -104,7 +102,6 @@ const getProcessor = (moduleId: string) => {
                     const loop = !!(i < parameters.loop.length ? parameters.loop[i] : parameters.loop[0]);
                     if (!playing) continue; // Not playing
                     const audioLength: number = this.audio[0].length;
-                    //coucou
                     if (this.playhead >= audioLength) { // Play was finished
                         if (loop) this.playhead = 0; // Loop just enabled, reset playhead
                         else continue; // EOF without loop

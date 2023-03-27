@@ -43,18 +43,20 @@ export default class RegionView extends Container {
         this.wave.clear();
         this.wave.beginFill(color);
 
-        let data = region.buffer.getChannelData(0);
-        let step = Math.ceil(data.length / range);
-        let amp = (HEIGHT_TRACK-1) / 2;
-        for (let i = 0; i < range; i++) {
-            let min = 1.0;
-            let max = -1.0;
-            for (let j = 0; j < step; j++) {
-                let dataum = data[i * step + j];
-                if (dataum < min) min = dataum;
-                if (dataum > max) max = dataum;
+        for (let channel = 0; channel < region.buffer.numberOfChannels; channel++) {
+            let data = region.buffer.getChannelData(channel);
+            let step = Math.ceil(data.length / range);
+            let amp = (HEIGHT_TRACK-1) / 2;
+            for (let i = 0; i < range; i++) {
+                let min = 1.0;
+                let max = -1.0;
+                for (let j = 0; j < step; j++) {
+                    let dataum = data[i * step + j];
+                    if (dataum < min) min = dataum;
+                    if (dataum > max) max = dataum;
+                }
+                this.wave.drawRect(i, (1+min) * amp, 1, Math.max(1, (max-min) * amp));
             }
-            this.wave.drawRect(i, (1+min) * amp, 1, Math.max(1, (max-min) * amp));
         }
     }
 

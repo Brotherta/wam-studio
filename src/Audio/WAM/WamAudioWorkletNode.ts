@@ -13,12 +13,9 @@ export default class WamAudioWorkletNode extends WamNode {
     constructor(module: WebAudioModule) {
         super(module,
             {
-                processorOptions: {
-                    numberOfInputs: 1,
-                    numberOfOutputs: 1,
-                    outputChannelCount: [2],
-                    useSab: true
-                }
+                numberOfInputs: 1,
+                numberOfOutputs: 1,
+                outputChannelCount: [2]
             });
     }
 

@@ -6,8 +6,8 @@ class AudioPlayerNode extends AudioWorkletNode {
 
         super(context, "host-processor", {
             numberOfInputs: 1,
-            numberOfOutputs: 1,
-            channelCount
+            numberOfOutputs: 2,
+            outputChannelCount: [channelCount, channelCount],
         });
     }
 

@@ -208,7 +208,6 @@ export default class RecorderController {
                         this.app.waveFormController.renderTemporaryRegion(region, track, audioBuffer, this.app.host.latency);
                         track.modified = true;
                     }
-                    console.log("Terminate worker of track : " + track.id);
                 }
             }
         }
