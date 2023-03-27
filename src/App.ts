@@ -17,6 +17,8 @@ import WaveformController from "./Controllers/WaveformController";
 import RecorderController from "./Controllers/RecorderController";
 import LatencyController from "./Controllers/LatencyController";
 import LatencyView from "./Views/LatencyView";
+import SettingsController from "./Controllers/SettingsController";
+import SettingsView from "./Views/SettingsView";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -33,6 +35,7 @@ export default class App {
     regionsController: RegionsController;
     recorderController: RecorderController;
     latencyController: LatencyController;
+    settingsController: SettingsController;
 
     hostView: HostView;
     tracksView: TracksView;
@@ -40,6 +43,7 @@ export default class App {
     pluginsView: PluginsView;
     automationView: AutomationView;
     latencyView: LatencyView;
+    settingsView: SettingsView;
 
     host: Host;
 
@@ -53,6 +57,7 @@ export default class App {
         this.editorView = new EditorView();
         this.automationView = new AutomationView();
         this.latencyView = new LatencyView();
+        this.settingsView = new SettingsView();
 
         this.hostController = new HostController(this);
         this.editorController = new EditorController(this);
@@ -64,6 +69,7 @@ export default class App {
         this.regionsController = new RegionsController(this);
         this.recorderController = new RecorderController(this);
         this.latencyController = new LatencyController(this);
+        this.settingsController = new SettingsController(this);
 
         makeDivScrollSync();
     }

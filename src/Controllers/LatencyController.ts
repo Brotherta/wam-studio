@@ -14,7 +14,6 @@ export default class LatencyController {
 
     mic: MediaStreamAudioSourceNode | undefined;
     workletNode: AudioWorkletNode;
-    constraints: MediaStreamConstraints;
     stream: MediaStream;
 
     roundtripLatency = 0;
@@ -28,13 +27,6 @@ export default class LatencyController {
         this.calibrateInitialized = false;
         this.calibrating = false;
 
-        this.constraints = { audio : {
-                echoCancellation: false,
-                noiseSuppression: false,
-                autoGainControl: false
-            }
-        };
-
         this.defineListeners();
     }
 
@@ -43,7 +35,7 @@ export default class LatencyController {
         await this.ac.suspend();
         await this.ac.audioWorklet.addModule(new URL('../Audio/LatencyProcessor.js', import.meta.url))
 
-        this.stream = await navigator.mediaDevices.getUserMedia(this.constraints);
+        this.stream = await navigator.mediaDevices.getUserMedia(this.app.settingsController.constraints);
         this.mic = this.ac.createMediaStreamSource(this.stream);
 
         if (this.workletNode !== undefined) {
@@ -92,7 +84,7 @@ export default class LatencyController {
                this.stopCalibrate();
            }
         });
-        this.hostView.settingsBtn.addEventListener("click", () => {
+        this.hostView.latencyBtn.addEventListener("click", () => {
             this.latencyView.openWindow();
         });
         this.latencyView.calibrationButton.addEventListener("click", async () => {

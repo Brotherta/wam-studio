@@ -25,7 +25,8 @@ export default class HostView {
 
     importSongs = document.getElementById("import-songs") as HTMLInputElement;
     newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
-    settingsBtn = document.getElementById("latency-btn") as HTMLDivElement;
+    latencyBtn = document.getElementById("latency-btn") as HTMLDivElement;
+    settingsBtn = document.getElementById("settings-btn") as HTMLDivElement;
 
 
     /**

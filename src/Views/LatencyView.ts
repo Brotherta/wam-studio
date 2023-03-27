@@ -4,7 +4,7 @@ import {focusWindow} from "../Controllers/StaticController";
 export default class LatencyView {
 
     latencyInput = document.getElementById("manual-latency") as HTMLInputElement;
-    closeWindowButton = document.getElementById("settings-close-button") as HTMLButtonElement;
+    closeWindowButton = document.getElementById("latency-close-button") as HTMLButtonElement;
     LatencyWindow = document.getElementById("latency-window") as HTMLDivElement;
     calibrationButton = document.getElementById("calibration-button") as HTMLDivElement;
 

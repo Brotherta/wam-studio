@@ -554,7 +554,7 @@ canvas {
     grid-row-start: 1;
 }
 
-#settings-body {
+.settings-body {
     color: lightgrey;
     min-width: 400px;
     min-height: 300px;
@@ -568,4 +568,8 @@ canvas {
     font-size: 9px;
     overflow-wrap: normal;
     max-width: 300px;
+}
+
+.select-input {
+    width: 250px;
 }

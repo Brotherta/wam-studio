@@ -31,6 +31,7 @@
 
 				</div>
 				<a class="dropdown-item" id="latency-btn">Latency Compensation</a>
+				<a class="dropdown-item" id="settings-btn">Settings</a>
 			</div>
 			<div id="back-btn" class="menu-item">
 				<span class="mytooltip">Restart</span>
@@ -202,11 +203,11 @@
 		</div>
 
 		<div id="latency-window" class="floating-window" hidden>
-			<div id="settings-header" class="header-window">
+			<div id="latency-header" class="header-window">
 				<span class="title">Latency Compensation</span>
-				<button id="settings-close-button" class="close-button">X</button>
+				<button id="latency-close-button" class="close-button">X</button>
 			</div>
-			<div id="settings-body">
+			<div class="settings-body">
 				<div class="settings-item">
 					<button id="calibration-button" type="button">Calibrate Latency</button>
 				</div>
@@ -233,6 +234,23 @@
 			</div>
 		</div>
 
+		<div id="settings-window" class="floating-window" hidden>
+			<div id="settings-header" class="header-window">
+				<span class="title">Settings</span>
+				<button id="settings-close-button" class="close-button">X</button>
+			</div>
+			<div class="settings-body">
+				<div class="settings-item">
+					<label for="select-input-device">Input Device</label>
+					<select class="select-input" id="select-input-device"></select>
+				</div>
+				<br>
+				<div class="settings-item">
+					<label for="select-output-device">Output Device</label>
+					<select class="select-input" id="select-output-device"></select>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<noscript>Please enable JavaScript in your web browser to view this page.</noscript>

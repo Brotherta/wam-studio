@@ -4,8 +4,11 @@ const playhead = document.getElementById("playhead") as HTMLDivElement;
 
 const automationController = document.getElementById("automation-container") as HTMLElement;
 
+const latencyHeader = document.getElementById("latency-header") as HTMLElement;
+const latencyWindow = document.getElementById("latency-window") as HTMLElement;
+
 const settingsHeader = document.getElementById("settings-header") as HTMLElement;
-const settingsWindow = document.getElementById("latency-window") as HTMLElement;
+const settingsWindow = document.getElementById("settings-window") as HTMLElement;
 
 const pluginHeader = document.getElementById("plugin-header") as HTMLElement;
 const pluginWindow = document.getElementById("plugin-window") as HTMLElement;
@@ -133,19 +136,28 @@ function focusWindow(windowToFocus: HTMLElement) {
     if (windowToFocus === draggableWindow.resizableWindow) {
         draggableWindow2.resizableWindow.style.zIndex = "99";
         draggableWindow.resizableWindow.style.zIndex = "100";
-    } else {
+        draggableWindow3.resizableWindow.style.zIndex = "99";
+    } else if (windowToFocus === draggableWindow2.resizableWindow) {
         draggableWindow2.resizableWindow.style.zIndex = "100";
         draggableWindow.resizableWindow.style.zIndex = "99";
+        draggableWindow3.resizableWindow.style.zIndex = "99";
+    } else {
+        draggableWindow2.resizableWindow.style.zIndex = "99";
+        draggableWindow.resizableWindow.style.zIndex = "99";
+        draggableWindow3.resizableWindow.style.zIndex = "100";
     }
 }
 
 // @ts-ignore
 const draggableWindow = new DraggableWindow(pluginHeader, pluginWindow);
 // @ts-ignore
-const draggableWindow2 = new DraggableWindow(settingsHeader, settingsWindow);
+const draggableWindow2 = new DraggableWindow(latencyHeader, latencyWindow);
+// @ts-ignore
+const draggableWindow3 = new DraggableWindow(settingsHeader, settingsWindow);
 
 draggableWindow2.resizableWindow.onmousedown = () => { focusWindow(draggableWindow2.resizableWindow) };
 draggableWindow.resizableWindow.onmousedown = () => { focusWindow(draggableWindow.resizableWindow) };
+draggableWindow3.resizableWindow.onmousedown = () => { focusWindow(draggableWindow3.resizableWindow) };
 
 
 

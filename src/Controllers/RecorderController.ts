@@ -106,14 +106,7 @@ export default class RecorderController {
         });
 
         if (track.micRecNode === undefined) {
-            var constraints = {
-                audio: {
-                    echoCancellation: false,
-                    noiseSuppression: false,
-                    autoGainControl: false
-                }
-            };
-            let stream = await navigator.mediaDevices.getUserMedia(constraints);
+            let stream = await navigator.mediaDevices.getUserMedia(this.app.settingsController.constraints);
             track.micRecNode = new MediaStreamAudioSourceNode(audioCtx, {
                 mediaStream: stream
             });
