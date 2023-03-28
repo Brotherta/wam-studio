@@ -567,7 +567,12 @@ canvas {
 .settings-tiny-item-text {
     font-size: 9px;
     overflow-wrap: normal;
-    max-width: 300px;
+    max-width: 385px;
+}
+
+.settings-small-item-text {
+    font-size: 12px;
+    max-width: 385px;
 }
 
 .select-input {

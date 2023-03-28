@@ -45,7 +45,6 @@ export default class SettingsController {
             });
         });
 
-
         this.defineListeners();
     }
 

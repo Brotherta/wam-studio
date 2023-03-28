@@ -32,6 +32,7 @@
 				</div>
 				<a class="dropdown-item" id="latency-btn">Latency Compensation</a>
 				<a class="dropdown-item" id="settings-btn">Settings</a>
+				<a class="dropdown-item" id="about-btn">About</a>
 			</div>
 			<div id="back-btn" class="menu-item">
 				<span class="mytooltip">Restart</span>
@@ -248,6 +249,44 @@
 				<div class="settings-item">
 					<label for="select-output-device">Output Device</label>
 					<select class="select-input" id="select-output-device"></select>
+				</div>
+			</div>
+		</div>
+
+		<div id="about-window" class="floating-window" hidden>
+			<div id="about-header" class="header-window">
+				<span class="title">About Wam Open Studio</span>
+				<button id="about-close-button" class="close-button">X</button>
+			</div>
+			<div class="settings-body" style="display:flex; justify-content: center; align-items: center">
+				<div>
+					Contributors
+				</div>
+				<div class="settings-small-item-text">
+					Wam Open Studio is a project by <a href="https://github.com/Brotherta" target="_blank">Antoine Vidal-Mazuy</a> and <a href="https://github.com/micbuffa" target="_blank">Michel Buffa</a>. It is based on the Web Audio Modules (WAM) standard, which is an open source project that aims to make audio plugins accessible to everyone. The Wam Open Studio project is supported by <a href="">Wam Community</a> and <a href="https://github.com/webaudiomodules" target="_blank">Wam Studio</a>. You can find the source code on <a href="https://github.com/Brotherta/wam-refont" target="_blank">Github</a>. If you want to contribute, please contact us.
+				</div>
+				<br>
+
+				<div>
+					Special thanks
+				</div>
+				<div class="settings-small-item-text">
+					Thanks to Paul Adenot from Mozilla for his help and his tools. Ring buffer, metronome and latency tester: code adapted from <a href="https://github.com/padenot" target="_blank">Paul Adenot’s</a> contributions.
+				</div>
+				<div class="settings-small-item-text">
+					Thanks to <a href="https://github.com/QuentinBeauchet" target="_blank">Quentin Beauchet</a> for his help and his contributions with the Pedalboard and <a href="https://wam-bank.vidalmazuy.fr" target="_blank">wam-bank</a>.
+				</div>
+				<br>
+
+				<div>
+					Web Audio Modules
+				</div>
+				<div class="settings-small-item-text">
+					Contributors of Web Audio Modules : Michel Buffa, Shihong Ren, Owen Campbell, Tom Burns, Steven Yi, Jari Kleimola, Oliver Larkin
+				</div>
+				<br>
+				<div style="width: 100%; display: flex; justify-content: center">
+					<img src="images/favicon.png" alt="Wam Open Studio" width="80" height="auto">
 				</div>
 			</div>
 		</div>

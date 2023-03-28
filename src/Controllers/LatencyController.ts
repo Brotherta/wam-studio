@@ -1,6 +1,7 @@
 import App from "../App";
 import LatencyView from "../Views/LatencyView";
 import HostView from "../Views/HostView";
+import {audioCtx} from "../index";
 
 
 export default class LatencyController {
@@ -27,7 +28,18 @@ export default class LatencyController {
         this.calibrateInitialized = false;
         this.calibrating = false;
 
+        this.getLocalStorages();
+
         this.defineListeners();
+    }
+
+    getLocalStorages() {
+        if (localStorage.getItem("latency-compensation") !== null) {
+            this.inputLatency = parseFloat(localStorage.getItem("latency-compensation")!);
+            this.latencyView.latencyInput.value = this.inputLatency.toString();
+            this.app.host.latency = this.inputLatency;
+            this.latencyView.inputLatencyLabel.innerText = "Compensation : -" + this.inputLatency.toFixed(2) + "ms";
+        }
     }
 
     async setupWorklet() {
@@ -69,14 +81,14 @@ export default class LatencyController {
     defineListeners() {
         this.latencyView.latencyInput.addEventListener("input", () => {
             //@ts-ignore
-            let outputLatency = this.ac.outputLatency * 1000;
+            let outputLatency = audioCtx.outputLatency * 1000;
             //@ts-ignore
             this.inputLatency = Number(this.latencyView.latencyInput.value);
             this.app.host.latency = this.inputLatency;
             //@ts-ignore
             this.latencyView.inputLatencyLabel.innerText = "Compensation : -" + this.inputLatency + "ms";
             this.latencyView.outputLatencyLabel.innerText = "Output Latency : " + outputLatency.toFixed(2) + "ms";
-
+            localStorage.setItem("latency-compensation", this.inputLatency.toString());
         });
         this.latencyView.closeWindowButton.addEventListener("click", () => {
            this.latencyView.closeWindow();

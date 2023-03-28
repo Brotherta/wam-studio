@@ -13,6 +13,9 @@ const settingsWindow = document.getElementById("settings-window") as HTMLElement
 const pluginHeader = document.getElementById("plugin-header") as HTMLElement;
 const pluginWindow = document.getElementById("plugin-window") as HTMLElement;
 
+const aboutHeader = document.getElementById("about-header") as HTMLElement;
+const aboutWindow = document.getElementById("about-window") as HTMLElement;
+
 
 /**
  * This function makes the track div and the editor div scroll synchronously.
@@ -137,14 +140,22 @@ function focusWindow(windowToFocus: HTMLElement) {
         draggableWindow2.resizableWindow.style.zIndex = "99";
         draggableWindow.resizableWindow.style.zIndex = "100";
         draggableWindow3.resizableWindow.style.zIndex = "99";
+        draggableWindow4.resizableWindow.style.zIndex = "99";
     } else if (windowToFocus === draggableWindow2.resizableWindow) {
         draggableWindow2.resizableWindow.style.zIndex = "100";
         draggableWindow.resizableWindow.style.zIndex = "99";
         draggableWindow3.resizableWindow.style.zIndex = "99";
-    } else {
+        draggableWindow4.resizableWindow.style.zIndex = "99";
+    } else if (windowToFocus === draggableWindow3.resizableWindow) {
         draggableWindow2.resizableWindow.style.zIndex = "99";
         draggableWindow.resizableWindow.style.zIndex = "99";
         draggableWindow3.resizableWindow.style.zIndex = "100";
+        draggableWindow4.resizableWindow.style.zIndex = "99";
+    } else if (windowToFocus === draggableWindow4.resizableWindow) {
+        draggableWindow2.resizableWindow.style.zIndex = "99";
+        draggableWindow.resizableWindow.style.zIndex = "99";
+        draggableWindow3.resizableWindow.style.zIndex = "99";
+        draggableWindow4.resizableWindow.style.zIndex = "100";
     }
 }
 
@@ -154,11 +165,21 @@ const draggableWindow = new DraggableWindow(pluginHeader, pluginWindow);
 const draggableWindow2 = new DraggableWindow(latencyHeader, latencyWindow);
 // @ts-ignore
 const draggableWindow3 = new DraggableWindow(settingsHeader, settingsWindow);
+// @ts-ignore
+const draggableWindow4 = new DraggableWindow(aboutHeader, aboutWindow);
 
 draggableWindow2.resizableWindow.onmousedown = () => { focusWindow(draggableWindow2.resizableWindow) };
 draggableWindow.resizableWindow.onmousedown = () => { focusWindow(draggableWindow.resizableWindow) };
 draggableWindow3.resizableWindow.onmousedown = () => { focusWindow(draggableWindow3.resizableWindow) };
+draggableWindow4.resizableWindow.onmousedown = () => { focusWindow(draggableWindow4.resizableWindow) };
 
+document.getElementById("about-close-button")!.onclick = () => {
+    aboutWindow.hidden = true;
+}
+document.getElementById("about-btn")!.onclick = () => {
+    aboutWindow.hidden = false;
+    focusWindow(aboutWindow);
+}
 
 
 export { makeDivScrollSync, focusWindow }
