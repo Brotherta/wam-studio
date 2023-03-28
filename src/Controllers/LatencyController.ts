@@ -68,6 +68,7 @@ export default class LatencyController {
             this.latencyView.roundtripLatencyLabel.innerText = "Measured Roundtrip: " + this.roundtripLatency.toFixed(2) + "ms";
             this.latencyView.outputLatencyLabel.innerText = "Output Latency: " + this.outputLatency.toFixed(2) + "ms";
             this.latencyView.inputLatencyLabel.innerText = "Compensation : -" + this.inputLatency.toFixed(2) + "ms";
+            localStorage.setItem("latency-compensation", this.inputLatency.toFixed(2).toString());
             // @ts-ignore
             // this.app.host.latency = Number(this.settingsView.latencyInput.value)- this.ac.outputLatency * 1000;
             this.app.host.latency = this.inputLatency;
