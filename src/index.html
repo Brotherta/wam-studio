@@ -212,9 +212,15 @@
 				<div class="settings-item">
 					<button id="calibration-button" type="button">Calibrate Latency</button>
 				</div>
-
+				<div class="settings-tiny-item-text">
+					Approach a Microphone near speakers, lower volume first, then press the button above. 
+					Increase slowly the volume until some latency values are displayed. Then stop.
+					The latency compensation will be saved, no need to recalibrate on this device unless you change 
+					the hardware configuration.
+				</div>
 				<div class="settings-item">
 					<input type="range" id="manual-latency" min="0" max="200" value="0">
+					
 					<label id="input-latency-label" for="manual-latency">Compensation 0 ms</label>
 					<div id="roundtrip-latency-label" class="settings-item-text">
 						Measured Roundtrip : N/A
@@ -263,26 +269,34 @@
 					Contributors
 				</div>
 				<div class="settings-small-item-text">
-					Wam Open Studio is a project by <a href="https://github.com/Brotherta" target="_blank">Antoine Vidal-Mazuy</a> and <a href="https://github.com/micbuffa" target="_blank">Michel Buffa</a>. It is based on the Web Audio Modules (WAM) standard, which is an open source project that aims to make audio plugins accessible to everyone. The Wam Open Studio project is supported by <a href="">Wam Community</a> and <a href="https://github.com/webaudiomodules" target="_blank">Wam Studio</a>. You can find the source code on <a href="https://github.com/Brotherta/wam-refont" target="_blank">Github</a>. If you want to contribute, please contact us.
+					Wam Open Studio is a Work-In-Progress project by <a href="https://github.com/Brotherta" target="_blank">Antoine Vidal-Mazuy</a> 
+					and <a href="https://github.com/micbuffa" target="_blank">Michel Buffa</a>. 
+					It is based on the <a href="https://github.com/webaudiomodules" target="_blank">Web Audio Modules standard</a> (WAM), 
+					which is an open source project that aims to make audio plugins available for the Web platform (aka VSTs for the Web). 
+				    You can find the DAW source code on <a href="https://github.com/Brotherta/wam-refont" target="_blank">Github</a>. 
+					If you want to contribute, please contact us by email (<a href="mailto:michel.buffa@univ-cotedazur.fr">michel.buffa@univ-cotedazur.fr</a>, 
+					<a href="mailto:antoine.vidalma@gmail.com">antoine.vidalma@gmail.com</a>) or
+					in the #webaudio / webaudiomodules slack channel (get invitation here : <a href="https://web-audio-slackin.herokuapp.com/" target="_blank">https://web-audio-slackin.herokuapp.com/</a>).
 				</div>
-				<br>
 
 				<div>
 					Special thanks
 				</div>
 				<div class="settings-small-item-text">
-					Thanks to Paul Adenot from Mozilla for his help and his tools. Ring buffer, metronome and latency tester: code adapted from <a href="https://github.com/padenot" target="_blank">Paul Adenot’s</a> contributions.
+					Thanks to Paul Adenot from Mozilla for his help and tools: his Ring buffer, metronome and latency tester code has been adapted and included in this DAW. 
+					Original code can be found in 
+					<a href="https://github.com/padenot" target="_blank">Paul's GitHub repo</a>.
 				</div>
 				<div class="settings-small-item-text">
-					Thanks to <a href="https://github.com/QuentinBeauchet" target="_blank">Quentin Beauchet</a> for his help and his contributions with the Pedalboard and <a href="https://wam-bank.vidalmazuy.fr" target="_blank">wam-bank</a>.
+					Thanks also to <a href="https://github.com/QuentinBeauchet" target="_blank">Quentin Beauchet</a> for his help and his contributions 
+					with the Pedalboard / plugin manager (<a href="https://wam-bank.vidalmazuy.fr" target="_blank">wam-bank</a>).
 				</div>
-				<br>
 
 				<div>
 					Web Audio Modules
 				</div>
 				<div class="settings-small-item-text">
-					Contributors of Web Audio Modules : Michel Buffa, Shihong Ren, Owen Campbell, Tom Burns, Steven Yi, Jari Kleimola, Oliver Larkin
+					Web Audio Modules 2.0 contributors: Michel Buffa, Shihong Ren, Owen Campbell, Tom Burns, Steven Yi, Jari Kleimola, Oliver Larkin
 				</div>
 				<br>
 				<div style="width: 100%; display: flex; justify-content: center">
