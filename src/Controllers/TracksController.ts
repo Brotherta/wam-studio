@@ -179,6 +179,7 @@ export default class TracksController {
     }
 
 
+
     async newEmptyTrack() {
         let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
         let node = wamInstance.audioNode as WamAudioWorkletNode;
@@ -319,5 +320,11 @@ export default class TracksController {
 
     getTrack(trackId: number) {
         return this.trackList.find(track => track.id === trackId);
+    }
+
+    clearAllTracks() {
+        for (let track of this.trackList) {
+            this.removeTrack(track);
+        }
     }
 }

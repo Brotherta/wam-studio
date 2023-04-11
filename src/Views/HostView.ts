@@ -27,6 +27,7 @@ export default class HostView {
     newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
     latencyBtn = document.getElementById("latency-btn") as HTMLDivElement;
     settingsBtn = document.getElementById("settings-btn") as HTMLDivElement;
+    saveBtn = document.getElementById("save-project") as HTMLDivElement;
 
 
     /**

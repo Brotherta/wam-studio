@@ -19,6 +19,7 @@ import LatencyController from "./Controllers/LatencyController";
 import LatencyView from "./Views/LatencyView";
 import SettingsController from "./Controllers/SettingsController";
 import SettingsView from "./Views/SettingsView";
+import Loader from "./Loader/Loader";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -46,10 +47,12 @@ export default class App {
     settingsView: SettingsView;
 
     host: Host;
+    loader: Loader;
 
 
     constructor() {
         this.host = new Host(this);
+        this.loader = new Loader(this);
 
         this.hostView = new HostView();
         this.tracksView = new TracksView();

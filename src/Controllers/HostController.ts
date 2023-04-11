@@ -43,6 +43,7 @@ export default class HostController {
         this.defineSongsDemoListener();
         this.defineTimerListener();
         this.defineImportSongListener();
+        this.defineSaveProjectListener();
         this.app.pluginsView.mainTrack.addEventListener("click", () => {
             this.app.pluginsController.selectHost();
         });
@@ -237,6 +238,19 @@ export default class HostController {
         }
         this.playing = !this.playing;
         this.hostView.pressPlayButton(this.playing, stop);
+    }
+
+    defineSaveProjectListener() {
+        this.app.hostView.saveBtn.onclick = async () => {
+            await this.app.loader.saveProject();
+        }
+    }
+
+    stopAll() {
+        this.app.tracksController.trackList.forEach(async (track) => {
+            //@ts-ignore
+            track.node.parameters.get("playing").value = 0;
+        });
     }
 }
 
