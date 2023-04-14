@@ -97,54 +97,54 @@ export default class Loader {
 
 
 
-    loadProject(file: File) {
-        let reader = new FileReader();
-        reader.onload = async (e) => {
-            let zip = await JSZip.loadAsync(e.target!.result);
-            let project = JSON.parse(await zip.file("project.json")!.async("string"));
-            let audio = zip.folder("audio")!;
-
-
-            this.app.hostController.stopAll();
-            this.app.tracksController.clearAllTracks();
-
-            this.app.tracksController.trackIdCount = project.host.trackAcc;
-            this.app.regionsController.regionIdCounter = project.host.regionAcc;
-
-            this.app.host.timer = project.host.timer;
-            this.app.host.playhead = project.host.playhead;
-            this.app.host.isMuted = project.host.muted;
-            this.app.host.volume = project.host.volume;
-            this.app.hostController.playing = project.host.playing;
-            this.app.recorderController.recording = project.host.recording;
-
-            for (let track of project.tracks) {
-                let trackJson = track.track;
-                let newTrack = this.app.tracksController.createTrack(trackJson.name);
-                newTrack.isMuted = trackJson.muted;
-                newTrack.isSolo = trackJson.soloed;
-                newTrack.volume = trackJson.volume;
-                newTrack.pannerNode.pan.value = trackJson.pan;
-
-                if (trackJson.plugins !== null) {
-                    await newTrack.plugin.initPlugin()
-                    await newTrack.plugin.instance!._audioNode.setState(trackJson.plugins);
-                }
-
-                for (let region of trackJson.regions) {
-                    let buffer = await audio.file(region.path)!.async("arraybuffer");
-                    let audioBuffer = await this.app.audioContext.decodeAudioData(buffer);
-                    newTrack.addRegion(audioBuffer, region.start, region.duration);
-                }
-
-                for (let automation of trackJson.automations) {
-                    let bpf = newTrack.automation.getBpfOfparam(automation.param);
-                    if (bpf !== undefined) {
-                        bpf.state = automation.state;
-                    }
-                }
-            }
-        }
-        reader.readAsArrayBuffer(file);
+    loadProject(_file: File) {
+        // let reader = new FileReader();
+        // reader.onload = async (e) => {
+        //     let zip = await JSZip.loadAsync(e.target!.result);
+        //     let project = JSON.parse(await zip.file("project.json")!.async("string"));
+        //     let audio = zip.folder("audio")!;
+        //
+        //
+        //     this.app.hostController.stopAll();
+        //     this.app.tracksController.clearAllTracks();
+        //
+        //     this.app.tracksController.trackIdCount = project.host.trackAcc;
+        //     this.app.regionsController.regionIdCounter = project.host.regionAcc;
+        //
+        //     this.app.host.timer = project.host.timer;
+        //     this.app.host.playhead = project.host.playhead;
+        //     this.app.host.isMuted = project.host.muted;
+        //     this.app.host.volume = project.host.volume;
+        //     this.app.hostController.playing = project.host.playing;
+        //     this.app.recorderController.recording = project.host.recording;
+        //
+        //     for (let track of project.tracks) {
+        //         let trackJson = track.track;
+        //         let newTrack = this.app.tracksController.createTrack(trackJson.name);
+        //         newTrack.isMuted = trackJson.muted;
+        //         newTrack.isSolo = trackJson.soloed;
+        //         newTrack.volume = trackJson.volume;
+        //         newTrack.pannerNode.pan.value = trackJson.pan;
+        //
+        //         if (trackJson.plugins !== null) {
+        //             await newTrack.plugin.initPlugin()
+        //             await newTrack.plugin.instance!._audioNode.setState(trackJson.plugins);
+        //         }
+        //
+        //         for (let region of trackJson.regions) {
+        //             let buffer = await audio.file(region.path)!.async("arraybuffer");
+        //             let audioBuffer = await this.app.audioContext.decodeAudioData(buffer);
+        //             newTrack.addRegion(audioBuffer, region.start, region.duration);
+        //         }
+        //
+        //         for (let automation of trackJson.automations) {
+        //             let bpf = newTrack.automation.getBpfOfparam(automation.param);
+        //             if (bpf !== undefined) {
+        //                 bpf.state = automation.state;
+        //             }
+        //         }
+        //     }
+        // }
+        // reader.readAsArrayBuffer(file);
     }
 }
