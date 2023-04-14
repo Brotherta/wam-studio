@@ -1,5 +1,5 @@
 import { WebAudioModule } from "@webaudiomodules/sdk"
-import WamAudioWorkletNode from "./WAMAudioWorkletNode";
+import WamAudioWorkletNode from "./WamAudioWorkletNode";
 import { audioCtx } from "../../index";
 
 export default class WamEventDestination extends WebAudioModule {
