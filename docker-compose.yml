@@ -1,0 +1,22 @@
+# docker-compose.yml
+version: "3.9"
+services:
+  frontend:
+    build: ./public
+    ports:
+      - "5002:5002"
+    environment:
+      - HTTPS=false
+
+  backend:
+    build: ./server
+    ports:
+      - "6002:6002"
+
+    environment:
+      - STORAGE_DIR=/data/storage
+    volumes:
+      - projects:/data/storage
+
+volumes:
+    projects:

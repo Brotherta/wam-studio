@@ -1,0 +1,701 @@
+:root {
+    --menu-color: #413e3e;
+    --head-color: #3b4046;
+    --main-background-color: #1C1E21;
+}
+
+html, body {
+    overflow: hidden;
+    height: 100%;
+    background-color: var(--main-background-color);
+}
+
+body {
+    scrollbar-color: rgb(107, 107, 107) #2c2c2c;
+    scrollbar-width: auto;
+}
+
+div::-webkit-scrollbar {
+    background-color: rgb(249, 249, 249);
+    width: 12px;
+    height: 12px;
+}
+
+div::-webkit-scrollbar-track {
+    background: rgb(44, 44, 44);
+}
+
+div::-webkit-scrollbar-corner {
+    background: rgb(44, 44, 44);
+}
+
+div::-webkit-scrollbar-thumb {
+    background: rgb(107, 107, 107);
+    border-radius: 9px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+div::-webkit-scrollbar-thumb:hover {
+    background: rgb(147, 147, 147);
+    border-radius: 9px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+.app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.controls-bar {
+    border: 1px solid black;
+    border-top: none;
+    background-color: rgb(41, 42, 45);
+    /* overflow: hidden; */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    height: 52px;
+}
+
+.editors {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.main-editors {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow-y: hidden;
+    border-bottom: 1px solid black;
+}
+
+.track-container {
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    background-color: rgb(23, 23, 26);
+    min-height: 100%;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+
+.track-container-header {
+    position: absolute;
+    min-height: 25px;
+    min-width: 198px;
+    border-bottom: 1px solid rgb(0, 0, 0);
+    background-color: var(--head-color);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 1;
+}
+
+.rack-container-header {
+    position: absolute;
+    min-height: 25px;
+    width: 100%;
+    border-bottom: 1px solid rgb(0, 0, 0);
+    background-color: var(--head-color);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#rack {
+    height: 25px;
+    border: 1px solid black;
+    background: rgb(23, 23, 26);
+}
+
+#plugins {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    margin-top: 24px;
+    display: flex;
+    flex-direction: row;
+}
+
+.editor {
+    width: 100%;
+    overflow-y: scroll;
+    margin-top: 24px;
+    background: #121213;
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.test {
+    width: 100%;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    background-color: #121214;
+}
+
+.playhead {
+    position: absolute;
+    min-height: 25px;
+    max-height: 25px;
+    overflow: hidden;
+    width: 4000px;
+    border-bottom: 1px solid rgb(0, 0, 0);
+    background-color: var(--head-color);
+}
+
+.playhead-range {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 25px; /* Specified height */
+    background: var(--head-color); /* Grey background */
+    outline: none; /* Remove outline */
+    cursor: pointer;
+}
+  
+  
+  /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.playhead-range::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 10px; /* Set a specific slider handle width */
+    height: 20px; /* Slider handle height */
+    background: lightgrey; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+    border-bottom-right-radius: 20px 30px;
+}
+  
+.playhead-range::-moz-range-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 10px; /* Set a specific slider handle width */
+    height: 20px; /* Slider handle height */
+    background: lightgrey; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+    border-bottom-right-radius: 20px 30px;
+}
+
+.track-container::-webkit-scrollbar {
+    display: none;
+ }
+
+
+.menu-item {
+    min-width: 55px;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    position: relative;
+  /*  -webkit-touch-callout: none; /* iOS Safari */
+  /*    -webkit-user-select: none; /* Safari */
+    /*   -khtml-user-select: none; /* Konqueror HTML */
+      /*   -moz-user-select: none; /* Old versions of Firefox */
+        /*  -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none;
+}
+
+.menu-item:hover {
+    cursor: pointer;
+    background-color: rgb(79, 81, 86); 
+}
+
+.menu-item.main {
+    background-color: rgb(80, 93, 202);
+}
+
+.menu-item.main:hover {
+    background-color: rgb(92, 105, 204);
+}
+
+.timer-item {
+    border-left: solid 1px rgb(111, 111, 111);
+    border-right: solid 1px rgb(111, 111, 111);
+    padding-left: 17px;
+    padding-right: 17px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    cursor: default;
+    max-width: 212px;
+    min-width: 212px;
+}
+
+.timer {
+    font-family: Helvetica, monospace;
+    color: rgb(80, 93, 202);
+    font-size: 30px;
+}
+
+.timer-item.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}
+
+.slider-menu {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center; 
+    min-width: 170px;
+    max-width: 160px;
+    margin-top: 20px;
+}
+
+.icon {
+    padding-left: 5px;
+    padding-right: 5px;
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none;
+    pointer-events: none;
+}
+
+.dropdown-menu {
+    background: rgb(41, 42, 45) !important;
+    cursor: pointer !important;
+}
+
+.dropdown-item {
+    color: lightgray !important;
+}
+.dropdown-item:hover {
+    background: rgb(79, 81, 86) !important;
+}
+
+#songs-container {
+    overflow-y: auto;
+    max-height: 350px;
+}
+
+
+.track-container track-element:nth-child(2) {
+    margin-top: 25px;
+}
+
+.track-container .new-track:nth-child(2) {
+    margin-top: 34px;
+}
+
+track-element {
+    display: flex;
+    width: 100%;
+    min-height: 130px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    background: rgb(44, 44, 44);
+    border: solid 1px black;
+} 
+
+.text-icon {
+    padding-left: 25px;
+    color: lightgrey;
+    font-size: 13px;
+    font-weight: bold;
+    pointer-events: none;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+}
+
+.new-track {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 181px;
+    min-height: 90px;
+    margin: 8px;
+    background: transparent;
+}
+
+.new-track-text {
+    color: lightgrey;
+    padding-bottom: 5px;
+    font-size: 13px;
+    font-weight: bold;
+    pointer-events: none;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+}
+
+.new-track:hover {
+    background: rgb(80, 93, 202);
+    cursor: pointer;
+}
+
+  
+.menu-item .mytooltip {
+    visibility: hidden;
+    width: auto;
+    background-color: rgb(107, 107, 107);
+    color: lightgrey;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    display: flex;
+    flex-wrap: nowrap;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 20;
+    top: 110%;
+    right: 0px;
+
+    transition: 0s visibility;
+  }
+  
+.menu-item:hover .mytooltip {
+    visibility: visible;
+    transition: 1s linear;
+    /* transition-delay: 0.3s; */
+}
+
+.resize-icon {
+    padding-right: 10px;
+    position: absolute;
+    right: 0;
+    -webkit-user-select: none;
+    cursor: ns-resize;
+}
+
+#min-max-btn {
+    cursor: pointer;
+    padding-right: 10px;
+    position: absolute;
+    right: 0px;
+}
+
+.resizableWindow {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    z-index: 20;
+    border: 1px solid #000;
+    background: #212529;
+}
+
+.header {
+    height: 30px;
+    background-color: #3b4046;
+    cursor: move;
+    color: lightgrey;
+    padding-bottom: 5px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.title {
+    float: left;
+    margin: 2px 10px;
+}
+
+.closeButtonResizeWindow {
+    float: right;
+    margin: 2px 2px;
+}
+
+.mount {
+    padding: 3px;
+}
+
+#main-track {
+    min-width: 200px;
+    background: rgb(23, 23, 26);
+    border: 1px solid black;
+    margin-top: 1px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+#header-main-track {
+    min-width: 200px;
+    border-right: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.vu-meter {
+    margin-top: 20px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+#vu-meter{
+    border: 1px solid #313131;
+    border-radius: 3px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+}
+
+#drag-cover {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    z-index: 999;
+    background-color: rgba(255,255,255,0.3);
+}
+
+#drag-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 143px;
+    min-height: 80px;
+    margin: 8px;
+}
+
+#automation-menu {
+    position: absolute;
+    background-color: rgba(70, 70, 70, 0.61);
+    max-height: 200px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow-y: auto;
+    border-radius: 5px;
+}
+
+.automation-item {
+    width: 100%;
+    background-color: rgba(70, 70, 70, 0.61);
+    color: lightgray;
+}
+.automation-item:hover {
+    background-color: rgba(98, 97, 97, 0.61);
+    cursor: pointer;
+}
+
+li {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul {
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style-type: none;
+}
+
+#automation-container {
+    height: auto;
+    width: 12000px;
+    flex-direction: column;
+    display: flex;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    pointer-events: none;
+    grid-column-start: 1;
+    grid-row-start: 1;
+}
+
+.automation-location {
+    z-index: 1;
+    width: 100%;
+    min-height: 90px;
+    pointer-events: none;
+    display: flex;
+}
+
+.event-active {
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.21);
+}
+
+canvas {
+    grid-column-start: 1;
+    grid-row-start: 1;
+}
+
+.form-range {
+    transform: scale(1.5);
+    width: 90px !important;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+#special-controls-container {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+    display: flex;
+    background-color: #121213;
+    overflow-y: scroll;
+    padding-top: 25px;
+    padding-bottom: 106px;
+    top: 0px;
+}
+
+control-element {
+    width: 100%;
+    min-height: 130px;
+    background-color: rgb(44, 44, 44);
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+    /*display: flex;*/
+    /*flex-direction: row;*/
+    /*flex-wrap: nowrap;*/
+    /*align-items: center;*/
+    /*overflow: auto;*/
+}
+
+#advanced-window {
+    z-index: 21;
+}
+
+advanced-element {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    width: 462px;
+    height: 300px;
+}
+
+/*#advanced-buttons {*/
+/*    display: flex;*/
+/*    flex-direction: row;*/
+/*    flex-wrap: nowrap;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*    width: 100%;*/
+/*    padding: 10px;*/
+/*}*/
+
+/*.dropdown-container {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    flex-wrap: nowrap;*/
+/*    overflow-y: scroll;*/
+/*    align-items: flex-start;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    border: solid 1px lightgray;*/
+/*    border-radius: 3px;*/
+/*}*/
+
+/*.parameter-item {*/
+/*    display: flex;*/
+/*    flex-direction: row;*/
+/*    flex-wrap: nowrap;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*    padding: 5px;*/
+/*}*/
+
+/*.btn-advanced {*/
+/*    margin: 5px;*/
+/*    border-radius: 6px;*/
+/*}*/
+
+/*.select-advanced {*/
+/*    margin: 5px;*/
+/*    border-radius: 4px;*/
+/*    width: 190px;*/
+/*    text-overflow: ellipsis;*/
+/*}*/
+
+.cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(1000px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.cover::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0.5;
+    filter: blur(1000px);
+}
+
+.cover::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    animation: rotate 1s linear infinite;
+    z-index: 1;
+    margin-bottom: 100px;
+}
+
+.cover-text {
+    color: #fff;
+    font-size: 24px;
+    margin-top: 50px;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
