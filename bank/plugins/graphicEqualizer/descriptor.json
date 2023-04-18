@@ -1,0 +1,11 @@
+{
+  "name": "Equalizer",
+  "vendor": "Wasabi",
+  "description": "TODO",
+  "version": "1.0.0",
+  "apiVersion": "2.0.0",
+  "thumbnail": "screenshot.png",
+  "keywords": ["equalizer", "mixing"],
+  "isInstrument": false,
+  "website": ""
+}

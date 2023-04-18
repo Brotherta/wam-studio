@@ -178,7 +178,15 @@ export default class TracksController {
 
     clearAllTracks() {
         for (let track of this.app.tracks.trackList) {
-            this.removeTrack(track);
+            this.app.pluginsController.removePlugins(track);
+            this.tracksView.removeTrack(track.element);
+            this.app.trackControlController.removeTrackControl(track);
+            this.app.waveFormController.removeWaveformOfTrack(track);
+            this.app.automationView.removeAutomationBpf(track.id);
+            track.node!.removeAudio();
+            track.node!.disconnectEvents();
+            track.node!.disconnect();
         }
+        this.app.tracks.trackList = [];
     }
 }

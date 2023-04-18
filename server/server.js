@@ -21,6 +21,17 @@ const storageDir = process.env.STORAGE_DIR;
 const adminPassword = process.env.ADMIN_PASSWORD;
 const jwtSecret = process.env.JWT_SECRET;
 
+
+// Create storage directory if it doesn't exist
+if (!fs.existsSync(storageDir)) {
+    fs.mkdirSync(storageDir);
+}
+
+// Create projects.json file if it doesn't exist
+if (!fs.existsSync(storageDir+'/projects.json')) {
+    writeJSONFile(storageDir+'/projects.json', []);
+}
+
 // Middleware to verify JWT token
 function verifyJWT(req, res, next) {
     const authHeader = req.header('Authorization');
@@ -41,7 +52,6 @@ function verifyJWT(req, res, next) {
 
 // Function to read and parse JSON file
 function readJSONFile(filePath) {
-    console.log(filePath)
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
@@ -52,34 +62,40 @@ function writeJSONFile(filePath, data) {
 
 // Route to get all projects
 app.get('/projects', (req, res) => {
-    const projects = readJSONFile('projects.json');
-    res.json(projects.map(({ name, date, id }) => ({ name, date, id })));
+    const projects = readJSONFile(storageDir+'/projects.json');
+    res.json(projects.map(({ username, name, date, id }) => ({ username, name, date, id })));
 });
 
 // Route to get all projects with given username or project name
 app.get('/projects/search', (req, res) => {
-    const { query } = req.query;
-    const words = query.toLowerCase().split(' ');
+    const { user, project } = req.query;
 
-    const projects = readJSONFile('projects.json');
+    const lowerUsernameQuery = user ? user.toLowerCase() : "";
+    const lowerProjectNameQuery = project ? project.toLowerCase() : "";
+
+    const projects = readJSONFile(storageDir+'/projects.json');
     const filteredProjects = projects.filter(({ username, name }) => {
         const lowerUsername = username.toLowerCase();
         const lowerName = name.toLowerCase();
-        return words.some((word) => lowerUsername.includes(word) || lowerName.includes(word));
+        return (
+            (lowerUsernameQuery === "" || lowerUsername.includes(lowerUsernameQuery)) &&
+            (lowerProjectNameQuery === "" || lowerName.includes(lowerProjectNameQuery))
+        );
     });
 
-    res.json(filteredProjects.map(({ name, date, id }) => ({ name, date, id })));
+    res.json(filteredProjects.map(({ username, name, date, id }) => ({ username, name, date, id })));
 });
+
 
 // Route to get a specific project by ID
 app.get('/projects/:id', (req, res) => {
     const projectId = req.params.id;
-    const projects = readJSONFile('projects.json');
+    const projects = readJSONFile(storageDir+'/projects.json');
     const project = projects.find(({ id }) => id === projectId);
 
     if (project) {
         const projectData = readJSONFile(project.path);
-        res.json(projectData);
+        res.json({id: projectId, user: project.username, project: project.name, data: projectData});
     } else {
         res.status(404).json({ message: 'Project not found' });
     }
@@ -89,7 +105,7 @@ app.get('/projects/:id', (req, res) => {
 app.post('/projects', (req, res) => {
     const { username, projectName, override, data } = req.body;
 
-    const projects = readJSONFile('projects.json');
+    const projects = readJSONFile(storageDir+'/projects.json');
     const userDir = path.join(storageDir, username);
     const projectFile = path.join(userDir, `${projectName}.json`);
 
@@ -102,7 +118,11 @@ app.post('/projects', (req, res) => {
     );
 
     if (existingProject && !override) {
-        res.status(400).json({ message: 'Project already exists' });
+        res.status(400).json({
+            message: 'Project already exists',
+            "name": existingProject.name,
+            "date": existingProject.date
+        });
     } else {
         if (existingProject && override) {
             const index = projects.findIndex(({ id }) => id === existingProject.id);
@@ -119,7 +139,7 @@ app.post('/projects', (req, res) => {
         };
 
         projects.push(project);
-        writeJSONFile('projects.json', projects);
+        writeJSONFile(storageDir+'/projects.json', projects);
         writeJSONFile(projectFile, data);
 
         res.status(201).json({ message: 'Project created', id: projectId });
@@ -141,14 +161,14 @@ app.post('/admin/login', (req, res) => {
 // Route to delete a project by ID (requires valid JWT token)
 app.delete('/projects/:id', verifyJWT, (req, res) => {
     const projectId = req.params.id;
-    const projects = readJSONFile('projects.json');
+    const projects = readJSONFile(storageDir+'/projects.json');
     const projectIndex = projects.findIndex(({ id }) => id === projectId);
 
     if (projectIndex !== -1) {
         const project = projects[projectIndex];
         fs.unlinkSync(project.path);
         projects.splice(projectIndex, 1);
-        writeJSONFile('projects.json', projects);
+        writeJSONFile(storageDir+'/projects.json', projects);
         res.json({ message: 'Project deleted' });
     } else {
         res.status(404).json({ message: 'Project not found' });
@@ -158,7 +178,7 @@ app.delete('/projects/:id', verifyJWT, (req, res) => {
 // Route to delete a user and all their projects (requires valid JWT token)
 app.delete('/users/:username', verifyJWT, (req, res) => {
     const username = req.params.username;
-    const projects = readJSONFile('projects.json');
+    const projects = readJSONFile(storageDir+'/projects.json');
     const userProjects = projects.filter(({ username: u }) => u === username);
 
     if (userProjects.length > 0) {
@@ -167,7 +187,7 @@ app.delete('/users/:username', verifyJWT, (req, res) => {
         });
 
         const updatedProjects = projects.filter(({ username: u }) => u !== username);
-        writeJSONFile('projects.json', updatedProjects);
+        writeJSONFile(storageDir+'/projects.json', updatedProjects);
 
         const userDir = path.join(storageDir, username);
         fs.rmdirSync(userDir);

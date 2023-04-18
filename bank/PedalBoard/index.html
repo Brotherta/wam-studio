@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PedalBoard</title>
+  <link rel="icon" href="data:," />
+</head>
+
+<body>
+<main>
+  <div id="state-menu">
+    <audio
+            id="player"
+            src="https://mainline.i3s.unice.fr/WebAudioPluginBank/BasketCaseGreendayriffDI.mp3"
+            controls
+            loop
+            crossorigin="anonymous"
+    ></audio>
+    <p>
+      <button id="toggleGuitarIn">Guitar input:
+        <span style='color:red;'>NOT ACTIVATED</span>, click to toggle on/off!</button>
+    </p>
+    <button id="save">Save state in cache</button>
+    <button id="restore">Restore state from cache</button>
+    <button id="delete">Delete cache</button>
+    <svg viewBox="0 0 80 80" width="30" height="30">
+      <circle id="inCache" class="circle" cx="40" cy="40" r="38" />
+    </svg>
+  </div>
+  <div id="mount"></div>
+</main>
+<script type="module" src="host.js"></script>
+<style>
+  #state-menu {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  #state-menu > button {
+    font-weight: bold;
+    font-size: larger;
+  }
+
+  #state-menu > svg {
+    fill: currentColor;
+    stroke: #0f1c3f;
+    stroke-width: 0.1875em;
+  }
+
+  #inCache[data="true"] {
+    color: rgb(87, 245, 24);
+  }
+
+  #inCache[data="false"] {
+    color: rgb(94, 94, 94);
+  }
+</style>
+</body>
+</html>

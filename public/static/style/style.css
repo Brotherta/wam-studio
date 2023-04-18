@@ -294,7 +294,6 @@ div::-webkit-scrollbar-thumb:hover {
     max-height: 350px;
 }
 
-
 .track-container track-element:nth-child(2) {
     margin-top: 25px;
 }
@@ -302,6 +301,7 @@ div::-webkit-scrollbar-thumb:hover {
 .track-container .new-track:nth-child(2) {
     margin-top: 34px;
 }
+
 
 track-element {
     display: flex;

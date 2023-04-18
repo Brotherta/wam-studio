@@ -20,6 +20,7 @@ import WaveformController from "./Controllers/WaveformController";
 import RecorderController from "./Controllers/RecorderController";
 import Loader from "./Loader/Loader";
 import ProjectView from "./Views/ProjectView";
+import ProjectController from "./Controllers/ProjectController";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -36,6 +37,7 @@ export default class App {
     regionsController: RegionsController;
     recorderController: RecorderController;
     trackControlController: TrackControlController;
+    projectController: ProjectController;
 
     hostView: HostView;
     tracksView: TracksView;
@@ -73,6 +75,7 @@ export default class App {
         this.waveFormController = new WaveformController(this);
         this.regionsController = new RegionsController(this);
         this.recorderController = new RecorderController(this);
+        this.projectController = new ProjectController(this);
 
         makeDivScrollSync();
     }

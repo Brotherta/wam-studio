@@ -1,0 +1,4 @@
+[submodule "src/sdk"]
+	path = src/sdk
+	url = https://github.com/webaudiomodules/sdk
+	branch = master

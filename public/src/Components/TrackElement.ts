@@ -221,6 +221,7 @@ export default class TrackElement extends HTMLElement {
     isArmed: boolean = false;
     isSolo: boolean = false;
     isMuted: boolean = false;
+    private initialized: Boolean;
 
     constructor() {
         super();
@@ -229,9 +230,9 @@ export default class TrackElement extends HTMLElement {
     }
 
     connectedCallback() {
-        if (this.shadowRoot !== null) {
+        if (this.shadowRoot !== null && !this.initialized) {
             this.shadowRoot.innerHTML = template.innerHTML;
-            
+            this.initialized = true;
             this.defineTrackNameListener();
         }
     }

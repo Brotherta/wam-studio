@@ -187,28 +187,34 @@ export default class HostController {
             this.app.pluginsController.selectHost();
         });
         this.app.hostView.saveProject.onclick = async () => {
-            // await this.app.loader.saveProject("test");
-            this.app.projectView.mountSave();
-            this.app.projectView.show();
+            await this.app.projectController.openSaveProject();
+        }
+        this.app.hostView.loadProject.onclick = async () => {
+            this.app.projectController.openLoadProject();
         }
         this.app.hostView.importProject.onclick = async () => {
             await this.hostView.importInput.click();
         }
+        this.app.hostView.exportProject.onclick = async () => {
+            let project = await this.app.loader.saveProject();
+            let date = new Date().toISOString().slice(0, 10);
+            let fileName = `WAM-Project_${date}.json`;
+            let blob = new Blob([JSON.stringify(project)], {type: "application/json"});
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            a.remove();
+        }
         this.app.hostView.importInput.onchange = async (e) => {
             // @ts-ignore
             let file = e.target.files[0];
-            console.log(file);
             if (file) {
                 const reader = new FileReader();
                 reader.onload = async (e) => {
-                    // try {
                     let json = JSON.parse(e.target!.result as string);
-                    console.log(json);
                     await this.app.loader.loadProject(json);
-
-                    // } catch (error) {
-                    //     console.error("Error parsing JSON file", error)
-                    // }
                 }
                 reader.readAsText(file);
             }

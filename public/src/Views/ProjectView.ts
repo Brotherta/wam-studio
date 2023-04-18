@@ -1,4 +1,5 @@
 import SaveProjectElement from "../Components/Project/SaveProjectElement";
+import LoadProjectElement from "../Components/Project/LoadProjectElement";
 
 
 export default class ProjectView {
@@ -9,7 +10,7 @@ export default class ProjectView {
     title: HTMLDivElement;
 
     saveElement: SaveProjectElement;
-    loadElement: HTMLDivElement;
+    loadElement: LoadProjectElement;
     newElement: HTMLDivElement;
     manageElement: HTMLDivElement;
 
@@ -22,6 +23,7 @@ export default class ProjectView {
         this.closeBtn.onclick = () => this.close();
 
         this.saveElement = new SaveProjectElement();
+        this.loadElement = new LoadProjectElement();
     }
 
     show() {
@@ -34,15 +36,21 @@ export default class ProjectView {
     }
 
     mountLoad() {
+        this.title.innerText = "Load Project";
+        this.mount.innerHTML = "";
+        this.mount.appendChild(this.loadElement);
     }
 
     mountSave() {
         this.title.innerText = "Save Project";
+        this.mount.innerHTML = "";
         this.mount.appendChild(this.saveElement);
     }
 
     mountNew() {
-
+        this.title.innerText = "New Project";
+        this.mount.innerHTML = "";
+        this.mount.appendChild(this.saveElement);
     }
 
     mountManage() {

@@ -8,12 +8,7 @@ export default class Loader {
         this.app = app;
     }
 
-    async saveProject(name: string) {
-
-        if (false) {
-            // check if project exists with this name
-        }
-
+    async saveProject() {
         let tracks = [];
         for (let track of this.app.tracks.trackList) {
             let hasPlugin = track.plugin.initialized;
@@ -30,7 +25,6 @@ export default class Loader {
                 for (let bind of control.binds) {
                     let bindParameters = [];
                     for (let bindParam of bind.bindParameters) {
-                        console.log(bindParam)
                         bindParameters.push({
                             "param": bindParam.selected,
                             "originalMin": bindParam.originalMin,
@@ -60,22 +54,12 @@ export default class Loader {
             });
         }
 
-        let date = new Date().toISOString();
         let project = {
-            "name": name,
-            "date": date,
             "trackIdCount": this.app.tracks.trackIdCount,
             "tracks": tracks
         }
 
-        let fileName = `${name}_${date}.json`;
-        let blob = new Blob([JSON.stringify(project)], {type: "application/json"});
-        let url = URL.createObjectURL(blob);
-        let a = document.createElement("a");
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        a.remove();
+        return project;
     }
 
     async loadProject(json: any) {
@@ -89,12 +73,9 @@ export default class Loader {
         cover.appendChild(coverText);
         document.body.appendChild(cover);
 
-
-
         this.app.hostController.playing = false;
         this.app.hostController.stopAll();
         this.app.tracksController.clearAllTracks();
-        this.app.trackControlController.clearAllControls();
         this.app.host.timer = 0;
         this.app.host.playhead = 0;
         this.app.tracks.trackIdCount = 1;
@@ -111,12 +92,8 @@ export default class Loader {
                 track = await this.app.tracks.newTrackUrl(trackJson.url);
             }
 
+            track.id = trackJson.id;
             await this.app.tracksController.initTrackComponents(track);
-            track.element.name = trackJson.name;
-            track.isMuted = trackJson.muted;
-            track.isSolo = trackJson.soloed;
-            track.volume = trackJson.volume;
-            track.pannerNode.pan.value = trackJson.pan;
 
             if (trackJson.plugin) {
                 await track.plugin.initPlugin();
@@ -141,14 +118,26 @@ export default class Loader {
 
         await Promise.all(trackInitializedPromise);
 
+
         let trackBindInitializedPromise = json.tracks.map(async (trackJson: any) => {
-            let track = this.app.tracks.getTrack(trackJson.id);
+            let track = this.app.tracks.getTrack(trackJson.id)!;
+
+            track.element.name = trackJson.name;
+            track.element.trackNameInput.value = trackJson.name;
+            if (trackJson.muted) track.element.mute();
+            if (trackJson.soloed) track.element.solo();
+            track.setVolume(trackJson.volume);
+            track.setBalance(trackJson.pan);
+            track.element.volumeSlider.value = (trackJson.volume*100).toString();
+            track.element.balanceSlider.value = trackJson.pan;
+
             let control = this.app.trackControlController.getControl(track!.id);
 
             let bindInitializedPromise = trackJson.binds.map(async (bindJson: any) => {
                 await this.app.trackControlController.createBindJsonAsync(control!, bindJson.name);
                 let bind = control!.binds[control!.binds.length - 1];
                 bind.trackBindElement.slider.value = bindJson.value;
+                bind.trackBindElement.valueLabel.innerText = bindJson.value;
 
                 for (let parameterJson of bindJson.parameters) {
                     let parameter = await this.app.trackControlController.addParameterAsync(control!, bind);
@@ -167,11 +156,16 @@ export default class Loader {
 
         await Promise.all(trackBindInitializedPromise);
 
-        this.app.controlsView.advancedMount.innerHTML = "";
-        this.app.pluginsView.mount.innerHTML = "";
-        this.app.pluginsView.hideFloatingWindow();
-        this.app.controlsView.closeAdvanced();
+        this.app.tracksView.reorderTracks(this.app.tracks.trackList);
+        this.app.controlsView.reorderControls(this.app.trackControlController.controls);
 
-        cover.remove();
+        setTimeout(() => {
+            this.app.controlsView.advancedMount.innerHTML = "";
+            this.app.pluginsView.mount.innerHTML = "";
+            this.app.pluginsView.hideFloatingWindow();
+            this.app.controlsView.closeAdvanced();
+            cover.remove();
+        }, 500);
+
     }
 }

@@ -56,6 +56,7 @@ export default class TrackControlElement extends HTMLElement {
 
     trackId: number;
     name: string;
+    initialized: boolean = false;
 
     constructor() {
         super();
@@ -64,18 +65,13 @@ export default class TrackControlElement extends HTMLElement {
     }
 
     connectedCallback() {
-        if (this.shadowRoot !== null) {
+        if (this.shadowRoot !== null && !this.initialized) {
             this.shadowRoot.innerHTML = template.innerHTML;
-
-            this.defineTrackNameListener();
+            this.initialized = true;
         }
     }
 
     get controlsContainer(): HTMLDivElement {
         return this.shadowRoot?.getElementById("controls") as HTMLDivElement;
-    }
-
-    defineTrackNameListener() {
-
     }
 }

@@ -9,6 +9,7 @@ import BPF from './Components/BPF';
 import BindParameterElement from "./Components/BindParameterElement";
 import TrackBindControlElement from "./Components/TrackBindControlElement";
 import SaveProjectElement from "./Components/Project/SaveProjectElement";
+import LoadProjectElement from "./Components/Project/LoadProjectElement";
 
 customElements.define(
     "track-element",
@@ -21,7 +22,7 @@ customElements.define(
 customElements.define(
     "advanced-element",
     AdvancedControlElement
-)
+);
 customElements.define(
     "bpf-automation",
     BPF
@@ -33,20 +34,15 @@ customElements.define(
 customElements.define(
     "track-bind-control-element",
     TrackBindControlElement
-)
+);
 customElements.define(
     "save-project-element",
     SaveProjectElement
-)
-
-const backendUrl = process.env.BACKEND_URL;
-console.log(backendUrl);
-
-fetch(backendUrl + "/projects")
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-    });
+);
+customElements.define(
+    "load-project-element",
+    LoadProjectElement
+);
 
 const audioCtx = new AudioContext();
 audioCtx.suspend();

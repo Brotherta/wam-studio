@@ -1,0 +1,11 @@
+{
+  "name": "DistoMachine (No builder)",
+  "vendor": "WebAudioModule",
+  "description": "DistoMachine written in native WebAudio nodes",
+  "version": "1.0.0",
+  "apiVersion": "2.0.0",
+  "thumbnail": "default.png",
+  "keywords": ["amplifier"],
+  "isInstrument": false,
+  "website": ""
+}

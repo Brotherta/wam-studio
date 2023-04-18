@@ -1,4 +1,5 @@
 import TrackControlElement from "../Components/TrackControlElement";
+import TrackControl from "../Models/TrackControl";
 
 
 export default class TrackControlView {
@@ -29,6 +30,15 @@ export default class TrackControlView {
 
     closeAdvanced() {
         this.advancedWindow.hidden = true;
+    }
+
+    reorderControls(controls: TrackControl[]) {
+        this.controlsContainer.innerHTML = "";
+        controls = controls.sort((a, b) => a.trackId - b.trackId);
+        for (let i = 0; i < controls.length; i++) {
+            const control = controls[i];
+            this.controlsContainer.appendChild(control.controlElement);
+        }
     }
 
 }

@@ -6,17 +6,25 @@ services:
     ports:
       - "5002:5002"
     environment:
-      - HTTPS=false
+      - PORT=5002
+      - HTTPS=true
 
   backend:
     build: ./server
     ports:
       - "6002:6002"
-
     environment:
+      - PORT=6002
       - STORAGE_DIR=/data/storage
     volumes:
       - projects:/data/storage
+
+  bank:
+    build: ./bank
+    ports:
+      - "7002:7002"
+    environment:
+      - PORT=7002
 
 volumes:
     projects:
