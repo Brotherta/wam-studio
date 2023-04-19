@@ -16,7 +16,7 @@ Wam-Studio’s is an online tool for creating audio projects that you can imagin
    - `PORT`: The port number that the frontend server will run on. For example, `5002`.
    - `HTTPS`: Set this to `true` if you want to enable HTTPS. If `true`, you must create a certificate and set the `SSL_CRT_FILE` and `SSL_KEY_FILE` variables.
    - `BACKEND_URL`: The URL of the backend server. For example, `http://localhost:6002`.
-   - `BANK_PLUGIN_URL`: The URL of the bank plugin. For example, `http://localhost:7002/src/index.js`.
+   - `BANK_PLUGIN_URL`: The URL of the bank plugin. For example, `http://localhost:7002`.
 5. Start the frontend server by running `npm start`.
 
 ### Backend
@@ -47,7 +47,7 @@ Wam-Studio’s is an online tool for creating audio projects that you can imagin
 6. Configure the following variables in the `docker-compose.yml` file:
    - `HTTPS`: Set this to `false` to disable HTTPS. If `true`, you must create a certificate and set the `SSL_CRT_FILE` and `SSL_KEY_FILE`
    - `BACKEND_URL`: The URL of the backend server. For example, `http://localhost:6002`.
-   - `BANK_PLUGIN_URL`: The URL of the bank plugin. For example, `http://localhost:7002/src/index.js`.
+   - `BANK_PLUGIN_URL`: The URL of the bank plugin. For example, `http://localhost:7002`.
    - `STORAGE_DIR`: The directory where the backend will store data. For example, `/data/storage` (inside the volume).
    - `ADMIN_PASSWORD`: The password for the admin user.
    - `JWT_SECRET`: The secret for JSON Web Tokens (JWT).

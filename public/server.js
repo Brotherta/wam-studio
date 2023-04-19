@@ -23,9 +23,10 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 if (HTTPS) {
     // HTTPS server
-
-    const privateKey = fs.readFileSync('key.pem', 'utf8');
-    const certificate = fs.readFileSync('cert.pem', 'utf8');
+    const keyPath = process.env.SSL_KEY_FILE;
+    const certPath = process.env.SSL_CERT_FILE;
+    const privateKey = fs.readFileSync(keyPath, 'utf8');
+    const certificate = fs.readFileSync(certPath, 'utf8');
     const credentials = { key: privateKey, cert: certificate };
     const httpsServer = https.createServer(credentials, app);
 

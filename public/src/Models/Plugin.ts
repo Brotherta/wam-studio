@@ -22,7 +22,7 @@ export default class Plugin {
      */
     async initPlugin() {
         //@ts-ignore
-        const {default: WAM} = await import(/* webpackIgnore: true */BANK_PLUGIN_URL);
+        const {default: WAM} = await import(/* webpackIgnore: true */BANK_PLUGIN_URL+"/src/index.js");
         this.instance = await WAM.createInstance(this.app.host.hostGroupId, this.app.host.audioCtx);
         // @ts-ignore
         this.dom = await this.instance.createGui();

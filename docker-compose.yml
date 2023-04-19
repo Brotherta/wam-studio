@@ -6,10 +6,9 @@ services:
     ports:
       - "5002:5002"
     environment:
-      - PORT=5002
       - HTTPS=false
       - BACKEND_URL=http://localhost:6002
-      - BANK_PLUGIN_URL=http://localhost:7002/src/index.js
+      - BANK_PLUGIN_URL=http://localhost:7002
     restart: always
 
 
@@ -18,8 +17,9 @@ services:
     ports:
       - "6002:6002"
     environment:
-      - PORT=6002
       - STORAGE_DIR=/data/storage
+      - ADMIN_PASSWORD=123456
+      - JWT_SECRET=123456
     volumes:
       - projects:/data/storage
     restart: always
@@ -29,7 +29,6 @@ services:
     ports:
       - "7002:7002"
     environment:
-      - PORT=7002
       - HTTPS=false
     restart: always
 
