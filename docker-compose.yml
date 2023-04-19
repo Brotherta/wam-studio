@@ -10,6 +10,8 @@ services:
       - HTTPS=false
       - BACKEND_URL=http://localhost:6002
       - BANK_PLUGIN_URL=http://localhost:7002/src/index.js
+    restart: always
+
 
   backend:
     build: ./server
@@ -20,6 +22,7 @@ services:
       - STORAGE_DIR=/data/storage
     volumes:
       - projects:/data/storage
+    restart: always
 
   bank:
     build: ./bank
@@ -28,6 +31,7 @@ services:
     environment:
       - PORT=7002
       - HTTPS=false
+    restart: always
 
 volumes:
     projects:
