@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-const HTTPS = process.env.HTTPS || false;
+const HTTPS = process.env.HTTPS === "true";
 const PORT = process.env.PORT || 5002;
 
 
