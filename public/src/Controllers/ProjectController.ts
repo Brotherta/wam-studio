@@ -1,4 +1,5 @@
 import App from "../App";
+import {BACKEND_URL} from "../Env";
 
 
 export default class ProjectController {
@@ -57,7 +58,7 @@ export default class ProjectController {
             this.app.projectView.loadElement.initialized = true;
 
             this.app.projectView.loadElement.searchButton.addEventListener("click", async () => {
-                let url = process.env.BACKEND_URL + "/projects";
+                let url = BACKEND_URL + "/projects";
                 let user = this.app.projectView.loadElement.userInput.value;
                 let project = this.app.projectView.loadElement.projectInput.value;
                 let query = "";
@@ -73,7 +74,7 @@ export default class ProjectController {
 
             this.app.projectView.loadElement.loadButton.addEventListener("click", async () => {
                 if (this.app.projectView.loadElement.selectedProject !== "") {
-                    let url = process.env.BACKEND_URL + "/projects/" + this.app.projectView.loadElement.selectedProject;
+                    let url = BACKEND_URL + "/projects/" + this.app.projectView.loadElement.selectedProject;
                     let response = await fetch(url);
                     if (response.status === 200) {
                         let responseData = await response.json();
@@ -117,7 +118,7 @@ export default class ProjectController {
     }
 
     async saveProject(override: boolean = false) {
-        let url = process.env.BACKEND_URL + "/projects";
+        let url = BACKEND_URL + "/projects";
 
         let user = this.app.projectView.saveElement.user.value;
         let project = this.app.projectView.saveElement.project.value;
@@ -155,7 +156,7 @@ export default class ProjectController {
     }
 
     async saveProjectConfirm(user: string, project: string, data: any, message: string = "") {
-        let url = process.env.BACKEND_URL + "/projects";
+        let url = BACKEND_URL + "/projects";
 
         this.app.projectView.saveElement.showConfirm(message, async () => {
             let response = await fetch(url, {

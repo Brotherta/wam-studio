@@ -5,8 +5,10 @@ const plugins = require("./plugins.json");
 
 const app = express();
 const port = process.env.PORT || 7002;
+const HTTPS = process.env.HTTPS || false;
 
 app.use(cors());
+
 
 // app.enable("trust proxy");
 
@@ -19,7 +21,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/wams", (req, res) => {
-  res.send(plugins.map((plugin) => `http://${req.get("Host")}/plugins/${plugin}/`));
+  res.send(plugins.map((plugin) => `${HTTPS ? 'https' : 'http'}://${req.get("Host")}/plugins/${plugin}/`));
 });
 
 app.use("/", express.static(path.join(__dirname, "./PedalBoard")));

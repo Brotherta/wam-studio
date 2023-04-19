@@ -17,9 +17,10 @@ app.use(express.json());
 app.use(cors());
 
 // Set storage directory and admin password from environment variables
-const storageDir = process.env.STORAGE_DIR;
-const adminPassword = process.env.ADMIN_PASSWORD;
-const jwtSecret = process.env.JWT_SECRET;
+const storageDir = process.env.STORAGE_DIR || 'storage';
+const adminPassword = process.env.ADMIN_PASSWORD || 'admin';
+const jwtSecret = process.env.JWT_SECRET || 'secret';
+const port = process.env.PORT || 6002;
 
 
 // Create storage directory if it doesn't exist
@@ -199,8 +200,7 @@ app.delete('/users/:username', verifyJWT, (req, res) => {
 });
 
 
-// Start the server
-const port = process.env.PORT;
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });

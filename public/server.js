@@ -6,9 +6,9 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const HTTPS = process.env.HTTPS === 'true';
 const app = express();
-const PORT = process.env.PORT;
+const HTTPS = process.env.HTTPS || false;
+const PORT = process.env.PORT || 5002;
 
 
 // Set headers

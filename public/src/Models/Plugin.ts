@@ -1,5 +1,6 @@
 import {WebAudioModule} from "@webaudiomodules/sdk";
 import App from "../App";
+import {BANK_PLUGIN_URL} from "../Env";
 
 /**
  * Class that represents a plugin.
@@ -10,7 +11,6 @@ export default class Plugin {
     dom: Element;
     app: App;
     initialized: boolean
-    pluginUrl: string = process.env.BANK_PLUGIN_URL!;
 
     constructor(app: App) {
         this.app = app;
@@ -22,7 +22,7 @@ export default class Plugin {
      */
     async initPlugin() {
         //@ts-ignore
-        const {default: WAM} = await import(/* webpackIgnore: true */this.pluginUrl);
+        const {default: WAM} = await import(/* webpackIgnore: true */BANK_PLUGIN_URL);
         this.instance = await WAM.createInstance(this.app.host.hostGroupId, this.app.host.audioCtx);
         // @ts-ignore
         this.dom = await this.instance.createGui();

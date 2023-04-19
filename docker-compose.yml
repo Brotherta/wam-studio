@@ -1,5 +1,5 @@
 # docker-compose.yml
-version: "3.9"
+version: "3.3"
 services:
   frontend:
     build: ./public
@@ -7,7 +7,9 @@ services:
       - "5002:5002"
     environment:
       - PORT=5002
-      - HTTPS=true
+      - HTTPS=false
+      - BACKEND_URL=http://localhost:6002
+      - BANK_PLUGIN_URL=http://localhost:7002/src/index.js
 
   backend:
     build: ./server
@@ -25,6 +27,7 @@ services:
       - "7002:7002"
     environment:
       - PORT=7002
+      - HTTPS=false
 
 volumes:
     projects:
