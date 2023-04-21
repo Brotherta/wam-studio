@@ -18,10 +18,14 @@ app.use(cors());
 
 // Set storage directory and admin password from environment variables
 const storageDir = process.env.STORAGE_DIR || 'storage';
-const adminPassword = process.env.ADMIN_PASSWORD || 'admin';
-const jwtSecret = process.env.JWT_SECRET || 'secret';
+const adminPassword = process.env.ADMIN_PASSWORD;
+const jwtSecret = process.env.JWT_SECRET;
 const port = process.env.PORT || 6002;
 
+if (!jwtSecret || !adminPassword) {
+    console.error('Environment variables not set.');
+    process.exit(1);
+}
 
 // Create storage directory if it doesn't exist
 if (!fs.existsSync(storageDir)) {

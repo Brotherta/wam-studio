@@ -4,8 +4,9 @@ const path = require("path");
 const plugins = require("./plugins.json");
 
 const app = express();
+
 const port = process.env.PORT || 7002;
-const HTTPS = process.env.HTTPS || false;
+const HTTPS = process.env.HTTPS === "true";
 
 app.use(cors());
 

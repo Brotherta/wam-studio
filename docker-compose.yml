@@ -7,10 +7,7 @@ services:
       - "5002:5002"
     environment:
       - HTTPS=false
-      - BACKEND_URL=http://localhost:6002
-      - BANK_PLUGIN_URL=http://localhost:7002
-    restart: always
-
+    restart: unless-stopped
 
   backend:
     build: ./server
@@ -18,11 +15,9 @@ services:
       - "6002:6002"
     environment:
       - STORAGE_DIR=/data/storage
-      - ADMIN_PASSWORD=123456
-      - JWT_SECRET=123456
     volumes:
       - projects:/data/storage
-    restart: always
+    restart: unless-stopped
 
   bank:
     build: ./bank
@@ -30,7 +25,7 @@ services:
       - "7002:7002"
     environment:
       - HTTPS=false
-    restart: always
+    restart: unless-stopped
 
 volumes:
     projects:
