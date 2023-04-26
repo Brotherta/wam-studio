@@ -1,0 +1,11 @@
+{
+  "name": "TS9 Overdrive",
+  "vendor": "WebAudioModule",
+  "description": "Overdrive written in Faust",
+  "version": "1.0.0",
+  "apiVersion": "2.0.0",
+  "thumbnail": "screenshot.png",
+  "keywords": ["faust"],
+  "isInstrument": false,
+  "website": ""
+}

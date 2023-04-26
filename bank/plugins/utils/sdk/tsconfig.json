@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"moduleResolution": "node",
+		"baseUrl": "../",
+		"target": "es6",
+		"module": "esnext",
+		"allowSyntheticDefaultImports": true,
+		"noEmit": true,
+		"experimentalDecorators": true
+	},
+	"include": [
+	  "src/**/*"
+	],
+	"exclude": [
+	  "esm",
+	  "node_modules"
+	]
+}

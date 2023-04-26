@@ -1,0 +1,285 @@
+:root {
+  --border-color: gray;
+  --text-color: black;
+  --bg-color: white;
+  --secondary-bg: dimgray;
+  --ternary-bg: black;
+}
+
+body {
+  width: min-content;
+  margin: 0;
+}
+
+main {
+  position: relative;
+  width: 1000px;
+  min-width: 500px;
+  resize: horizontal;
+  overflow: auto;
+  color: var(--text-color, white);
+  border: 1px solid var(--border-color, gray);
+  border-radius: 0.25rem;
+  font-family: "helvetica", sans-serif, cursive;
+}
+
+img {
+  max-height: 6rem;
+}
+
+#preview {
+  border: 1px solid var(--border-color, gray);
+  border-width: 0 1px 0 1px;
+  padding: 0.5em;
+  overflow-x: auto;
+}
+
+#preview > div {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 0;
+}
+
+#preview > div[full],
+#preview > div > img[disabled] {
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+}
+
+#WASMErrorMsg {
+  color: #ff4500;
+  margin: 0;
+  font-size: smaller;
+  padding-top: 0.5rem;
+  text-align: center;
+}
+
+#board {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  height: 270px;
+  padding: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid var(--border-color, gray);
+}
+
+#board > * {
+  cursor: move;
+  flex-shrink: 0;
+}
+
+#presetsInfos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--border-color, gray);
+  border-width: 0 1px 0 1px;
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  margin: 0;
+}
+
+#banks,
+#presets,
+#infos,
+#presetsInfos > h1 {
+  border-right: 1px solid var(--border-color, gray);
+  margin: 0;
+}
+
+#infos,
+#presetsInfos > h1:last-of-type {
+  border-right: none;
+}
+
+#banks,
+#presets,
+#infos {
+  border-top: none;
+  max-height: 5em;
+  overflow-y: auto;
+  padding: 0 5% 0.5rem 5%;
+}
+
+#banks *,
+#presets * {
+  cursor: pointer;
+}
+
+#presetsInfos > h1 {
+  border-bottom: none;
+  text-align: center;
+}
+
+li {
+  list-style-type: square;
+}
+
+.nodeArticle > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-style: solid;
+  background-color: black;
+  border-color: lightgray;
+  color: white;
+  box-sizing: border-box;
+}
+
+.nodeArticle > header > h2 {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-left: 0.5rem;
+}
+
+.nodeArticle > header > img {
+  filter: contrast(300%);
+  margin-right: 0.5rem;
+}
+
+.addBtn {
+  border: 1px solid var(--border-color, gray);
+  border-radius: 0.25rem;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-color, black);
+}
+
+.addBtn:hover {
+  filter: brightness(0.95);
+}
+
+select {
+  border: 1px solid var(--border-color, gray);
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.25em;
+  text-transform: uppercase;
+  background: none;
+  color: white;
+}
+
+option {
+  color: black;
+  background: rgba(1, 1, 1, 0);
+}
+
+input {
+  border-color: var(--border-color, gray);
+}
+
+.presetElement,
+.bankElement {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.presetElement > span,
+.bankElement > span {
+  flex-grow: 1;
+}
+
+.presetElement > span > input,
+.bankElement > span > input {
+  width: 95%;
+}
+
+.listElementButton {
+  border: none;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  user-select: none;
+}
+
+.listElementButton:last-child {
+  margin-right: 0;
+}
+
+.flex-container {
+  list-style: none;
+  display: flex;
+  float: left;
+}
+
+.stretch {
+  -webkit-align-items: stretch;
+  align-items: stretch;
+}
+
+.flex-item {
+  text-align: center;
+}
+
+#dropZone {
+  display: inline-block;
+  align-self: center;
+  border: 5px dashed var(--border-color, gray);
+  width: 100px;
+  height: 220px;
+  z-index: 1;
+}
+
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-bg, dimgray);
+  border-radius: 2rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ternary-bg, white);
+}
+
+#title {
+  text-align: center;
+  margin: 0;
+  border: 1px solid var(--border-color, gray);
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  user-select: none;
+}
+
+details {
+  border: 0;
+}
+
+details > summary {
+  border: 1px solid var(--border-color, gray);
+  border-width: 0 1px 0 1px;
+  user-select: none;
+  text-align: center;
+}
+
+details[open] > summary {
+  border-width: 0 1px 1px 1px;
+}
+
+details:last-child {
+  border: 1px solid var(--border-color, gray);
+  border-width: 0 0 1px 0;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: black;
+}

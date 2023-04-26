@@ -1,0 +1,40 @@
+{
+  "name": "@webaudiomodules/sdk",
+  "version": "0.0.7",
+  "description": "WebAudioModules Plugin SDK",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "prebuild": "node src/prebuild.js",
+    "build": "esbuild src/index.js --target=esnext --bundle --sourcemap --outdir=dist --format=esm",
+    "test": "jest"
+  },
+  "keywords": [
+    "webaudio",
+    "webaudiomodules",
+    "wam",
+    "sdk"
+  ],
+  "author": "WebAudioModules Working Group",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/%40webaudiomodules/sdk.git"
+  },
+  "scriptPreprocessor": "node_modules/babel-jest",
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "@webaudiomodules/api": "^2.0.0-alpha.3",
+    "dts-bundle-generator": "^6.2.0",
+    "esbuild": "^0.14.2",
+    "esbuild-jest": "^0.5.0",
+    "jest": "^27.4.4",
+    "typescript": "^4.5.3"
+  },
+  "module": "dist",
+  "bugs": {
+    "url": "https://github.com/%40webaudiomodules/sdk/issues"
+  },
+  "homepage": "https://github.com/%40webaudiomodules/sdk#readme"
+}

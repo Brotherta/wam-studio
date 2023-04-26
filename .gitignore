@@ -1,5 +1,9 @@
-.vscode
+*.vscode
 .cache
 dist
 node_modules
-.DS_STORE
+*.DS_STORE
+
+storage/*
+*.env
+*.pem
