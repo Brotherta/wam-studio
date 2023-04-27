@@ -33,7 +33,7 @@ module.exports = (env, argv) => {
                 progress: true,
             },
             port: 5002, host: '0.0.0.0',
-            https: true
+            https: false
         },
 
         // Web games are bigger than pages, disable the warnings that our game is too big.

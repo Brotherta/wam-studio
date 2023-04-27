@@ -188,8 +188,8 @@ export default class PluginsController {
                 .connect(track.plugin.instance!._audioNode)
                 .connect(track.pannerNode);
             if (track.isMonitored) {
-                track.monitorSlitterNode.disconnect(track.pannerNode);
-                track.monitorSlitterNode.connect(track.plugin.instance?._audioNode!);
+                track.mergerNode.disconnect(track.pannerNode);
+                track.mergerNode.connect(track.plugin.instance?._audioNode!);
             }
         }
     }
@@ -208,8 +208,8 @@ export default class PluginsController {
             track.node!.disconnect(track.plugin.instance!._audioNode);
             track.node!.connect(track.pannerNode);
             if (track.isMonitored) {
-                track.monitorSlitterNode.disconnect(track.plugin.instance?._audioNode!);
-                track.monitorSlitterNode.connect(track.pannerNode);
+                track.mergerNode.disconnect(track.plugin.instance?._audioNode!);
+                track.mergerNode.connect(track.pannerNode);
             }
         }
     }

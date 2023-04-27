@@ -22,6 +22,9 @@ export default class Track {
     panRecNode: StereoPannerNode;
     micRecNode: MediaStreamAudioSourceNode | undefined;
 
+    splitterNode: ChannelSplitterNode;
+    mergerNode: ChannelMergerNode;
+
     volume: number = 0.50;
     oldVolume: number = 0.50;
 
@@ -42,6 +45,11 @@ export default class Track {
     worker: Worker | undefined;
     sab: SharedArrayBuffer;
 
+    stereo: boolean = false;
+    merge: boolean = true;
+    left: boolean = true;
+    right: boolean = false;
+
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;
         this.element = element;
@@ -55,8 +63,9 @@ export default class Track {
         this.gainNode = audioCtx.createGain();
         this.gainNode.gain.value = 0.5;
         this.pannerNode = audioCtx.createStereoPanner();
-        this.monitorSlitterNode = audioCtx.createChannelSplitter(2);
-        this.panRecNode = audioCtx.createStereoPanner();
+
+        this.splitterNode = audioCtx.createChannelSplitter(NUM_CHANNELS);
+        this.mergerNode = audioCtx.createChannelMerger(NUM_CHANNELS);
 
         if (this.node !== undefined) {
             this.node.connect(this.pannerNode).connect(this.gainNode);

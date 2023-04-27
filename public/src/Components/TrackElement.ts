@@ -154,6 +154,74 @@ template.innerHTML = /*html*/`
     cursor: pointer;
 }
 
+/*.toggle-control {*/
+/*  border: 1px solid grey;*/
+/*  border-radius: 2px;*/
+/*  background-color: transparent;*/
+/*  color: grey;*/
+/*  font-size: 8px;*/
+/*  font-family: "Helvetica Neue", sans-serif;*/
+/*  font-weight: bold;*/
+/*  text-transform: uppercase;*/
+/*  padding: 1px 3px;*/
+/*  transition: all 0.2s ease;*/
+/*  cursor: pointer;*/
+/*  margin-bottom: 3px;*/
+/*}*/
+
+/*.toggle-control:hover, .toggle-control.active {*/
+/*  background-color: #e74c3c;*/
+/*  color: white;*/
+/*  border-color: #c0392b;*/
+/*}*/
+
+/*.toggle-control:active {*/
+/*  background-color: #c0392b;*/
+/*}*/
+
+.toggle-control {
+  border: 1px solid grey;
+  border-radius: 2px;
+  background-color: transparent;
+  color: grey;
+  font-size: 8px;
+  font-family: "Helvetica Neue", sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 1px 3px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin-bottom: 3px;
+}
+
+.toggle-control:hover, .toggle-control.active {
+  background-color: #5c69cc;
+  color: white;
+  border-color: #5c69cc;
+}
+
+.toggle-control:active {
+  background-color: #444fa6;
+  border-color: #444fa6;
+  color: white;
+}
+
+.toggle-control.disabled {
+  background-color: #bbb;
+  color: #666;
+  border-color: #bbb;
+  cursor: default;
+}
+
+.toggle-control.disabled:hover, .toggle-control.disabled:active {
+  background-color: #bbb;
+  color: #666;
+  border-color: #bbb;
+}
+
+
+
+
 </style>
 
 <link rel="stylesheet" href="style/icons.css">
@@ -191,7 +259,7 @@ template.innerHTML = /*html*/`
         <div id="mute-btn" class="mute-icon">M</div>
         <div id="solo-btn" class="solo-icon">S</div>
         <div id="monitoring" class="control">
-            <i class="monitor-icon"></i>
+            <i class="monitor-icon" style="padding-top: 4px"></i>
         </div>
         <div id="arm" class="control">
             <i class="mic-icon" style="width: 15px"></i>
@@ -199,6 +267,18 @@ template.innerHTML = /*html*/`
         <div id="automation" class="control">
             <i class="automation-icon" style="width: 15px"></i>
         </div>
+    </div>
+<!--    <div class="track-controls" style="padding-top: 5px">-->
+<!--        <div id="mono" class="toggle-control">mono</div>-->
+<!--        <div id="stereo" class="toggle-control">stereo</div>-->
+<!--        <div id="chan1" class="toggle-control">ch1</div>-->
+<!--        <div id="chan2" class="toggle-control">ch2</div>-->
+<!--    </div>-->
+     <div class="track-controls" style="padding-top: 5px">
+        <div id="mode" class="toggle-control">mono</div>
+        <div id="left" class="toggle-control active">L</div>
+        <div id="right" class="toggle-control">R</div>
+        <div id="merge" class="toggle-control active">merge</div>
     </div>
 </div>
 <div id="color-div" class="track-color">
@@ -268,6 +348,21 @@ export default class TrackElement extends HTMLElement {
 
     get monitoringBtn() {
         return this.shadowRoot?.getElementById("monitoring") as HTMLDivElement;
+    }
+
+    get modeBtn() {
+        return this.shadowRoot?.getElementById("mode") as HTMLDivElement;
+    }
+    get leftBtn() {
+        return this.shadowRoot?.getElementById("left") as HTMLDivElement;
+    }
+
+    get rightBtn() {
+        return this.shadowRoot?.getElementById("right") as HTMLDivElement;
+    }
+
+    get mergeBtn() {
+        return this.shadowRoot?.getElementById("merge") as HTMLDivElement;
     }
 
     defineTrackNameListener() {
@@ -381,4 +476,34 @@ export default class TrackElement extends HTMLElement {
         this.monitoringBtn.style.filter = "none";
         this.isMonitoring = false;
     }
+
+    setMono() {
+        this.modeBtn.innerText = "mono";
+        this.mergeBtn.hidden = true;
+        this.leftBtn.hidden = false;
+        this.rightBtn.hidden = false;
+        // this.leftBtn.classList.add("active");
+        // this.rightBtn.classList.remove("active");
+    }
+
+    setStereo() {
+        this.modeBtn.innerText = "stereo";
+        this.mergeBtn.hidden = false;
+        this.leftBtn.hidden = true;
+        this.rightBtn.hidden = true;
+        // this.mergeBtn.classList.add("active");
+    }
+
+    clickMerge() {
+        this.mergeBtn.classList.toggle("active");
+    }
+
+    clickLeft() {
+        this.leftBtn.classList.toggle("active");
+    }
+
+    clickRight() {
+        this.rightBtn.classList.toggle("active");
+    }
+
 }

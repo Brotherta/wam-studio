@@ -79,9 +79,9 @@ export default class RecorderController {
             track.isMonitored = true;
             track.element.monitorOn();
             if (track.plugin.initialized) {
-                track.monitorSlitterNode.connect(track.plugin.instance?._audioNode!);
+                track.mergerNode.connect(track.plugin.instance?._audioNode!);
             } else {
-                track.monitorSlitterNode.connect(track.pannerNode);
+                track.mergerNode.connect(track.pannerNode);
             }
         }
     }
@@ -90,10 +90,10 @@ export default class RecorderController {
         track.isMonitored = false;
         track.element.monitorOff();
         if (track.plugin.initialized) {
-            track.monitorSlitterNode.disconnect(track.plugin.instance?._audioNode!);
+            track.mergerNode.disconnect(track.plugin.instance?._audioNode!);
         }
         else {
-            track.monitorSlitterNode.disconnect(track.pannerNode);
+            track.mergerNode.disconnect(track.pannerNode);
         }
     }
 
@@ -108,11 +108,14 @@ export default class RecorderController {
         if (track.micRecNode === undefined) {
             let stream = await navigator.mediaDevices.getUserMedia(this.app.settingsController.constraints);
             track.micRecNode = new MediaStreamAudioSourceNode(audioCtx, {
-                mediaStream: stream
+                mediaStream: stream,
             });
 
-            track.micRecNode.connect(track.monitorSlitterNode)
-                .connect(track.panRecNode);
+            track.micRecNode.connect(track.splitterNode);
+            // track.splitterNode.connect(track.mergerNode, 0, 0);
+            // track.splitterNode.connect(track.mergerNode, 0, 1);
+            // track.splitterNode.connect(track.mergerNode, 1, 0);
+            // track.splitterNode.connect(track.mergerNode, 1, 1);
         }
     }
 
@@ -142,7 +145,7 @@ export default class RecorderController {
 
     startRecording(track: Track, playhead: number) {
         this.recording = true;
-        track.panRecNode.connect(track.node!);
+        track.mergerNode.connect(track.node!);
 
         let start = (playhead / audioCtx.sampleRate) * 1000;
         let region = this.app.waveFormController.createTemporaryRegion(track, start);
@@ -214,6 +217,79 @@ export default class RecorderController {
         track.node?.port.postMessage({
             "stopRecording": true
         });
-        track.panRecNode?.disconnect(track.node!);
+        track.mergerNode?.disconnect(track.node!);
+    }
+
+    clickMode(track: Track) {
+        if (track.stereo) {
+            track.element.setMono();
+            track.splitterNode.disconnect();
+            if (track.left) {
+                track.splitterNode.connect(track.mergerNode, 0, 0);
+                track.splitterNode.connect(track.mergerNode, 0, 1);
+            }
+            if (track.right) {
+                track.splitterNode.connect(track.mergerNode, 1, 0);
+                track.splitterNode.connect(track.mergerNode, 1, 1);
+            }
+        }
+        else {
+            track.element.setStereo();
+            track.splitterNode.disconnect();
+            if (track.merge) {
+                track.splitterNode.connect(track.mergerNode, 0, 0);
+                track.splitterNode.connect(track.mergerNode, 0, 1);
+                track.splitterNode.connect(track.mergerNode, 1, 0);
+                track.splitterNode.connect(track.mergerNode, 1, 1);
+            }
+            else {
+                track.splitterNode.connect(track.mergerNode, 0, 0);
+                track.splitterNode.connect(track.mergerNode, 1, 1);
+            }
+        }
+        track.stereo = !track.stereo;
+    }
+
+    clickLeft(track: Track) {
+        if (track.left) {
+            track.splitterNode.disconnect(track.mergerNode, 0, 0);
+            track.splitterNode.disconnect(track.mergerNode, 0, 1);
+        }
+        else {
+            track.splitterNode.connect(track.mergerNode, 0, 0);
+            track.splitterNode.connect(track.mergerNode, 0, 1);
+        }
+        track.element.clickLeft();
+        track.left = !track.left;
+    }
+
+    clickRight(track: Track) {
+        if (track.right) {
+            track.splitterNode.disconnect(track.mergerNode, 1, 0);
+            track.splitterNode.disconnect(track.mergerNode, 1, 1);
+        }
+        else {
+            track.splitterNode.connect(track.mergerNode, 1, 0);
+            track.splitterNode.connect(track.mergerNode, 1, 1);
+        }
+        track.element.clickRight();
+        track.right = !track.right;
+    }
+
+    clickMerge(track: Track) {
+        if (track.merge) {
+            track.splitterNode.disconnect();
+            track.splitterNode.connect(track.mergerNode, 0, 0);
+            track.splitterNode.connect(track.mergerNode, 1, 1);
+        }
+        else {
+            track.splitterNode.disconnect();
+            track.splitterNode.connect(track.mergerNode, 0, 0);
+            track.splitterNode.connect(track.mergerNode, 0, 1);
+            track.splitterNode.connect(track.mergerNode, 1, 0);
+            track.splitterNode.connect(track.mergerNode, 1, 1);
+        }
+        track.element.clickMerge();
+        track.merge = !track.merge;
     }
 }

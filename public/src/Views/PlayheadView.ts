@@ -31,8 +31,8 @@ export default class PlayheadView {
         this.playheadRange.min = "0";
         this.playheadRange.step = "1";
         this.drawPlayhead();
-        this.playhead.style.width = `${this.width}`;
-        this.playheadRange.style.width = `${this.width}`;
+        this.playhead.style.width = `${this.width}px`;
+        this.playheadRange.style.width = `${this.width}px`;
     }
 
     /**

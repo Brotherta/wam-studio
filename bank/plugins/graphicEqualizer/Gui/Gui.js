@@ -584,7 +584,7 @@ export default class GraphicEQHTMLElement extends HTMLElement {
     e.preventDefault();
     if (this.selectedFilter) {
       this.selectedFilter.originalQValue = this.selectedFilter.Q.value;
-      this.mode = "dragControlPoint";
+      this.modeBtn = "dragControlPoint";
       this.shiftPressed = e.shiftKey;
       this.clickedY = this.getMousePos(e).y;
       this.drawTooltip();
@@ -593,7 +593,7 @@ export default class GraphicEQHTMLElement extends HTMLElement {
   }
 
   processMouseUp(e) {
-    this.mode = "none";
+    this.modeBtn = "none";
     this.selectedFilter = null;
     this.shiftPressed = false;
     this.dy = 0;

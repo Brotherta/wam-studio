@@ -48,7 +48,8 @@ export default class TracksController {
     addNewTrackInit(track: Track) {
         this.tracksView.addTrack(track.element);
         this.tracksView.changeColor(track);
-        this.defineTrackListener(track); 
+        this.defineTrackListener(track);
+        this.app.recorderController.clickMode(track);
     }
 
     /**
@@ -148,6 +149,18 @@ export default class TracksController {
         }
         track.element.monitoringBtn.onclick = () => {
             this.app.recorderController.clickMonitoring(track);
+        }
+        track.element.modeBtn.onclick = () => {
+            this.app.recorderController.clickMode(track);
+        }
+        track.element.leftBtn.onclick = () => {
+            this.app.recorderController.clickLeft(track);
+        }
+        track.element.rightBtn.onclick = () => {
+            this.app.recorderController.clickRight(track);
+        }
+        track.element.mergeBtn.onclick = () => {
+            this.app.recorderController.clickMerge(track);
         }
     }
 

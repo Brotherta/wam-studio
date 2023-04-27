@@ -23,6 +23,8 @@ const getProcessor = (moduleId: string) => {
         sab: SharedArrayBuffer;
         _audioWriter: AudioWriter;
 
+        inputChannel = undefined;
+
         // @ts-ignore
         constructor(options) {
             super(options);
@@ -69,6 +71,16 @@ const getProcessor = (moduleId: string) => {
             else if (e.data.sab) {
                 this.sab = e.data.sab;
             }
+            else if (e.data.stereo !== undefined) {
+                console.log("stereo", e.data);
+                let { stereo, channelNum } = e.data;
+                if (stereo) {
+                    this.inputChannel = undefined;
+                }
+                else {
+                    this.inputChannel = channelNum;
+                }
+            }
         }
 
         _processEvent(event) {
@@ -86,7 +98,7 @@ const getProcessor = (moduleId: string) => {
             if (this.recording) {
                 if (inputs[0].length === 0) return true;
                 if (inputs[0]) {
-                    interleave(inputs[0], this.interleaved);
+                    interleave(inputs[0], this.interleaved, this.inputChannel);
                     if (this._audioWriter.enqueue(this.interleaved) !== 256) {
                         console.log("uderrun: the worker doesn't dequeue fast enough !");
                     }
@@ -532,14 +544,19 @@ const getProcessor = (moduleId: string) => {
      *
      * @param {Float32Array} input An array of n*128 frames Float32Array that hold the audio data.
      * @param {Float32Array} output A Float32Array that is n*128 elements long.
+     * @param chan The channel to interleave, if undefined, all channels are interleaved
      */
-    function interleave(input, output) {
+    function interleave(input, output, chan) {
         if (input.length * 128 !== output.length) {
             throw RangeError("input and output of incompatible sizes");
         }
         let out_idx = 0;
+        // let start = chan !== undefined ? chan : 0;
+        // let end = chan !== undefined ? chan+1 : input.length;
+        // console.log("CHAN ", start, end)
         for (let i = 0; i < 128; i++) {
             for (let channel = 0; channel < input.length; channel++) {
+                // let chanNum = chan !== undefined ? chan : channel;
                 output[out_idx] = input[channel][i];
                 out_idx++;
             }

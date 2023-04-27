@@ -100,7 +100,7 @@ export default class SettingsController {
                 let stream = await navigator.mediaDevices.getUserMedia(this.constraints);
                 track.micRecNode.disconnect();
                 track.micRecNode = audioCtx.createMediaStreamSource(stream);
-                track.micRecNode.connect(track.monitorSlitterNode);
+                track.micRecNode.connect(track.mergerNode);
             }
         }
     }

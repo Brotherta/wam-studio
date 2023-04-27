@@ -236,7 +236,7 @@ export default class BPF extends HTMLElement {
         this._root = this.attachShadow({mode: 'open'});
         this._svg = this._root.ownerDocument.createElementNS('http://www.w3.org/2000/svg', 'svg');
         this._svg.setAttribute('width', '100%');
-        this._svg.setAttribute('height', '100px');
+        this._svg.setAttribute('height', '120px');
         this._svg.style.backgroundColor = 'none';
         this._svg.style.zIndex = 10;
         this._svg.addEventListener('mousemove', this.handleMouseMove);

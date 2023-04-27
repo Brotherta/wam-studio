@@ -1,6 +1,6 @@
 import HostView from "../Views/HostView";
 import App from "../App";
-import songs from "../../static/songs/songs.json"
+import songs from "../../static/songs.json"
 import {audioCtx} from "../index";
 
 /**
