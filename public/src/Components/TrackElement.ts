@@ -154,31 +154,6 @@ template.innerHTML = /*html*/`
     cursor: pointer;
 }
 
-/*.toggle-control {*/
-/*  border: 1px solid grey;*/
-/*  border-radius: 2px;*/
-/*  background-color: transparent;*/
-/*  color: grey;*/
-/*  font-size: 8px;*/
-/*  font-family: "Helvetica Neue", sans-serif;*/
-/*  font-weight: bold;*/
-/*  text-transform: uppercase;*/
-/*  padding: 1px 3px;*/
-/*  transition: all 0.2s ease;*/
-/*  cursor: pointer;*/
-/*  margin-bottom: 3px;*/
-/*}*/
-
-/*.toggle-control:hover, .toggle-control.active {*/
-/*  background-color: #e74c3c;*/
-/*  color: white;*/
-/*  border-color: #c0392b;*/
-/*}*/
-
-/*.toggle-control:active {*/
-/*  background-color: #c0392b;*/
-/*}*/
-
 .toggle-control {
   border: 1px solid grey;
   border-radius: 2px;
@@ -219,7 +194,12 @@ template.innerHTML = /*html*/`
   border-color: #bbb;
 }
 
-
+.toggle-control:hover.active {
+  background-color: #5c69cc;
+  color: white;
+  border-color: #5c69cc;
+  box-shadow: 0 0 5px #5c69cc;
+}
 
 
 </style>
@@ -268,17 +248,11 @@ template.innerHTML = /*html*/`
             <i class="automation-icon" style="width: 15px"></i>
         </div>
     </div>
-<!--    <div class="track-controls" style="padding-top: 5px">-->
-<!--        <div id="mono" class="toggle-control">mono</div>-->
-<!--        <div id="stereo" class="toggle-control">stereo</div>-->
-<!--        <div id="chan1" class="toggle-control">ch1</div>-->
-<!--        <div id="chan2" class="toggle-control">ch2</div>-->
-<!--    </div>-->
      <div class="track-controls" style="padding-top: 5px">
-        <div id="mode" class="toggle-control">mono</div>
+        <div id="mode" class="toggle-control active">mono ⇉ stereo</div>
         <div id="left" class="toggle-control active">L</div>
         <div id="right" class="toggle-control">R</div>
-        <div id="merge" class="toggle-control active">merge</div>
+        <div id="merge" class="toggle-control active">merge L / R</div>
     </div>
 </div>
 <div id="color-div" class="track-color">
@@ -478,12 +452,10 @@ export default class TrackElement extends HTMLElement {
     }
 
     setMono() {
-        this.modeBtn.innerText = "mono";
+        this.modeBtn.innerText = "mono ⇉ stereo";
         this.mergeBtn.hidden = true;
         this.leftBtn.hidden = false;
         this.rightBtn.hidden = false;
-        // this.leftBtn.classList.add("active");
-        // this.rightBtn.classList.remove("active");
     }
 
     setStereo() {

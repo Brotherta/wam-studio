@@ -15,91 +15,11 @@ export default class RecorderController {
         this.recording = false;
     }
 
-    // Handlers methods
-
-    async clickArm(track: Track) {
-        if (track.isArmed) {
-            track.isArmed = false;
-            track.element.unArm();
-            if (this.app.hostController.playing) {
-                this.stopRecording(track);
-            }
-            track.worker?.terminate();
-            track.node?.port.postMessage({"stopRecording": true});
-            if (track.isMonitored) {
-                this.stopMonitoring(track);
-            }
-        }
-        else {
-            track.isArmed = true;
-            track.element.arm();
-
-            await this.setupWorker(track);
-            await this.setupRecording(track);
-        }
-    }
-
-    clickRecord() {
-        if (this.recording) {
-            this.stopRecordingAllTracks();
-            this.recording = false;
-            this.app.hostController.clickOnPlayButton();
-        }
-        else {
-            let armed = this.app.tracksController.trackList.find((e) => e.isArmed);
-            if (armed === undefined) {
-                alert("No track armed");
-                return;
-            }
-
-            this.recording = true;
-            if (!this.app.hostController.playing) {
-                this.app.hostController.clickOnPlayButton(true);
-            }
-            for (let track of this.app.tracksController.trackList) {
-                if (track.isArmed) {
-                    this.startRecording(track, this.app.host.playhead);
-                }
-            }
-        }
-        this.app.hostView.pressRecordingButton(this.recording);
-    }
-
-    clickMonitoring(track: Track) {
-        if (!track.isMonitored) {
-            this.startMonitoring(track);
-        }
-        else {
-            this.stopMonitoring(track);
-        }
-    }
-
-    startMonitoring(track: Track) {
-        if (track.isArmed) {
-            track.isMonitored = true;
-            track.element.monitorOn();
-            if (track.plugin.initialized) {
-                track.mergerNode.connect(track.plugin.instance?._audioNode!);
-            } else {
-                track.mergerNode.connect(track.pannerNode);
-            }
-        }
-    }
-
-    stopMonitoring(track: Track) {
-        track.isMonitored = false;
-        track.element.monitorOff();
-        if (track.plugin.initialized) {
-            track.mergerNode.disconnect(track.plugin.instance?._audioNode!);
-        }
-        else {
-            track.mergerNode.disconnect(track.pannerNode);
-        }
-    }
-
-
-    // Setup methods
-
+    /**
+     * Sets up the recording functionality for the given track.
+     *
+     * @param track - The track to set up recording for.
+     */
     async setupRecording(track: Track) {
         track.node?.port.postMessage({
             "arm": true
@@ -112,13 +32,14 @@ export default class RecorderController {
             });
 
             track.micRecNode.connect(track.splitterNode);
-            // track.splitterNode.connect(track.mergerNode, 0, 0);
-            // track.splitterNode.connect(track.mergerNode, 0, 1);
-            // track.splitterNode.connect(track.mergerNode, 1, 0);
-            // track.splitterNode.connect(track.mergerNode, 1, 1);
         }
     }
 
+    /**
+     * Sets up the Web Worker for the given track.
+     *
+     * @param track - The track to set up the Web Worker for.
+     */
     async setupWorker(track: Track) {
         let url1 = new URL('../Audio/Utils/wav-writer.js', import.meta.url);
         let url2 = new URL('../Audio/Utils/Ringbuffer/index.js', import.meta.url);
@@ -133,8 +54,38 @@ export default class RecorderController {
         })
     }
 
-    // Recording methods
+    /**
+     * Starts monitoring on the given track.
+     *
+     * @param track - The track to start monitoring.
+     */
+    startMonitoring(track: Track) {
+        if (track.isArmed) {
+            if (track.plugin.initialized) {
+                track.mergerNode.connect(track.plugin.instance?._audioNode!);
+            } else {
+                track.mergerNode.connect(track.pannerNode);
+            }
+        }
+    }
 
+    /**
+     * Stops monitoring on the given track.
+     *
+     * @param track - The track to stop monitoring.
+     */
+    stopMonitoring(track: Track) {
+        if (track.plugin.initialized) {
+            track.mergerNode.disconnect(track.plugin.instance?._audioNode!);
+        }
+        else {
+            track.mergerNode.disconnect(track.pannerNode);
+        }
+    }
+
+    /**
+     * Stops recording all armed tracks.
+     */
     stopRecordingAllTracks() {
         for (let track of this.app.tracksController.trackList) {
             if (track.isArmed) {
@@ -143,6 +94,13 @@ export default class RecorderController {
         }
     }
 
+    /**
+     * Starts recording on the given track.
+     *
+     *
+     * @param track - The track to start recording on.
+     * @param playhead - The current playhead position.
+     */
     startRecording(track: Track, playhead: number) {
         this.recording = true;
         track.mergerNode.connect(track.node!);
@@ -209,6 +167,11 @@ export default class RecorderController {
         }
     }
 
+    /**
+     * Stops recording on the given track.
+     *
+     * @param track
+     */
     stopRecording(track: Track) {
         this.recording = false;
         track.worker?.postMessage({
@@ -220,76 +183,181 @@ export default class RecorderController {
         track.mergerNode?.disconnect(track.node!);
     }
 
-    clickMode(track: Track) {
-        if (track.stereo) {
-            track.element.setMono();
-            track.splitterNode.disconnect();
-            if (track.left) {
-                track.splitterNode.connect(track.mergerNode, 0, 0);
-                track.splitterNode.connect(track.mergerNode, 0, 1);
-            }
-            if (track.right) {
-                track.splitterNode.connect(track.mergerNode, 1, 0);
-                track.splitterNode.connect(track.mergerNode, 1, 1);
-            }
+    /**
+     * Toggles the armed status of the given track.
+     *
+     * @param track - The track to toggle the armed status of.
+     */
+    async clickArm(track: Track) {
+        track.isArmed = !track.isArmed;
+
+        if (track.isArmed) {
+            track.element.arm();
+
+            await this.setupWorker(track);
+            await this.setupRecording(track);
         }
         else {
+            track.element.unArm();
+            if (this.app.hostController.playing) {
+                this.stopRecording(track);
+            }
+            track.worker?.terminate();
+            track.node?.port.postMessage({"stopRecording": true});
+            if (track.isMonitored) {
+                this.stopMonitoring(track);
+            }
+        }
+    }
+
+    /**
+     * Toggles the recording status of the controller.
+     */
+    clickRecord() {
+        if (this.recording) {
+            this.stopRecordingAllTracks();
+            this.recording = false;
+            this.app.hostController.clickOnPlayButton();
+        }
+        else {
+            let armed = this.app.tracksController.trackList.find((e) => e.isArmed);
+            if (armed === undefined) {
+                alert("No track armed");
+                return;
+            }
+
+            this.recording = true;
+            if (!this.app.hostController.playing) {
+                this.app.hostController.clickOnPlayButton(true);
+            }
+            for (let track of this.app.tracksController.trackList) {
+                if (track.isArmed) {
+                    this.startRecording(track, this.app.host.playhead);
+                }
+            }
+        }
+        this.app.hostView.pressRecordingButton(this.recording);
+    }
+
+    /**
+     * Toggles the monitoring status of the given track.
+     *
+     * @param track - The track to toggle the monitoring status of.
+     */
+    clickMonitoring(track: Track) {
+        track.isMonitored = !track.isMonitored
+        if (track.isMonitored) {
+            track.element.monitorOn();
+            this.startMonitoring(track);
+        }
+        else {
+            track.element.monitorOff();
+            this.stopMonitoring(track);
+        }
+    }
+
+    /**
+     * Toggles between stereo and mono mode for the given track.
+     *
+     * @param track - The track to toggle the mode of.
+     */
+    clickMode(track: Track) {
+        track.stereo = !track.stereo;
+        if (track.stereo) {
             track.element.setStereo();
             track.splitterNode.disconnect();
             if (track.merge) {
+                // Connect left and right channels to both output channels
                 track.splitterNode.connect(track.mergerNode, 0, 0);
                 track.splitterNode.connect(track.mergerNode, 0, 1);
                 track.splitterNode.connect(track.mergerNode, 1, 0);
                 track.splitterNode.connect(track.mergerNode, 1, 1);
             }
             else {
+                // Connect left and right channels to their respective output channels
                 track.splitterNode.connect(track.mergerNode, 0, 0);
                 track.splitterNode.connect(track.mergerNode, 1, 1);
             }
+
         }
-        track.stereo = !track.stereo;
+        else {
+            track.element.setMono();
+            track.splitterNode.disconnect();
+            if (track.left) {
+                // Connect left channel to both output channels
+                track.splitterNode.connect(track.mergerNode, 0, 0);
+                track.splitterNode.connect(track.mergerNode, 0, 1);
+            }
+            if (track.right) {
+                // Connect right channel to both output channels
+                track.splitterNode.connect(track.mergerNode, 1, 0);
+                track.splitterNode.connect(track.mergerNode, 1, 1);
+            }
+        }
     }
 
+    /**
+     * Toggles the left channel in mono mode for the given track.
+     *
+     * @param track - The track to toggle the left channel of.
+     */
     clickLeft(track: Track) {
+        track.element.clickLeft();
+        track.left = !track.left;
         if (track.left) {
+            // Connect left channel to both output channels
+            track.splitterNode.connect(track.mergerNode, 0, 0);
+            track.splitterNode.connect(track.mergerNode, 0, 1);
+        }
+        else {
             track.splitterNode.disconnect(track.mergerNode, 0, 0);
             track.splitterNode.disconnect(track.mergerNode, 0, 1);
         }
-        else {
-            track.splitterNode.connect(track.mergerNode, 0, 0);
-            track.splitterNode.connect(track.mergerNode, 0, 1);
-        }
-        track.element.clickLeft();
-        track.left = !track.left;
+
     }
 
+    /**
+     * Toggles the right channel in mono mode for the given track.
+     *
+     * @param track - The track to toggle the right channel of.
+     */
     clickRight(track: Track) {
+        track.element.clickRight();
+        track.right = !track.right;
         if (track.right) {
+            // Connect right channel to both output channels
+            track.splitterNode.connect(track.mergerNode, 1, 0);
+            track.splitterNode.connect(track.mergerNode, 1, 1);
+        }
+        else {
             track.splitterNode.disconnect(track.mergerNode, 1, 0);
             track.splitterNode.disconnect(track.mergerNode, 1, 1);
         }
-        else {
-            track.splitterNode.connect(track.mergerNode, 1, 0);
-            track.splitterNode.connect(track.mergerNode, 1, 1);
-        }
-        track.element.clickRight();
-        track.right = !track.right;
+
     }
 
+    /**
+     * Toggles the merging of left and right channels for the given track.
+     *
+     * @param track - The track to toggle merging for.
+     */
     clickMerge(track: Track) {
+        track.element.clickMerge();
+        track.merge = !track.merge;
         if (track.merge) {
             track.splitterNode.disconnect();
-            track.splitterNode.connect(track.mergerNode, 0, 0);
-            track.splitterNode.connect(track.mergerNode, 1, 1);
-        }
-        else {
-            track.splitterNode.disconnect();
+
+            // Connect left and right channels to both output channels
             track.splitterNode.connect(track.mergerNode, 0, 0);
             track.splitterNode.connect(track.mergerNode, 0, 1);
             track.splitterNode.connect(track.mergerNode, 1, 0);
             track.splitterNode.connect(track.mergerNode, 1, 1);
         }
-        track.element.clickMerge();
-        track.merge = !track.merge;
+        else {
+            track.splitterNode.disconnect();
+            // Connect left and right channels to their respective output channels
+            track.splitterNode.connect(track.mergerNode, 0, 0);
+            track.splitterNode.connect(track.mergerNode, 1, 1);
+        }
     }
 }
