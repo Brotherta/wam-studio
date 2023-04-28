@@ -22,17 +22,31 @@
 				<i class="menu-icon"></i>
 			</a>
 			<div class="dropdown-menu dropright" aria-labelledby="dropdownMenuButton">
+				<a class="dropdown-item" id="new-project">New Project</a>
+				<a class="dropdown-item" id="load-project">Load Project</a>
 				<a class="dropdown-item" id="save-project">Save Project</a>
+				<a class="dropdown-item" id="manage-projects">Manage projects</a>
+
+				<div class="dropdown-divider"></div>
+
 				<a class="dropdown-item" id="import-project">Import Project</a>
-				<a class="dropdown-item" id="import-songs">Import Song files</a>
-				<input id="new-track-input" type="file" accept=".mp3, .wav, .ogg" multiple style="display: none">
+				<input id="import-input" type="file" accept=".json" style="display: none">
+				<a class="dropdown-item" id="export-project">Export Project</a>
+
+				<div class="dropdown-divider"></div>
 
 				<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add Demo Songs</a>
 				<div id="songs-container" class="dropdown-menu" aria-labelledby="dropdownSubMenuButton">
 
 				</div>
-				<a class="dropdown-item" id="latency-btn">Latency Compensation</a>
+
+				<div class="dropdown-divider"></div>
+
 				<a class="dropdown-item" id="settings-btn">Settings</a>
+				<a class="dropdown-item" id="latency-btn">Latency Compensation</a>
+
+				<div class="dropdown-divider"></div>
+
 				<a class="dropdown-item" id="about-btn">About</a>
 			</div>
 			<div id="back-btn" class="menu-item">
@@ -239,6 +253,16 @@
 						Here’s a suggestion: Play a drum track while simultaneously recording some music or noise in rhythm. If you observe that the recorded track is out of sync with the drum track, it implies that you need to adjust for latency. You can accomplish this manually by adjusting the latency compensation slider or by using the automatic calibration button.
 					</div>
 				</div>
+			</div>
+		</div>
+
+		<div id="project-window" class="floating-window" hidden>
+			<div id="project-header" class="header-window">
+				<span id="project-title" class="title">Advanced Window</span>
+				<button id="project-close-button" class="close-button">X</button>
+			</div>
+			<div class="mount" id="project-mount">
+
 			</div>
 		</div>
 

@@ -26,28 +26,107 @@ export default class HostController {
         this.app = app;
         this.hostView = app.hostView;
         this.audioCtx = audioCtx;
-        
-        this.defineControls();
-    }
 
-    /**
-     * Define all the listeners for the audio controls.
-     */
-    defineControls() {
         this.definePlayListener();
         this.defineBackListener();
         this.defineRecordListener();
         this.defineLoopListener();
         this.defineVolumeListener();
         this.defineMuteListener();
-        this.defineSongsDemoListener();
         this.defineTimerListener();
-        this.defineImportSongListener();
-        this.defineSaveProjectListener();
+        this.defineMenuListeners();
+    }
+
+
+    /**
+     * Define the listener for all items in the main menu.
+     */
+    defineMenuListeners() {
+        // Import Songs from file browser input
+        this.hostView.importSongs.addEventListener('click', () => {
+            this.hostView.newTrackInput.click();
+        });
+
+        // Fired when a file is selected in the file browser input
+        this.hostView.newTrackInput.addEventListener('change', (e) => {
+            // @ts-ignore
+            for (let i = 0; i < e.target.files.length; i++) {
+                // @ts-ignore
+                let file = e.target.files[i];
+                if (file !== undefined) {
+                    this.app.tracksController.newTrackWithFile(file)
+                        .then(track => {
+                            if (track !== undefined) {
+                                this.app.tracksController.initTrackComponents(track);
+                            }
+                        });
+                }
+
+            }
+        });
+
+        // For each songs in the songs.json file, create a new song associated with a new track.
+        songs.forEach((song) => {
+            let name = song.name;
+            let el = this.hostView.createNewSongItem(name);
+            el.onclick = () => {
+                for (let trackSong of song.songs) {
+                    this.app.tracksController.newTrackUrl(trackSong)
+                        .then(track => {
+                            if (track !== undefined) {
+                                this.app.tracksController.initTrackComponents(track);
+                            }
+                        });
+                }
+            }
+        });
+
+        // Select the master track as the current selected track
         this.app.pluginsView.mainTrack.addEventListener("click", () => {
             this.app.pluginsController.selectHost();
         });
-    } 
+
+        // Open the save project window
+        this.app.hostView.saveProject.onclick = async () => {
+            await this.app.projectController.openSaveProject();
+        }
+
+        // Open the load project window
+        this.app.hostView.loadProject.onclick = async () => {
+            this.app.projectController.openLoadProject();
+        }
+
+        // Open the browser file input to import a project, then load it on change event
+        this.app.hostView.importProject.onclick = async () => {
+            await this.hostView.importInput.click();
+        }
+        this.app.hostView.importInput.onchange = async (e) => {
+            // @ts-ignore
+            let file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    let json = JSON.parse(e.target!.result as string);
+                    await this.app.loader.loadProject(json);
+                }
+                reader.readAsText(file);
+            }
+        }
+
+        // Export the current project as a json file
+        this.app.hostView.exportProject.onclick = async () => {
+            let project = await this.app.loader.saveProject();
+            let date = new Date().toISOString().slice(0, 10);
+            let fileName = `WAM-Project_${date}.json`;
+            let blob = new Blob([JSON.stringify(project)], {type: "application/json"});
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            a.remove();
+        }
+    }
 
     /**
      * Define the listener for the timer.
@@ -151,25 +230,6 @@ export default class HostController {
     }
 
     /**
-     * Define the listeners for the demo songs in the menu.
-     */
-    defineSongsDemoListener() {
-        songs.forEach((song) => {
-            let name = song.name;
-            let el = this.hostView.createNewSongItem(name);
-            el.onclick = () => {
-                for (let trackSong of song.songs) {
-                    this.app.tracksController.newTrackUrl(trackSong)
-                        .then(track => {
-                            if (track !== undefined) {
-                                this.app.tracksController.initTrackComponents(track);
-                            }
-                        });
-                }
-            }
-        });
-    }
-    /**
      * Pause the timer interval. Used when the user is jumping to a specific beat.
      */
     pauseUpdateInterval() {
@@ -183,32 +243,17 @@ export default class HostController {
         this.pauseInterval = false;
     }
 
+    /**
+     * Initialize the vu meter.
+     */
     initVuMeter() {
         this.vuMeter = new VuMeter(this.hostView.vuMeterCanvas, 30, 157);
     }
 
-    defineImportSongListener() {
-        this.hostView.importSongs.addEventListener('click', () => {
-            this.hostView.newTrackInput.click();
-        });
-        this.hostView.newTrackInput.addEventListener('change', (e) => {
-            // @ts-ignore
-            for (let i = 0; i < e.target.files.length; i++) {
-                // @ts-ignore
-                let file = e.target.files[i];
-                if (file !== undefined) {
-                    this.app.tracksController.newTrackWithFile(file)
-                        .then(track => {
-                            if (track !== undefined) {
-                                this.app.tracksController.initTrackComponents(track);
-                            }
-                        });
-                }
-
-            }
-        });
-    }
-
+    /**
+     * Click on play button. If the host is playing, it stops it. If it is stopped, it plays it.
+     * @param stop used for recording, if the play button is a stop button.
+     */
     clickOnPlayButton(stop: boolean = false) {
         if (this.playing) {
             for (let track of this.app.tracksController.trackList) {
@@ -240,12 +285,9 @@ export default class HostController {
         this.hostView.pressPlayButton(this.playing, stop);
     }
 
-    defineSaveProjectListener() {
-        this.app.hostView.saveBtn.onclick = async () => {
-            await this.app.loader.saveProject();
-        }
-    }
-
+    /**
+     * Stop all the tracks and the host.
+     */
     stopAll() {
         this.app.tracksController.trackList.forEach(async (track) => {
             //@ts-ignore
