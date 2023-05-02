@@ -539,7 +539,7 @@ ul {
 .automation-location {
     z-index: 1;
     width: 100%;
-    min-height: 100px;
+    min-height: 120px;
     pointer-events: none;
     display: flex;
 }
