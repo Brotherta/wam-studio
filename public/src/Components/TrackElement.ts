@@ -239,7 +239,7 @@ template.innerHTML = /*html*/`
         <div id="mute-btn" class="mute-icon">M</div>
         <div id="solo-btn" class="solo-icon">S</div>
         <div id="monitoring" class="control">
-            <i class="monitor-icon" style="padding-top: 4px"></i>
+            <i class="monitor-icon"></i>
         </div>
         <div id="arm" class="control">
             <i class="mic-icon" style="width: 15px"></i>
