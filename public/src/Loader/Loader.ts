@@ -74,7 +74,7 @@ export default class Loader {
         document.body.appendChild(cover);
 
         this.app.hostController.playing = false;
-        this.app.hostController.stopAll();
+        this.app.hostController.stop();
         this.app.tracksController.clearAllTracks();
         this.app.host.timer = 0;
         this.app.host.playhead = 0;

@@ -45,7 +45,11 @@ customElements.define(
 );
 
 const audioCtx = new AudioContext();
-audioCtx.suspend();
+
+window.addEventListener('beforeunload', (e) => {
+    e.returnValue = 'test';
+});
+
 const app = new App();
 (async () => {
     await app.initHost();

@@ -14,6 +14,9 @@ export default class HostView {
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
 
+    playbackSlider = document.getElementById("playback-slider") as HTMLInputElement;
+    headerTitle = document.getElementById("header-title") as HTMLDivElement;
+
     controlsBar = document.getElementById("controls-bar") as HTMLDivElement;
 
     vuMeterCanvas = document.getElementById("vu-meter") as HTMLCanvasElement;
@@ -57,7 +60,11 @@ export default class HostView {
                 d.getUTCMinutes(),
                 d.getUTCSeconds()
             ];
-        return parts.map(s => String(s).padStart(2, '0')).join(':') + "." + String(d.getMilliseconds()).padStart(3, '0');
+        // get ms only 1 or 2 digits
+        let ms = String(d.getMilliseconds());
+        ms = ms.substring(0, 2);
+
+        return parts.map(s => String(s).padStart(2, '0')).join(':') + "." + ms.padStart(2, '0');
     }
 
     /**

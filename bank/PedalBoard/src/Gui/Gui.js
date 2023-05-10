@@ -52,7 +52,7 @@ export default class pedalboardGui extends HTMLElement {
     let canvas = document.createElement("canvas");
     canvas.on = true;
     this.main.appendChild(canvas);
-    new Visualizer(canvas, this._plug.pedalboardNode._output);
+    // new Visualizer(canvas, this._plug.pedalboardNode._output);
 
     title.addEventListener("click", () => {
       canvas.on = !canvas.on;
@@ -175,7 +175,7 @@ export default class pedalboardGui extends HTMLElement {
     details.open = false;
     details.id = "collapsePresets";
     var summary = document.createElement("summary");
-    summary.innerHTML = "Presets Menu";
+    summary.innerHTML = "Preset Menu";
 
     details.appendChild(summary);
     details.appendChild(this.presetsMenu);

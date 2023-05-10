@@ -1,6 +1,6 @@
 // @ts-ignore
 import BPF from "../Components/BPF"
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Utils";
 
 /**
  * Model for the automations stored in each track.

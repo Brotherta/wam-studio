@@ -365,6 +365,7 @@ export default class TrackElement extends HTMLElement {
 
     setName(arg0: string) {
         this.trackNameInput.value = arg0;
+        this.name = arg0;
     }
 
     select() {

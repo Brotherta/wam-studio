@@ -1,6 +1,7 @@
 import HostView from "../Views/HostView";
 import App from "../App";
 import songs from "../../static/songs/songs.json";
+import {audioCtx} from "../index";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -21,10 +22,13 @@ export default class HostController {
 
     vuMeter: VuMeter;
 
+    maxTime: number;
+
     constructor(app: App) {
         this.app = app;
         this.hostView = app.hostView;
         this.audioCtx = app.tracks.audioCtx;
+        this.maxTime = 300000;
         
         this.defineControls();
     }
@@ -42,6 +46,7 @@ export default class HostController {
         this.defineTimerListener();
         this.defineSongs();
         this.defineMenuListeners();
+        this.app.hostView.updateTimer(0)
     } 
 
     /**
@@ -50,16 +55,20 @@ export default class HostController {
      */
     defineTimerListener() {
         let lastPos = this.app.host.playhead;
-        this.timerInterval = setInterval(() => {
+
+        let updateFrame = () => {
             let newPos = this.app.host.playhead;
             if (lastPos !== newPos) {
                 lastPos = newPos;
                 if (!this.pauseInterval) {
-                    this.app.editorView.playhead.movePlayhead(newPos);
                     this.app.hostView.updateTimer(newPos);
+                    let value = Math.min(((newPos / audioCtx.sampleRate) * 1000) / this.maxTime * 100, 100);
+                    this.app.hostView.playbackSlider.value = value.toString();
                 }
             }
-        }, 1000/60)
+            requestAnimationFrame(updateFrame);
+        }
+        requestAnimationFrame(updateFrame);
     }
 
     /**
@@ -150,6 +159,7 @@ export default class HostController {
             let name = song.name;
             let el = this.hostView.createNewSongItem(name);
             el.onclick = () => {
+                this.app.hostView.headerTitle.innerHTML = name;
                 for (let trackSong of song.songs) {
                     this.app.tracks.newTrackUrl(trackSong)
                         .then(track => {
@@ -240,6 +250,9 @@ export default class HostController {
     }
 
     clickOnPlayButton() {
+        if (this.audioCtx.state === "suspended") {
+            this.audioCtx.resume();
+        }
         if (this.playing) {
             this.app.tracks.trackList.forEach((track) => {
                 //@ts-ignore
@@ -252,7 +265,6 @@ export default class HostController {
             });
             //@ts-ignore
             this.app.host.hostNode.parameters.get("playing").value = 0;
-            this.audioCtx.suspend();
         }
         else {
             this.app.automationController.applyAllAutomations();
@@ -264,17 +276,28 @@ export default class HostController {
             });
             //@ts-ignore
             this.app.host.hostNode.parameters.get("playing").value = 1;
-            this.audioCtx.resume();
         }
         this.playing = !this.playing;
         this.hostView.pressPlayButton(this.playing);
     }
 
-    stopAll() {
+    stop() {
+        // @ts-ignore
+        this.app.host.node.parameters.get("playing").value = 0;
+        this.app.host.node?.port.postMessage({playhead: 0});
         this.app.tracks.trackList.forEach(async (track) => {
             //@ts-ignore
             track.node.parameters.get("playing").value = 0;
             track.node?.port.postMessage({playhead: 0});
+        });
+    }
+
+    play() {
+        // @ts-ignore
+        this.app.host.hostNode.parameters.get("playing").value = 0;
+        this.app.tracks.trackList.forEach(async (track) => {
+            //@ts-ignore
+            track.node.parameters.get("playing").value = 1;
         });
     }
 }

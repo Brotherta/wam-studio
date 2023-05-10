@@ -1,5 +1,5 @@
 import App from "../App";
-import {RATIO_MILLS_BY_PX} from "../Utils";
+import {RATIO_MILLS_BY_PX} from "../Utils/Utils";
 import {audioCtx} from "../index";
 
 /**
@@ -15,9 +15,36 @@ export default class PlayheadController {
         this.app = app;
 
         this.app.editorView.playhead.playheadRange.value = "0";
-        this.defineControllers();
+        //this.defineControllers();
         this.movingPlayhead = false;
+
+        this.app.hostView.playbackSlider.onmousedown = () => {
+            this.app.hostController.pauseUpdateInterval();
+        }
+
+        this.app.hostView.playbackSlider.onchange = () => {
+            console.log(this.app.hostView.playbackSlider.value);
+            let value = this.app.hostView.playbackSlider.valueAsNumber;
+            let newValueMs = this.app.hostController.maxTime * value / 100;
+
+            let playhead = Math.round(newValueMs / 1000 * audioCtx.sampleRate);
+
+            this.app.tracks.trackList.forEach((track) => {
+                track.node!.port.postMessage({playhead: playhead+1})
+            });
+            this.app.host.hostNode?.port.postMessage({playhead: playhead+1});
+            this.app.hostView.updateTimer(playhead);
+            this.app.hostController.resumeUpdateInteravel();
+        }
+        this.app.hostView.playbackSlider.oninput = () => {
+            let value = this.app.hostView.playbackSlider.valueAsNumber;
+            let newValueMs = this.app.hostController.maxTime * value / 100;
+
+            let playhead = Math.round(newValueMs / 1000 * audioCtx.sampleRate);
+            this.app.hostView.updateTimer(playhead);
+        }
     }
+
 
     /**
      * Define all the listeners for the playhead.

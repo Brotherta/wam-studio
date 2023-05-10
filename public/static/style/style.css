@@ -56,9 +56,26 @@ div::-webkit-scrollbar-thumb:hover {
     background-color: rgb(41, 42, 45);
     /* overflow: hidden; */
     display: flex;
+    width: 100%;
+    flex-direction: row;
+
+    /*justify-content: space-between;*/
+}
+
+.left-controls {
+    display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     height: 52px;
+    min-width: max-content;
+}
+
+.right-controls {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    height: 52px;
+    width: 100%;
 }
 
 .editors {
@@ -87,6 +104,7 @@ div::-webkit-scrollbar-thumb:hover {
     background-color: rgb(23, 23, 26);
     min-height: 100%;
     overflow-y: scroll;
+    overflow-x: hidden;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
@@ -170,9 +188,9 @@ div::-webkit-scrollbar-thumb:hover {
     outline: none; /* Remove outline */
     cursor: pointer;
 }
-  
-  
-  /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
 .playhead-range::-webkit-slider-thumb {
     -webkit-appearance: none; /* Override default look */
     appearance: none;
@@ -182,7 +200,7 @@ div::-webkit-scrollbar-thumb:hover {
     cursor: pointer; /* Cursor on hover */
     border-bottom-right-radius: 20px 30px;
 }
-  
+
 .playhead-range::-moz-range-thumb {
     -webkit-appearance: none; /* Override default look */
     appearance: none;
@@ -195,26 +213,26 @@ div::-webkit-scrollbar-thumb:hover {
 
 .track-container::-webkit-scrollbar {
     display: none;
- }
+}
 
 
 .menu-item {
     min-width: 55px;
     display: flex;
     justify-content: center;
-    align-items: center; 
+    align-items: center;
     position: relative;
-  /*  -webkit-touch-callout: none; /* iOS Safari */
-  /*    -webkit-user-select: none; /* Safari */
+    /*  -webkit-touch-callout: none; /* iOS Safari */
+    /*    -webkit-user-select: none; /* Safari */
     /*   -khtml-user-select: none; /* Konqueror HTML */
-      /*   -moz-user-select: none; /* Old versions of Firefox */
-        /*  -ms-user-select: none; /* Internet Explorer/Edge */
-              user-select: none;
+    /*   -moz-user-select: none; /* Old versions of Firefox */
+    /*  -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
 }
 
 .menu-item:hover {
     cursor: pointer;
-    background-color: rgb(79, 81, 86); 
+    background-color: rgb(79, 81, 86);
 }
 
 .menu-item.main {
@@ -228,15 +246,13 @@ div::-webkit-scrollbar-thumb:hover {
 .timer-item {
     border-left: solid 1px rgb(111, 111, 111);
     border-right: solid 1px rgb(111, 111, 111);
-    padding-left: 17px;
-    padding-right: 17px;
     display: flex;
     flex-wrap: nowrap;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     cursor: default;
-    max-width: 212px;
-    min-width: 212px;
+    max-width: 180px;
+    min-width: 180px;
 }
 
 .timer {
@@ -245,13 +261,13 @@ div::-webkit-scrollbar-thumb:hover {
     font-size: 30px;
 }
 
-.timer-item.noselect {
+.noselect {
     -webkit-touch-callout: none; /* iOS Safari */
-      -webkit-user-select: none; /* Safari */
-       -khtml-user-select: none; /* Konqueror HTML */
-         -moz-user-select: none; /* Old versions of Firefox */
-          -ms-user-select: none; /* Internet Explorer/Edge */
-              user-select: none; /* Non-prefixed version, currently
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
                                     supported by Chrome, Edge, Opera and Firefox */
 }
 
@@ -259,21 +275,50 @@ div::-webkit-scrollbar-thumb:hover {
     display: flex;
     flex-wrap: nowrap;
     justify-content: flex-start;
-    align-items: center; 
+    align-items: center;
     min-width: 170px;
     max-width: 160px;
     margin-top: 20px;
+}
+
+.playback-container {
+    display: flex;
+    min-width: fit-content;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px 0 10px;
+    border-left: solid 1px rgb(111, 111, 111);
+}
+
+#header-title {
+    font-family: "helvetica", monospace;
+    color: lightgrey;
+    font-weight: bold;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /*min-width: fit-content;*/
+    max-width: 500px;
+    text-overflow: ellipsis;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-right: solid 1px rgb(111, 111, 111);
+}
+
+#global-volume-slider {
+    width: 124px;
 }
 
 .icon {
     padding-left: 5px;
     padding-right: 5px;
     -webkit-touch-callout: none; /* iOS Safari */
-      -webkit-user-select: none; /* Safari */
-       -khtml-user-select: none; /* Konqueror HTML */
-         -moz-user-select: none; /* Old versions of Firefox */
-          -ms-user-select: none; /* Internet Explorer/Edge */
-              user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
     pointer-events: none;
 }
 
@@ -313,7 +358,7 @@ track-element {
     align-items: center;
     background: rgb(44, 44, 44);
     border: solid 1px black;
-} 
+}
 
 .text-icon {
     padding-left: 25px;
@@ -323,10 +368,10 @@ track-element {
     pointer-events: none;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none;
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
 }
 
 .new-track {
@@ -349,10 +394,10 @@ track-element {
     pointer-events: none;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none;
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
 }
 
 .new-track:hover {
@@ -360,7 +405,7 @@ track-element {
     cursor: pointer;
 }
 
-  
+
 .menu-item .mytooltip {
     visibility: hidden;
     width: auto;
@@ -379,8 +424,8 @@ track-element {
     right: 0px;
 
     transition: 0s visibility;
-  }
-  
+}
+
 .menu-item:hover .mytooltip {
     visibility: visible;
     transition: 1s linear;
@@ -569,9 +614,13 @@ canvas {
     display: flex;
     background-color: #121213;
     overflow-y: scroll;
-    padding-top: 25px;
+    margin-top: 25px;
     padding-bottom: 106px;
     top: 0px;
+}
+
+#presets-btn {
+    border-left: solid 1px rgb(111, 111, 111);
 }
 
 control-element {

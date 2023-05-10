@@ -3,7 +3,7 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import Region from "../Models/Region";
 import RegionView from "../Views/RegionView";
 import WaveformView from "../Views/WaveformView";
-import {RATIO_MILLS_BY_PX} from "../Utils";
+import {RATIO_MILLS_BY_PX} from "../Utils/Utils";
 import {InteractionEvent} from "pixi.js";
 
 

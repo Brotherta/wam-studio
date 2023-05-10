@@ -30,8 +30,8 @@ Because the issues come from Faust IDE we can't, and we won't try to resolve it,
          - You can add a new bank if you click on "New Bank".
          - You can rename a bank if you click on the button : <img src="https://michael-marynowicz.github.io/TER/pedalboard/Gui/assets/editButton.svg" width="15" height="15">
          - You can delete a bank (if it's empty) if you click on the button : <img src="https://michael-marynowicz.github.io/TER/pedalboard/Gui/assets/deleteButton.svg" width="15" height="15">
-         - And if you click on a bank it's list all the presets of the bank in the categorie "Presets"
-      2. The Presets :
+         - And if you click on a bank it's list all the presets of the bank in the categorie "Preset"
+      2. The Preset :
        it's the list of all the presets for a bank. 
          - For the presets it’s the same as for the banks if you click on <img src="https://michael-marynowicz.github.io/TER/pedalboard/Gui/assets/editButton.svg" width="15" height="15"> you can modify the name of the preset and if you click on 
           <img src="https://michael-marynowicz.github.io/TER/pedalboard/Gui/assets/deleteButton.svg" width="15" height="15"> you can delete the preset.

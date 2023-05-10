@@ -16,64 +16,80 @@
 <body>
 	<div class="app">
 		<div class="controls-bar" id="controls-bar">
-			
-			<a class="menu-item main" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				<img src="icons/list.svg">	
-			</a>
-			<div class="dropdown-menu dropright" aria-labelledby="dropdownMenuButton">
+			<div class="left-controls">
+				<a class="menu-item main" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<img src="icons/list.svg">
+				</a>
+				<div class="dropdown-menu dropright" aria-labelledby="dropdownMenuButton">
 
-				<a class="dropdown-item" id="new-project">New Project</a>
-				<a class="dropdown-item" id="load-project">Load Project</a>
-				<a class="dropdown-item" id="save-project">Save Project</a>
+					<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Song</a>
+					<div id="songs-container" class="dropdown-menu songs" aria-labelledby="dropdownSubMenuButton"></div>
 
-				<div class="dropdown-divider"></div>
+					<div class="dropdown-divider"></div>
 
-				<a class="dropdown-item" id="import-project">Import Project</a>
-				<input id="import-input" type="file" accept=".json" style="display: none">
-				<a class="dropdown-item" id="export-project">Export Project</a>
+					<a class="dropdown-item" id="load-project">Load Project</a>
+					<a class="dropdown-item" id="save-project">Save Project</a>
 
-				<div class="dropdown-divider"></div>
+					<div class="dropdown-divider"></div>
 
-				<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add Demo Songs</a>
-				<div id="songs-container" class="dropdown-menu songs" aria-labelledby="dropdownSubMenuButton"></div>
-				<a class="dropdown-item" id="import-songs">Import Song files</a>
-				<input id="new-track-input" type="file" accept=".mp3, .wav, .ogg" multiple style="display: none">
+					<a class="dropdown-item" id="import-project" hidden>Import Project</a>
+					<input id="import-input" type="file" accept=".json" style="display: none">
+					<a class="dropdown-item" id="export-project" hidden>Export Project</a>
 
-				<div class="dropdown-divider"></div>
+					<div class="dropdown-divider"></div>
 
-				<a class="dropdown-item" id="manage-projects">Manage projects</a>
+					<a class="dropdown-item" id="import-songs" hidden>Import Song files</a>
+					<input id="new-track-input" type="file" accept=".mp3, .wav, .ogg" multiple style="display: none" hidden>
 
-			</div>
-			<div id="back-btn" class="menu-item">
-				<span class="mytooltip">Restart</span>
-				<img src="/icons/skip-start-fill.svg">
-			</div>
-			<div id="play-btn" class="menu-item">
-				<span class="mytooltip">Play</span>
-				<img src="/icons/play-fill.svg" id="play-img">
-				<img src="/icons/pause-fill.svg" id="pause-img" hidden>
-			</div>
-			<div id="mute-btn" class="menu-item">
-				<span class="mytooltip">Mute</span>
-				<img id="unmute-img" src="icons/volume-up-fill.svg">
-				<img id="mute-img" src="icons/volume-mute-fill.svg" hidden>
-			</div>
-			<div id="record-btn" class="menu-item" hidden>
-				<span class="mytooltip">Record</span>
-				<img src="icons/record-fill.svg">
-			</div>
-			<div id="loop-btn" class="menu-item" hidden>
-				<span class="mytooltip">Loop</span>
-				<img src="/icons/repeat.svg">
-			</div>
-			<div class="timer-item noselect">
-				<div id="timer" class="timer">
-					00:00:00:00
+					<a class="dropdown-item" id="manage-projects">Sign in</a>
+
+				</div>
+				<div id="back-btn" class="menu-item">
+					<span class="mytooltip">Restart</span>
+					<img src="/icons/skip-start-fill.svg">
+				</div>
+				<div id="play-btn" class="menu-item">
+					<span class="mytooltip">Play</span>
+					<img src="/icons/play-fill.svg" id="play-img">
+					<img src="/icons/pause-fill.svg" id="pause-img" hidden>
+				</div>
+				<div id="mute-btn" class="menu-item">
+					<span class="mytooltip">Mute</span>
+					<img id="unmute-img" src="icons/volume-up-fill.svg">
+					<img id="mute-img" src="icons/volume-mute-fill.svg" hidden>
+				</div>
+				<div id="record-btn" class="menu-item" hidden>
+					<span class="mytooltip">Record</span>
+					<img src="icons/record-fill.svg">
+				</div>
+				<div id="loop-btn" class="menu-item" hidden>
+					<span class="mytooltip">Loop</span>
+					<img src="/icons/repeat.svg">
+				</div>
+				<div class="playback-container">
+					<input id="playback-slider" type="range" min="0" max="100" value="0">
+				</div>
+				<div class="timer-item noselect">
+					<div id="timer" class="timer">
+						00:00:00:00
+					</div>
+				</div>
+				<div id="header-title">
+					Empty Project
+				</div>
+				<div id="metro-btn" class="menu-item" hidden>
+					<span class="mytooltip">Metronome</span>
+					<i class="metro-icon"></i>
 				</div>
 			</div>
-			<div id="metro-btn" class="menu-item" hidden>
-				<span class="mytooltip">Metronome</span>
-				<i class="metro-icon"></i>
+			<div class="right-controls">
+				<div id="presets-btn" class="menu-item" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="mytooltip">Preset</span>
+					<i class="presets-icon"></i>
+				</div>
+				<div class="dropdown-menu dropleft" id="presets-dropdown" aria-labelledby="presets-btn">
+					<a class="dropdown-item" id="default-presets">Default</a>
+				</div>
 			</div>
 
 		</div>
@@ -180,12 +196,6 @@
 						<img id="min-max-btn-icon" src="icons/plugin.svg">
 					</div>
 
-<!--					<div class="resize-icon" id="resize-btn">-->
-<!--						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="lightgrey" class="bi bi-arrows-expand" viewBox="0 0 16 16">-->
-<!--							<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8ZM7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2ZM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10Z"/>-->
-<!--						</svg>-->
-<!--					</div>-->
-
 				</div>
 
 				<div id="plugins">
@@ -194,7 +204,7 @@
 							<div class="icon">
 								<img src="icons/volume-down-fill.svg">
 							</div>
-							<input type="range" class="form-range" id="global-volume-slider">
+							<input type="range" class="dform-range" id="global-volume-slider">
 							<div class="icon">
 								<img src="icons/volume-up2-fill.svg">
 							</div>

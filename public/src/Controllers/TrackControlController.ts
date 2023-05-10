@@ -7,6 +7,7 @@ import Bind from "../Models/Bind";
 import BindParameterElement from "../Components/BindParameterElement";
 import TrackBindControlElement from "../Components/TrackBindControlElement";
 import {getMinMax} from "../Audio/Utils/Normalizer";
+import Preset from "../Models/Preset";
 
 
 export default class TrackControlController {
@@ -19,6 +20,10 @@ export default class TrackControlController {
     constructor(app: App) {
         this.app = app;
         this.controls = [];
+        this.loadPresets();
+    }
+
+    async loadPresets() {
     }
 
     addControl(control: TrackControl) {
@@ -45,8 +50,18 @@ export default class TrackControlController {
         let control = new TrackControl(track.id, controlElement, advancedElement);
         this.addControl(control);
         this.app.controlsView.addControl(control.controlElement);
-
         advancedElement.control = control;
+
+        advancedElement.tag = track.tag;
+        let presets = this.app.presetsController.getAllPresets(track.tag);
+        let defaultPreset = presets.find(p => p.name == "Default");
+        if (defaultPreset != undefined) {
+            advancedElement.selectedPreset = defaultPreset;
+            // @ts-ignore
+            if (advancedElement.presetsOptions.find(p => p == defaultPreset.name) == undefined) {
+                advancedElement.presetsOptions.push(defaultPreset.name);
+            }
+        }
 
         track.element.settingsBtn.addEventListener('click', async () => {
             await this.refreshPluginsParameters(track, control);
@@ -75,7 +90,7 @@ export default class TrackControlController {
         let plugin = track.plugin;
         if (plugin.initialized) {
             let params = await plugin.instance?._audioNode.getParameterInfo();
-            if (params != undefined) control.advancedElement.refreshBindParams(control, params);
+            if (params != undefined) control.advancedElement.refreshBindParams(params);
         }
     }
 
@@ -94,6 +109,9 @@ export default class TrackControlController {
         advElement.refreshParamButton.addEventListener('click', () => {
            this.refreshPluginsParameters(this.app.tracks.getTrack(control.trackId)!, control);
         });
+        advElement.presetsSelect.onchange = () => {
+            this.selectPreset(control);
+        }
     }
 
     defineTrackControlListeners(control: TrackControl) {
@@ -325,5 +343,9 @@ export default class TrackControlController {
         let ostop = (max) !== undefined ? max : maxValue;
 
         return ostart + (ostop - ostart) * ((normalizedValue - istart) / (istop - istart));
+    }
+
+    private selectPreset(control: TrackControl) {
+
     }
 }

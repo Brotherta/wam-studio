@@ -5,8 +5,9 @@ import Plugin from "./Plugin";
 import Automations from "./Automations";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import Region from "./Region";
-import {NUM_CHANNELS} from "../Utils";
+import {NUM_CHANNELS} from "../Utils/Utils";
 import {RingBuffer} from "../Audio/Utils/ringbuf";
+import {SongTagEnum} from "../Utils/SongTagEnum";
 
 export default class Track {
 
@@ -38,6 +39,7 @@ export default class Track {
 
     currentBufferRecorded: OperableAudioBuffer | undefined;
     url: string;
+    tag: SongTagEnum;
 
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;
@@ -48,6 +50,7 @@ export default class Track {
         this.automations = new Automations();
         this.regions = [];
         this.modified = true;
+        this.tag = SongTagEnum.OTHER;
 
         this.gainNode = audioCtx.createGain();
         this.gainNode.gain.value = 0.5;

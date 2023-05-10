@@ -22,6 +22,22 @@ const adminPassword = process.env.ADMIN_PASSWORD;
 const jwtSecret = process.env.JWT_SECRET;
 const port = process.env.PORT || 6002;
 
+const SongTagEnum = {
+    LEAD_VOCAL: "lead_vocal",
+    BACKING_VOCAL: "backing_vocal",
+    ELECTRIC_GUITAR: "electric_guitar",
+    ACOUSTIC_GUITAR: "acoustic_guitar",
+    BASS: "bass",
+    DRUMS: "drums",
+    PIANO: "piano",
+    SYNTH: "synth",
+    STRINGS: "strings",
+    BRASS: "brass",
+    SNARES: "snares",
+    KICKS: "kicks",
+    OTHER: "other",
+}
+
 if (!jwtSecret || !adminPassword) {
     console.error('Environment variables not set.');
     process.exit(1);
@@ -35,6 +51,18 @@ if (!fs.existsSync(storageDir)) {
 // Create projects.json file if it doesn't exist
 if (!fs.existsSync(storageDir+'/projects.json')) {
     writeJSONFile(storageDir+'/projects.json', []);
+}
+
+// Create presets.json file if it doesn't exist
+if (!fs.existsSync(storageDir+'/presets.json')) {
+    let tags = [];
+    for (let key in SongTagEnum) {
+        tags.push({
+            "tag": SongTagEnum[key],
+            "presets": []
+        })
+    }
+    writeJSONFile(storageDir+'/presets.json', tags);
 }
 
 // Middleware to verify JWT token

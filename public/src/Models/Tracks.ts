@@ -4,7 +4,7 @@ import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import WamEventDestination from "../Audio/WAM/WamEventDestination";
 import TrackElement from "../Components/TrackElement";
 import { audioCtx } from "../index";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Utils";
 import Track from "./Track";
 import Plugin from "./Plugin";
 
@@ -31,14 +31,14 @@ export default class Tracks {
      * Create a new TracksView for all files given in parameters with the given information. Fetching audio files and initialize
      * the audio nodes and the canvas.
      *
-     * @param url the url of the audio file
      * @returns the new tracks that have been created
+     * @param song
      */
-    async newTrackUrl(url: string) {
+    async newTrackUrl(song: any) {
         let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
         let node = wamInstance.audioNode as WamAudioWorkletNode;
 
-        let response = await fetch(url);
+        let response = await fetch(song.url);
         let audioArrayBuffer = await response.arrayBuffer();
         let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
 
@@ -47,10 +47,13 @@ export default class Tracks {
         node.setAudio(operableAudioBuffer.toArray());
 
         // @ts-ignore
-        let track = this.createTrack(node, url);
+        let track = this.createTrack(node);
         track.addBuffer(operableAudioBuffer);
-        let urlSplit = url.split("/");
-        track.element.name = urlSplit[urlSplit.length - 1];
+
+        track.url = song.url;
+        track.element.name = song.name;
+        track.tag = song.tag;
+
         return track;
     }
 
@@ -102,19 +105,16 @@ export default class Tracks {
      *
      * @param node
      * @param url
+     * @param name
      * @returns the created track
      */
-    createTrack(node: WamAudioWorkletNode, url?: string) {
+    createTrack(node: WamAudioWorkletNode) {
         let trackElement = document.createElement("track-element") as TrackElement;
         trackElement.trackId = this.trackIdCount;
 
         let track = new Track(this.trackIdCount, trackElement, node);
         track.plugin  = new Plugin(this.app);
         track.gainNode.connect(this.app.host.gainNode);
-
-        if (url) {
-            track.url = url;
-        }
 
         this.trackList.push(track);
         
