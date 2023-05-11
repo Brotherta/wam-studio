@@ -162,9 +162,9 @@ export default class HostController {
                 this.app.hostView.headerTitle.innerHTML = name;
                 for (let trackSong of song.songs) {
                     this.app.tracks.newTrackUrl(trackSong)
-                        .then(track => {
+                        .then(async track => {
                             if (track !== undefined) {
-                                this.app.tracksController.initTrackComponents(track);
+                                await this.app.tracksController.initTrackComponents(track);
                             }
                         });
                 }

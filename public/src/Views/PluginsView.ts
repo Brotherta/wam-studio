@@ -123,7 +123,7 @@ export default class PluginsView {
      * @param track
      */
     showPlugins(track: Track) {
-        this.deletePluginView()
+        // this.deletePluginView()
         this.mount.appendChild(track.plugin.dom);
     }
 

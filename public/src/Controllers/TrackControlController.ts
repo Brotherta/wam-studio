@@ -15,7 +15,6 @@ export default class TrackControlController {
     app: App;
 
     controls: TrackControl[];
-    activeBind: Bind | undefined;
 
     constructor(app: App) {
         this.app = app;
@@ -57,17 +56,20 @@ export default class TrackControlController {
         let defaultPreset = presets.find(p => p.name == "Default");
         if (defaultPreset != undefined) {
             advancedElement.selectedPreset = defaultPreset;
+            control.binds = defaultPreset.binds;
             // @ts-ignore
             if (advancedElement.presetsOptions.find(p => p == defaultPreset.name) == undefined) {
                 advancedElement.presetsOptions.push(defaultPreset.name);
             }
         }
+        this.app.controlsView.advancedMount.appendChild(control.advancedElement);
+        control.advancedElement.hidden = true;
 
         track.element.settingsBtn.addEventListener('click', async () => {
             await this.refreshPluginsParameters(track, control);
-            this.activeBind = undefined;
-            this.app.controlsView.advancedMount.innerHTML = "";
-            this.app.controlsView.advancedMount.appendChild(control.advancedElement);
+            control.advancedElement.updatePresetsOptions();
+            this.app.controlsView.hideAllAdvanced();
+            control.advancedElement.hidden = false;
             this.app.controlsView.advancedWindow.hidden = false;
             this.app.controlsView.advancedTitle.innerText = "Advanced Settings - " + track.element.name;
         });
@@ -96,6 +98,7 @@ export default class TrackControlController {
 
     defineAdvancedControlListeners(control: TrackControl) {
         let advElement = control.advancedElement;
+        let track = this.app.tracks.getTrack(control.trackId)!
 
         advElement.removeBindButton.addEventListener('click', () => {
            this.removeBind(control);
@@ -107,11 +110,17 @@ export default class TrackControlController {
             this.createBindParameter(control);
         });
         advElement.refreshParamButton.addEventListener('click', () => {
-           this.refreshPluginsParameters(this.app.tracks.getTrack(control.trackId)!, control);
+           this.refreshPluginsParameters(track, control);
         });
-        advElement.presetsSelect.onchange = () => {
-            this.selectPreset(control);
-        }
+        advElement.presetsSelect.addEventListener('change', () => {
+            this.app.presetsController.selectPreset(control, track);
+        });
+        advElement.savePresetButton.addEventListener('click', () => {
+            this.app.presetsController.savePreset(control, track);
+        });
+        advElement.deletePresetButton.addEventListener('click', () => {
+            this.app.presetsController.deletePreset(control, track);
+        });
     }
 
     defineTrackControlListeners(control: TrackControl) {
@@ -138,7 +147,6 @@ export default class TrackControlController {
         let bind = new Bind(name, trackBind, btn);
         btn.onclick = async () => {
             control.advancedElement.clickBind(btn, bind);
-            this.activeBind = bind;
         }
 
         // TODO Check for existing
@@ -171,7 +179,6 @@ export default class TrackControlController {
         let bind = new Bind(name, trackBind, btn);
         btn.onclick = async () => {
             control.advancedElement.clickBind(btn, bind);
-            this.activeBind = bind;
         }
 
         // TODO Check for existing
@@ -185,12 +192,12 @@ export default class TrackControlController {
     }
 
     addParameterToBind(control: TrackControl) {
-        if (this.activeBind == undefined) {
+        if (control.advancedElement.activeBind == undefined) {
             alert("No bind selected");
             return;
         }
         else {
-            this.addParameter(control, this.activeBind);
+            this.addParameter(control, control.advancedElement.activeBind);
         }
     }
 
@@ -272,6 +279,7 @@ export default class TrackControlController {
             const checkParameterBindInitiated = setInterval(async () => {
                 if (parameterBindEl.options) {
                     clearInterval(checkParameterBindInitiated);
+                    console.log("refreshing")
                     await this.refreshPluginsParameters(this.app.tracks.getTrack(control.trackId)!, control);
                     resolve();
                 }
@@ -283,16 +291,21 @@ export default class TrackControlController {
     }
 
     removeBind(control: TrackControl) {
-        if (this.activeBind == undefined) {
+        let bind = control.advancedElement.activeBind;
+        if (bind == undefined) {
             alert("No bind selected");
             return;
         }
         else {
-            control.binds.splice(control.binds.indexOf(this.activeBind), 1);
-            this.activeBind.bindButton.remove();
-            this.activeBind.trackBindElement.remove();
-            this.activeBind.bindParameters.forEach(param => param.remove());
-            this.activeBind = undefined;
+            let presetsTracks = this.app.tracks.trackList.filter(t => t.tag == control.advancedElement.tag);
+            let controls = presetsTracks.map(t => this.getControl(t.id)!);
+
+
+            control.binds.splice(control.binds.indexOf(bind), 1);
+            bind.bindButton.remove();
+            bind.trackBindElement.remove();
+            bind.bindParameters.forEach(param => param.remove());
+            bind = undefined;
         }
     }
 
@@ -345,7 +358,4 @@ export default class TrackControlController {
         return ostart + (ostop - ostart) * ((normalizedValue - istart) / (istop - istart));
     }
 
-    private selectPreset(control: TrackControl) {
-
-    }
 }

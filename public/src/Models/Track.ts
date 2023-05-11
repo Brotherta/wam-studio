@@ -8,6 +8,7 @@ import Region from "./Region";
 import {NUM_CHANNELS} from "../Utils/Utils";
 import {RingBuffer} from "../Audio/Utils/ringbuf";
 import {SongTagEnum} from "../Utils/SongTagEnum";
+import TrackControl from "./TrackControl";
 
 export default class Track {
 

@@ -95,14 +95,14 @@ div {
     <button class="btn-advanced" id="delete-preset" type="button">Delete preset</button>
 </div>
 
-<div class="bind-buttons" style="margin-bottom: 15px">
+<div class="bind-buttons">
     <button class="btn-advanced" id="new-bind-btn" type="button">New bind</button>
     <button class="btn-advanced" id="remove-bind-btn" type="button">Remove bind</button>
     <button class="btn-advanced" id="add-param-btn" type="button">Add parameter</button>
     <button class="btn-advanced" id="refresh-param-btn" type="button">Refresh parameters</button>
 </div>
 
-<div class="bind-buttons" id="bind-buttons">
+<div class="bind-buttons" id="bind-buttons" style="margin-bottom: 15px">
 
 </div>
 
@@ -119,8 +119,8 @@ export default class AdvancedControlElement extends HTMLElement {
     initialized: boolean = false;
 
     presetsOptions: string[];
-    selectedPreset: Preset | null;
-    activeBind: Bind | null;
+    selectedPreset: Preset | undefined;
+    activeBind: Bind | undefined;
     tag: SongTagEnum;
 
     constructor() {
@@ -128,8 +128,6 @@ export default class AdvancedControlElement extends HTMLElement {
         this.attachShadow({mode: "open"});
         this.name = "";
         this.presetsOptions = [];
-        this.selectedPreset = null;
-        this.activeBind = null;
     }
 
     connectedCallback() {
@@ -139,7 +137,6 @@ export default class AdvancedControlElement extends HTMLElement {
             app.trackControlController.defineAdvancedControlListeners(this.control);
             app.trackControlController.defineTrackControlListeners(this.control);
         }
-        this.updatePresetsOptions();
     }
 
     get newBindButton() {
@@ -197,7 +194,7 @@ export default class AdvancedControlElement extends HTMLElement {
 
     updatePresetsOptions() {
         this.tagHeader.innerHTML = "TAG: " + this.tag;
-        if (this.selectedPreset !== null) {
+        if (this.selectedPreset !== undefined) {
             this.unSelectAllPresets();
             this.selectPreset(this.selectedPreset.name);
             this.presetName.value = this.selectedPreset.name;
@@ -208,7 +205,8 @@ export default class AdvancedControlElement extends HTMLElement {
     }
 
     refreshBindParams(params: WamParameterInfoMap) {
-        if (this.selectedPreset !== null) {
+        if (this.selectedPreset !== undefined) {
+            console.log("refreshing bind params")
             for (let bind of this.selectedPreset.binds) {
                 for (let bindParam of bind.bindParameters) {
                     bindParam.refreshParam(params);

@@ -41,4 +41,10 @@ export default class TrackControlView {
         }
     }
 
+    hideAllAdvanced() {
+        for (let i = 0; i < this.advancedMount.children.length; i++) {
+            const element = this.advancedMount.children[i] as HTMLDivElement;
+            element.hidden = true;
+        }
+    }
 }

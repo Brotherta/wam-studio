@@ -54,7 +54,11 @@ export default class TracksController {
         }
     }
 
-    initTrackComponents(track: Track) {
+    async initTrackComponents(track: Track) {
+        await track.plugin.initPlugin();
+        document.getElementById("loading-zone")!.appendChild(track.plugin.dom);
+        this.app.tracksController.connectPlugin(track);
+
         this.app.tracksController.addNewTrackInit(track);
         this.app.automationView.addAutomationBpf(track.id);
         this.app.waveFormController.addWaveformToTrack(track);

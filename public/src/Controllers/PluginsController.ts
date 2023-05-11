@@ -54,9 +54,9 @@ export default class PluginsController {
         });
 
         this.app.pluginsView.removePlugin.addEventListener("click", () => {
-            if (this.selectedTrack !== undefined) {
-                this.removePlugins(this.selectedTrack);
-            }
+            // if (this.selectedTrack !== undefined) {
+            //     this.removePlugins(this.selectedTrack);
+            // }
         });
 
         this.app.pluginsView.showPlugin.addEventListener("click", () => {
@@ -127,6 +127,11 @@ export default class PluginsController {
             this.app.pluginsView.showNew();
         }
         else {
+            for (let track of this.app.tracks.trackList) {
+                if (track.plugin.initialized) {
+                    document.getElementById("loading-zone")!.appendChild(track.plugin.dom);
+                }
+            }
             this.app.pluginsView.showPlugins(this.selectedTrack);
             if (this.app.pluginsView.floating.hidden) {
                 this.hideAllControllers();
