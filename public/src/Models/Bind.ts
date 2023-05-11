@@ -1,20 +1,14 @@
-import BindParameterElement from "../Components/BindParameterElement";
-import TrackBindControlElement from "../Components/TrackBindControlElement";
+import Parameter from "./Parameter";
 
 
 export default class Bind {
 
-    bindName: string;
-    bindParameters: BindParameterElement[];
-    trackBindElement: TrackBindControlElement;
-    bindButton: HTMLButtonElement;
+    name: string;
+    parameters: Parameter[];
 
-    constructor(name: string, trackBindElement: TrackBindControlElement, bindButton: HTMLButtonElement) {
-        this.bindName = name;
-        this.bindParameters = [];
-        this.trackBindElement = trackBindElement;
-        this.bindButton = bindButton
+    constructor(name: string) {
+        this.name = name;
+        this.parameters = [];
     }
-
 
 }

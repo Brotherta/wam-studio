@@ -111,6 +111,7 @@ export default class Tracks {
     createTrack(node: WamAudioWorkletNode) {
         let trackElement = document.createElement("track-element") as TrackElement;
         trackElement.trackId = this.trackIdCount;
+        trackElement.id = "track-" + this.trackIdCount;
 
         let track = new Track(this.trackIdCount, trackElement, node);
         track.plugin  = new Plugin(this.app);

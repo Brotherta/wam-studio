@@ -1,7 +1,7 @@
 import {WamParameterInfoMap} from "@webaudiomodules/api";
 import TrackControl from "../Models/TrackControl";
 import {app} from "../index";
-import Bind from "../Models/Bind";
+import BindOld from "../Models/BindOld";
 import Preset from "../Models/Preset";
 import {SongTagEnum} from "../Utils/SongTagEnum";
 
@@ -120,7 +120,7 @@ export default class AdvancedControlElement extends HTMLElement {
 
     presetsOptions: string[];
     selectedPreset: Preset | undefined;
-    activeBind: Bind | undefined;
+    activeBind: BindOld | undefined;
     tag: SongTagEnum;
 
     constructor() {
@@ -221,7 +221,7 @@ export default class AdvancedControlElement extends HTMLElement {
         }
     }
 
-    clickBind(btn: HTMLButtonElement, bind: Bind) {
+    clickBind(btn: HTMLButtonElement, bind: BindOld) {
         this.unselectAllBinds();
         btn.classList.add("active");
         this.activeBind = bind;

@@ -22,6 +22,8 @@ import Loader from "./Loader/Loader";
 import ProjectView from "./Views/ProjectView";
 import ProjectController from "./Controllers/ProjectController";
 import PresetsController from "./Controllers/PresetsController";
+import BindsController from "./Controllers/BindsController";
+import BindsView from "./Views/BindsView";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -39,6 +41,7 @@ export default class App {
     recorderController: RecorderController;
     trackControlController: TrackControlController;
     projectController: ProjectController;
+    bindsController: BindsController;
     presetsController: PresetsController;
 
     hostView: HostView;
@@ -48,6 +51,7 @@ export default class App {
     automationView: AutomationView;
     controlsView: TrackControlView;
     projectView: ProjectView;
+    bindsView: BindsView;
 
     tracks: Tracks;
     host: Host;
@@ -66,6 +70,7 @@ export default class App {
         this.automationView = new AutomationView();
         this.controlsView = new TrackControlView();
         this.projectView = new ProjectView();
+        this.bindsView = new BindsView();
 
         this.hostController = new HostController(this);
         this.editorController = new EditorController(this);
@@ -78,6 +83,7 @@ export default class App {
         this.regionsController = new RegionsController(this);
         this.recorderController = new RecorderController(this);
         this.projectController = new ProjectController(this);
+        this.bindsController = new BindsController(this);
         this.presetsController = new PresetsController(this);
 
         makeDivScrollSync();

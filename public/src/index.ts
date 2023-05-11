@@ -11,6 +11,11 @@ import TrackBindControlElement from "./Components/TrackBindControlElement";
 import SaveProjectElement from "./Components/Project/SaveProjectElement";
 import LoadProjectElement from "./Components/Project/LoadProjectElement";
 
+import AdvancedElement from "./Components/new/AdvancedElement";
+import BindSliderElement from "./Components/new/BindSliderElement";
+import ParameterElement from "./Components/new/ParameterElement";
+import TrackBindElement from "./Components/new/TrackBindElement";
+
 customElements.define(
     "track-element",
     TrackElement
@@ -20,7 +25,7 @@ customElements.define(
     TrackControlElement
 );
 customElements.define(
-    "advanced-element",
+    "advanced-control-element",
     AdvancedControlElement
 );
 customElements.define(
@@ -42,6 +47,23 @@ customElements.define(
 customElements.define(
     "load-project-element",
     LoadProjectElement
+);
+
+customElements.define(
+    "advanced-element",
+    AdvancedElement
+);
+customElements.define(
+    "bind-slider-element",
+    BindSliderElement
+);
+customElements.define(
+    "parameter-element",
+    ParameterElement
+);
+customElements.define(
+    "track-bind-element",
+    TrackBindElement
 );
 
 const audioCtx = new AudioContext();

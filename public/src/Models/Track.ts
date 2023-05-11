@@ -8,7 +8,7 @@ import Region from "./Region";
 import {NUM_CHANNELS} from "../Utils/Utils";
 import {RingBuffer} from "../Audio/Utils/ringbuf";
 import {SongTagEnum} from "../Utils/SongTagEnum";
-import TrackControl from "./TrackControl";
+import BindControl from "./BindControl";
 
 export default class Track {
 
@@ -39,6 +39,8 @@ export default class Track {
     sab: SharedArrayBuffer;
 
     currentBufferRecorded: OperableAudioBuffer | undefined;
+
+    bindControl: BindControl;
     url: string;
     tag: SongTagEnum;
 

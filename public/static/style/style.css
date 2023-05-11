@@ -306,7 +306,7 @@ div::-webkit-scrollbar-thumb:hover {
     border-right: solid 1px rgb(111, 111, 111);
 }
 
-.loading-zone {
+#loading-zone {
     position: absolute;
     top: -1500px;
     left: -1500px;
@@ -630,7 +630,7 @@ canvas {
     border-left: solid 1px rgb(111, 111, 111);
 }
 
-control-element {
+track-bind-element {
     width: 100%;
     min-height: 130px;
     background-color: rgb(44, 44, 44);
@@ -653,8 +653,8 @@ advanced-element {
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: flex-start;
-    width: 462px;
-    height: 300px;
+    width: max-content;
+    height: max-content;
 }
 
 /*#advanced-buttons {*/

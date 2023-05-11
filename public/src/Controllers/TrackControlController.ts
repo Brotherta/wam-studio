@@ -3,10 +3,10 @@ import TrackControl from "../Models/TrackControl";
 import Track from "../Models/Track";
 import TrackControlElement from "../Components/TrackControlElement";
 import AdvancedControlElement from "../Components/AdvancedControlElement";
-import Bind from "../Models/Bind";
+import BindOld from "../Models/BindOld";
 import BindParameterElement from "../Components/BindParameterElement";
 import TrackBindControlElement from "../Components/TrackBindControlElement";
-import {getMinMax} from "../Audio/Utils/Normalizer";
+import {getMinMax} from "../Utils/Normalizer";
 import Preset from "../Models/Preset";
 
 
@@ -116,10 +116,10 @@ export default class TrackControlController {
             this.app.presetsController.selectPreset(control, track);
         });
         advElement.savePresetButton.addEventListener('click', () => {
-            this.app.presetsController.savePreset(control, track);
+            // this.app.presetsController.savePreset(control, track);
         });
         advElement.deletePresetButton.addEventListener('click', () => {
-            this.app.presetsController.deletePreset(control, track);
+            // this.app.presetsController.deletePreset(control, track);
         });
     }
 
@@ -144,7 +144,7 @@ export default class TrackControlController {
         let trackBind = document.createElement("track-bind-control-element") as TrackBindControlElement;
 
         let btn = control.advancedElement.addBindButton(name);
-        let bind = new Bind(name, trackBind, btn);
+        let bind = new BindOld(name, trackBind, btn);
         btn.onclick = async () => {
             control.advancedElement.clickBind(btn, bind);
         }
@@ -176,7 +176,7 @@ export default class TrackControlController {
         await trackPromise;
 
         let btn = control.advancedElement.addBindButton(name);
-        let bind = new Bind(name, trackBind, btn);
+        let bind = new BindOld(name, trackBind, btn);
         btn.onclick = async () => {
             control.advancedElement.clickBind(btn, bind);
         }
@@ -201,7 +201,7 @@ export default class TrackControlController {
         }
     }
 
-    async addParameter(control: TrackControl, bind: Bind) {
+    async addParameter(control: TrackControl, bind: BindOld) {
         let parameterBindEl = document.createElement("bind-parameter-element") as BindParameterElement;
         bind.bindParameters.push(parameterBindEl);
         if (control.advancedElement.parametersContainer) {
@@ -272,7 +272,7 @@ export default class TrackControlController {
         return parameterBindEl;
     }
 
-    async addParameterAsync(control: TrackControl, bind: Bind) {
+    async addParameterAsync(control: TrackControl, bind: BindOld) {
         let parameterBindEl = await this.addParameter(control, bind);
 
         let parameterPromise = new Promise<void>(async (resolve) => {
@@ -309,7 +309,7 @@ export default class TrackControlController {
         }
     }
 
-    async updatePluginParameter(value: string, control: TrackControl, bind: Bind) {
+    async updatePluginParameter(value: string, control: TrackControl, bind: BindOld) {
         for (const bindParam of bind.bindParameters) {
            if (bindParam.selected != "none") {
                let track = this.app.tracks.getTrack(control.trackId)!;

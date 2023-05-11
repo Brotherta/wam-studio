@@ -168,6 +168,7 @@ export default class HostController {
                             }
                         });
                 }
+                this.app.bindsView.reorderControls(this.app.tracks.trackList);
             }
         })
     }

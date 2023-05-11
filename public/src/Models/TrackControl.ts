@@ -1,6 +1,6 @@
 import TrackControlElement from "../Components/TrackControlElement";
 import AdvancedControlElement from "../Components/AdvancedControlElement";
-import Bind from "./Bind";
+import BindOld from "./BindOld";
 import Preset from "./Preset";
 
 
@@ -11,7 +11,7 @@ export default class TrackControl {
     advancedElement: AdvancedControlElement;
 
     activePreset: Preset | undefined;
-    binds: Bind[];
+    binds: BindOld[];
 
     constructor(trackId: number, element: TrackControlElement, advancedElement: AdvancedControlElement) {
         this.trackId = trackId;

@@ -1,9 +1,9 @@
-import Bind from "./Bind";
+import BindOld from "./BindOld";
 
 
 export default class Preset {
 
-    binds: Bind[];
+    binds: BindOld[];
     pluginState: any;
     name: string;
 
@@ -12,11 +12,11 @@ export default class Preset {
         this.name = name;
     }
 
-    addBind(bind: Bind) {
+    addBind(bind: BindOld) {
         this.binds.push(bind);
     }
 
-    removeBind(bind: Bind) {
+    removeBind(bind: BindOld) {
         const index = this.binds.indexOf(bind);
         if (index > -1) {
             this.binds.splice(index, 1);

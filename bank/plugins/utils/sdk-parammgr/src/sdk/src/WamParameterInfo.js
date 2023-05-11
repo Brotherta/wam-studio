@@ -1,3 +1,4 @@
+// @ts-nocheck
 /** @typedef {import('@webaudiomodules/api').WamParameterInfo} IWamParameterInfo */
 /** @typedef {typeof import('@webaudiomodules/api').WamParameterInfo} WamParameterInfoConstructor */
 /** @typedef {import('@webaudiomodules/api').WamParameterType} WamParameterType */
