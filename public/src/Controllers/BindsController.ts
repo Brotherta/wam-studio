@@ -38,6 +38,12 @@ export default class BindsController {
         this.defineBindListener(bindControl, track);
     }
 
+    removeBindControl(track: Track) {
+        let bindControl = track.bindControl;
+        this.view.removeTrackBindElement(track.id);
+        bindControl.advElement.remove();
+    }
+
     private defineBindListener(bindControl: BindControl, track: Track) {
 
         // Presets Controllers

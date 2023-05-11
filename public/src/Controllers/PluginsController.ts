@@ -169,5 +169,6 @@ export default class PluginsController {
         if (this.selectedTrack === track) {
             this.selectPlugins();
         }
+        track.plugin.dom.remove();
     }
 }

@@ -76,7 +76,7 @@ export default class TracksController {
         this.app.pluginsController.removePlugins(track);
         this.tracksView.removeTrack(track.element);
         this.app.tracks.removeTrack(track);
-        // this.app.trackControlController.removeTrackControl(track);
+        this.app.bindsController.removeBindControl(track);
         this.app.waveFormController.removeWaveformOfTrack(track);
         this.app.automationView.removeAutomationBpf(track.id);
     }
@@ -189,7 +189,7 @@ export default class TracksController {
         for (let track of this.app.tracks.trackList) {
             this.app.pluginsController.removePlugins(track);
             this.tracksView.removeTrack(track.element);
-            this.app.trackControlController.removeTrackControl(track);
+            this.app.bindsController.removeBindControl(track);
             this.app.waveFormController.removeWaveformOfTrack(track);
             this.app.automationView.removeAutomationBpf(track.id);
             track.node!.removeAudio();

@@ -11,8 +11,6 @@ import PlayheadController from "./Controllers/PlayheadController";
 import PluginsController from "./Controllers/PluginsController";
 import PluginsView from "./Views/PluginsView";
 import EditorView from "./Views/EditorView";
-import TrackControlController from "./Controllers/TrackControlController";
-import TrackControlView from "./Views/TrackControlView";
 import AutomationController from "./Controllers/AutomationController";
 import AutomationView from "./Views/AutomationView";
 import RegionsController from "./Controllers/RegionsController";
@@ -39,7 +37,6 @@ export default class App {
     waveFormController: WaveformController;
     regionsController: RegionsController;
     recorderController: RecorderController;
-    trackControlController: TrackControlController;
     projectController: ProjectController;
     bindsController: BindsController;
     presetsController: PresetsController;
@@ -49,7 +46,6 @@ export default class App {
     editorView: EditorView;
     pluginsView: PluginsView;
     automationView: AutomationView;
-    controlsView: TrackControlView;
     projectView: ProjectView;
     bindsView: BindsView;
 
@@ -68,7 +64,6 @@ export default class App {
         this.pluginsView = new PluginsView();
         this.editorView = new EditorView();
         this.automationView = new AutomationView();
-        this.controlsView = new TrackControlView();
         this.projectView = new ProjectView();
         this.bindsView = new BindsView();
 
@@ -77,7 +72,6 @@ export default class App {
         this.tracksController = new TracksController(this);
         this.playheadController = new PlayheadController(this);
         this.pluginsController = new PluginsController(this);
-        this.trackControlController = new TrackControlController(this);
         this.automationController = new AutomationController(this);
         this.waveFormController = new WaveformController(this);
         this.regionsController = new RegionsController(this);

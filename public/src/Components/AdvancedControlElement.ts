@@ -134,8 +134,6 @@ export default class AdvancedControlElement extends HTMLElement {
         if (!this.initialized && this.shadowRoot !== null) {
             this.initialized = true;
             this.shadowRoot.innerHTML = template.innerHTML;
-            app.trackControlController.defineAdvancedControlListeners(this.control);
-            app.trackControlController.defineTrackControlListeners(this.control);
         }
     }
 
