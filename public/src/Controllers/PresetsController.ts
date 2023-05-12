@@ -1,9 +1,7 @@
 import App from "../App";
 import {SongTagEnum} from "../Utils/SongTagEnum";
 import Preset from "../Models/Preset";
-import TrackControl from "../Models/TrackControl";
 import Track from "../Models/Track";
-import BindOld from "../Models/BindOld";
 import BindControl from "../Models/BindControl";
 
 export default class PresetsController {
@@ -96,9 +94,9 @@ export default class PresetsController {
         return this.presets.get(tag)?.find(preset => preset.name == "Default");
     }
 
-
-    selectPreset(control: TrackControl, track: Track) {
-
-    }
+    //
+    // selectPreset(control: TrackControl, track: Track) {
+    //
+    // }
 
 }

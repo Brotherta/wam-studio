@@ -1,7 +1,7 @@
-import AdvancedElement from "../Components/new/AdvancedElement";
+import AdvancedElement from "../Components/Binds/AdvancedElement";
 import Bind from "./Bind";
 import {SongTagEnum} from "../Utils/SongTagEnum";
-import TrackBindElement from "../Components/new/TrackBindElement";
+import TrackBindElement from "../Components/Binds/TrackBindElement";
 
 
 export default class BindControl {

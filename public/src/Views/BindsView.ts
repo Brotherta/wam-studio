@@ -1,8 +1,6 @@
-import TrackControlElement from "../Components/TrackControlElement";
-import TrackControl from "../Models/TrackControl";
-import TrackBindElement from "../Components/new/TrackBindElement";
+import TrackBindElement from "../Components/Binds/TrackBindElement";
 import Track from "../Models/Track";
-import AdvancedElement from "../Components/new/AdvancedElement";
+import AdvancedElement from "../Components/Binds/AdvancedElement";
 
 
 export default class BindsView {
