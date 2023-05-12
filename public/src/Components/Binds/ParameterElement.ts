@@ -46,7 +46,7 @@ label {
 
 export default class ParameterElement extends HTMLElement {
 
-    parameter: Parameter;
+    parameter: Parameter | undefined;
 
     initialized: boolean = false;
 
@@ -86,13 +86,17 @@ export default class ParameterElement extends HTMLElement {
 
     selectParam(param: Parameter) {
         this.parameter = param;
+        this.options.value = param.parameterName;
 
-        this.minInput.value = param.min.toString();
-        this.maxInput.value = param.max.toString();
-        this.minInput.min = param.min.toString();
-        this.maxInput.min = param.min.toString();
-        this.minInput.max = param.max.toString();
-        this.maxInput.max = param.max.toString();
+        this.minInput.value = param.currentMin.toString();
+        this.maxInput.value = param.currentMax.toString();
+
+        this.minInput.min = param.currentMin.toString();
+        this.maxInput.min = param.currentMin.toString();
+
+        this.minInput.max = param.currentMax.toString();
+        this.maxInput.max = param.currentMax.toString();
+
         this.minInput.step = param.discreteStep.toString();
         this.maxInput.step = param.discreteStep.toString();
     }
@@ -122,12 +126,12 @@ export default class ParameterElement extends HTMLElement {
     }
 
     setMin(newMin: number) {
-        this.parameter.currentMin = newMin;
+        this.parameter!.currentMin = newMin;
         this.minInput.value = newMin.toString();
     }
 
     setMax(newMax: number) {
-        this.parameter.currentMax = newMax;
+        this.parameter!.currentMax = newMax;
         this.maxInput.value = newMax.toString();
     }
 }

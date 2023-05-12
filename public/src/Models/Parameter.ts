@@ -20,4 +20,11 @@ export default class Parameter {
         this.currentMin = min;
         this.discreteStep = discreteStep;
     }
+
+    clone() {
+        let parameter = new Parameter(this.parameterName, this.max, this.min, this.discreteStep);
+        parameter.currentMax = this.currentMax;
+        parameter.currentMin = this.currentMin;
+        return parameter;
+    }
 }

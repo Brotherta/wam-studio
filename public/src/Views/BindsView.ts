@@ -1,6 +1,7 @@
 import TrackBindElement from "../Components/Binds/TrackBindElement";
 import Track from "../Models/Track";
 import AdvancedElement from "../Components/Binds/AdvancedElement";
+import {app} from "../index";
 
 
 export default class BindsView {

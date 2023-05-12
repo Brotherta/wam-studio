@@ -1,6 +1,7 @@
 import App from "../App";
 import Track from "../Models/Track";
 import Host from "../Models/Host";
+import {BANK_PLUGIN_URL} from "../Env";
 
 /**
  * Controller for the plugins view. This controller is responsible for selecting and removing plugins.
@@ -12,6 +13,7 @@ export default class PluginsController {
     selectedTrack: Track | undefined;
     hostTrack: Host;
 
+    WAM: any;
     constructor(app: App) {
         this.app = app;
 
@@ -47,7 +49,7 @@ export default class PluginsController {
         this.app.pluginsView.newPlugin.addEventListener("click", async () => {
             if (this.selectedTrack != undefined) {
                 this.app.pluginsView.hideNew();
-                await this.selectedTrack.plugin.initPlugin();
+                await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM);
                 this.app.tracksController.connectPlugin(this.selectedTrack);
                 this.selectPlugins();
             }
@@ -164,11 +166,10 @@ export default class PluginsController {
     removePlugins(track: Track) {
         track.plugin.instance?._audioNode.clearEvents();
         this.app.tracksController.disconnectPlugin(track);
+        track.plugin.dom.remove();
         track.plugin.unloadPlugin();
-        this.app.pluginsView.deletePluginView();
         if (this.selectedTrack === track) {
             this.selectPlugins();
         }
-        track.plugin.dom.remove();
     }
 }

@@ -7,7 +7,6 @@ import { createElement } from "./Gui/index.js";
  * @returns {string}
  */
 const getBasetUrl = (relativeURL) => {
-  console.log("relativeURL : ", relativeURL)
   const baseURL = relativeURL.href.substring(0, relativeURL.href.lastIndexOf("/"));
   return baseURL;
 };
@@ -21,10 +20,8 @@ export default class PedalBoardPlugin extends WebAudioModule {
 
   removeRelativeUrl = (relativeURL) => {
     if (relativeURL[0] == ".") {
-      console.log(`relative url ${this._baseURL}${relativeURL.substring(1)}`);
       return `${this._baseURL}${relativeURL.substring(1)}`;
     } else {
-      console.log("relative url 2 : ", `${this._baseURL.replace('/src', '')}${relativeURL}`);
       return `${this._baseURL.replace('/src', '')}${relativeURL}`;
     }
   };
@@ -74,12 +71,10 @@ export default class PedalBoardPlugin extends WebAudioModule {
 
     let repos = await fetch(`${this._baseURL}/repositories.json`);
     let json2 = await repos.json();
-    console.log("json : " + json2);
     let files = await Promise.allSettled(json2.map((el) => fetch(this.removeRelativeUrl(el))));
     let urls = await Promise.all(files.filter(filterFetch).map((el) => el.value.json()));
 
     urls = urls.reduce((arr, next) => arr.concat(next), []);
-    console.log(urls);
     let responses = await Promise.allSettled(urls.map((el) => fetch(`${el}descriptor.json`)));
 
     let descriptors = await Promise.all(responses.map((el) => (filterFetch(el) ? el.value.json() : undefined)));

@@ -18,7 +18,6 @@ export default class RecorderController {
     }
 
     addRecordListener(track: Track) {
-        console.log("add recording track: " + track.id);
     }
 
     async clickArm(track: Track) {

@@ -55,7 +55,7 @@ export default class TracksController {
     }
 
     async initTrackComponents(track: Track) {
-        await track.plugin.initPlugin();
+        await track.plugin.initPlugin(this.app.host.pluginWAM);
         document.getElementById("loading-zone")!.appendChild(track.plugin.dom);
         this.app.tracksController.connectPlugin(track);
 
@@ -89,6 +89,14 @@ export default class TracksController {
         track.element.addEventListener("click", () => {
             if (!track.removed) {
                 this.app.pluginsController.selectTrack(track);
+                if (!this.app.bindsView.advancedWindow.hidden) {
+                    if (track.bindControl.advElement.firstOpen) {
+                        this.app.presetsController.refreshPresetList(track.tag);
+                        track.bindControl.advElement.selectPreset("Default");
+                        track.bindControl.advElement.firstOpen = false;
+                    }
+                    this.app.bindsView.showAdvancedWindow(track);
+                }
             }
         })
 
@@ -144,7 +152,11 @@ export default class TracksController {
             this.app.recorderController.clickArm(track);
         }
         track.element.settingsBtn.onclick = () => {
-
+            if (track.bindControl.advElement.firstOpen) {
+                this.app.presetsController.refreshPresetList(track.tag);
+                track.bindControl.advElement.selectPreset("Default");
+                track.bindControl.advElement.firstOpen = false;
+            }
             this.app.bindsView.showAdvancedWindow(track);
         }
     }

@@ -11,4 +11,11 @@ export default class Bind {
         this.parameters = [];
     }
 
+    clone() {
+        let bind = new Bind(this.name);
+        for (let param of this.parameters) {
+            bind.parameters.push(param.clone());
+        }
+        return bind;
+    }
 }

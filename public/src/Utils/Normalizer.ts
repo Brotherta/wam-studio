@@ -1,5 +1,22 @@
 
 
+
+export function verifyString(toVerify: string | null) {
+    if (toVerify == null || toVerify == '') {
+        alert("Not empty please !");
+        return false;
+    }
+    if (!/^[a-zA-Z]+$/.test(toVerify)) {
+        alert("Only letters please (a-Z)");
+        return false;
+    }
+    if (toVerify.length > 16) {
+        alert("No more than 16 chars please...");
+        return false;
+    }
+    return true;
+}
+
 export function getMinMax(param: String) {
     if (param.includes("Equalizer")) {
         let type = param.split(" ")[3];

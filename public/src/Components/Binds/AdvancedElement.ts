@@ -1,4 +1,5 @@
 import ParameterElement from "./ParameterElement";
+import Preset from "../../Models/Preset";
 
 const template: HTMLTemplateElement = document.createElement("template");
 
@@ -123,6 +124,7 @@ export default class AdvancedElement extends HTMLElement {
 
     parameters: ParameterElement[] = [];
     initialized: boolean = false;
+    firstOpen: boolean = true;
 
     constructor() {
         super();
@@ -193,6 +195,53 @@ export default class AdvancedElement extends HTMLElement {
         }
     }
 
+    addPresetsOption(name: string) {
+        const option = document.createElement("option");
+        option.value = name;
+        option.innerText = name;
+        this.presetsSelect.appendChild(option);
+    }
+
+    removePresetsOption(name: string) {
+        const option = this.presetsSelect.querySelector(`option[value="${name}"]`);
+        if (option) {
+            if (this.presetsSelect.value === name) {
+                this.presetsSelect.value = "none";
+            }
+            this.presetsSelect.removeChild(option);
+        }
+    }
+
+    refreshPresetsOptions(presets: Preset[]) {
+        let selected = this.presetsSelect.value;
+
+        this.presetsSelect.innerHTML = "";
+        let firstOption = document.createElement("option");
+        firstOption.value = "none";
+        firstOption.innerText = "Select a preset";
+        firstOption.disabled = true;
+        this.presetsSelect.appendChild(firstOption);
+
+        if (selected === "none") {
+            firstOption.selected = true;
+        }
+
+        for (let preset of presets) {
+            let option = document.createElement("option");
+            option.value = preset.name;
+            option.innerText = preset.name;
+            this.presetsSelect.appendChild(option);
+            if (selected === preset.name) {
+                option.selected = true;
+            }
+        }
+
+    }
+
+    selectPreset(name: string) {
+        this.presetsSelect.value = name;
+    }
+
     addParameterElement(parameterElement: ParameterElement) {
         this.parameters.push(parameterElement);
         this.parametersContainer.appendChild(parameterElement);
@@ -208,4 +257,5 @@ export default class AdvancedElement extends HTMLElement {
             parameter.style.display = "none";
         }
     }
+
 }

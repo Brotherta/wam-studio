@@ -8,7 +8,7 @@ import Parameter from "../Models/Parameter";
 import Bind from "../Models/Bind";
 import BindSliderElement from "../Components/Binds/BindSliderElement";
 import ParameterElement from "../Components/Binds/ParameterElement";
-import {getMinMax, normalizeValue} from "../Utils/Normalizer";
+import {getMinMax, normalizeValue, verifyString} from "../Utils/Normalizer";
 
 
 export default class BindsController {
@@ -36,6 +36,8 @@ export default class BindsController {
         this.view.addTrackBindElement(trackBindElement);
 
         this.defineBindListener(bindControl, track);
+        // this.app.presetsController.refreshPresetList(track.tag);
+        // bindControl.advElement.selectPreset("Default");
     }
 
     removeBindControl(track: Track) {
@@ -47,7 +49,7 @@ export default class BindsController {
     private defineBindListener(bindControl: BindControl, track: Track) {
 
         // Presets Controllers
-        bindControl.advElement.bindsSelect.onchange = async () => {
+        bindControl.advElement.presetsSelect.onchange = async () => {
             await this.app.presetsController.changePreset(bindControl, track);
         }
         bindControl.advElement.savePresetBtn.onclick = async () => {
@@ -84,15 +86,19 @@ export default class BindsController {
      * Create a new bind for the track. It creates the bindControl object that will be used to store the bind.
      * It also creates the bindSliderElement that will be used to display the bind.
      * @param track
+     * @param name
      */
-    async createBind(track: Track) {
+    async createBind(track: Track, name?: string) {
         let bindControl = track.bindControl;
-        let name = window.prompt("Enter the name of the bind (16 char max a-Z) no special characters", "Bind");
+        if (!name) {
+            let pname = window.prompt("Enter the name of the bind (16 char max a-Z) no special characters", "Bind");
 
-        if (!this.verifyString(name)) return null;
-        if (bindControl.binds.find(b => b.name === name)) {
-            alert("The bind "+ name + " already exists");
-            return null;
+            if (!verifyString(pname)) return null;
+            if (bindControl.binds.find(b => b.name === pname)) {
+                alert("The bind "+ pname + " already exists");
+                return null;
+            }
+            name = pname!;
         }
 
         let bind = new Bind(name!);
@@ -116,10 +122,11 @@ export default class BindsController {
      * Delete a bind from the track. It will delete the parameters associated with the bind and the elements.
      *
      * @param track
+     * @param bind
      * @private
      */
-    private async deleteBind(track: Track) {
-        let activeBindName = track.bindControl.advElement.bindsSelect.value;
+    async deleteBind(track: Track, bind?: Bind) {
+        let activeBindName = bind ? bind.name : track.bindControl.advElement.bindsSelect.value;
         if (activeBindName !== "none") {
             let bind = track.bindControl.binds.find(b => b.name === activeBindName)!;
 
@@ -137,6 +144,7 @@ export default class BindsController {
 
             track.bindControl.removeBind(bind);
             track.bindControl.advElement.removeBindOption(bind.name);
+            track.bindControl.trackBindElement.removeBindSliderElement(bind.name);
         }
     }
 
@@ -146,12 +154,14 @@ export default class BindsController {
      * @param track
      * @private
      */
-    private async selectBind(track: Track) {
+    async selectBind(track: Track) {
         track.bindControl.advElement.hideAllParameters();
         let activeBindName = track.bindControl.advElement.bindsSelect.value;
         if (activeBindName !== "none") {
             for (let parameterElement of track.bindControl.advElement.parameters) {
-                if (parameterElement.id.includes(activeBindName)) {
+                let idFiltered = parameterElement.id.split("-");
+                let name = idFiltered[1];
+                if (name === activeBindName) {
                     parameterElement.style.display = "";
                 }
             }
@@ -184,15 +194,27 @@ export default class BindsController {
         }
     }
 
+    async deleteAllBinds(track: Track) {
+        let bindControl = track.bindControl;
+        let bindsToDelete: Bind[] = [];
+        for (let bind of bindControl.binds) {
+            bindsToDelete.push(bind);
+        }
+        for (let bind of bindsToDelete) {
+            await this.deleteBind(track, bind);
+        }
+    }
+
     // PARAMETERS CONTROLLERS
 
     /**
      * Create a new parameter for the bind. It creates the parameter element that will be used to display the parameter.
      * @param track
+     * @param name
      */
-    async createParameter(track: Track) {
+    async createParameter(track: Track, name?: string) {
         let bindControl = track.bindControl;
-        let bindName = bindControl.advElement.bindsSelect.value;
+        let bindName = name ? name : bindControl.advElement.bindsSelect.value;
         let bind = bindControl.binds.find(b => b.name === bindName);
 
         if (bindName == null || bindName == "none") {
@@ -219,6 +241,8 @@ export default class BindsController {
         parameterElement.maxInput.onchange = async () => {
             this.verifyNumber(parameterElement);
         }
+
+        return parameterElement;
     }
 
     /**
@@ -228,31 +252,39 @@ export default class BindsController {
      * @param track
      * @param bind
      * @param parameterElement
+     * @param param
      * @private
      */
-    private async updateParameter(track: Track, bind: Bind, parameterElement: ParameterElement) {
-        let parameter = parameterElement.parameter;
-        let paramName = parameterElement.options.value;
-        if (parameter === undefined || parameter.parameterName !== parameterElement.options.value) {
-            // @ts-ignore
-            let paramInfo = await track.plugin.instance?._audioNode.getParameterInfo([paramName]);
-            if (paramInfo === undefined) {
-                alert("The parameter "+paramName+" doesn't exist");
-                return;
-            }
-            // @ts-ignore
-            let {minValue, maxValue, discreteStep} = paramInfo[paramName];
+    async updateParameter(track: Track, bind: Bind, parameterElement: ParameterElement, param?: Parameter) {
+        if (param) {
+            let newParameter = param.clone();
+            parameterElement.selectParam(newParameter);
+            bind.parameters.push(newParameter);
+        }
+        else {
+            let parameter = parameterElement.parameter;
+            let paramName =  parameterElement.options.value;
+            if (parameter === undefined || parameter.parameterName !== parameterElement.options.value) {
+                // @ts-ignore
+                let paramInfo = await track.plugin.instance?._audioNode.getParameterInfo([paramName]);
+                if (paramInfo === undefined) {
+                    alert("The parameter "+paramName+" doesn't exist");
+                    return;
+                }
+                // @ts-ignore
+                let {minValue, maxValue, discreteStep} = paramInfo[paramName];
 
-            // Normalize values for the equalizer...
-            let minMaxNormalized = getMinMax(paramName);
-            if (minMaxNormalized !== undefined) {
-                minValue = minMaxNormalized.min;
-                maxValue = minMaxNormalized.max;
-            }
+                // Normalize values for the equalizer...
+                let minMaxNormalized = getMinMax(paramName);
+                if (minMaxNormalized !== undefined) {
+                    minValue = minMaxNormalized.min;
+                    maxValue = minMaxNormalized.max;
+                }
 
-            parameter = new Parameter(paramName, maxValue, minValue, discreteStep);
-            parameterElement.selectParam(parameter);
-            bind.parameters.push(parameter);
+                parameter = new Parameter(paramName, maxValue, minValue, discreteStep);
+                parameterElement.selectParam(parameter);
+                bind.parameters.push(parameter);
+            }
         }
     }
 
@@ -266,9 +298,10 @@ export default class BindsController {
      * @private
      */
     private async deleteParameter(track: Track, bind: Bind, parameterElement: ParameterElement) {
-        if (parameterElement.parameter !== null) {
-            bind.parameters.slice(bind.parameters.indexOf(parameterElement.parameter), 1);
+        if (parameterElement.parameter !== undefined) {
+            bind.parameters.splice(bind.parameters.indexOf(parameterElement.parameter!), 1);
         }
+        parameterElement.parameter = undefined;
         track.bindControl.advElement.removeParameterElement(parameterElement);
     }
 
@@ -280,7 +313,7 @@ export default class BindsController {
      * @param track
      * @private
      */
-    private async refreshParam(track: Track) {
+    async refreshParam(track: Track) {
 
         // TODO : Check if the selected parameter is still available in the plugin !!!
 
@@ -293,26 +326,9 @@ export default class BindsController {
         }
     }
 
-
-    private verifyString(toVerify: string | null) {
-        if (toVerify == null || toVerify == '') {
-            alert("Not empty please !");
-            return false;
-        }
-        if (!/^[a-zA-Z]+$/.test(toVerify)) {
-            alert("Only letters please (a-Z)");
-            return false;
-        }
-        if (toVerify.length > 16) {
-            alert("No more than 16 chars please...");
-            return false;
-        }
-        return true;
-    }
-
     private verifyNumber(parameterEl: ParameterElement, isMin: boolean = false) {
         let parameter = parameterEl.parameter;
-        if (parameter === null) {
+        if (parameter === undefined) {
             return;
         }
         let input = isMin ? parameterEl.minInput : parameterEl.maxInput;
@@ -355,4 +371,5 @@ export default class BindsController {
             input.value = parameter.currentMax.toString();
         }
     }
+
 }
