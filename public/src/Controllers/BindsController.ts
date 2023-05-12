@@ -1,13 +1,13 @@
 import App from "../App";
 import Track from "../Models/Track";
 import BindControl from "../Models/BindControl";
-import AdvancedElement from "../Components/new/AdvancedElement";
-import TrackBindElement from "../Components/new/TrackBindElement";
+import AdvancedElement from "../Components/Binds/AdvancedElement";
+import TrackBindElement from "../Components/Binds/TrackBindElement";
 import BindsView from "../Views/BindsView";
 import Parameter from "../Models/Parameter";
 import Bind from "../Models/Bind";
-import BindSliderElement from "../Components/new/BindSliderElement";
-import ParameterElement from "../Components/new/ParameterElement";
+import BindSliderElement from "../Components/Binds/BindSliderElement";
+import ParameterElement from "../Components/Binds/ParameterElement";
 import {getMinMax, normalizeValue} from "../Utils/Normalizer";
 
 
