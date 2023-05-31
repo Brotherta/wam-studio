@@ -50,6 +50,7 @@ export default class BindsController {
 
         // Presets Controllers
         bindControl.advElement.presetsSelect.onchange = async () => {
+            bindControl.trackBindElement.selectPresets(bindControl.advElement.presetsSelect.value);
             await this.app.presetsController.changePreset(bindControl, track);
         }
         bindControl.advElement.savePresetBtn.onclick = async () => {
@@ -77,6 +78,10 @@ export default class BindsController {
         }
         bindControl.advElement.addParamBtn.onclick = async () => {
             await this.createParameter(track);
+        }
+        bindControl.trackBindElement.presetsSelect.onchange = async () => {
+            bindControl.advElement.selectPreset(bindControl.trackBindElement.presetsSelect.value);
+            await this.app.presetsController.changePreset(bindControl, track);
         }
     }
 

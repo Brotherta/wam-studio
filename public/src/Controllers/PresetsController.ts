@@ -20,6 +20,7 @@ export default class PresetsController {
             let presets = [defaultPreset];
             this.presets.set(tag, presets);
         }
+        this.updateGlobalPresetList(new Set<string>().add("Default"));
     }
 
     addPreset(preset: Preset, tag: SongTagEnum) {
@@ -155,12 +156,54 @@ export default class PresetsController {
      * @param tag
      */
     refreshPresetList(tag: SongTagEnum) {
+        let presetsSet = new Set<string>();
+
+
         for (let track of this.app.tracks.trackList) {
             let bindControl = track.bindControl;
             if (bindControl.tag != tag) continue;
 
             let presets = this.presets.get(tag)!;
             bindControl.advElement.refreshPresetsOptions(presets);
+            bindControl.trackBindElement.refreshPresetsOptions(presets);
+
+            for (let preset of presets) {
+                presetsSet.add(preset.name);
+            }
+        }
+
+        this.updateGlobalPresetList(presetsSet);
+    }
+
+    /**
+     * Add the preset to the preset list.
+     *
+     * @param presetsSet
+     */
+    updateGlobalPresetList(presetsSet: Set<string>) {
+        this.app.hostView.presetsDropdown.innerHTML = "";
+
+        for (let presetString of presetsSet) {
+
+            let a = document.createElement("a");
+            a.innerText = presetString;
+            a.classList.add("dropdown-item");
+
+            a.addEventListener("click", async () => {
+                for (let track of this.app.tracks.trackList) {
+                    let bindControl = track.bindControl;
+                    let tag = track.tag;
+                    let preset = this.getPresetByTag(tag)?.find(p => p.name == presetString);
+                    if (preset) {
+                        track.bindControl.advElement.selectPreset(preset.name);
+                        track.bindControl.trackBindElement.selectPresets(preset.name);
+                        await this.changePreset(bindControl, track);
+                    }
+                }
+            });
+
+            this.app.hostView.presetsDropdown.appendChild(a);
         }
     }
+
 }

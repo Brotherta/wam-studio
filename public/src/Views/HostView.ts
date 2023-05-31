@@ -14,6 +14,8 @@ export default class HostView {
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
 
+    presetsDropdown = document.getElementById("presets-dropdown") as HTMLDivElement;
+
     playbackSlider = document.getElementById("playback-slider") as HTMLInputElement;
     headerTitle = document.getElementById("header-title") as HTMLDivElement;
 
