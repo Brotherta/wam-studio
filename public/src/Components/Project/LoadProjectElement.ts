@@ -123,6 +123,7 @@ button {
         <div id="project-name" style="font-weight: bold"></div>
         <div id="date"></div>
         <button id="load-button" type="button">Load</button>
+        <button id="delete-button" type="button">Delete</button>
     </div>
     
 </div>    
@@ -143,6 +144,39 @@ export default class LoadProjectElement extends HTMLElement {
             this.shadowRoot?.appendChild(template.content.cloneNode(true));
         }
     }
+
+    parseDate(dateString: string) {
+        const date = new Date(dateString);
+
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const year = date.getFullYear().toString().slice(-2); // slice(-2) gets the last 2 digits of the year
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const amOrPm = hours < 12 ? 'AM' : 'PM';
+        return `${month}/${day}/${year} ${hours % 12}:${minutes} ${amOrPm}`;
+    }
+
+    addResults(results: any) {
+        this.resultsContainer.innerHTML = "";
+        this.selectedProject = "";
+        results.forEach((result: any) => {
+            const resultElement = document.createElement("div");
+            resultElement.classList.add("result");
+            resultElement.innerText = `${result.username} - ${result.name} - ${this.parseDate(result.date)}`;
+            resultElement.addEventListener("click", () => {
+                this.selectedResult?.classList.remove("selected");
+                this.selectedProject = result.id;
+                this.selectedResult = resultElement;
+                resultElement.classList.add("selected");
+                this.projectName!.innerText = result.name;
+                this.date!.innerText = this.parseDate(result.date);
+                this.confirmLoadDiv!.style.display = "flex";
+            });
+            this.resultsContainer.appendChild(resultElement);
+        });
+    }
+
 
     get userInput(): HTMLInputElement {
         return this.shadowRoot?.getElementById("user-input") as HTMLInputElement;
@@ -176,36 +210,8 @@ export default class LoadProjectElement extends HTMLElement {
         return this.shadowRoot?.getElementById("confirm") as HTMLDivElement;
     }
 
-    parseDate(dateString: string) {
-        const date = new Date(dateString);
-
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        const year = date.getFullYear().toString().slice(-2); // slice(-2) gets the last 2 digits of the year
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        const amOrPm = hours < 12 ? 'AM' : 'PM';
-        return `${month}/${day}/${year} ${hours % 12}:${minutes} ${amOrPm}`;
-    }
-
-    addResults(results: any) {
-        this.resultsContainer.innerHTML = "";
-        this.selectedProject = "";
-        results.forEach((result: any) => {
-            const resultElement = document.createElement("div");
-            resultElement.classList.add("result");
-            resultElement.innerText = `${result.username} - ${result.name} - ${this.parseDate(result.date)}`;
-            resultElement.addEventListener("click", () => {
-                this.selectedResult?.classList.remove("selected");
-                this.selectedProject = result.id;
-                this.selectedResult = resultElement;
-                resultElement.classList.add("selected");
-                this.projectName!.innerText = result.name;
-                this.date!.innerText = this.parseDate(result.date);
-                this.confirmLoadDiv!.style.display = "flex";
-            });
-            this.resultsContainer.appendChild(resultElement);
-        });
+    get deleteButton(): HTMLButtonElement {
+        return this.shadowRoot?.getElementById("delete-button") as HTMLButtonElement;
     }
 }
 

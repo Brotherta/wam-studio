@@ -34,8 +34,10 @@ export default class HostView {
     importSongs = document.getElementById("import-songs") as HTMLInputElement;
     saveProject = document.getElementById("save-project") as HTMLInputElement;
     loadProject = document.getElementById("load-project") as HTMLInputElement;
+    login = document.getElementById("login") as HTMLInputElement;
     importProject = document.getElementById("import-project") as HTMLInputElement;
     exportProject = document.getElementById("export-project") as HTMLInputElement;
+    syncPresets = document.getElementById("sync-presets") as HTMLInputElement;
     newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
     importInput: HTMLInputElement = document.getElementById("import-input") as HTMLInputElement;
 

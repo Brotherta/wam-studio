@@ -13,6 +13,7 @@ import AdvancedElement from "./Components/Binds/AdvancedElement";
 import BindSliderElement from "./Components/Binds/BindSliderElement";
 import ParameterElement from "./Components/Binds/ParameterElement";
 import TrackBindElement from "./Components/Binds/TrackBindElement";
+import LoginElement from "./Components/Project/LoginElement";
 
 customElements.define(
     "track-element",
@@ -29,6 +30,10 @@ customElements.define(
 customElements.define(
     "load-project-element",
     LoadProjectElement
+);
+customElements.define(
+    "login-element",
+    LoginElement
 );
 
 customElements.define(

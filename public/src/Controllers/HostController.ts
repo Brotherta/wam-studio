@@ -206,6 +206,12 @@ export default class HostController {
         this.app.hostView.importProject.onclick = async () => {
             await this.hostView.importInput.click();
         }
+        this.app.hostView.login.onclick = async () => {
+            await this.app.projectController.openLogin();
+        }
+        this.app.hostView.syncPresets.onclick = async () => {
+            await this.app.presetsController.syncPresets();
+        }
         this.app.hostView.exportProject.onclick = async () => {
             let project = await this.app.loader.saveProject();
             let date = new Date().toISOString().slice(0, 10);
@@ -300,6 +306,16 @@ export default class HostController {
             //@ts-ignore
             track.node.parameters.get("playing").value = 1;
         });
+    }
+
+    switchMode() {
+        // let currentMode = "advanced" = this.app
+        // if (currentMode === "eazy") {
+        //
+        // }
+        // else (currentMode === "offline") {
+        //
+        // }
     }
 }
 

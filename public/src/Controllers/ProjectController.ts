@@ -10,9 +10,11 @@ export default class ProjectController {
     projectId: string = "";
     projectName: string = "";
     projectUser: string = "";
+    isLogged: boolean = false;
 
     constructor(app: App) {
         this.app = app;
+        this.isLoggedIn();
     }
 
     async openSaveProject() {
@@ -33,8 +35,10 @@ export default class ProjectController {
         this.app.projectView.show();
     }
 
-    openManageProject() {
-
+    async openLogin() {
+        this.app.projectView.mountLogin();
+        await this.initLogin();
+        this.app.projectView.show();
     }
 
     async initSaveProject() {
@@ -65,10 +69,15 @@ export default class ProjectController {
                 if (user !== "" || project !== "") {
                     query = `/search?user=${user}&project=${project}`;
                 }
-                let response = await fetch(url + query);
+                let response = await fetch(url + query, {
+                    credentials: "include"
+                });
                 if (response.status === 200) {
                     let responseData = await response.json();
                     this.app.projectView.loadElement.addResults(responseData);
+                }
+                else if (response.status === 401) {
+                    console.log("Not logged in");
                 }
             });
 
@@ -89,7 +98,37 @@ export default class ProjectController {
                     }
                 }
             });
+
+            this.app.projectView.loadElement.deleteButton.addEventListener("click", async () => {
+                if (this.app.projectView.loadElement.selectedProject !== "") {
+                    let url = BACKEND_URL + "/projects/" + this.app.projectView.loadElement.selectedProject;
+                    let response = await fetch(url, {
+                        method: "DELETE",
+                        credentials: "include"
+                    });
+                    if (response.status === 200) {
+                        this.app.projectView.loadElement.selectedProject = "";
+                        this.app.projectView.loadElement.userInput.value = "";
+                        this.app.projectView.loadElement.projectInput.value = "";
+                        this.app.projectView.loadElement.searchButton.click();
+                    }
+                }
+            });
         }
+    }
+
+    async initLogin() {
+        if (!this.app.projectView.loginElement.initialized) {
+            this.app.projectView.loginElement.initialized = true;
+            this.app.projectView.loginElement.logInButton.addEventListener("click", async () => {
+                await this.login();
+            });
+            this.app.projectView.loginElement.logOutButton.addEventListener("click", async () => {
+                await this.logout();
+            });
+        }
+
+        this.app.projectView.updateLogin(this.isLogged);
     }
 
     async initNewProject() {
@@ -113,8 +152,8 @@ export default class ProjectController {
     async newProject() {
         await this.app.loader.loadProject({
             "tracks": [],
-            "trackIdCount": 1,
-        })
+            "trackIdCount": 1
+        });
     }
 
     async saveProject(override: boolean = false) {
@@ -183,4 +222,70 @@ export default class ProjectController {
         });
     }
 
+    async login() {
+        if (!this.isLogged) {
+            let url = BACKEND_URL + "/login";
+            let user = this.app.projectView.loginElement.user.value;
+            let password = this.app.projectView.loginElement.password.value;
+            let response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    "username": user,
+                    "password": password
+                })
+            });
+            if (response.status === 200) {
+                this.isLogged = true;
+                this.app.projectView.loginElement.showInfo("Login successful");
+            }
+            else if (response.status === 401) {
+                this.app.projectView.loginElement.showError("Wrong username or password");
+                this.app.projectView.loginElement.password.value = "";
+            }
+        }
+        this.app.projectView.updateLogin(this.isLogged);
+    }
+
+    async logout() {
+        if (this.isLogged) {
+            let url = BACKEND_URL + "/logout";
+            let response = await fetch(url, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            if (response.status === 200) {
+                this.isLogged = false;
+                this.app.projectView.loginElement.showInfo("Logout successful");
+                this.app.projectView.loginElement.password.value = "";
+            }
+            else if (response.status === 401) {
+                this.app.projectView.loginElement.showError("Logout failed");
+            }
+        }
+        this.app.projectView.updateLogin(this.isLogged);
+    }
+
+    async isLoggedIn() {
+        let url = BACKEND_URL + "/verify";
+        let response = await fetch(url, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        if (response.status === 200) {
+            this.isLogged = true;
+        }
+        else if (response.status === 401) {
+            this.isLogged = false;
+        }
+    }
 }

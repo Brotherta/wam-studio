@@ -6,6 +6,9 @@ import BindControl from "../Models/BindControl";
 import {verifyString} from "../Utils/Normalizer";
 import {param} from "jquery";
 import {WamParameterInfoMap} from "@webaudiomodules/api";
+import {BACKEND_URL} from "../Env";
+import Bind from "../Models/Bind";
+import Parameter from "../Models/Parameter";
 
 export default class PresetsController {
 
@@ -15,12 +18,113 @@ export default class PresetsController {
     constructor(app: App) {
         this.app = app;
         this.presets = new Map<SongTagEnum, Preset[]>();
+
+        this.getPresets();
+    }
+
+    getPresets() {
         for (let tag of Object.values(SongTagEnum)) {
             let defaultPreset = new Preset("Default");
             let presets = [defaultPreset];
             this.presets.set(tag, presets);
         }
-        this.updateGlobalPresetList(new Set<string>().add("Default"));
+
+
+        fetch(BACKEND_URL+ "/presets", {
+            method: "GET"
+        }).then(async (response) => {
+            if (response.ok) {
+                let data = await response.json()
+                for (let item of data) {
+                    let tag = item.tag;
+                    let presets = item.presets;
+                    for (let preset of presets) {
+                        let newPreset = new Preset(preset.name);
+                        newPreset.pluginState = preset.pluginState;
+
+                        let binds = [];
+                        for (let bind of preset.binds) {
+                            let newBind = new Bind(bind.name);
+                            for (let param of bind.parameters) {
+                                let newParam = new Parameter(param.parameterName, param.max, param.min, param.discreteStep);
+                                newParam.currentMax = param.currentMax;
+                                newParam.currentMin = param.currentMin;
+                                newBind.parameters.push(newParam);
+                            }
+                            binds.push(newBind);
+                        }
+
+                        newPreset.binds = binds;
+                        this.addPreset(newPreset, tag);
+                    }
+                }
+
+                this.updateGlobalPresetList(new Set<string>().add("Default"));
+            }
+        });
+    }
+
+    /**
+     * Synchronises the presets to the server. It will ignore the Default Presets.
+     * Get all plugin state of each preset and each parameter of each bind.
+     */
+    syncPresets() {
+        let data = [];
+
+        for (let tag of Object.values(SongTagEnum)) {
+            let presets = this.presets.get(tag)!;
+
+            let presetsObject = [];
+            for (let preset of presets) {
+                if (preset.name == "Default") {
+                    continue;
+                }
+
+                let bindsObject = [];
+                for (let bind of preset.binds) {
+
+                    let parametersObject = [];
+                    for (let param of bind.parameters) {
+                        parametersObject.push({
+                            "parameterName": param.parameterName,
+                            "max": param.max,
+                            "min": param.min,
+                            "currentMax": param.currentMax,
+                            "currentMin": param.currentMin,
+                            "discreteStep": param.discreteStep
+                        });
+                    }
+                    bindsObject.push({
+                        "name": bind.name,
+                        "parameters": parametersObject
+                    });
+                }
+
+                presetsObject.push({
+                    "name": preset.name,
+                    "pluginState": preset.pluginState,
+                    "binds": bindsObject
+                });
+            }
+            data.push({tag: tag, presets: presetsObject});
+        }
+
+        fetch(BACKEND_URL + "/presets", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(data)
+        }).then(async (response) => {
+            if (response.ok) {
+                let data = await response.json()
+                console.log(data);
+            }
+            else {
+                console.log("An error occurred in the process of syncing the presets.")
+            }
+        });
     }
 
     addPreset(preset: Preset, tag: SongTagEnum) {

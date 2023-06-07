@@ -10,11 +10,7 @@ const cors = require('cors');
 // Load environment variables
 dotenv.config();
 
-// Initialize Express
-const app = express();
-app.use(express.json());
 
-app.use(cors());
 
 // Set storage directory and admin password from environment variables
 const storageDir = process.env.STORAGE_DIR || 'storage';
@@ -37,6 +33,17 @@ const SongTagEnum = {
     KICKS: "kicks",
     OTHER: "other",
 }
+
+const corsOptions = {
+    origin: 'http://localhost:5002',
+    credentials: true,
+}
+
+// Initialize Express
+const app = express();
+app.use(express.json());
+app.use(cors(corsOptions));
+app.use(require('cookie-parser')());
 
 if (!jwtSecret || !adminPassword) {
     console.error('Environment variables not set.');
@@ -67,13 +74,11 @@ if (!fs.existsSync(storageDir+'/presets.json')) {
 
 // Middleware to verify JWT token
 function verifyJWT(req, res, next) {
-    const authHeader = req.header('Authorization');
-
-    if (!authHeader) {
+    if (!req.cookies || !req.cookies.token) {
         return res.status(401).send('Access denied. No token provided.');
     }
 
-    const token = authHeader.split(' ')[1]; // Extract the token from the Bearer string
+    const token = req.cookies.token; // Extract the token from the cookie
 
     try {
         req.user = jwt.verify(token, jwtSecret);
@@ -82,6 +87,7 @@ function verifyJWT(req, res, next) {
         res.status(400).send('Invalid token.');
     }
 }
+
 
 // Function to read and parse JSON file
 function readJSONFile(filePath) {
@@ -94,7 +100,7 @@ function writeJSONFile(filePath, data) {
 }
 
 // Route to get all projects
-app.get('/projects', (req, res) => {
+app.get('/projects', verifyJWT, (req, res) => {
     const projects = readJSONFile(storageDir+'/projects.json');
     res.json(projects.map(({ username, name, date, id }) => ({ username, name, date, id })));
 });
@@ -180,16 +186,52 @@ app.post('/projects', (req, res) => {
 });
 
 // Route to login as admin
-app.post('/admin/login', (req, res) => {
+app.post('/login', (req, res) => {
     const { password } = req.body;
 
     if (password === adminPassword) {
         const token = jwt.sign({ role: 'admin' }, jwtSecret, { expiresIn: '1h' });
-        res.json({ token });
+
+        // Set the JWT as an HTTP-Only cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            // secure: true, // Uncomment this line to enforce secure (https) cookies
+            sameSite: 'strict' // Uncomment this line if you want to enforce same site policy
+        });
+
+        res.json({ message: 'Logged in' });
     } else {
         res.status(401).json({ message: 'Invalid admin password' });
     }
 });
+
+// Route to save the presets
+app.post('/presets', verifyJWT, (req, res) => {
+    const presets = req.body;
+    console.log(presets)
+    writeJSONFile(storageDir+'/presets.json', presets);
+    res.json({ message: 'Presets saved' });
+});
+
+// Route to get the presets
+app.get('/presets', (req, res) => {
+    const presets = readJSONFile(storageDir+'/presets.json');
+    res.json(presets);
+});
+
+// Route to logout
+app.post('/logout', (req, res) => {
+    res.cookie('token', "loggedout", {
+        httpOnly: true,
+        sameSite: 'strict'
+    }).json({ message: 'Logged out' });
+});
+
+// Route to verify JWT token
+app.get('/verify', verifyJWT, (req, res) => {
+    res.json({ message: 'Valid token' });
+});
+
 
 // Route to delete a project by ID (requires valid JWT token)
 app.delete('/projects/:id', verifyJWT, (req, res) => {
@@ -207,31 +249,6 @@ app.delete('/projects/:id', verifyJWT, (req, res) => {
         res.status(404).json({ message: 'Project not found' });
     }
 });
-
-// Route to delete a user and all their projects (requires valid JWT token)
-app.delete('/users/:username', verifyJWT, (req, res) => {
-    const username = req.params.username;
-    const projects = readJSONFile(storageDir+'/projects.json');
-    const userProjects = projects.filter(({ username: u }) => u === username);
-
-    if (userProjects.length > 0) {
-        userProjects.forEach((project) => {
-            fs.unlinkSync(project.path);
-        });
-
-        const updatedProjects = projects.filter(({ username: u }) => u !== username);
-        writeJSONFile(storageDir+'/projects.json', updatedProjects);
-
-        const userDir = path.join(storageDir, username);
-        fs.rmdirSync(userDir);
-
-        res.json({ message: 'User and their projects deleted' });
-    } else {
-        res.status(404).json({ message: 'User not found' });
-    }
-});
-
-
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

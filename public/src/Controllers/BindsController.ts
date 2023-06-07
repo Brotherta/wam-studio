@@ -36,8 +36,7 @@ export default class BindsController {
         this.view.addTrackBindElement(trackBindElement);
 
         this.defineBindListener(bindControl, track);
-        // this.app.presetsController.refreshPresetList(track.tag);
-        // bindControl.advElement.selectPreset("Default");
+        this.app.presetsController.refreshPresetList(track.tag);
     }
 
     removeBindControl(track: Track) {

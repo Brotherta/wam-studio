@@ -1,5 +1,6 @@
 import SaveProjectElement from "../Components/Project/SaveProjectElement";
 import LoadProjectElement from "../Components/Project/LoadProjectElement";
+import LoginElement from "../Components/Project/LoginElement";
 
 
 export default class ProjectView {
@@ -11,6 +12,7 @@ export default class ProjectView {
 
     saveElement: SaveProjectElement;
     loadElement: LoadProjectElement;
+    loginElement: LoginElement;
     newElement: HTMLDivElement;
     manageElement: HTMLDivElement;
 
@@ -24,6 +26,7 @@ export default class ProjectView {
 
         this.saveElement = new SaveProjectElement();
         this.loadElement = new LoadProjectElement();
+        this.loginElement = new LoginElement();
     }
 
     show() {
@@ -53,8 +56,18 @@ export default class ProjectView {
         this.mount.appendChild(this.saveElement);
     }
 
-    mountManage() {
-
+    mountLogin() {
+        this.title.innerText = "Log in";
+        this.mount.innerHTML = "";
+        this.mount.appendChild(this.loginElement);
     }
 
+    updateLogin(isLogged: boolean) {
+        this.loginElement.logInButton.hidden = isLogged;
+        this.loginElement.logOutButton.hidden = !isLogged;
+
+        this.loginElement.usernameForm.style.display = isLogged ? "none" : "flex";
+        this.loginElement.passwordForm.style.display = isLogged ? "none" : "flex";
+        this.title.innerText = isLogged ? "Log out" : "Log in";
+    }
 }
