@@ -1,5 +1,5 @@
 {
-    "name": "Faust Generated WAM",
+    "name": "Octaver",
     "vendor": "Faust IDE",
     "description": "A WAM written in Faust with a generated GUI",
     "version": "1.0.0",
