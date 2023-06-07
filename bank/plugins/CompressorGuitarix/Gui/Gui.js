@@ -13,392 +13,391 @@ import '../../utils/webaudio-controls.js'
         console.log(this._plug);
           
         this._root = this.attachShadow({ mode: 'open' });
-        this._root.innerHTML = `<style>.my-pedal {animation:none 0s ease 0s 1 normal none running;appearance:none;background:linear-gradient(to top, rgb(165, 40, 200), rgb(203, 37, 37)) repeat scroll 0% 0% / auto padding-box border-box, rgba(0, 0, 0, 0) url("https://mainline.i3s.unice.fr/PedalEditor/Back-End/functional-pedals/commonAssets/img/background/metal11.jpg") repeat scroll 0% 0% / 100% 100% padding-box border-box;border:0.8px solid rgb(73, 73, 73);bottom:221.619px;clear:none;clip:auto;color:rgb(33, 37, 41);columns:auto auto;contain:none;container:none;content:normal;cursor:auto;cx:0px;cy:0px;d:none;direction:ltr;display:block;fill:rgb(0, 0, 0);filter:none;flex:0 1 auto;float:none;font:16px / 24px -apple-system, "system-ui", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";gap:normal;grid:none / none / none / row / auto / auto;height:314.6px;hyphens:manual;inset:58.1813px 563.025px 221.619px 212px;isolation:auto;left:212px;margin:2px;marker:none;mask:none;offset:none 0px auto 0deg;opacity:1;order:0;orphans:2;outline:rgb(33, 37, 41) none 0px;overflow:visible;padding:1px;page:auto;perspective:none;position:unset;quotes:auto;r:0px;resize:none;right:563.025px;rotate:none;rx:auto;ry:auto;scale:none;speak:normal;stroke:none;top:58.1813px;transform:matrix(1, 0, 0, 1, -123.585, 0);transition:all 0s ease 0s;translate:none;visibility:visible;widows:2;width:242.575px;x:0px;y:0px;zoom:1;};</style>
-        <div id="CompressorGuitarix" class="resize-drag my-pedal gradiant-target" style="border: medium none; text-align: center; display: grid; vertical-align: baseline; padding: 1px; margin: 2px; box-sizing: border-box; background: linear-gradient(to top, rgb(165, 40, 200), rgb(203, 37, 37)), url(&quot;https://mainline.i3s.unice.fr/PedalEditor/Back-End/functional-pedals/commonAssets/img/background/metal11.jpg&quot;) 0% 0% / 100% 100%; box-shadow: rgba(0, 0, 0, 0.7) 4px 5px 6px, rgba(0, 0, 0, 0.2) -2px -2px 5px 0px inset, rgba(255, 255, 255, 0.2) 3px 1px 1px 4px inset, rgba(0, 0, 0, 0.9) 1px 0px 1px 0px, rgba(0, 0, 0, 0.9) 0px 2px 1px 0px, rgba(0, 0, 0, 0.9) 1px 1px 1px 0px; border-radius: 15px; touch-action: none; width: 242.581px; position: relative; top: 0px; left: 0px; height: 314.602px; transform: none; grid-template-rows: repeat(3, 1fr);" data-x="-123.58500671386719" data-y="0"><label for="CompressorGuitarix" style="display: block; touch-action: none; position: static; z-index: 1; border: medium none; font-family: Skranji; font-size: 23px; -webkit-text-stroke: 1px rgb(108, 109, 39); color: rgb(215, 222, 202); place-self: center;" class="drag" data-x="24.30723447651809" data-y="205.06692295986232" font="Skranji" contenteditable="false">CompressorGT</label><div id="grid" style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);"><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: static; place-self: center;" data-x="160.23912811279297" data-y="-152.86180114746094"><webaudio-knob id="/CompressorGuitarix/Attack" src="/./img/knobs/MiniMoog_Main.png" sprites="100" min="0" max="1" step="0.001" width="40" height="40" style="touch-action: none; display: block;"><style>
-        
-        .webaudioctrl-tooltip{
-          display:inline-block;
-          position:absolute;
-          margin:0 -1000px;
-          z-index: 999;
-          background:#eee;
-          color:#000;
-          border:1px solid #666;
-          border-radius:4px;
-          padding:5px 10px;
-          text-align:center;
-          left:0; top:0;
-          font-size:11px;
-          opacity:0;
-          visibility:hidden;
-        }
-        .webaudioctrl-tooltip:before{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -8px;
-          border: 8px solid transparent;
-          border-top: 8px solid #666;
-        }
-        .webaudioctrl-tooltip:after{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -6px;
-          border: 6px solid transparent;
-          border-top: 6px solid #eee;
-        }
-        
-        webaudio-knob{
-          display:inline-block;
-          position:relative;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          font-family: sans-serif;
-          font-size: 11px;
-        }
-        .webaudio-knob-body{
-          display:inline-block;
-          position:relative;
-          z-index:1;
-          margin:0;
-          padding:0;
-        }
-        </style>
-        <div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;/./img/knobs/MiniMoog_Main.png&quot;); background-size: 40px 4040px; outline: none; width: 40px; height: 40px; background-position: 0px 0px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip" style="display: inline-block; width: auto; height: auto; transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden; left: 995.242px; top: -44px;">0.000</div>
-        </webaudio-knob></div><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: static; place-self: center;" data-x="42.95683288574219" data-y="-69.84754943847656"><webaudio-knob id="/CompressorGuitarix/Knee" src="/./img/knobs/MiniMoog_Main.png" sprites="100" min="0" max="20" step="0.1" width="40" height="40" style="touch-action: none; display: block;"><style>
-        
-        .webaudioctrl-tooltip{
-          display:inline-block;
-          position:absolute;
-          margin:0 -1000px;
-          z-index: 999;
-          background:#eee;
-          color:#000;
-          border:1px solid #666;
-          border-radius:4px;
-          padding:5px 10px;
-          text-align:center;
-          left:0; top:0;
-          font-size:11px;
-          opacity:0;
-          visibility:hidden;
-        }
-        .webaudioctrl-tooltip:before{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -8px;
-          border: 8px solid transparent;
-          border-top: 8px solid #666;
-        }
-        .webaudioctrl-tooltip:after{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -6px;
-          border: 6px solid transparent;
-          border-top: 6px solid #eee;
-        }
-        
-        webaudio-knob{
-          display:inline-block;
-          position:relative;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          font-family: sans-serif;
-          font-size: 11px;
-        }
-        .webaudio-knob-body{
-          display:inline-block;
-          position:relative;
-          z-index:1;
-          margin:0;
-          padding:0;
-        }
-        </style>
-        <div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;/./img/knobs/MiniMoog_Main.png&quot;); background-size: 40px 4040px; outline: none; width: 40px; height: 40px; background-position: 0px -600px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip" style="display: inline-block; width: auto; height: auto; transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden; left: 1001.36px; top: -44px;">0.0</div>
-        </webaudio-knob></div><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: static; place-self: center;" data-x="71.66630554199219" data-y="-232.56246948242188"><webaudio-knob id="/CompressorGuitarix/Ratio" src="/./img/knobs/MiniMoog_Main.png" sprites="100" min="1" max="20" step="0.1" width="40" height="40" style="touch-action: none; display: block;"><style>
-        
-        .webaudioctrl-tooltip{
-          display:inline-block;
-          position:absolute;
-          margin:0 -1000px;
-          z-index: 999;
-          background:#eee;
-          color:#000;
-          border:1px solid #666;
-          border-radius:4px;
-          padding:5px 10px;
-          text-align:center;
-          left:0; top:0;
-          font-size:11px;
-          opacity:0;
-          visibility:hidden;
-        }
-        .webaudioctrl-tooltip:before{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -8px;
-          border: 8px solid transparent;
-          border-top: 8px solid #666;
-        }
-        .webaudioctrl-tooltip:after{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -6px;
-          border: 6px solid transparent;
-          border-top: 6px solid #eee;
-        }
-        
-        webaudio-knob{
-          display:inline-block;
-          position:relative;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          font-family: sans-serif;
-          font-size: 11px;
-        }
-        .webaudio-knob-body{
-          display:inline-block;
-          position:relative;
-          z-index:1;
-          margin:0;
-          padding:0;
-        }
-        </style>
-        <div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;/./img/knobs/MiniMoog_Main.png&quot;); background-size: 40px 4040px; outline: none; width: 40px; height: 40px; background-position: 0px -200px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip" style="display: inline-block; width: auto; height: auto; transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden; left: 1001.36px; top: -44px;">0.0</div>
-        </webaudio-knob></div><label for="Attack" style="text-align: center; display: block; touch-action: none; position: static; z-index: 1; border: medium none; font-family: Skranji; -webkit-text-stroke: 1px rgb(108, 109, 39); color: rgb(215, 222, 202); font-size: 17px; place-self: center;" class="drag" data-x="152.79295349121094" data-y="-152.02780151367188" font="Skranji" contenteditable="false">Attack</label><label for="Knee" style="text-align: center; display: block; touch-action: none; position: static; z-index: 1; border: medium none; font-family: Skranji; -webkit-text-stroke: 1px rgb(108, 109, 39); color: rgb(215, 222, 202); font-size: 17px; place-self: center;" class="drag" data-x="39.34161376953125" data-y="-64.65458679199219" font="Skranji" contenteditable="false">Knee</label><label for="Ratio" style="text-align: center; display: block; touch-action: none; position: static; z-index: 1; border: medium none; font-family: Skranji; -webkit-text-stroke: 1px rgb(108, 109, 39); color: rgb(215, 222, 202); font-size: 17px; place-self: center;" class="drag" data-x="58.94419860839844" data-y="-233.0755844116211" font="Skranji" contenteditable="false">Ratio</label><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: static; place-self: center;" data-x="-0.185699462890625" data-y="-229.85718536376953"><webaudio-knob id="/CompressorGuitarix/Release" src="/./img/knobs/MiniMoog_Main.png" sprites="100" min="0" max="10" step="0.01" width="40" height="40" style="touch-action: none; display: block;"><style>
-        
-        .webaudioctrl-tooltip{
-          display:inline-block;
-          position:absolute;
-          margin:0 -1000px;
-          z-index: 999;
-          background:#eee;
-          color:#000;
-          border:1px solid #666;
-          border-radius:4px;
-          padding:5px 10px;
-          text-align:center;
-          left:0; top:0;
-          font-size:11px;
-          opacity:0;
-          visibility:hidden;
-        }
-        .webaudioctrl-tooltip:before{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -8px;
-          border: 8px solid transparent;
-          border-top: 8px solid #666;
-        }
-        .webaudioctrl-tooltip:after{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -6px;
-          border: 6px solid transparent;
-          border-top: 6px solid #eee;
-        }
-        
-        webaudio-knob{
-          display:inline-block;
-          position:relative;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          font-family: sans-serif;
-          font-size: 11px;
-        }
-        .webaudio-knob-body{
-          display:inline-block;
-          position:relative;
-          z-index:1;
-          margin:0;
-          padding:0;
-        }
-        </style>
-        <div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;/./img/knobs/MiniMoog_Main.png&quot;); background-size: 40px 4040px; outline: none; width: 40px; height: 40px; background-position: 0px -200px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip"></div>
-        </webaudio-knob></div><div class="drag target-style" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: static; place-self: center;" data-x="2.1013031005859375" data-y="-394.30323791503906"><webaudio-knob id="/CompressorGuitarix/Threshold" src="/./img/knobs/MiniMoog_Main.png" sprites="100" min="-96" max="10" step="0.1" width="40" height="40" style="touch-action: none; display: block;"><style>
-        
-        .webaudioctrl-tooltip{
-          display:inline-block;
-          position:absolute;
-          margin:0 -1000px;
-          z-index: 999;
-          background:#eee;
-          color:#000;
-          border:1px solid #666;
-          border-radius:4px;
-          padding:5px 10px;
-          text-align:center;
-          left:0; top:0;
-          font-size:11px;
-          opacity:0;
-          visibility:hidden;
-        }
-        .webaudioctrl-tooltip:before{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -8px;
-          border: 8px solid transparent;
-          border-top: 8px solid #666;
-        }
-        .webaudioctrl-tooltip:after{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -6px;
-          border: 6px solid transparent;
-          border-top: 6px solid #eee;
-        }
-        
-        webaudio-knob{
-          display:inline-block;
-          position:relative;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          font-family: sans-serif;
-          font-size: 11px;
-        }
-        .webaudio-knob-body{
-          display:inline-block;
-          position:relative;
-          z-index:1;
-          margin:0;
-          padding:0;
-        }
-        </style>
-        <div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;/./img/knobs/MiniMoog_Main.png&quot;); background-size: 40px 4040px; outline: none; width: 40px; height: 40px; background-position: 0px -2840px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip" style="display: inline-block; width: auto; height: auto; transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden; left: 1001.36px; top: -44px;">0.0</div>
-        </webaudio-knob></div><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: static; place-self: center;" data-x="139.0149688720703" data-y="39.26655578613281"><webaudio-knob id="/CompressorGuitarix/3-gain/Makeup_Gain" src="/./img/knobs/MiniMoog_Main.png" sprites="100" min="-96" max="96" step="0.1" width="40" height="40" style="touch-action: none; display: block;"><style>
-        
-        .webaudioctrl-tooltip{
-          display:inline-block;
-          position:absolute;
-          margin:0 -1000px;
-          z-index: 999;
-          background:#eee;
-          color:#000;
-          border:1px solid #666;
-          border-radius:4px;
-          padding:5px 10px;
-          text-align:center;
-          left:0; top:0;
-          font-size:11px;
-          opacity:0;
-          visibility:hidden;
-        }
-        .webaudioctrl-tooltip:before{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -8px;
-          border: 8px solid transparent;
-          border-top: 8px solid #666;
-        }
-        .webaudioctrl-tooltip:after{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -6px;
-          border: 6px solid transparent;
-          border-top: 6px solid #eee;
-        }
-        
-        webaudio-knob{
-          display:inline-block;
-          position:relative;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          font-family: sans-serif;
-          font-size: 11px;
-        }
-        .webaudio-knob-body{
-          display:inline-block;
-          position:relative;
-          z-index:1;
-          margin:0;
-          padding:0;
-        }
-        </style>
-        <div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;/./img/knobs/MiniMoog_Main.png&quot;); background-size: 40px 4040px; outline: none; width: 40px; height: 40px; background-position: 0px -2000px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip"></div>
-        </webaudio-knob></div><label for="Release" style="text-align: center; display: block; touch-action: none; position: static; z-index: 1; border: medium none; font-family: Skranji; -webkit-text-stroke: 1px rgb(108, 109, 39); color: rgb(215, 222, 202); font-size: 17px; place-self: center;" class="drag" data-x="-13.810928344726562" data-y="-225.3245849609375" font="Skranji" contenteditable="false">Release</label><label for="Threshold" style="text-align: center; display: block; touch-action: none; position: static; z-index: 1; border: medium none; font-family: Skranji; -webkit-text-stroke: 1px rgb(108, 109, 39); color: rgb(215, 222, 202); font-size: 17px; place-self: center;" class="drag" data-x="-44.207786560058594" data-y="-393.5933074951172" font="Skranji" contenteditable="false">Threshold</label><label for="Makeup Gain" style="text-align: center; display: block; touch-action: none; position: static; z-index: 1; border: medium none; font-family: Skranji; -webkit-text-stroke: 1px rgb(108, 109, 39); color: rgb(215, 222, 202); font-size: 17px; place-self: center;" class="drag" data-x="136.86427307128906" data-y="43.00633239746094" font="Skranji" contenteditable="false">Gain</label></div><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: static; place-self: center;" data-x="83.762451171875" data-y="-240.10812997817993"><webaudio-switch id="/CompressorGuitarix/bypass" src="/./img/switches/switch_1.png" sprites="100" width="42" height="24" style="touch-action: none;"><style>
-        
-        .webaudioctrl-tooltip{
-          display:inline-block;
-          position:absolute;
-          margin:0 -1000px;
-          z-index: 999;
-          background:#eee;
-          color:#000;
-          border:1px solid #666;
-          border-radius:4px;
-          padding:5px 10px;
-          text-align:center;
-          left:0; top:0;
-          font-size:11px;
-          opacity:0;
-          visibility:hidden;
-        }
-        .webaudioctrl-tooltip:before{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -8px;
-          border: 8px solid transparent;
-          border-top: 8px solid #666;
-        }
-        .webaudioctrl-tooltip:after{
-          content: "";
-          position: absolute;
-          top: 100%;
-          left: 50%;
-           margin-left: -6px;
-          border: 6px solid transparent;
-          border-top: 6px solid #eee;
-        }
-        
-        webaudio-switch{
-          display:inline-block;
-          margin:0;
-          padding:0;
-          font-family: sans-serif;
-          font-size: 11px;
-          cursor:pointer;
-        }
-        .webaudio-switch-body{
-          display:inline-block;
-          margin:0;
-          padding:0;
-        }
-        </style>
-        <div class="webaudio-switch-body" tabindex="1" touch-action="none" style="background-image: url(&quot;/./img/switches/switch_1.png&quot;); background-size: 100% 200%; width: 42px; height: 24px; outline: none; background-position: 0px -100%;"><div class="webaudioctrl-tooltip"></div></div>
-        </webaudio-switch></div></div>
+        this.style.display = "inline-flex";
+        this._root.innerHTML = `<style>.my-pedal {animation:none 0s ease 0s 1 normal none running;appearance:none;background:rgb(128, 128, 128) url("https://mainline.i3s.unice.fr/fausteditorweb/dist/PedalEditor/Front-End/img/background/metal6.jpg") repeat scroll 0% 0% / 100% 100% padding-box border-box;border:0.909091px solid rgb(73, 73, 73);bottom:287.749px;clear:none;clip:auto;color:rgb(33, 37, 41);columns:auto auto;contain:none;container:none;content:normal;cursor:auto;cx:0px;cy:0px;d:none;direction:ltr;display:block;fill:rgb(0, 0, 0);filter:none;flex:0 1 auto;float:none;font:16px / 24px -apple-system, "system-ui", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";gap:normal;grid:none / none / none / row / auto / auto;height:349.766px;hyphens:manual;inset:58.4972px 687.251px 287.749px 212px;isolation:auto;left:212px;margin:2px;marker:none;mask:none;offset:none 0px auto 0deg;opacity:1;order:0;orphans:2;outline:rgb(33, 37, 41) none 0px;overflow:visible;padding:1px;page:auto;perspective:none;position:unset;quotes:auto;r:0px;resize:none;right:687.251px;rotate:none;rx:auto;ry:auto;scale:none;speak:normal;stroke:none;top:58.4972px;transform:matrix(1, 0, 0, 1, 0, 0);transition:all 0s ease 0s;translate:none;visibility:visible;widows:2;width:314.034px;x:0px;y:0px;zoom:1;};</style>
+<div id="CompressorGuitarix" class="resize-drag my-pedal gradiant-target" style="border: 1px solid rgb(73, 73, 73); text-align: center; display: inline-block; vertical-align: baseline; padding: 1px; margin: 2px; box-sizing: border-box; background-size: 100% 100%; box-shadow: rgba(0, 0, 0, 0.7) 4px 5px 6px, rgba(0, 0, 0, 0.2) -2px -2px 5px 0px inset, rgba(255, 255, 255, 0.2) 3px 1px 1px 4px inset, rgba(0, 0, 0, 0.9) 1px 0px 1px 0px, rgba(0, 0, 0, 0.9) 0px 2px 1px 0px, rgba(0, 0, 0, 0.9) 1px 1px 1px 0px; border-radius: 15px; background-color: grey; touch-action: none; width: 314.034px; position: relative; top: 0px; left: 0px; height: 349.771px; transform: translate(0px, 0px); background-image: url(&quot;./img/background/metal6.jpg&quot;);" data-x="0" data-y="0"><div id="CompressorGuitarix" class="resize-drag" style="border: 1px solid rgb(73, 73, 73); text-align: center; display: none; vertical-align: baseline; padding: 1px; margin: 2px; box-sizing: border-box; background-size: 100% 100%; border-radius: 15px; background-color: transparent; touch-action: none; width: 85.9943px; position: absolute; top: 32.8835px; left: 4.98863px; height: 140.455px; background-image: url(&quot;./img/background/metal14.jpg&quot;); transform: translate(198.586px, 225.547px);" data-x="198.58590698242188" data-y="225.54715728759766"></div><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: absolute; top: 68.777px; left: 8.88635px; width: 51px; height: 102.663px; transform: translate(176.327px, 30.8408px);" data-x="176.32675170898438" data-y="30.84075927734375"><webaudio-knob id="/CompressorGuitarix/3-gain/Makeup_Gain" src="./img/knobs/simplegray.png" sprites="100" min="-96" max="96" step="0.1" width="51" height="51" style="touch-action: none; display: block;"><style>
 
-        `;
+.webaudioctrl-tooltip{
+  display:inline-block;
+  position:absolute;
+  margin:0 -1000px;
+  z-index: 999;
+  background:#eee;
+  color:#000;
+  border:1px solid #666;
+  border-radius:4px;
+  padding:5px 10px;
+  text-align:center;
+  left:0; top:0;
+  font-size:11px;
+  opacity:0;
+  visibility:hidden;
+}
+.webaudioctrl-tooltip:before{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -8px;
+	border: 8px solid transparent;
+	border-top: 8px solid #666;
+}
+.webaudioctrl-tooltip:after{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -6px;
+	border: 6px solid transparent;
+	border-top: 6px solid #eee;
+}
+
+webaudio-knob{
+  display:inline-block;
+  position:relative;
+  margin:0;
+  padding:0;
+  cursor:pointer;
+  font-family: sans-serif;
+  font-size: 11px;
+}
+.webaudio-knob-body{
+  display:inline-block;
+  position:relative;
+  z-index:1;
+  margin:0;
+  padding:0;
+}
+</style>
+<div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;./img/knobs/simplegray.png&quot;); background-size: 51px 5151px; outline: none; width: 51px; height: 51px; background-position: 0px -5100px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip" style="display: inline-block; width: auto; height: auto; transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden; left: 1002.89px; top: -36.3168px;">96.0</div>
+</webaudio-knob></div><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: absolute; top: 177.328px; left: 2.73579px; width: 51px; height: 78.6648px; transform: translate(160.62px, -158.21px);" data-x="160.62042236328125" data-y="-158.2104949951172"><webaudio-knob id="/CompressorGuitarix/Attack" src="./img/knobs/simplegray.png" sprites="100" min="0" max="1" step="0.001" width="51" height="51" style="touch-action: none; display: block;"><style>
+
+.webaudioctrl-tooltip{
+  display:inline-block;
+  position:absolute;
+  margin:0 -1000px;
+  z-index: 999;
+  background:#eee;
+  color:#000;
+  border:1px solid #666;
+  border-radius:4px;
+  padding:5px 10px;
+  text-align:center;
+  left:0; top:0;
+  font-size:11px;
+  opacity:0;
+  visibility:hidden;
+}
+.webaudioctrl-tooltip:before{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -8px;
+	border: 8px solid transparent;
+	border-top: 8px solid #666;
+}
+.webaudioctrl-tooltip:after{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -6px;
+	border: 6px solid transparent;
+	border-top: 6px solid #eee;
+}
+
+webaudio-knob{
+  display:inline-block;
+  position:relative;
+  margin:0;
+  padding:0;
+  cursor:pointer;
+  font-family: sans-serif;
+  font-size: 11px;
+}
+.webaudio-knob-body{
+  display:inline-block;
+  position:relative;
+  z-index:1;
+  margin:0;
+  padding:0;
+}
+</style>
+<div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;./img/knobs/simplegray.png&quot;); background-size: 51px 5151px; outline: none; width: 51px; height: 51px; background-position: 0px -5100px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip" style="display: inline-block; width: auto; height: auto; transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden; left: 999.83px; top: -36.3168px;">1.000</div>
+</webaudio-knob></div><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: absolute; top: 177.328px; left: 53.2472px; width: 51px; height: 78.6648px; transform: translate(17.6566px, -75.5198px);" data-x="17.656646728515625" data-y="-75.51979064941406"><webaudio-knob id="/CompressorGuitarix/Knee" src="./img/knobs/simplegray.png" sprites="100" min="0" max="20" step="0.1" width="51" height="51" style="touch-action: none; display: block;"><style>
+
+.webaudioctrl-tooltip{
+  display:inline-block;
+  position:absolute;
+  margin:0 -1000px;
+  z-index: 999;
+  background:#eee;
+  color:#000;
+  border:1px solid #666;
+  border-radius:4px;
+  padding:5px 10px;
+  text-align:center;
+  left:0; top:0;
+  font-size:11px;
+  opacity:0;
+  visibility:hidden;
+}
+.webaudioctrl-tooltip:before{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -8px;
+	border: 8px solid transparent;
+	border-top: 8px solid #666;
+}
+.webaudioctrl-tooltip:after{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -6px;
+	border: 6px solid transparent;
+	border-top: 6px solid #eee;
+}
+
+webaudio-knob{
+  display:inline-block;
+  position:relative;
+  margin:0;
+  padding:0;
+  cursor:pointer;
+  font-family: sans-serif;
+  font-size: 11px;
+}
+.webaudio-knob-body{
+  display:inline-block;
+  position:relative;
+  z-index:1;
+  margin:0;
+  padding:0;
+}
+</style>
+<div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;./img/knobs/simplegray.png&quot;); background-size: 51px 5151px; outline: none; width: 51px; height: 51px; background-position: 0px -3672px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip" style="display: inline-block; width: auto; height: auto; transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden; left: 1002.89px; top: -36.3168px;">14.4</div>
+</webaudio-knob></div><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: absolute; top: 257.982px; left: 27.9915px; width: 51px; height: 78.6648px; transform: translate(1.90308px, -237.8px);" data-x="1.903076171875" data-y="-237.79978942871094"><webaudio-knob id="/CompressorGuitarix/Ratio" src="./img/knobs/simplegray.png" sprites="100" min="1" max="20" step="0.1" width="51" height="51" style="touch-action: none; display: block;"><style>
+
+.webaudioctrl-tooltip{
+  display:inline-block;
+  position:absolute;
+  margin:0 -1000px;
+  z-index: 999;
+  background:#eee;
+  color:#000;
+  border:1px solid #666;
+  border-radius:4px;
+  padding:5px 10px;
+  text-align:center;
+  left:0; top:0;
+  font-size:11px;
+  opacity:0;
+  visibility:hidden;
+}
+.webaudioctrl-tooltip:before{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -8px;
+	border: 8px solid transparent;
+	border-top: 8px solid #666;
+}
+.webaudioctrl-tooltip:after{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -6px;
+	border: 6px solid transparent;
+	border-top: 6px solid #eee;
+}
+
+webaudio-knob{
+  display:inline-block;
+  position:relative;
+  margin:0;
+  padding:0;
+  cursor:pointer;
+  font-family: sans-serif;
+  font-size: 11px;
+}
+.webaudio-knob-body{
+  display:inline-block;
+  position:relative;
+  z-index:1;
+  margin:0;
+  padding:0;
+}
+</style>
+<div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;./img/knobs/simplegray.png&quot;); background-size: 51px 5151px; outline: none; width: 51px; height: 51px; background-position: 0px -5100px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip" style="display: inline-block; width: auto; height: auto; transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden; left: 998.384px; top: -36.3168px;">20.0</div>
+</webaudio-knob></div><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: absolute; top: 338.635px; left: 19.6392px; width: 51px; height: 78.6648px; transform: translate(211.797px, -322.786px);" data-x="211.7965087890625" data-y="-322.78589630126953"><webaudio-knob id="/CompressorGuitarix/Release" src="./img/knobs/simplegray.png" sprites="100" min="0" max="10" step="0.01" width="51" height="51" style="touch-action: none; display: block;"><style>
+
+.webaudioctrl-tooltip{
+  display:inline-block;
+  position:absolute;
+  margin:0 -1000px;
+  z-index: 999;
+  background:#eee;
+  color:#000;
+  border:1px solid #666;
+  border-radius:4px;
+  padding:5px 10px;
+  text-align:center;
+  left:0; top:0;
+  font-size:11px;
+  opacity:0;
+  visibility:hidden;
+}
+.webaudioctrl-tooltip:before{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -8px;
+	border: 8px solid transparent;
+	border-top: 8px solid #666;
+}
+.webaudioctrl-tooltip:after{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -6px;
+	border: 6px solid transparent;
+	border-top: 6px solid #eee;
+}
+
+webaudio-knob{
+  display:inline-block;
+  position:relative;
+  margin:0;
+  padding:0;
+  cursor:pointer;
+  font-family: sans-serif;
+  font-size: 11px;
+}
+.webaudio-knob-body{
+  display:inline-block;
+  position:relative;
+  z-index:1;
+  margin:0;
+  padding:0;
+}
+</style>
+<div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;./img/knobs/simplegray.png&quot;); background-size: 51px 5151px; outline: none; width: 51px; height: 51px; background-position: 0px -5100px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip" style="display: inline-block; width: auto; height: auto; transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden; left: 999.83px; top: -36.3168px;">10.00</div>
+</webaudio-knob></div><div class="drag target-style" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: absolute; top: 419.288px; left: 11.5639px; width: 51px; height: 78.6648px; transform: translate(84.3221px, -402.246px);" data-x="84.32211303710938" data-y="-402.24629974365234"><webaudio-knob id="/CompressorGuitarix/Threshold" src="./img/knobs/simplegray.png" sprites="100" min="-96" max="10" step="0.1" width="51" height="51" style="touch-action: none; display: block;"><style>
+
+.webaudioctrl-tooltip{
+  display:inline-block;
+  position:absolute;
+  margin:0 -1000px;
+  z-index: 999;
+  background:#eee;
+  color:#000;
+  border:1px solid #666;
+  border-radius:4px;
+  padding:5px 10px;
+  text-align:center;
+  left:0; top:0;
+  font-size:11px;
+  opacity:0;
+  visibility:hidden;
+}
+.webaudioctrl-tooltip:before{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -8px;
+	border: 8px solid transparent;
+	border-top: 8px solid #666;
+}
+.webaudioctrl-tooltip:after{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -6px;
+	border: 6px solid transparent;
+	border-top: 6px solid #eee;
+}
+
+webaudio-knob{
+  display:inline-block;
+  position:relative;
+  margin:0;
+  padding:0;
+  cursor:pointer;
+  font-family: sans-serif;
+  font-size: 11px;
+}
+.webaudio-knob-body{
+  display:inline-block;
+  position:relative;
+  z-index:1;
+  margin:0;
+  padding:0;
+}
+</style>
+<div class="webaudio-knob-body" tabindex="1" touch-action="none" style="background-image: url(&quot;./img/knobs/simplegray.png&quot;); background-size: 51px 5151px; outline: none; width: 51px; height: 51px; background-position: 0px -5100px; transform: rotate(0deg);"></div><div class="webaudioctrl-tooltip" style="display: inline-block; width: auto; height: auto; transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden; left: 1002.89px; top: -36.3168px;">10.0</div>
+</webaudio-knob></div><div class="drag" style="padding: 1px; margin: 1px; text-align: center; display: inline-block; box-sizing: border-box; touch-action: none; position: absolute; top: 499.942px; left: 15.9957px; width: 65.9872px; height: 80.2557px; transform: translate(96.264px, -307.639px);" data-x="96.26397705078125" data-y="-307.6394348144531"><webaudio-switch id="/CompressorGuitarix/bypass" src="./img/switches/switch_1.png" sprites="100" width="64" height="40" style="touch-action: none;"><style>
+
+.webaudioctrl-tooltip{
+  display:inline-block;
+  position:absolute;
+  margin:0 -1000px;
+  z-index: 999;
+  background:#eee;
+  color:#000;
+  border:1px solid #666;
+  border-radius:4px;
+  padding:5px 10px;
+  text-align:center;
+  left:0; top:0;
+  font-size:11px;
+  opacity:0;
+  visibility:hidden;
+}
+.webaudioctrl-tooltip:before{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -8px;
+	border: 8px solid transparent;
+	border-top: 8px solid #666;
+}
+.webaudioctrl-tooltip:after{
+  content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -6px;
+	border: 6px solid transparent;
+	border-top: 6px solid #eee;
+}
+
+webaudio-switch{
+  display:inline-block;
+  margin:0;
+  padding:0;
+  font-family: sans-serif;
+  font-size: 11px;
+  cursor:pointer;
+}
+.webaudio-switch-body{
+  display:inline-block;
+  margin:0;
+  padding:0;
+}
+</style>
+<div class="webaudio-switch-body" tabindex="1" touch-action="none" style="background-image: url(&quot;./img/switches/switch_1.png&quot;); background-size: 100% 200%; width: 64px; height: 40px; outline: none; background-position: 0px -100%;"><div class="webaudioctrl-tooltip" style="transition: opacity 0.1s ease 0s, visibility 0.1s ease 0s; opacity: 0; visibility: hidden;"></div></div>
+</webaudio-switch></div><label for="CompressorGuitarix" style="display: block; touch-action: none; position: absolute; z-index: 1; width: 310px; left: 1.89488px; top: 4.39346px; transform: translate(2.62473px, 242.828px); border: none; color: rgb(226, 255, 5); font-family: &quot;Gloria Hallelujah&quot;; font-size: 33px;" class="drag" contenteditable="false" data-x="2.624725341796875" data-y="242.82803344726562" font="Gloria Hallelujah">GCompressor</label><label for="3-gain" style="display: none; touch-action: none; position: absolute; z-index: 1; width: 82.1875px; left: 9.78551px; top: 40.1818px; border: none; color: rgb(226, 255, 5); font-family: &quot;Gloria Hallelujah&quot;;" class="drag" contenteditable="false" font="Gloria Hallelujah">3-gain</label><label for="Makeup Gain" style="text-align: center; display: block; touch-action: none; position: absolute; z-index: 1; width: 100px; left: 11.7741px; top: 118.839px; transform: translate(149.631px, 31.4506px); border: none; color: rgb(226, 255, 5); font-family: &quot;Gloria Hallelujah&quot;;" class="drag" contenteditable="false" data-x="149.630859375" data-y="31.450637817382812" font="Gloria Hallelujah">Makeup Gain</label><label for="Attack" style="text-align: center; display: block; touch-action: none; position: absolute; z-index: 1; width: 130px; left: 5.62357px; top: 227.391px; transform: translate(122.659px, -154.335px); border: none; color: rgb(226, 255, 5); font-family: &quot;Gloria Hallelujah&quot;;" class="drag" contenteditable="false" data-x="122.65879821777344" data-y="-154.33460998535156" font="Gloria Hallelujah">Attack</label><label for="Knee" style="text-align: center; display: block; touch-action: none; position: absolute; z-index: 1; width: 40px; left: 56.1349px; top: 227.391px; transform: translate(22.3262px, -76.2469px); border: none; color: rgb(226, 255, 5); font-family: &quot;Gloria Hallelujah&quot;;" class="drag" contenteditable="false" data-x="22.326171875" data-y="-76.2469482421875" font="Gloria Hallelujah">Knee</label><label for="Ratio" style="text-align: center; display: block; touch-action: none; position: absolute; z-index: 1; width: 120px; left: 30.8793px; top: 308.044px; transform: translate(-38.2612px, -236.247px); border: none; color: rgb(226, 255, 5); font-family: &quot;Gloria Hallelujah&quot;;" class="drag" contenteditable="false" data-x="-38.261199951171875" data-y="-236.24667358398438" font="Gloria Hallelujah">Ratio</label><label for="Release" style="text-align: center; display: block; touch-action: none; position: absolute; z-index: 1; width: 130px; left: 22.527px; top: 388.697px; transform: translate(169.121px, -316.648px); border: none; color: rgb(226, 255, 5); font-family: &quot;Gloria Hallelujah&quot;;" class="drag" contenteditable="false" data-x="169.12115478515625" data-y="-316.6483459472656" font="Gloria Hallelujah">Release</label><label for="Threshold" style="text-align: center; display: block; touch-action: none; position: absolute; z-index: 1; width: 90px; left: 14.4517px; top: 469.351px; transform: translate(61.5662px, -396.79px); border: none; color: rgb(226, 255, 5); font-family: &quot;Gloria Hallelujah&quot;;" class="drag" contenteditable="false" data-x="61.566192626953125" data-y="-396.7900390625" font="Gloria Hallelujah">Threshold</label><label for="bypass" style="text-align: center; display: none; touch-action: none; position: absolute; z-index: 1; width: 63.9986px; left: 18.8835px; top: 551.595px; border: none; color: rgb(226, 255, 5); font-family: &quot;Gloria Hallelujah&quot;;" class="drag" contenteditable="false" font="Gloria Hallelujah">bypass</label></div>`;
   
         this.isOn;
             this.state = new Object();

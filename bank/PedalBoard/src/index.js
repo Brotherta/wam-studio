@@ -140,10 +140,4 @@ export default class PedalBoardPlugin extends WebAudioModule {
   createGui() {
     return createElement(this);
   }
-
-  testFunction() {
-    console.log("COUCOCU P D QEFH MIFHMQLEFHQLZI");
-    
-  }
-
 }

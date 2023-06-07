@@ -10,8 +10,8 @@ declare copyright 	"(c)GRAME 2006";
 
 import("stdfaust.lib");
 
-ps(nbSemiTones) = ef.transpose(4000, 
-    4000,
+ps(nbSemiTones) = ef.transpose(1000,
+    1000,
     nbSemiTones
 );
 
