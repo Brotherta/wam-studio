@@ -51,9 +51,11 @@ export default class BindsController {
         bindControl.advElement.presetsSelect.onchange = async () => {
             bindControl.trackBindElement.selectPresets(bindControl.advElement.presetsSelect.value);
             await this.app.presetsController.changePreset(bindControl, track);
+            this.app.projectController.saved = false;
         }
         bindControl.advElement.savePresetBtn.onclick = async () => {
             await this.app.presetsController.savePreset(bindControl, track);
+            this.app.projectController.saved = false;
         }
         bindControl.advElement.deletePresetBtn.onclick = async () => {
             await this.app.presetsController.deletePreset(bindControl, track);
@@ -65,22 +67,28 @@ export default class BindsController {
             if (!bind) return;
             track.bindControl.advElement.bindsSelect.value = bind!.name;
             await this.selectBind(track);
+            this.app.projectController.saved = false;
         }
         bindControl.advElement.removeBindBtn.onclick = async () => {
             await this.deleteBind(track);
+            this.app.projectController.saved = false;
         }
         bindControl.advElement.refreshParamBtn.onclick = async () => {
             await this.refreshParam(track);
+            this.app.projectController.saved = false;
         }
         bindControl.advElement.bindsSelect.onchange = async () => {
             await this.selectBind(track);
+            this.app.projectController.saved = false;
         }
         bindControl.advElement.addParamBtn.onclick = async () => {
             await this.createParameter(track);
+            this.app.projectController.saved = false;
         }
         bindControl.trackBindElement.presetsSelect.onchange = async () => {
             bindControl.advElement.selectPreset(bindControl.trackBindElement.presetsSelect.value);
             await this.app.presetsController.changePreset(bindControl, track);
+            this.app.projectController.saved = false;
         }
     }
 
@@ -115,6 +123,7 @@ export default class BindsController {
         slider.slider.oninput = async () => {
             console.log("slider input " + slider.slider.value);
             await this.updateBindValue(track, bind, slider.slider.value);
+            this.app.projectController.saved = false;
         }
 
         bindControl.advElement.addBindOption(name!);
@@ -235,15 +244,19 @@ export default class BindsController {
 
         parameterElement.deleteBtn.onclick = async () => {
             await this.deleteParameter(track, bind!, parameterElement);
+            this.app.projectController.saved = false;
         }
         parameterElement.options.onchange = async () => {
             await this.updateParameter(track, bind!, parameterElement);
+            this.app.projectController.saved = false;
         }
         parameterElement.minInput.onchange = async () => {
             this.verifyNumber(parameterElement, true);
+            this.app.projectController.saved = false;
         }
         parameterElement.maxInput.onchange = async () => {
             this.verifyNumber(parameterElement);
+            this.app.projectController.saved = false;
         }
 
         return parameterElement;

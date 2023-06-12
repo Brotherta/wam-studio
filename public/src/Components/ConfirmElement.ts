@@ -19,15 +19,15 @@ template.innerHTML = /*html*/`
 }
 
 .form-element {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    align-items: center;
-    margin: 5px;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-evenly;
+	align-items: center;
+	margin: 5px;
+	max-width: 300px;
 }
-
 
 button {
     margin: 5px;
@@ -67,7 +67,7 @@ export default class ConfirmElement extends HTMLElement {
     connectedCallback() {
         if (!this.initialized) {
             this.shadowRoot?.appendChild(template.content.cloneNode(true));
-
+            this.initialized = true;
         }
     }
 

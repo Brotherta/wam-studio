@@ -14,6 +14,7 @@ export default class PresetsController {
 
     app: App;
     presets: Map<SongTagEnum, Preset[]>
+    presetsSet = new Set<string>();
 
     constructor(app: App) {
         this.app = app;
@@ -58,8 +59,7 @@ export default class PresetsController {
                         this.addPreset(newPreset, tag);
                     }
                 }
-
-                this.updateGlobalPresetList(new Set<string>().add("Default"));
+                this.presetsSet.add("Default");
             }
         });
     }
@@ -260,23 +260,18 @@ export default class PresetsController {
      * @param tag
      */
     refreshPresetList(tag: SongTagEnum) {
-        let presetsSet = new Set<string>();
-
-
         for (let track of this.app.tracks.trackList) {
             let bindControl = track.bindControl;
-            if (bindControl.tag != tag) continue;
+            if (!bindControl || bindControl.tag != tag) continue;
 
             let presets = this.presets.get(tag)!;
             bindControl.advElement.refreshPresetsOptions(presets);
             bindControl.trackBindElement.refreshPresetsOptions(presets);
 
             for (let preset of presets) {
-                presetsSet.add(preset.name);
+                this.presetsSet.add(preset.name);
             }
         }
-
-        this.updateGlobalPresetList(presetsSet);
     }
 
     /**
@@ -284,10 +279,10 @@ export default class PresetsController {
      *
      * @param presetsSet
      */
-    updateGlobalPresetList(presetsSet: Set<string>) {
+    updateGlobalPresetList() {
         this.app.hostView.presetsDropdown.innerHTML = "";
 
-        for (let presetString of presetsSet) {
+        for (let presetString of this.presetsSet) {
 
             let a = document.createElement("a");
             a.innerText = presetString;

@@ -29,6 +29,7 @@ export default class ProjectView {
         this.saveElement = new SaveProjectElement();
         this.loadElement = new LoadProjectElement();
         this.loginElement = new LoginElement();
+        this.confirmElement = new ConfirmElement();
     }
 
     show() {

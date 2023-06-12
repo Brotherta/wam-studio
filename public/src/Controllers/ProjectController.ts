@@ -5,7 +5,7 @@ import {BACKEND_URL} from "../Env";
 export default class ProjectController {
 
     app: App;
-    saved: boolean = false;
+    saved: boolean = true;
     inProject: boolean = false;
     projectId: string = "";
     projectName: string = "";
@@ -168,10 +168,10 @@ export default class ProjectController {
     }
 
     async newProject() {
-        await this.app.loader.loadProject({
-            "tracks": [],
-            "trackIdCount": 1
-        });
+        // await this.app.loader.loadProject({
+        //     "tracks": [],
+        //     "trackIdCount": 1
+        // });
     }
 
     async saveProject(override: boolean = false) {

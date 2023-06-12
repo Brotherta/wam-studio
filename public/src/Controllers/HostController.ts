@@ -164,19 +164,20 @@ export default class HostController {
             let name = song.name;
             let el = this.hostView.createNewSongItem(name);
             el.onclick = () => {
-                // this.app.projectController.openConfirm(
-                //     ""
-                // )
-                this.app.hostView.headerTitle.innerHTML = name;
-                for (let trackSong of song.songs) {
-                    this.app.tracks.newTrackUrl(trackSong)
-                        .then(async track => {
-                            if (track !== undefined) {
-                                await this.app.tracksController.initTrackComponents(track);
-                            }
-                        });
+                if (!this.app.projectController.saved) {
+                    this.app.projectController.openConfirm(
+                        "If you open a new project, you will lose all your unsaved changes. Do you want to continue ?",
+                        () => {
+                            this.app.tracksController.openSong(song, name);
+                            this.app.projectController.saved = false;
+                        },
+                        () => { }
+                    )
                 }
-                this.app.bindsView.reorderControls(this.app.tracks.trackList);
+                else {
+                    this.app.tracksController.openSong(song, name);
+                    this.app.projectController.saved = false;
+                }
             }
         })
     }
@@ -246,6 +247,9 @@ export default class HostController {
         }
         this.app.hostView.switchMode.onclick = () => {
             this.switchMode();
+        }
+        this.app.hostView.presetsBtn.onclick = () => {
+            this.app.presetsController.updateGlobalPresetList();
         }
     }
 
@@ -322,7 +326,6 @@ export default class HostController {
     switchMode() {
         this.advancedMode = !this.advancedMode;
         localStorage.setItem('advancedMode', this.advancedMode.toString());
-        console.log("qdv", this.advancedMode)
 
         let advanced = document.getElementsByClassName('advanced');
         for (let element of advanced) {
