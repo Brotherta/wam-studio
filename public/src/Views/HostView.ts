@@ -40,6 +40,7 @@ export default class HostView {
     syncPresets = document.getElementById("sync-presets") as HTMLInputElement;
     newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
     importInput: HTMLInputElement = document.getElementById("import-input") as HTMLInputElement;
+    switchMode = document.getElementById("switch-mode") as HTMLDivElement;
 
 
     /**

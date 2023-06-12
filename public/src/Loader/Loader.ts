@@ -9,6 +9,18 @@ export default class Loader {
     }
 
     async saveProject() {
+        let tracks = [];
+        for (let track of this.app.tracks.trackList) {
+                let hasPlugin = track.plugin.initialized;
+                let pluginState = null;
+
+                if (hasPlugin) {
+                    pluginState = await track.plugin.instance!._audioNode.getState();
+                }
+
+                let binds = [];
+
+        }
         // let tracks = [];
         // for (let track of this.app.tracks.trackList) {
         //     let hasPlugin = track.plugin.initialized;

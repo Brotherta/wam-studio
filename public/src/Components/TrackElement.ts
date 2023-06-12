@@ -170,11 +170,11 @@ template.innerHTML = /*html*/`
     <div class="track-header">
         <input id="name-input" class="track-name">
         
-        <div id="settings-btn">
+        <div id="settings-btn" class="advanced">
             <img class="settings-icon">
         </div>
         
-        <div id="close-btn" class="track-close">
+        <div id="close-btn" class="track-close advanced">
             <img src="/icons/x-circle-fill.svg">
         </div>
       
@@ -384,5 +384,20 @@ export default class TrackElement extends HTMLElement {
     unArm() {
         this.armBtn.style.filter = "none";
         this.isArmed = false;
+    }
+
+    switchMode(advancedMode: boolean) {
+        let advancedControls = this.shadowRoot?.querySelectorAll(".advanced");
+        console.log("advanced", advancedControls, advancedMode)
+        if (advancedControls === undefined) {
+            return;
+        }
+        for (let element of advancedControls) {
+            if (advancedMode) {
+                element.removeAttribute("hidden");
+            } else {
+                element.setAttribute("hidden", "");
+            }
+        }
     }
 }

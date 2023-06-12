@@ -14,6 +14,7 @@ import BindSliderElement from "./Components/Binds/BindSliderElement";
 import ParameterElement from "./Components/Binds/ParameterElement";
 import TrackBindElement from "./Components/Binds/TrackBindElement";
 import LoginElement from "./Components/Project/LoginElement";
+import ConfirmElement from "./Components/ConfirmElement";
 
 customElements.define(
     "track-element",
@@ -51,6 +52,10 @@ customElements.define(
 customElements.define(
     "track-bind-element",
     TrackBindElement
+);
+customElements.define(
+    "confirm-element",
+    ConfirmElement
 );
 
 const audioCtx = new AudioContext();

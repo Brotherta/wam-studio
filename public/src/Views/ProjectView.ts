@@ -1,6 +1,7 @@
 import SaveProjectElement from "../Components/Project/SaveProjectElement";
 import LoadProjectElement from "../Components/Project/LoadProjectElement";
 import LoginElement from "../Components/Project/LoginElement";
+import ConfirmElement from "../Components/ConfirmElement";
 
 
 export default class ProjectView {
@@ -15,6 +16,7 @@ export default class ProjectView {
     loginElement: LoginElement;
     newElement: HTMLDivElement;
     manageElement: HTMLDivElement;
+    confirmElement: ConfirmElement;
 
 
     constructor() {
@@ -60,6 +62,12 @@ export default class ProjectView {
         this.title.innerText = "Log in";
         this.mount.innerHTML = "";
         this.mount.appendChild(this.loginElement);
+    }
+
+    mountConfirm() {
+        this.title.innerText = "Confirm";
+        this.mount.innerHTML = "";
+        this.mount.appendChild(this.confirmElement);
     }
 
     updateLogin(isLogged: boolean) {

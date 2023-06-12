@@ -37,7 +37,8 @@ export default class TracksController {
     addNewTrackInit(track: Track) {
         this.tracksView.addTrack(track.element);
         this.tracksView.changeColor(track);
-        this.defineTrackListener(track); 
+        this.defineTrackListener(track);
+        track.element.switchMode(this.app.hostController.advancedMode);
     }
 
     /**

@@ -41,6 +41,12 @@ export default class ProjectController {
         this.app.projectView.show();
     }
 
+    openConfirm(message: string, confirm: () => void, cancel: () => void) {
+        this.app.projectView.mountConfirm();
+        this.initConfirm(message, confirm, cancel);
+        this.app.projectView.show();
+    }
+
     async initSaveProject() {
         if (this.inProject) {
             this.app.projectView.saveElement.user.value = this.projectUser;
@@ -147,6 +153,18 @@ export default class ProjectController {
 
         await this.newProject();
         await this.saveProject();
+    }
+
+    initConfirm(message: string, confirm: () => void, cancel: () => void) {
+        this.app.projectView.confirmElement.setMessage(message);
+        this.app.projectView.confirmElement.confirmButton.onclick = () => {
+            confirm();
+            this.app.projectView.close();
+        }
+        this.app.projectView.confirmElement.cancelButton.onclick = () => {
+            cancel();
+            this.app.projectView.close();
+        }
     }
 
     async newProject() {
@@ -288,4 +306,6 @@ export default class ProjectController {
             this.isLogged = false;
         }
     }
+
+
 }

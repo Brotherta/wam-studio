@@ -28,23 +28,28 @@
 					<div class="dropdown-divider"></div>
 
 					<a class="dropdown-item" id="load-project">Load Project</a>
-					<a class="dropdown-item" id="save-project">Save Project</a>
+					<a class="dropdown-item advanced" id="save-project" hidden>Save Project</a>
 
 					<div class="dropdown-divider"></div>
 
-					<a class="dropdown-item" id="import-project" hidden>Import Project</a>
+					<a class="dropdown-item advanced" id="import-project" hidden>Import Project</a>
 					<input id="import-input" type="file" accept=".json" style="display: none">
-					<a class="dropdown-item" id="export-project" hidden>Export Project</a>
+					<a class="dropdown-item advanced" id="export-project" hidden>Export Project</a>
 
 					<div class="dropdown-divider"></div>
 
-					<a class="dropdown-item" id="import-songs" hidden>Import Song files</a>
+					<a class="dropdown-item" id="import-songs">Import Song files</a>
 					<input id="new-track-input" type="file" accept=".mp3, .wav, .ogg" multiple style="display: none" hidden>
 
-					<a class="dropdown-item" id="sync-presets">Sync Presets</a>
-					<a class="dropdown-item" id="login">Log in</a>
+					<a class="dropdown-item advanced" id="sync-presets" hidden>Sync Presets</a>
+					<a class="dropdown-item advanced" id="login" hidden>Log in</a>
+
+					<div class="dropdown-divider"></div>
+
+					<a class="dropdown-item" id="switch-mode">Switch mode</a>
 
 				</div>
+
 				<div id="back-btn" class="menu-item">
 					<span class="mytooltip">Restart</span>
 					<img src="/icons/skip-start-fill.svg">

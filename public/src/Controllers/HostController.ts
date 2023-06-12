@@ -24,13 +24,18 @@ export default class HostController {
 
     maxTime: number;
 
+    advancedMode: boolean = false;
+
     constructor(app: App) {
         this.app = app;
         this.hostView = app.hostView;
         this.audioCtx = app.tracks.audioCtx;
         this.maxTime = 300000;
-        
+
         this.defineControls();
+        this.advancedMode = localStorage.getItem("advancedMode") === "true";
+        localStorage.setItem("advancedMode", this.advancedMode.toString());
+        this.switchMode();
     }
 
     /**
@@ -159,6 +164,9 @@ export default class HostController {
             let name = song.name;
             let el = this.hostView.createNewSongItem(name);
             el.onclick = () => {
+                // this.app.projectController.openConfirm(
+                //     ""
+                // )
                 this.app.hostView.headerTitle.innerHTML = name;
                 for (let trackSong of song.songs) {
                     this.app.tracks.newTrackUrl(trackSong)
@@ -236,6 +244,9 @@ export default class HostController {
                 reader.readAsText(file);
             }
         }
+        this.app.hostView.switchMode.onclick = () => {
+            this.switchMode();
+        }
     }
 
     /**
@@ -309,13 +320,22 @@ export default class HostController {
     }
 
     switchMode() {
-        // let currentMode = "advanced" = this.app
-        // if (currentMode === "eazy") {
-        //
-        // }
-        // else (currentMode === "offline") {
-        //
-        // }
+        this.advancedMode = !this.advancedMode;
+        localStorage.setItem('advancedMode', this.advancedMode.toString());
+        console.log("qdv", this.advancedMode)
+
+        let advanced = document.getElementsByClassName('advanced');
+        for (let element of advanced) {
+            if (this.advancedMode) {
+                element.removeAttribute('hidden')
+            }
+            else {
+                element.setAttribute('hidden', "")
+            }
+        }
+        for (let track of this.app.tracks.trackList) {
+            track.element.switchMode(this.advancedMode);
+        }
     }
 }
 

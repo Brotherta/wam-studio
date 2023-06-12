@@ -28,8 +28,6 @@ export default class Host extends Track {
     hostNode: AudioPlayerNode | undefined;
     override gainNode: GainNode;
 
-    mode: string = "advanced"
-
     constructor(app: App) {
         super(-1, new TrackElement(), undefined);
         this.app = app;
