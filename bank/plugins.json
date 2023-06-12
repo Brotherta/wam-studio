@@ -2,6 +2,7 @@
   "Octaver",
   "CompressorGuitarix",
   "graphicEqualizer",
+  "greyhole",
   "disto_machine/src",
   "GuitarAmpSim60s",
   "StonePhaserStereo",
@@ -17,7 +18,7 @@
   "OwlDirty",
   "Kpp_fuzz",
   "deathgate",
-  "greyhole",
+
   "kbverb",
   "blipper",
   "DualPitchShifter",

@@ -4,6 +4,8 @@ declare author      "Julian Parker, bug fixes by Till Bovermann";
 declare license     "GPL2+";
 declare copyright   "(c) Julian Parker 2013";
 import("stdfaust.lib");
+import ("misceffects.lib");
+
 fb = hslider("feedback [style:knob]",0.9,0.0,1.0,0.01):linear_interp;
 depth = ((ma.SR/44100)*50*hslider("modDepth [style:knob]",0.1,0.0,1.0,0.001)):linear_interp;
 freq = hslider("modFreq[style:knob]",2.0,0.0,10.0,0.01):linear_interp;
@@ -59,9 +61,19 @@ diffuser_nested(1,angle,g,scale) = si.bus(2) <: ( (si.bus(2) :par(i,2,*(c_norm))
             c_norm = cos(g);
             s_norm = sin(g);
         };
+        
         // blackhole =
         greyhole =   ( si.bus(4) :> seq(i,3,diffuser_nested(4,ma.PI/2,(-1^i)*diff,10+19*i) ):par(i,2,si.smooth(damp)) )
                      ~( (de.fdelay4(512, 10+depth + depth*os.oscrc(freq)),de.fdelay4(512, 10+ depth + depth*os.oscrs(freq)) ) :
                         (de.sdelay(65536,44100/2,floor(dt)),de.sdelay(65536,44100/2,floor(dt))) :
                         par(i,2,*(fb)) );
-        process = ba.bypass_fade(ma.SR/10, checkbox("bypass"), greyhole);
+
+        wetSlider = hslider("Dry/Wet[style:knob]",1.0,0.0,1.0,0.01):linear_interp;
+
+// fxctrl : add an input gain and a wet-dry control to a stereo FX
+//----------------------------------------------------------------
+
+fxctrl(g,w,Fx) =  _,_ <: (*(g),*(g) : Fx : *(w),*(w)), *(1-w), *(1-w) +> _,_;
+grlh =  vgroup("Greyhole", fxctrl(1, wetSlider, greyhole));
+
+        process = ba.bypass_fade(ma.SR/10, checkbox("bypass"), grlh);
