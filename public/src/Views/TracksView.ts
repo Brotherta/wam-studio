@@ -48,17 +48,4 @@ export default class TracksView {
         track.color = newColor;
         track.element.color.style.background = newColor;
     }
-
-    reorderTracks(trackList: Track[]) {
-        for (let node of this.trackContainerDiv.childNodes) {
-            if (node instanceof TrackElement) {
-                node.remove();
-            }
-        }
-        trackList = trackList.sort((a, b) => a.id - b.id);
-        for (let i = 0; i < trackList.length; i++) {
-            const track = trackList[i];
-            this.addTrack(track.element);
-        }
-    }
 }

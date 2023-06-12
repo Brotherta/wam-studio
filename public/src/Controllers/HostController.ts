@@ -22,6 +22,7 @@ export default class HostController {
 
     vuMeter: VuMeter;
 
+    // The maximum time of the song in milliseconds.
     maxTime: number;
 
     advancedMode: boolean = false;

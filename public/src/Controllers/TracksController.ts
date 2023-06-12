@@ -215,14 +215,17 @@ export default class TracksController {
     openSong(song:any, name: string) {
         this.app.tracksController.clearAllTracks();
         this.app.hostView.headerTitle.innerHTML = name;
+        this.app.hostController.maxTime = 0;
         for (let trackSong of song.songs) {
             this.app.tracks.newTrackUrl(trackSong)
                 .then(async track => {
                     if (track !== undefined) {
                         await this.app.tracksController.initTrackComponents(track);
+                        this.app.hostController.maxTime = Math.max(this.app.hostController.maxTime, track.audioBuffer!.duration*1000);
                     }
                 });
         }
+
         this.app.bindsView.reorderControls(this.app.tracks.trackList);
     }
 }
