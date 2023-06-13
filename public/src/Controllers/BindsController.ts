@@ -99,8 +99,9 @@ export default class BindsController {
      * It also creates the bindSliderElement that will be used to display the bind.
      * @param track
      * @param name
+     * @param value
      */
-    async createBind(track: Track, name?: string) {
+    async createBind(track: Track, name?: string, value?: string) {
         let bindControl = track.bindControl;
         if (!name) {
             let pname = window.prompt("Enter the name of the bind (16 char max a-Z) no special characters", "Bind");
@@ -114,14 +115,16 @@ export default class BindsController {
         }
 
         let bind = new Bind(name!);
+        bind.currentValue = value ? value : "50";
         bindControl.binds.push(bind);
 
         let slider = document.createElement("bind-slider-element") as BindSliderElement;
         bindControl.trackBindElement.addBindSliderElement(slider);
         slider.id = "slider-"+name;
         slider.setNameLabel(name!);
+        slider.slider.value = bind.currentValue;
+        slider.valueLabel.innerHTML = bind.currentValue;
         slider.slider.oninput = async () => {
-            console.log("slider input " + slider.slider.value);
             await this.updateBindValue(track, bind, slider.slider.value);
             this.app.projectController.saved = false;
         }
@@ -181,17 +184,31 @@ export default class BindsController {
         }
     }
 
-    private async updateBindValue(track: Track, bind: Bind, value: string) {
+    async updateBindValue(track: Track, bind: Bind, value: string) {
         if (!track.plugin.initialized) return;
+        bind.currentValue = value;
 
         for (let parameter of bind.parameters) {
             if (parameter.parameterName !== "none") {
                 // @ts-ignore
                 let parameterInfo = await track.plugin.instance!._audioNode.getParameterInfo([parameter.parameterName]);
 
-                // @ts-ignore
-                let {minValue, maxValue, type} = parameterInfo[parameter.parameterName];
+                // let infoPromise = new Promise<void>((resolve) => {
+                //     let checkInterval = setInterval(async () => {
+                //         // @ts-ignore
+                //        parameterInfo = await track.plugin.instance!._audioNode.getParameterInfo([parameter.parameterName]);
+                //           if (parameterInfo[parameter.parameterName]) {
+                //             clearInterval(checkInterval);
+                //             resolve();
+                //           }
+                //           else {
+                //               await track.plugin.instance!._audioNode.setState(track.plugin.state);
+                //           }
+                //     }, 1000);
+                // });
+                // await infoPromise;
 
+                let {minValue, maxValue, type} = parameterInfo[parameter.parameterName];
                 let minMaxNormalized = getMinMax(parameter.parameterName);
                 if (minMaxNormalized) {
                     minValue = minMaxNormalized.min;

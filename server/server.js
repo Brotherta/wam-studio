@@ -100,7 +100,7 @@ function writeJSONFile(filePath, data) {
 }
 
 // Route to get all projects
-app.get('/projects', verifyJWT, (req, res) => {
+app.get('/projects', (req, res) => {
     const projects = readJSONFile(storageDir+'/projects.json');
     res.json(projects.map(({ username, name, date, id }) => ({ username, name, date, id })));
 });

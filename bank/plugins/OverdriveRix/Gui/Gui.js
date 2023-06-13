@@ -343,7 +343,7 @@ export default class OverdriveRixGui extends HTMLElement {
 }
 try {
   customElements.define("wap-overdriverix", OverdriveRixGui);
-  console.log("Element defined");
+  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

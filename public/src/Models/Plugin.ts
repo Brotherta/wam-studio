@@ -11,6 +11,7 @@ export default class Plugin {
     dom: Element;
     app: App;
     initialized: boolean
+    state: any;
 
     constructor(app: App) {
         this.app = app;

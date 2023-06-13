@@ -377,9 +377,9 @@ export default class StonePhaserStereo {
    * @param baseURL - the baseURL of the plugin folder
    */
   constructor(context, baseURL = "") {
-    console.log("baseLatency " + context.baseLatency);
-    console.log("outputLatency " + context.outputLatency);
-    console.log("sampleRate " + context.sampleRate);
+    // console.log("baseLatency " + context.baseLatency);
+    // console.log("outputLatency " + context.outputLatency);
+    // console.log("sampleRate " + context.sampleRate);
 
     this.context = context;
     this.baseURL = baseURL;
@@ -486,7 +486,7 @@ export default class StonePhaserStereo {
           );
           await this.context.audioWorklet.addModule(real_url);
           // Keep the DSP name
-          console.log("Keep the DSP name");
+          // console.log("Keep the DSP name");
           this.fWorkletProcessors.push(name);
         } catch (e) {
           console.error(e);
@@ -504,7 +504,7 @@ export default class StonePhaserStereo {
         processorOptions: options,
       });
       this.node.onprocessorerror = () => {
-        console.log("An error from StonePhaserStereo-processor was detected.");
+        // console.log("An error from StonePhaserStereo-processor was detected.");
       };
       return this.node;
     } catch (e) {

@@ -52,6 +52,7 @@ export default class PresetsController {
                                 newParam.currentMin = param.currentMin;
                                 newBind.parameters.push(newParam);
                             }
+                            newBind.currentValue = bind.currentValue;
                             binds.push(newBind);
                         }
 
@@ -96,6 +97,7 @@ export default class PresetsController {
                     }
                     bindsObject.push({
                         "name": bind.name,
+                        "currentValue": bind.currentValue,
                         "parameters": parametersObject
                     });
                 }
@@ -178,13 +180,14 @@ export default class PresetsController {
 
 
             for (let bindPreset of preset.binds) {
-                let bind = await this.app.bindsController.createBind(track, bindPreset.name);
+                let bind = await this.app.bindsController.createBind(track, bindPreset.name, bindPreset.currentValue);
 
                 for (let paramPreset of bindPreset.parameters) {
                     let parameterEl = await this.app.bindsController.createParameter(track, bind!.name);
                     parameterEl!.refreshParam(paramInfo);
                     await this.app.bindsController.updateParameter(track, bind!, parameterEl!, paramPreset);
                 }
+                await this.app.bindsController.updateBindValue(track, bind!, bindPreset.currentValue);
             }
             await this.app.bindsController.selectBind(track);
         }

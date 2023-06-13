@@ -498,7 +498,7 @@ export default class GuitarAmpSim60sGui extends HTMLElement {
 }
 try {
   customElements.define("wap-guitarampsim60s", GuitarAmpSim60sGui);
-  console.log("Element defined");
+  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

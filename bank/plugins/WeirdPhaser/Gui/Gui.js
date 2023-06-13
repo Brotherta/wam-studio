@@ -473,7 +473,7 @@ this._root.getElementById("/weirdPhaser/Rate").addEventListener("input", (e) =>t
       try {
           customElements.define('wap-weirdphaser', 
                                 weirdPhaserGui);
-          console.log("Element defined");
+          ;
       } catch(error){
           console.log(error);
           console.log("Element already defined");      

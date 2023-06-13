@@ -86,7 +86,6 @@ export default class pedalboardGui extends HTMLElement {
    */
   async loadThumbnails() {
     let wams = Object.keys(this._plug.WAMS);
-    console.log(wams)
     let keywords = { all: [] };
     let urls = await Promise.all(
       wams.map((el) => {

@@ -10,7 +10,7 @@ import '../../utils/webaudio-controls.js'
         super();
             this._plug = plug;
             this._plug.gui = this;
-        console.log(this._plug);
+        // console.log(this._plug);
           
         this._root = this.attachShadow({ mode: 'open' });
         this._root.innerHTML = `<style>.my-pedal {animation:none 0s ease 0s 1 normal none running;appearance:none;background:linear-gradient(to top, rgb(66, 123, 255), rgb(11, 10, 10)) repeat scroll 0% 0% / auto padding-box border-box, rgba(0, 0, 0, 0) url("https://mainline.i3s.unice.fr/fausteditorweb/dist/PedalEditor/Front-End/?name=StereoFreqShifter.dsp") repeat scroll 0% 0% / 100% 100% padding-box border-box;border:0.994318px dashed rgb(73, 73, 73);bottom:189.134px;clear:none;clip:auto;color:rgb(33, 37, 41);columns:auto auto;contain:none;content:normal;cursor:auto;cx:0px;cy:0px;d:none;direction:ltr;display:block;fill:rgb(0, 0, 0);filter:none;flex:0 1 auto;float:none;font:16px / 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";gap:normal;grid:none / none / none / row / auto / auto;height:300px;hyphens:manual;inset:58.7102px 1462.22px 189.134px 212px;isolation:auto;left:212px;margin:2px;marker:none;mask:none;offset:none 0px auto 0deg;opacity:1;order:0;orphans:2;outline:rgb(33, 37, 41) none 0px;overflow:visible;padding:1px;page:auto;perspective:none;position:unset;quotes:auto;r:0px;resize:none;right:1462.22px;rx:auto;ry:auto;speak:normal;stroke:none;top:58.7102px;transform:none;transition:all 0s ease 0s;visibility:visible;widows:2;width:200px;x:0px;y:0px;zoom:1;};</style>
@@ -302,7 +302,7 @@ import '../../utils/webaudio-controls.js'
             // to fix all relative paths in CSS, as they are relative to
             // the main document, not the plugin's main.html
             this.basePath = getBaseURL();
-            console.log("basePath = " + this.basePath)
+            // console.log("basePath = " + this.basePath)
   
             // Fix relative path in WebAudio Controls elements
             this.fixRelativeImagePathsInCSS();
@@ -381,7 +381,7 @@ import '../../utils/webaudio-controls.js'
           
               attributeChangedCallback() {
                  
-            console.log('Custom element attributes changed.');
+            // console.log('Custom element attributes changed.');
             this.state = JSON.parse(this.getAttribute('state'));
         let tmp = '/PingPongDelayFaust/bypass';
         
@@ -394,11 +394,11 @@ import '../../utils/webaudio-controls.js'
         }
   
         this.knobs = this._root.querySelectorAll('.knob');
-        console.log(this.state);
+        // console.log(this.state);
   
         for (var i = 0; i < this.knobs.length; i++) {
           this.knobs[i].setValue(this.state[this.knobs[i].id], false);
-          console.log(this.knobs[i].value);
+          // console.log(this.knobs[i].value);
         }
       
               }
@@ -464,7 +464,7 @@ this._root.getElementById("/StereoFreqShifter/Shift").addEventListener("input", 
         let switches = this._root.querySelectorAll(".switch webaudio-switch");
   
         switches.forEach(s => {
-          console.log("### SWITCH ID = " + s.id);
+          // console.log("### SWITCH ID = " + s.id);
           this._plug.audioNode.setParamValue(s.id, 0);
         });
       
@@ -473,9 +473,9 @@ this._root.getElementById("/StereoFreqShifter/Shift").addEventListener("input", 
       try {
           customElements.define('wap-stereofreqshifter', 
                                 StereoFreqShifterGui);
-          console.log("Element defined");
+          // ;
       } catch(error){
-          console.log(error);
-          console.log("Element already defined");      
+          // console.log(error);
+          // console.log("Element already defined");
       }
       

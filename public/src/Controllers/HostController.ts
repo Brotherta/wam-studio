@@ -36,7 +36,7 @@ export default class HostController {
         this.defineControls();
         this.advancedMode = localStorage.getItem("advancedMode") === "true";
         localStorage.setItem("advancedMode", this.advancedMode.toString());
-        this.switchMode();
+        this.switchToAdvancedMode();
     }
 
     /**
@@ -305,9 +305,11 @@ export default class HostController {
     }
 
     stop() {
-        // @ts-ignore
-        this.app.host.node.parameters.get("playing").value = 0;
-        this.app.host.node?.port.postMessage({playhead: 0});
+        if (this.app.host.node) {
+            // @ts-ignore
+            this.app.host.node.parameters.get("playing").value = 0;
+            this.app.host.node?.port.postMessage({playhead: 0});
+        }
         this.app.tracks.trackList.forEach(async (track) => {
             //@ts-ignore
             track.node.parameters.get("playing").value = 0;
@@ -327,14 +329,19 @@ export default class HostController {
     switchMode() {
         this.advancedMode = !this.advancedMode;
         localStorage.setItem('advancedMode', this.advancedMode.toString());
+        this.switchToAdvancedMode();
+    }
 
+    switchToAdvancedMode() {
         let advanced = document.getElementsByClassName('advanced');
         for (let element of advanced) {
             if (this.advancedMode) {
-                element.removeAttribute('hidden')
+                // element.removeAttribute('hidden')
+                element.setAttribute('style', '');
             }
             else {
-                element.setAttribute('hidden', "")
+                // element.setAttribute('hidden', "")
+                element.setAttribute('style', 'display: none;');
             }
         }
         for (let track of this.app.tracks.trackList) {

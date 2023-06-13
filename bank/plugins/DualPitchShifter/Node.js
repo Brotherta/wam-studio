@@ -377,9 +377,9 @@ export default class DualPitchShifter {
    * @param baseURL - the baseURL of the plugin folder
    */
   constructor(context, baseURL = "") {
-    console.log("baseLatency " + context.baseLatency);
-    console.log("outputLatency " + context.outputLatency);
-    console.log("sampleRate " + context.sampleRate);
+    // console.log("baseLatency " + context.baseLatency);
+    // console.log("outputLatency " + context.outputLatency);
+    // console.log("sampleRate " + context.sampleRate);
 
     this.context = context;
     this.baseURL = baseURL;
@@ -500,11 +500,11 @@ export default class DualPitchShifter {
           );
           await this.context.audioWorklet.addModule(real_url);
           // Keep the DSP name
-          console.log("Keep the DSP name");
+          // console.log("Keep the DSP name");
           this.fWorkletProcessors.push(name);
         } catch (e) {
-          console.error(e);
-          console.error("Faust " + this.name + " cannot be loaded or compiled");
+          // console.error(e);
+          // console.error("Faust " + this.name + " cannot be loaded or compiled");
           return null;
         }
       }

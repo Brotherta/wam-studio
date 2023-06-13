@@ -388,15 +388,15 @@ export default class TrackElement extends HTMLElement {
 
     switchMode(advancedMode: boolean) {
         let advancedControls = this.shadowRoot?.querySelectorAll(".advanced");
-        console.log("advanced", advancedControls, advancedMode)
         if (advancedControls === undefined) {
             return;
         }
         for (let element of advancedControls) {
             if (advancedMode) {
-                element.removeAttribute("hidden");
+                // element.removeAttribute("hidden");
+                element.setAttribute("style", "")
             } else {
-                element.setAttribute("hidden", "");
+                element.setAttribute("style", "display: none;");
             }
         }
     }

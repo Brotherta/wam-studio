@@ -9,7 +9,7 @@ export default class StonePhaserStereoGui extends HTMLElement {
     super();
     this._plug = plug;
     this._plug.gui = this;
-    console.log(this._plug);
+    // console.log(this._plug);
 
     this._root = this.attachShadow({ mode: "open" });
     this._root.innerHTML = `<style>	
@@ -296,7 +296,7 @@ export default class StonePhaserStereoGui extends HTMLElement {
     // to fix all relative paths in CSS, as they are relative to
     // the main document, not the plugin's main.html
     this.basePath = getBaseURL();
-    console.log("basePath = " + this.basePath);
+    // console.log("basePath = " + this.basePath);
 
     // Fix relative path in WebAudio Controls elements
     this.fixRelativeImagePathsInCSS();
@@ -326,10 +326,10 @@ export default class StonePhaserStereoGui extends HTMLElement {
     sliders.forEach((e) => {
       let currentImagePath = e.getAttribute("knobsrc");
       if (currentImagePath !== undefined) {
-        console.log("Got img src as " + e.getAttribute("src"));
+        // console.log("Got img src as " + e.getAttribute("src"));
         let imagePath = e.getAttribute("knobsrc");
         e.setAttribute("knobsrc", this.basePath + "/" + imagePath);
-        console.log("After fix : slider knobsrc as " + e.getAttribute("knobsrc"));
+        // console.log("After fix : slider knobsrc as " + e.getAttribute("knobsrc"));
       }
     });
   }
@@ -344,7 +344,7 @@ export default class StonePhaserStereoGui extends HTMLElement {
   }
 
   attributeChangedCallback() {
-    console.log("Custom element attributes changed.");
+    // console.log("Custom element attributes changed.");
     this.state = JSON.parse(this.getAttribute("state"));
     let tmp = "/PingPongDelayFaust/bypass";
 
@@ -357,11 +357,11 @@ export default class StonePhaserStereoGui extends HTMLElement {
     }
 
     this.knobs = this._root.querySelectorAll(".knob");
-    console.log(this.state);
+    // console.log(this.state);
 
     for (var i = 0; i < this.knobs.length; i++) {
       this.knobs[i].setValue(this.state[this.knobs[i].id], false);
-      console.log(this.knobs[i].value);
+      // console.log(this.knobs[i].value);
     }
   }
   handleAnimationFrame = () => {
@@ -451,15 +451,15 @@ export default class StonePhaserStereoGui extends HTMLElement {
     let switches = this._root.querySelectorAll(".switch webaudio-switch");
 
     switches.forEach((s) => {
-      console.log("### SWITCH ID = " + s.id);
+      // console.log("### SWITCH ID = " + s.id);
       this._plug.audioNode.setParamValue(s.id, 0);
     });
   }
 }
 try {
   customElements.define("wap-stonephaserstereo", StonePhaserStereoGui);
-  console.log("Element defined");
+  // ;
 } catch (error) {
-  console.log(error);
-  console.log("Element already defined");
+  // console.log(error);
+  // console.log("Element already defined");
 }

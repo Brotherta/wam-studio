@@ -460,7 +460,7 @@ export default class SweetGui extends HTMLElement {
 }
 try {
   customElements.define("wap-sweet", SweetGui);
-  console.log("Element defined");
+  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

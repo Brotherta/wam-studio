@@ -459,7 +459,7 @@ webaudio-switch{
 }
 try {
   customElements.define("wap-owlshimmer", OwlShimmer);
-  console.log("Element defined");
+  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

@@ -399,7 +399,7 @@ export default class OscTubeGui extends HTMLElement {
 }
 try {
   customElements.define("wap-osctube", OscTubeGui);
-  console.log("Element defined");
+  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

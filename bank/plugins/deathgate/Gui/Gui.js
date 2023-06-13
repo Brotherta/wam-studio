@@ -281,7 +281,7 @@ export default class deathgateGui extends HTMLElement {
 }
 try {
   customElements.define("wap-deathgate", deathgateGui);
-  console.log("Element defined");
+  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

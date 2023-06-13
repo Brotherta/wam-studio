@@ -293,7 +293,7 @@ webaudio-switch{
 }
 try {
   customElements.define("wap-kbverb", kbverbGui);
-  console.log("Element defined");
+  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

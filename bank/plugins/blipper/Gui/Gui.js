@@ -473,7 +473,7 @@ this._root.getElementById("/blipper/Release").addEventListener("input", (e) =>th
       try {
           customElements.define('wap-blipper', 
                                 blipperGui);
-          console.log("Element defined");
+          ;
       } catch(error){
           console.log(error);
           console.log("Element already defined");      

@@ -1,5 +1,6 @@
 import TrackElement from "../Components/TrackElement";
 import Track from "../Models/Track";
+import {SongTagEnum} from "../Utils/SongTagEnum";
 
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
@@ -44,8 +45,50 @@ export default class TracksView {
      * @param track
      */
     changeColor(track: Track) {
-        let newColor = getRandomColor();
-        track.color = newColor;
-        track.element.color.style.background = newColor;
+        let color = "#000000";
+        switch (track.tag) {
+            case SongTagEnum.LEAD_VOCAL:
+                color = "#BDB2FF";
+                break;
+            case SongTagEnum.BACKING_VOCAL:
+                color = "#FFC6FF";
+                break;
+            case SongTagEnum.ELECTRIC_GUITAR:
+                color = "#94D2BD";
+                break;
+            case SongTagEnum.ACOUSTIC_GUITAR:
+                color = "#0A9396";
+                break;
+            case SongTagEnum.BASS:
+                color = "#005F73";
+                break;
+            case SongTagEnum.DRUMS:
+                color = "#9B2226";
+                break;
+            case SongTagEnum.PIANO:
+                color = "#036666";
+                break;
+            case SongTagEnum.SYNTH:
+                color = "#248277";
+                break;
+            case SongTagEnum.STRINGS:
+                color = "#56AB91";
+                break;
+            case SongTagEnum.BRASS:
+                color = "#88D4AB";
+                break;
+            case SongTagEnum.SNARES:
+                color = "#BB3E03";
+                break;
+            case SongTagEnum.KICKS:
+                color = "#AE2012";
+                break;
+            case SongTagEnum.OTHER:
+                color = "#001219";
+                break;
+        }
+        // let newColor = getRandomColor();
+        track.color = color;
+        track.element.color.style.background = color;
     }
 }

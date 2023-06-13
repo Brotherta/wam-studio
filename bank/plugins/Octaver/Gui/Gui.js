@@ -416,7 +416,7 @@ this._root.getElementById("/Octaver/Up").addEventListener("input", (e) =>this._p
       try {
           customElements.define('wap-octaver', 
                                 OctaverGui);
-          console.log("Element defined");
+          ;
       } catch(error){
           console.log(error);
           console.log("Element already defined");      

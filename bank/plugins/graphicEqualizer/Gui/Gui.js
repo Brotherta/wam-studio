@@ -212,7 +212,7 @@ export default class GraphicEQHTMLElement extends HTMLElement {
   setKnobs() {}
 
   setSwitchListener() {
-    console.log("GraphicEQ : set switch listener");
+    // console.log("GraphicEQ : set switch listener");
     const { plugin } = this;
     // by default, plugin is disabled
     plugin.audioNode.setParamsValues({ enabled: 1 });

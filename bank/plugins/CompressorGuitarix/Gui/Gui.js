@@ -593,7 +593,7 @@ this._root.getElementById("/CompressorGuitarix/Threshold").addEventListener("inp
       try {
           customElements.define('wap-compressorguitarix', 
                                 CompressorGuitarixGui);
-          console.log("Element defined");
+          ;
       } catch(error){
           console.log(error);
           console.log("Element already defined");      

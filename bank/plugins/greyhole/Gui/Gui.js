@@ -712,7 +712,7 @@ this._root.getElementById("/greyhole/Greyhole/size").addEventListener("input", (
       try {
           customElements.define('wap-greyhole', 
                                 greyholeGui);
-          console.log("Element defined");
+          ;
       } catch(error){
           console.log(error);
           console.log("Element already defined");      
