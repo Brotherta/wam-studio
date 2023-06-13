@@ -367,6 +367,18 @@ track-element {
     border: solid 1px black;
 }
 
+placeholder-element {
+    display: flex;
+    width: 100%;
+    min-height: 130px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    background: rgb(44, 44, 44);
+    border: solid 1px black;
+}
+
 .text-icon {
     padding-left: 25px;
     color: lightgrey;

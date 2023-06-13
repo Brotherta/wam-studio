@@ -193,21 +193,6 @@ export default class BindsController {
                 // @ts-ignore
                 let parameterInfo = await track.plugin.instance!._audioNode.getParameterInfo([parameter.parameterName]);
 
-                // let infoPromise = new Promise<void>((resolve) => {
-                //     let checkInterval = setInterval(async () => {
-                //         // @ts-ignore
-                //        parameterInfo = await track.plugin.instance!._audioNode.getParameterInfo([parameter.parameterName]);
-                //           if (parameterInfo[parameter.parameterName]) {
-                //             clearInterval(checkInterval);
-                //             resolve();
-                //           }
-                //           else {
-                //               await track.plugin.instance!._audioNode.setState(track.plugin.state);
-                //           }
-                //     }, 1000);
-                // });
-                // await infoPromise;
-
                 let {minValue, maxValue, type} = parameterInfo[parameter.parameterName];
                 let minMaxNormalized = getMinMax(parameter.parameterName);
                 if (minMaxNormalized) {

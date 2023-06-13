@@ -15,6 +15,7 @@ import ParameterElement from "./Components/Binds/ParameterElement";
 import TrackBindElement from "./Components/Binds/TrackBindElement";
 import LoginElement from "./Components/Project/LoginElement";
 import ConfirmElement from "./Components/ConfirmElement";
+import PlaceholderElement from "./Components/PlaceholderElement";
 
 customElements.define(
     "track-element",
@@ -57,6 +58,11 @@ customElements.define(
     "confirm-element",
     ConfirmElement
 );
+customElements.define(
+    "placeholder-element",
+    PlaceholderElement
+);
+
 
 const audioCtx = new AudioContext();
 
