@@ -51,7 +51,6 @@ export default class ProjectController {
         if (this.inProject) {
             this.app.projectView.saveElement.user.value = this.projectUser;
             this.app.projectView.saveElement.project.value = this.projectName;
-            await this.saveProject(true);
         }
 
         if (!this.app.projectView.saveElement.initialized) {
