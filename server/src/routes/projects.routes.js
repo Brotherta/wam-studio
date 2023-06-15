@@ -2,7 +2,8 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
-const { config, utils } = require('../config');
+const config= require('../config');
+const utils = require('../utils');
 
 const router = express.Router();
 

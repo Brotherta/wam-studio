@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
-const { config } = require('./config');
+const config = require('./config');
 // put all utility functions here, for example:
+
 
 function verifyJWT(req, res, next) {
     if (!req.cookies || !req.cookies.token) {

@@ -1,7 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const { config, utils } = require('./config');
+const config= require('./config');
+const utils = require('./utils');
+
+
+console.log(config.jwtSecret);
 
 const projectsRoutes = require('./routes/projects.routes');
 const presetsRoutes = require('./routes/presets.routes');

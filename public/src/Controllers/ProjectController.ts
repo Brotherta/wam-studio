@@ -62,7 +62,6 @@ export default class ProjectController {
     }
 
     initLoadProject() {
-
         if (!this.app.projectView.loadElement.initialized) {
             this.app.projectView.loadElement.initialized = true;
 
