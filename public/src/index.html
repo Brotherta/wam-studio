@@ -16,52 +16,80 @@
 <body>
 	<div class="app">
 		<div class="controls-bar" id="controls-bar">
+			<div class="left-controls">
+				<a class="menu-item main" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<i class="menu-icon"></i>
+				</a>
+				<div class="dropdown-menu dropright" aria-labelledby="dropdownMenuButton">
+					<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Demo Song</a>
+					<div id="songs-container" class="dropdown-menu songs" aria-labelledby="dropdownSubMenuButton"></div>
 
-			<a class="menu-item main" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				<i class="menu-icon"></i>
-			</a>
-			<div class="dropdown-menu dropright" aria-labelledby="dropdownMenuButton">
-				<a class="dropdown-item" id="save-project">Save Project</a>
-				<a class="dropdown-item" id="import-project">Import Project</a>
-				<a class="dropdown-item" id="import-songs">Import Song files</a>
-				<input id="new-track-input" type="file" accept=".mp3, .wav, .ogg" multiple style="display: none">
+					<div class="dropdown-divider"></div>
 
-				<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Add Demo Songs</a>
-				<div id="songs-container" class="dropdown-menu" aria-labelledby="dropdownSubMenuButton">
+					<a class="dropdown-item" id="load-project">Load Project</a>
+					<a class="dropdown-item" id="save-project">Save Project</a>
 
+					<div class="dropdown-divider"></div>
+
+					<a class="dropdown-item" id="import-project" >Import Project</a>
+					<input id="import-input" type="file" accept=".json" style="display: none">
+					<a class="dropdown-item" id="export-project" >Export Project</a>
+
+					<div class="dropdown-divider"></div>
+
+					<a class="dropdown-item" id="import-songs" >Import Song</a>
+					<input id="new-track-input" type="file" accept=".mp3, .wav, .ogg" multiple style="display: none">
+					<a class="dropdown-item" id="export-songs">Export Song</a>
+
+					<div class="dropdown-divider advanced"></div>
+
+					<a class="dropdown-item" id="latency-btn">Latency Compensation</a>
+					<a class="dropdown-item" id="settings-btn">Settings</a>
+
+					<div class="dropdown-divider advanced"></div>
+
+					<a class="dropdown-item" id="login">Log in</a>
+
+					<div class="dropdown-divider advanced"></div>
+
+					<a class="dropdown-item" id="about-btn">About</a>
 				</div>
-				<a class="dropdown-item" id="latency-btn">Latency Compensation</a>
-				<a class="dropdown-item" id="settings-btn">Settings</a>
-				<a class="dropdown-item" id="about-btn">About</a>
-			</div>
-			<div id="back-btn" class="menu-item">
-				<span class="mytooltip">Restart</span>
-				<i class="skip-start-icon"></i>
-			</div>
-			<div id="play-btn" class="menu-item">
-				<span class="mytooltip">Play</span>
-				<i class="play-icon" id="play-icon"></i>
-			</div>
-			<div id="record-btn" class="menu-item">
-				<span class="mytooltip">Record</span>
-				<i class="record-icon"></i>
-			</div>
-			<div id="loop-btn" class="menu-item">
-				<span class="mytooltip">Loop</span>
-				<i class="loop-icon"></i>
-			</div>
-			<div class="timer-item noselect">
-				<div id="timer" class="timer">
-					00:00:00:00
+
+				<div id="back-btn" class="menu-item">
+					<span class="mytooltip">Restart</span>
+					<i class="skip-start-icon"></i>
+				</div>
+				<div id="play-btn" class="menu-item">
+					<span class="mytooltip">Play</span>
+					<i class="play-icon" id="play-icon"></i>
+				</div>
+				<div id="record-btn" class="menu-item">
+					<span class="mytooltip">Record</span>
+					<i class="record-icon"></i>
+				</div>
+				<div id="loop-btn" class="menu-item">
+					<span class="mytooltip">Loop</span>
+					<i class="loop-icon"></i>
+				</div>
+				<div class="timer-item noselect">
+					<div id="timer" class="timer">
+						00:00:00:00
+					</div>
+				</div>
+				<div id="metro-btn" class="menu-item">
+					<span class="mytooltip">Metronome</span>
+					<i class="metro-icon"></i>
+				</div>
+				<div id="mute-btn" class="menu-item">
+					<span class="mytooltip">Mute</span>
+					<i class="volume-up-icon" style="width: 30px" id="mute-icon"></i>
 				</div>
 			</div>
-			<div id="metro-btn" class="menu-item">
-				<span class="mytooltip">Metronome</span>
-				<i class="metro-icon"></i>
-			</div>
-			<div id="mute-btn" class="menu-item">
-				<span class="mytooltip">Mute</span>
-				<i class="volume-up-icon" style="width: 30px" id="mute-icon"></i>
+			<div class="right-controls">
+				<div class="menu-item">
+					<span class="mytooltip">Dummy</span>
+					<i class="volume-up-icon" style="width: 30px"></i>
+				</div>
 			</div>
 		</div>
 
@@ -192,7 +220,6 @@
 			</div>
 		</div>
 
-
 		<div id="plugin-window" class="floating-window" hidden>
 			<div id="plugin-header" class="header-window">
 				<span class="title">PedalBoard</span>
@@ -303,6 +330,18 @@
 				<div style="width: 100%; display: flex; justify-content: center">
 					<img src="images/favicon.png" alt="Wam Open Studio" width="80" height="auto">
 				</div>
+			</div>
+
+			<div id="loading-zone"></div>
+		</div>
+
+		<div id="project-window" class="floating-window" hidden>
+			<div id="project-header" class="header-window">
+				<span id="project-title" class="title">Advanced Window</span>
+				<button id="project-close-button" class="close-button">X</button>
+			</div>
+			<div class="mount" id="project-mount">
+
 			</div>
 		</div>
 	</div>

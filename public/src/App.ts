@@ -20,6 +20,8 @@ import LatencyView from "./Views/LatencyView";
 import SettingsController from "./Controllers/SettingsController";
 import SettingsView from "./Views/SettingsView";
 import Loader from "./Loader/Loader";
+import ProjectController from "./Controllers/ProjectController";
+import ProjectView from "./Views/ProjectView";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -37,6 +39,7 @@ export default class App {
     recorderController: RecorderController;
     latencyController: LatencyController;
     settingsController: SettingsController;
+    projectController: ProjectController;
 
     hostView: HostView;
     tracksView: TracksView;
@@ -45,6 +48,7 @@ export default class App {
     automationView: AutomationView;
     latencyView: LatencyView;
     settingsView: SettingsView;
+    projectView: ProjectView;
 
     host: Host;
     loader: Loader;
@@ -61,6 +65,7 @@ export default class App {
         this.automationView = new AutomationView();
         this.latencyView = new LatencyView();
         this.settingsView = new SettingsView();
+        this.projectView = new ProjectView();
 
         this.hostController = new HostController(this);
         this.editorController = new EditorController(this);
@@ -73,6 +78,7 @@ export default class App {
         this.recorderController = new RecorderController(this);
         this.latencyController = new LatencyController(this);
         this.settingsController = new SettingsController(this);
+        this.projectController = new ProjectController(this);
 
         makeDivScrollSync();
     }

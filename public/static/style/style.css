@@ -61,6 +61,22 @@ div::-webkit-scrollbar-thumb:hover {
     height: 52px;
 }
 
+.left-controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    height: 52px;
+    min-width: max-content;
+}
+
+.right-controls {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    height: 52px;
+    width: 100%;
+}
+
 .editors {
     height: 100%;
     width: 100%;
@@ -91,6 +107,12 @@ div::-webkit-scrollbar-thumb:hover {
     scrollbar-width: none;  /* Firefox */
 }
 
+#loading-zone {
+    position: absolute;
+    top: -1500px;
+    left: -1500px;
+    z-index: -100;
+}
 
 #songs-container {
     overflow-y: auto;

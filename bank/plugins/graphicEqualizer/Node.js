@@ -25,7 +25,7 @@ export default class GraphicEQNode extends CompositeAudioNode {
     this.connectNodes();
   }
   createNodes() {
-    console.log("create nodes");
+    // console.log("create nodes");
 
     // for dry/wet route
     this.outputNode = this.context.createGain();
@@ -97,11 +97,11 @@ export default class GraphicEQNode extends CompositeAudioNode {
 
   // ---- params
   setParam(key, value) {
-    console.log(key, value);
+    // console.log(key, value);
     try {
       this[key] = value;
     } catch (error) {
-      console.log(key, error);
+      // console.log(key, error);
       console.warn("this plugin does not implement this param");
     }
   }
@@ -113,11 +113,11 @@ export default class GraphicEQNode extends CompositeAudioNode {
 
     this.isEnabled = _sig;
     if (_sig) {
-      console.log("BYPASS MODE OFF FX RUNNING");
+      // console.log("BYPASS MODE OFF FX RUNNING");
       this.wetGainNode.gain.linearRampToValueAtTime(1, this.context.currentTime + 0.5);
       this.dryGainNode.gain.linearRampToValueAtTime(0, this.context.currentTime + 0.5);
     } else {
-      console.log("BYPASS MODE ON");
+      // console.log("BYPASS MODE ON");
       this.wetGainNode.gain.linearRampToValueAtTime(0, this.context.currentTime + 0.5);
       this.dryGainNode.gain.linearRampToValueAtTime(1, this.context.currentTime + 0.5);
     }

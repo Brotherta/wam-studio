@@ -5,7 +5,6 @@ import {audioCtx} from "../index";
 
 export default class HostView {
 
-    automationBtn = document.getElementById("automation-btn") as HTMLDivElement;
     playBtn = document.getElementById("play-btn") as HTMLDivElement;
     backBtn = document.getElementById("back-btn") as HTMLDivElement;
     recordBtn = document.getElementById("record-btn") as HTMLDivElement;
@@ -17,8 +16,6 @@ export default class HostView {
     playIcon = document.getElementById("play-icon") as HTMLDivElement;
     muteIcon = document.getElementById("mute-icon") as HTMLDivElement;
 
-    controlsBar = document.getElementById("controls-bar") as HTMLDivElement;
-
     vuMeterCanvas = document.getElementById("vu-meter") as HTMLCanvasElement;
 
     songsContainer = document.getElementById("songs-container") as HTMLDivElement;
@@ -28,7 +25,13 @@ export default class HostView {
     latencyBtn = document.getElementById("latency-btn") as HTMLDivElement;
     settingsBtn = document.getElementById("settings-btn") as HTMLDivElement;
     saveBtn = document.getElementById("save-project") as HTMLDivElement;
+    loadBtn = document.getElementById("load-project") as HTMLDivElement;
+    loginBtn = document.getElementById("login") as HTMLDivElement;
 
+
+    aboutBtn = document.getElementById("about-btn") as HTMLDivElement;
+    aboutCloseBtn = document.getElementById("about-close-button") as HTMLDivElement;
+    aboutWindow = document.getElementById("about-window") as HTMLDivElement;
 
     /**
      * Update the timer of the host view.

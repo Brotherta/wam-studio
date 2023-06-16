@@ -2,6 +2,7 @@ import HostView from "../Views/HostView";
 import App from "../App";
 import songs from "../../static/songs.json"
 import {audioCtx} from "../index";
+import {focusWindow} from "./StaticController";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -42,8 +43,7 @@ export default class HostController {
         this.defineMuteListener();
         this.defineSongsDemoListener();
         this.defineTimerListener();
-        this.defineImportSongListener();
-        this.defineSaveProjectListener();
+        this.defineMenuListener();
         this.app.pluginsView.mainTrack.addEventListener("click", () => {
             this.app.pluginsController.selectHost();
         });
@@ -121,9 +121,7 @@ export default class HostController {
         }
     }
 
-    /**
-     * TODO : Not implemented yet.
-     */
+
     defineRecordListener() {
         this.hostView.recordBtn.onclick = () => {
             this.app.recorderController.clickRecord();
@@ -169,25 +167,8 @@ export default class HostController {
             }
         });
     }
-    /**
-     * Pause the timer interval. Used when the user is jumping to a specific beat.
-     */
-    pauseUpdateInterval() {
-        this.pauseInterval = true;
-    }
 
-    /**
-     * Resume the timer interval. Used when the user is jumping to a specific beat.
-     */
-    resumeUpdateInteravel() {
-        this.pauseInterval = false;
-    }
-
-    initVuMeter() {
-        this.vuMeter = new VuMeter(this.hostView.vuMeterCanvas, 30, 157);
-    }
-
-    defineImportSongListener() {
+    defineMenuListener() {
         this.hostView.importSongs.addEventListener('click', () => {
             this.hostView.newTrackInput.click();
         });
@@ -207,6 +188,41 @@ export default class HostController {
 
             }
         });
+        this.app.hostView.saveBtn.onclick = async () => {
+            await this.app.projectController.openSaveProject();
+        }
+        this.app.hostView.loadBtn.onclick = async () => {
+            await this.app.projectController.openLoadProject();
+        }
+        this.app.hostView.loginBtn.onclick = async () => {
+            await this.app.projectController.openLogin();
+        }
+        this.app.hostView.aboutBtn.onclick = async () => {
+            this.app.hostView.aboutWindow.hidden = false;
+            focusWindow(this.app.hostView.aboutWindow);
+        }
+        this.app.hostView.aboutCloseBtn.onclick = () => {
+            this.app.hostView.aboutWindow.hidden = true;
+        }
+    }
+
+
+    /**
+     * Pause the timer interval. Used when the user is jumping to a specific beat.
+     */
+    pauseUpdateInterval() {
+        this.pauseInterval = true;
+    }
+
+    /**
+     * Resume the timer interval. Used when the user is jumping to a specific beat.
+     */
+    resumeUpdateInteravel() {
+        this.pauseInterval = false;
+    }
+
+    initVuMeter() {
+        this.vuMeter = new VuMeter(this.hostView.vuMeterCanvas, 30, 157);
     }
 
     clickOnPlayButton(stop: boolean = false) {
@@ -240,11 +256,7 @@ export default class HostController {
         this.hostView.pressPlayButton(this.playing, stop);
     }
 
-    defineSaveProjectListener() {
-        this.app.hostView.saveBtn.onclick = async () => {
-            await this.app.loader.saveProject();
-        }
-    }
+
 
     stopAll() {
         this.app.tracksController.trackList.forEach(async (track) => {

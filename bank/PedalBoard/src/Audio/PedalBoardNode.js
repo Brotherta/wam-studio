@@ -14,6 +14,7 @@ export default class PedalBoardNode extends WamNode {
     await addFunctionModule(audioWorklet, getCustomProcessor, moduleId);
   }
 
+  nodeId = 0;
   nodes = {};
   pedalBoardInfos = {};
   lastParameterValue = {};
@@ -208,13 +209,17 @@ export default class PedalBoardNode extends WamNode {
     await this.setState(this.initialState);
   }
 
+  async resetState() {
+    await this.setState(this.initialState);
+    this.nodeId = 0;
+  }
+
   /**
    * Trigger an event to inform the ParamMgrNode of a change in order or an addition/deletion of the nodes in the PedalBoard.
    * @author Quentin Beauchet
    */
   updateInfos() {
     let nodes = Object.entries(this.nodes);
-
     this.port.postMessage({
       request: "set/nodes",
       content: {

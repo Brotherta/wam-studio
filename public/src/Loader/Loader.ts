@@ -15,6 +15,7 @@ export default class Loader {
         const zip = new JSZip();
         const audio = zip.folder("audio")!;
 
+        let wavs = [];
         // TODO Total TRACK ACC
         let tracks = [];
         for (let track of this.app.tracksController.trackList) {
@@ -43,7 +44,11 @@ export default class Loader {
             for (let region of track.regions) {
                 let name = `Track-${track.id}_Region-${region.id}.wav`
                 let blob = bufferToWave(region.buffer);
-                audio.file(name, blob);
+                // audio.file(name, blob);
+                wavs.push({
+                    "name": name,
+                    "blob": blob
+                });
                 let regionJson = {
                     "id": region.id,
                     "path": `audio/${name}`,
@@ -83,21 +88,59 @@ export default class Loader {
             "tracks": tracks
         }
 
-        zip.file("project.json", JSON.stringify(project));
-
-        let content = await zip.generateAsync({type: "blob"})
-
-        const new_file = URL.createObjectURL(content);
-        const link = document.createElement("a")
-        link.href = new_file
-        link.download = "project.zip"
-        link.click()
-        link.remove()
+        // zip.file("project.json", JSON.stringify(project));
+        //
+        // let content = await zip.generateAsync({type: "blob"})
+        //
+        // const new_file = URL.createObjectURL(content);
+        // const link = document.createElement("a")
+        // link.href = new_file
+        // link.download = "project.zip"
+        // link.click()
+        // link.remove()
+        return {
+            "project": project,
+            "wavs": wavs
+        }
     }
 
 
 
-    loadProject(_file: File) {
+    async loadProject(data: any) {
+        let version = data.host.version;
+        if (version !== APP_VERSION) {
+            alert("Incompatible project version");
+            return;
+        }
+        let muted = data.host.muted;
+        let volume = data.host.volume;
+        let playing = data.host.playing;
+        let recording = data.host.recording;
+        let timer = data.host.timer;
+        let playhead = data.host.playhead;
+        let trackAcc = data.host.trackAcc;
+        let regionAcc = data.host.regionAcc;
+
+        let tracksJson = data.tracks;
+
+        this.app.hostController.stopAll();
+        this.app.tracksController.clearAllTracks();
+
+        tracksJson.forEach((trackJson: any) => {
+            let trackName = trackJson.track.name;
+            let muted = trackJson.track.muted;
+            let soloed = trackJson.track.soloed;
+            let volume = trackJson.track.volume;
+            let pan = trackJson.track.pan;
+            let plugins = trackJson.track.plugins;
+
+            let regions = trackJson.track.regions;
+            let automations = trackJson.track.automations;
+
+
+        });
+
+
         // let reader = new FileReader();
         // reader.onload = async (e) => {
         //     let zip = await JSZip.loadAsync(e.target!.result);

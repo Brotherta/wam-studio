@@ -2,7 +2,7 @@ export default class AutomationTrack extends HTMLElement {
   constructor(paramId, param) {
     super();
     this.paramId = paramId;
-    this.param = param;
+    this.parameter = param;
 
     this.param.minValue = Math.max(-128, this.param.minValue);
     this.param.maxValue = Math.min(128, this.param.maxValue);

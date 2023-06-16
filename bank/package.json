@@ -2,9 +2,9 @@
   "name": "plugins_server_webaudiomodules",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,11 +18,13 @@
   },
   "homepage": "https://github.com/Zorrino/plugins_server_webaudiomodules#readme",
   "dependencies": {
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "express": "^4.17.3",
     "jsonwebtoken": "^9.0.0",
+    "multer": "^1.4.5-lts.1",
     "path": "^0.12.7",
-    "uuid": "^9.0.0",
-    "dotenv": "^10.0.0"
+    "uuid": "^9.0.0"
   }
 }

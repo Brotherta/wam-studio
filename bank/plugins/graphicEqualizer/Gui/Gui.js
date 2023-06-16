@@ -212,7 +212,7 @@ export default class GraphicEQHTMLElement extends HTMLElement {
   setKnobs() {}
 
   setSwitchListener() {
-    console.log("GraphicEQ : set switch listener");
+    // console.log("GraphicEQ : set switch listener");
     const { plugin } = this;
     // by default, plugin is disabled
     plugin.audioNode.setParamsValues({ enabled: 1 });
@@ -584,7 +584,7 @@ export default class GraphicEQHTMLElement extends HTMLElement {
     e.preventDefault();
     if (this.selectedFilter) {
       this.selectedFilter.originalQValue = this.selectedFilter.Q.value;
-      this.modeBtn = "dragControlPoint";
+      this.mode = "dragControlPoint";
       this.shiftPressed = e.shiftKey;
       this.clickedY = this.getMousePos(e).y;
       this.drawTooltip();
@@ -593,7 +593,7 @@ export default class GraphicEQHTMLElement extends HTMLElement {
   }
 
   processMouseUp(e) {
-    this.modeBtn = "none";
+    this.mode = "none";
     this.selectedFilter = null;
     this.shiftPressed = false;
     this.dy = 0;

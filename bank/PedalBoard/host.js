@@ -31,11 +31,11 @@ const mountPlugin = (domNode) => {
 
 (async () => {
   // Init WamEnv
-  const { default: initializeWamHost } = await import("../plugins/utils/sdk/src/initializeWamHost.js");
+  const { default: initializeWamHost } = await import("http://localhost:6002/plugins/utils/sdk/src/initializeWamHost.js");
   const [hostGroupId] = await initializeWamHost(audioContext);
 
   // Import WAM
-  const { default: WAM } = await import("./src/index.js");
+  const { default: WAM } = await import("http://localhost:6002/src/index.js");
   //const { default: WAM } = await import("https://wam-bank.vidalmazuy.fr/plugins/TS9_OverdriveFaustGenerated/index.js");
   // Create a new instance of the plugin
   // You can can optionnally give more options such as the initial state of the plugin
