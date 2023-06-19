@@ -109,8 +109,8 @@ div::-webkit-scrollbar-thumb:hover {
 
 #loading-zone {
     position: absolute;
-    top: -1500px;
-    left: -1500px;
+    top: 300px;
+    left: 300px;
     z-index: -100;
 }
 
@@ -524,15 +524,39 @@ track-element {
     overflow-y: auto;
     border-radius: 5px;
 }
-
 .automation-item {
     width: 100%;
     background-color: rgba(70, 70, 70, 0.61);
     color: lightgray;
+    position: relative;
+    padding-left: 16px;
 }
+
 .automation-item:hover {
     background-color: rgba(98, 97, 97, 0.61);
     cursor: pointer;
+}
+
+.automation-item.active {
+    background-color: rgba(98, 97, 97, 0.61);
+    color: white;
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: green;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    visibility: hidden;
+}
+
+.automation-item.active .dot {
+    visibility: visible;
 }
 
 li {

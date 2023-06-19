@@ -6,6 +6,7 @@ import { MAX_DURATION_SEC } from "../Utils";
 import Track from "./Track";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "./Plugin";
+import {BANK_PLUGIN_URL} from "../Env";
 
 /**
  * Host class that contains the master track.
@@ -26,6 +27,7 @@ export default class Host extends Track {
 
     hostNode: AudioPlayerNode | undefined;
     override gainNode: GainNode;
+    pluginWAM: any;
     
     constructor(app: App) {
         super(-1, new TrackElement(), undefined);
@@ -48,6 +50,9 @@ export default class Host extends Track {
      * It is asynchronous because it needs to load the WAM SDK and the AudioPlayerNode.
      */
     async initWAM() {
+        const {default: WAM} = await import(/* webpackIgnore: true */BANK_PLUGIN_URL+"/src/index.js");
+        this.pluginWAM = WAM;
+
         const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
         const {default: AudioPlayerNode} = await import("../Audio/AudioNode");
         await this.audioCtx.audioWorklet.addModule(new URL('../Audio/HostProcessor.js', import.meta.url));

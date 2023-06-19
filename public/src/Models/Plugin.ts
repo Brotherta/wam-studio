@@ -21,9 +21,8 @@ export default class Plugin {
      * Initialize the plugin by loading the WAM script and creating the instance.
      */
     async initPlugin() {
-        //@ts-ignore
-        const {default: WAM} = await import(/* webpackIgnore: true */BANK_PLUGIN_URL+"/src/index.js");
-        this.instance = await WAM.createInstance(this.app.host.hostGroupId, this.app.host.audioCtx);
+
+        this.instance = await this.app.host.pluginWAM.createInstance(this.app.host.hostGroupId, this.app.host.audioCtx);
         // @ts-ignore
         this.dom = await this.instance.createGui();
         this.initialized = true;

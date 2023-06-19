@@ -167,7 +167,11 @@ export default class pedalboardGui extends HTMLElement {
     this.PresetsBank = presets;
 
     if (this.presetsMenu) {
-      this._root.getElementById("collapsePresets").remove();
+      let collapse = this._root.getElementById("collapsePresets");
+      if (collapse) {
+        collapse.remove();
+      }
+      // this._root.getElementById("collapsePresets").remove();
     }
     this.presetsMenu = await this.loadMenu();
 
@@ -285,7 +289,7 @@ export default class pedalboardGui extends HTMLElement {
 
     this.board.appendChild(wrapper);
 
-    await gui.loaded;
+    // await gui.loaded;
 
     this.resizeWrapper(wrapper, header, title, cross, gui);
     wrapper.insertBefore(header, gui);

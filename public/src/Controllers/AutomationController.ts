@@ -74,6 +74,11 @@ export default class AutomationController {
                 track.plugin.instance?._audioNode.clearEvents();
             })
             for (let param in params) {
+                let active = false;
+                let bpf = track.automation.getBpfOfparam(param);
+                if (bpf !== undefined && bpf.points.length > 0) {
+                    active = true;
+                }
                 this.automationView.createItem(
                     param,
                     // @ts-ignore
@@ -86,7 +91,8 @@ export default class AutomationController {
                         else {
                             console.warn("There is no bpf associated with the track "+track.id);
                         }
-                    }
+                    },
+                    active
                 );
             }
         }

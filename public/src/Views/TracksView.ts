@@ -48,4 +48,9 @@ export default class TracksView {
         track.color = newColor;
         track.element.color.style.background = newColor;
     }
+
+    setColor(track: Track, color: string) {
+        track.color = color;
+        track.element.color.style.background = color;
+    }
 }

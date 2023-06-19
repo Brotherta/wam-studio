@@ -44,6 +44,9 @@ customElements.define(
     PlaceholderElement
 );
 
+window.addEventListener('beforeunload', (e) => {
+    e.returnValue = 'test';
+});
 
 const audioCtx = new AudioContext({latencyHint: 0.00001});
 const app = new App();

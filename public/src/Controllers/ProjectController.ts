@@ -156,7 +156,7 @@ export default class ProjectController {
                 this.projectName = responseData.project;
                 this.projectUser = responseData.user;
                 this.saved = true;
-                await this.app.loader.loadProject(responseData.data);
+                await this.app.loader.loadProject(responseData);
                 this.app.projectView.close();
             }
         }

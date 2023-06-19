@@ -14,7 +14,7 @@ export default class PlayheadView {
     trackContainer = document.getElementById("track-container") as HTMLDivElement;
 
     width = (MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX;
-    height = this.trackContainer.scrollHeight - 35;
+    height = (this.trackContainer.scrollHeight - 35) * 1000;
 
     playheadLine: Graphics | undefined
 

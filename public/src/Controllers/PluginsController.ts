@@ -131,6 +131,9 @@ export default class PluginsController {
             this.pluginsView.showNew();
         }
         else {
+            this.app.tracksController.trackList.forEach(track => {
+                this.pluginsView.movePluginLoadingZone(track);
+            })
             this.pluginsView.showPlugins(this.selectedTrack);
             if (this.pluginsView.floating.hidden) {
                 this.hideAllControllers();

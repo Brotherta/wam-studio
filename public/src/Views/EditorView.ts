@@ -20,7 +20,7 @@ export default class EditorView {
     playhead: PlayheadView;
 
     width = (MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX;
-    height = this.trackContainer.scrollHeight - 35;
+    height = this.trackContainer.scrollHeight - 40;
 
     constructor() {
         this.pixiApp = new Application({width: this.width, height: this.height, backgroundColor: 0x121213})
@@ -30,6 +30,7 @@ export default class EditorView {
 
         this.pixiApp.stage.sortableChildren = true;
         this.defineDragNDrop();
+        window.addEventListener("resize", () => this.resizeCanvas());
     }
 
     defineDragNDrop() {
@@ -72,7 +73,7 @@ export default class EditorView {
      * Resize the canvas when the window is resized.
      */
     resizeCanvas() {
-        this.pixiApp.renderer.resize(this.pixiApp.renderer.width, this.trackContainer.scrollHeight - 35)
+        this.pixiApp.renderer.resize(this.pixiApp.renderer.width, this.trackContainer.scrollHeight - 40);
     }
 
     /**

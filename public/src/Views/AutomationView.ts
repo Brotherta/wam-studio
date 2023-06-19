@@ -35,11 +35,27 @@ export default class AutomationView {
      * @param id the id of the item.
      * @param callback the callback for the onclick event.
      */
-    createItem(text: string, id: string, callback: any) {
+    createItem(text: string, id: string, callback: any, active: boolean = false) {
         let el = document.createElement("li");
         el.id = id;
-        el.innerText = text;
         el.className = "automation-item";
+        if (active) el.classList.add("active");
+
+        // Create a green dot element
+        let dot = document.createElement("span");
+        dot.className = "dot";
+        if (active) dot.classList.add("active-dot");
+
+        // Append the green dot to the item
+        el.appendChild(dot);
+
+        // Create a span element for the text
+        let itemText = document.createElement("span");
+        itemText.innerText = text;
+
+        // Append the text to the item
+        el.appendChild(itemText);
+
         el.onclick = callback;
         this.itemList.appendChild(el);
     }

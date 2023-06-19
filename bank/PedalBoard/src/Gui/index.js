@@ -13,5 +13,7 @@ export { Gui };
 export async function createElement(plugin, ...args) {
   // here we return the WebComponent GUI but it could be
   // any DOM node
-  return new Gui(plugin, ...args);
+  let gui = new Gui(plugin, ...args);
+  // await gui.loaded;
+  return gui;
 }

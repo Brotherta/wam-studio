@@ -89,7 +89,7 @@ router.get('/projects/:id/audio/:filename', (req, res) => {
     if (project) {
         const baseDir = path.dirname(project.path);
         const projectAudioDir = path.join(baseDir, 'audio');
-        const filePath = path.join(projectAudioDir, filename);
+        const filePath = path.resolve(projectAudioDir, filename);
         if (fs.existsSync(filePath)) {
             res.sendFile(filePath);
         }

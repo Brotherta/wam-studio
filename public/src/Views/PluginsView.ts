@@ -17,6 +17,8 @@ export default class PluginsView {
     mainTrack = document.getElementById("main-track") as HTMLDivElement;
     minMaxIcon = document.getElementById("min-max-icon") as HTMLImageElement;
 
+    loadingZone = document.getElementById("loading-zone") as HTMLDivElement;
+
     maxHeight: number;
     minHeight: number;
     originalHeight: number;
@@ -83,7 +85,7 @@ export default class PluginsView {
      * @param track
      */
     showPlugins(track: Track) {
-        this.deletePluginView()
+        // this.deletePluginView()
         this.mount.appendChild(track.plugin.dom);
     }
 
@@ -177,5 +179,13 @@ export default class PluginsView {
      */
     unselectHost() {
         this.mainTrack.style.border = "1px solid black";
+    }
+
+    async movePluginLoadingZone(track: Track) {
+        if (track.plugin.initialized) {
+            this.loadingZone.appendChild(track.plugin.dom);
+            // @ts-ignore
+            await track.plugin.dom._isConnected;
+        }
     }
 }

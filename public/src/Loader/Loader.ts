@@ -2,6 +2,10 @@ import App from "../App";
 import JSZip from "jszip";
 import {bufferToWave} from "../Audio/Utils/audioBufferToFlac";
 import APP_VERSION from "../version";
+import {BACKEND_URL} from "../Env";
+import * as path from "path";
+import {audioCtx} from "../index";
+import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 
 
 export default class Loader {
@@ -18,6 +22,12 @@ export default class Loader {
         let wavs = [];
         // TODO Total TRACK ACC
         let tracks = [];
+
+        let pluginHostState = null;
+        if (this.app.host.plugin.initialized) {
+            pluginHostState = await this.app.host.plugin.instance!._audioNode.getState();
+        }
+
         for (let track of this.app.tracksController.trackList) {
             let hasPlugin = track.plugin.initialized;
             let pluginState = null;
@@ -59,16 +69,16 @@ export default class Loader {
             }
 
             let trackJson = {
-                "track": {
-                    "name": track.element.name,
-                    "muted": track.isMuted,
-                    "soloed": track.isSolo,
-                    "volume": track.volume,
-                    "pan": track.pannerNode.pan.value,
-                    "plugins": hasPlugin ? pluginState : null,
-                    "regions": regions,
-                    "automations": automations
-                }
+                "id": track.id,
+                "name": track.element.name,
+                "color": track.color,
+                "muted": track.isMuted,
+                "soloed": track.isSolo,
+                "volume": track.volume,
+                "pan": track.pannerNode.pan.value,
+                "plugins": hasPlugin ? pluginState : null,
+                "regions": regions,
+                "automations": automations
             }
             tracks.push(trackJson);
         }
@@ -84,6 +94,7 @@ export default class Loader {
                 "recording": this.app.recorderController.recording,
                 "trackAcc": this.app.tracksController.trackIdCount,
                 "regionAcc": this.app.regionsController.regionIdCounter,
+                "plugin": pluginHostState
             },
             "tracks": tracks
         }
@@ -107,87 +118,122 @@ export default class Loader {
 
 
     async loadProject(data: any) {
-        let version = data.host.version;
+        let project = data.data;
+
+        let version = project.host.version;
         if (version !== APP_VERSION) {
             alert("Incompatible project version");
             return;
         }
-        let muted = data.host.muted;
-        let volume = data.host.volume;
-        let playing = data.host.playing;
-        let recording = data.host.recording;
-        let timer = data.host.timer;
-        let playhead = data.host.playhead;
-        let trackAcc = data.host.trackAcc;
-        let regionAcc = data.host.regionAcc;
+        let muted = project.host.muted;
+        let volume = project.host.volume;
+        let playing = project.host.playing;
+        let recording = project.host.recording;
+        let timer = project.host.timer;
+        let playhead = project.host.playhead;
+        let trackAcc = project.host.trackAcc;
+        let regionAcc = project.host.regionAcc;
 
-        let tracksJson = data.tracks;
+        let tracksJson = project.tracks;
 
+        this.app.hostController.playing = false;
         this.app.hostController.stopAll();
         this.app.tracksController.clearAllTracks();
+        this.app.host.timer = 0;
+        this.app.host.playhead = 0;
+        this.app.tracksController.trackIdCount = 1;
 
-        tracksJson.forEach((trackJson: any) => {
-            let trackName = trackJson.track.name;
-            let muted = trackJson.track.muted;
-            let soloed = trackJson.track.soloed;
-            let volume = trackJson.track.volume;
-            let pan = trackJson.track.pan;
-            let plugins = trackJson.track.plugins;
+        if (project.host.plugin !== null) {
+            await this.app.host.plugin.initPlugin();
+            this.app.pluginsController.connectPlugin(this.app.host);
+            this.app.pluginsView.movePluginLoadingZone(this.app.host);
+            await this.app.host.plugin.instance?._audioNode.setState(project.host.plugin);
+        }
 
-            let regions = trackJson.track.regions;
-            let automations = trackJson.track.automations;
+        // TODO WORKER FOR LOADING
+        for (const trackJson of tracksJson) {
+            let track = await this.app.tracksController.newEmptyTrack();
+            track.id = trackJson.id;
+
+            await this.app.tracksController.initTrackComponents(track);
 
 
-        });
+            track.element.name = trackJson.name;
+            track.element.trackNameInput.value = trackJson.name;
 
+            if (trackJson.muted) {
+                track.mute();
+                track.element.mute();
+            }
+            if (trackJson.soloed) {
+                track.isSolo = true;
+                track.element.solo();
+            }
+
+            track.setBalance(trackJson.pan);
+            track.setVolume(trackJson.volume);
+            track.element.volumeSlider.value = (trackJson.volume*100).toString();
+            track.element.balanceSlider.value = trackJson.pan;
+            this.app.tracksView.setColor(track, trackJson.color);
+
+            let plugins = trackJson.plugins;
+            if (plugins !== null) {
+                await track.plugin.initPlugin();
+                this.app.pluginsController.connectPlugin(track);
+                this.app.pluginsView.movePluginLoadingZone(track);
+                await track.plugin.instance?._audioNode.setState(plugins);
+
+                let state = await track.plugin.instance?._audioNode.getState();
+
+                let statePluginPromise = new Promise<void>((resolve, reject) => {
+                    const interval = setInterval(async () => {
+                        if (state.current.length === plugins.current.length) {
+                            await this.app.automationController.getAllAutomations(track);
+                            clearInterval(interval);
+                            resolve();
+                        }
+                        state = await track.plugin.instance?._audioNode.getState();
+                    }, 100);
+                });
+                await statePluginPromise;
+
+                let automations = trackJson.automations;
+                for (let automation of automations) {
+                    let bpf = track.automation.getBpfOfparam(automation.param);
+                    if (bpf !== undefined) {
+                        bpf.state = automation.state;
+                    }
+                }
+            }
+
+            let regions = trackJson.regions;
+            for (let region of regions) {
+                let url = `${BACKEND_URL}/projects/${data.id}/${region.path}`;
+                fetch(url, {
+                    method: "GET",
+                    credentials: "include"
+                }).then(async (response) => {
+                    if (response.ok) {
+                        let buffer = await response.arrayBuffer();
+                        let audioBuffer = await audioCtx.decodeAudioData(buffer);
+                        let opAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                        this.app.waveFormController.createWaveform(track, opAudioBuffer, region.start);
+                    }
+                });
+            }
+
+        }
 
         // let reader = new FileReader();
         // reader.onload = async (e) => {
         //     let zip = await JSZip.loadAsync(e.target!.result);
         //     let project = JSON.parse(await zip.file("project.json")!.async("string"));
         //     let audio = zip.folder("audio")!;
-        //
-        //
-        //     this.app.hostController.stopAll();
-        //     this.app.tracksController.clearAllTracks();
-        //
-        //     this.app.tracksController.trackIdCount = project.host.trackAcc;
-        //     this.app.regionsController.regionIdCounter = project.host.regionAcc;
-        //
-        //     this.app.host.timer = project.host.timer;
-        //     this.app.host.playhead = project.host.playhead;
-        //     this.app.host.isMuted = project.host.muted;
-        //     this.app.host.volume = project.host.volume;
-        //     this.app.hostController.playing = project.host.playing;
-        //     this.app.recorderController.recording = project.host.recording;
-        //
-        //     for (let track of project.tracks) {
-        //         let trackJson = track.track;
-        //         let newTrack = this.app.tracksController.createTrack(trackJson.name);
-        //         newTrack.isMuted = trackJson.muted;
-        //         newTrack.isSolo = trackJson.soloed;
-        //         newTrack.volume = trackJson.volume;
-        //         newTrack.pannerNode.pan.value = trackJson.pan;
-        //
-        //         if (trackJson.plugins !== null) {
-        //             await newTrack.plugin.initPlugin()
-        //             await newTrack.plugin.instance!._audioNode.setState(trackJson.plugins);
-        //         }
-        //
-        //         for (let region of trackJson.regions) {
-        //             let buffer = await audio.file(region.path)!.async("arraybuffer");
-        //             let audioBuffer = await this.app.audioContext.decodeAudioData(buffer);
-        //             newTrack.addRegion(audioBuffer, region.start, region.duration);
-        //         }
-        //
-        //         for (let automation of trackJson.automations) {
-        //             let bpf = newTrack.automation.getBpfOfparam(automation.param);
-        //             if (bpf !== undefined) {
-        //                 bpf.state = automation.state;
-        //             }
-        //         }
-        //     }
+        // ...
+        // ...
+        // ...
         // }
+        //
         // reader.readAsArrayBuffer(file);
     }
 }

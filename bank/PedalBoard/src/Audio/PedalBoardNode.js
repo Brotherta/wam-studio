@@ -196,7 +196,7 @@ export default class PedalBoardNode extends WamNode {
    * @author  Yann Forner
    */
   async setState(state) {
-    this.module.loadPreset(state.current);
+    await this.module.loadPreset(state.current);
     await this.module.gui.reloadPresets(state.presets);
   }
 

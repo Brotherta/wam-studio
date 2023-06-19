@@ -38,6 +38,7 @@ export default class WaveformController {
 
         this.app.regionsController.defineRegionListeners(region, regionView, waveformView!);
 
+        track.modified = true;
         track.addRegion(region);
     }
 
