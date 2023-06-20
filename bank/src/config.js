@@ -12,7 +12,7 @@ const CORS_OPTIONS = {
         allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]
     },
     production: {
-        origin: 'https://wam-studio.i3s.univ-cotedazur.fr/',
+        origin: 'https://wam-studio.i3s.univ-cotedazur.fr',
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]

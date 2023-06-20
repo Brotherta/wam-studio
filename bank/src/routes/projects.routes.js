@@ -24,13 +24,6 @@ const storage = multer.diskStorage({
             }
             cb(null, projectAudioDir);
         }
-
-        // const userDir = path.join(config.storageDir, req.params.id, 'audio');
-        // console.log(config.storageDir, req.params.id, userDir)
-        // if (!fs.existsSync(userDir)) {
-        //     fs.mkdirSync(userDir, { recursive: true });
-        // }
-        // cb(null, userDir);
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname);
