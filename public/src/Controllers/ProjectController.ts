@@ -105,10 +105,8 @@ export default class ProjectController {
         });
         if (response.status === 201) {
             let json = await response.json();
-            this.app.projectView.saveElement.showInfo("Project saved!");
             this.projectId = json.id;
             this.uploadWav(json.id, wavs);
-            this.saved = true;
         }
         else if (response.status === 400 && !override) {
             let json = await response.json();
@@ -247,11 +245,11 @@ export default class ProjectController {
         let url = BACKEND_URL + "/projects/" + projectId + "/audio";
 
         let totalSize = wavs.reduce((sum, wav) => sum + wav.blob.size, 0);
-        let loadedSize = 0;
+        let loadedSizes = Array(wavs.length).fill(0);
 
         let uploadsRemaining = wavs.length;
 
-        wavs.forEach((wav: any) => {
+        wavs.forEach((wav, index) => {
             let formData = new FormData();
             formData.append('audio', wav.blob, wav.name);
 
@@ -259,17 +257,18 @@ export default class ProjectController {
             xhr.open('POST', url, true);
             xhr.withCredentials = true
 
-            xhr.addEventListener('progress', (e) => {
+            xhr.upload.addEventListener('progress', (e) => {
+                console.log('progress');
                 if (e.lengthComputable) {
-                    loadedSize += e.loaded;
-                    let percentComplete = loadedSize / totalSize * 100;
+                    loadedSizes[index] = e.loaded;  // store the loaded bytes for this file
+                    let totalLoaded = loadedSizes.reduce((sum, loaded) => sum + loaded, 0);  // calculate the total loaded bytes for all files
+                    let percentComplete = totalLoaded / totalSize * 100;
                     console.log(`Total upload progress: ${percentComplete}%`);
 
                     // Assuming 'saveProjectElement' is the reference to your SaveProjectElement instance
-                    this.app.projectView.saveElement.progress(percentComplete, loadedSize, totalSize);
+                    this.app.projectView.saveElement.progress(percentComplete, totalLoaded, totalSize);
                 }
             });
-
             // Event listener for when the upload is done
             xhr.addEventListener('load', async () => {
                 if (xhr.status >= 200 && xhr.status < 300) {
@@ -278,6 +277,8 @@ export default class ProjectController {
 
                     uploadsRemaining--;
                     if (uploadsRemaining <= 0) {
+                        this.app.projectView.saveElement.showInfo("Project saved!");
+                        this.saved = true;
                         this.app.projectView.saveElement.progressDone(); // Hide the progress bar when all uploads are done
                     }
                 } else {

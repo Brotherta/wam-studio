@@ -60,6 +60,7 @@ button {
 #progress-bar {
     height: 100%;
     width: 0%;
+    border-radius: 5px;
     background-color: #4CAF50;
 }
 
