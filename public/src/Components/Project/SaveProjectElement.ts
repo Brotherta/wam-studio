@@ -48,6 +48,30 @@ button {
     border-radius: 4px;
 }
 
+#progress-bar-container {
+    display: none;
+    margin-top: 10px;
+    height: 20px;
+    width: 100%;
+    background-color: #888;
+    border-radius: 5px;
+}
+
+#progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #4CAF50;
+}
+
+#progress-text {
+    display: none;
+    font-size: 12px;
+    color: white;
+    text-align: center;
+    margin-top: 5px;
+}
+
+
 </style>
 
 <div class="main">
@@ -71,6 +95,12 @@ button {
     </div>
     
     <button id="save-project" type="button">Save Project</button>
+    
+    <div id="progress-bar-container">
+        <div id="progress-bar"></div>
+    </div>
+    <div id="progress-text"></div>
+
 </div>    
 `
 
@@ -97,6 +127,35 @@ export default class SaveProjectElement extends HTMLElement {
                 this._placeHolderErrorLog();
             });
         }
+    }
+
+    // Method to update the progress bar
+    progress(percent: number, loaded: number, total: number) {
+        this.progressBarContainer.style.display = "block";
+        this.progressText.style.display = "block";
+        this.progressBar.style.width = `${percent}%`;
+
+        let loadedMB = (loaded / (1024 * 1024)).toFixed(2); // convert to MB
+        let totalMB = (total / (1024 * 1024)).toFixed(2); // convert to MB
+        this.progressText.textContent = `${loadedMB} MB of ${totalMB} MB uploaded`;
+    }
+
+    // Method to hide the progress bar
+    progressDone() {
+        this.progressBarContainer.style.display = "none";
+        this.progressText.style.display = "none";
+    }
+
+    get progressBar() {
+        return this.shadowRoot?.getElementById("progress-bar") as HTMLDivElement;
+    }
+
+    get progressBarContainer() {
+        return this.shadowRoot?.getElementById("progress-bar-container") as HTMLDivElement;
+    }
+
+    get progressText() {
+        return this.shadowRoot?.getElementById("progress-text") as HTMLDivElement;
     }
 
     get user() {

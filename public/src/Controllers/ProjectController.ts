@@ -90,9 +90,6 @@ export default class ProjectController {
 
         let data = await this.app.loader.saveProject();
         let wavs = data.wavs;
-        for (let wav of wavs) {
-
-        }
 
         let response = await fetch(url, {
             method: "POST",
@@ -249,6 +246,11 @@ export default class ProjectController {
     uploadWav(projectId: string, wavs: { blob: Blob; name: string }[]) {
         let url = BACKEND_URL + "/projects/" + projectId + "/audio";
 
+        let totalSize = wavs.reduce((sum, wav) => sum + wav.blob.size, 0);
+        let loadedSize = 0;
+
+        let uploadsRemaining = wavs.length;
+
         wavs.forEach((wav: any) => {
             let formData = new FormData();
             formData.append('audio', wav.blob, wav.name);
@@ -259,8 +261,12 @@ export default class ProjectController {
 
             xhr.addEventListener('progress', (e) => {
                 if (e.lengthComputable) {
-                    const percentComplete = e.loaded / e.total;
-                    console.log(`Audio ${wav.name} upload progress: ${percentComplete}%`);
+                    loadedSize += e.loaded;
+                    let percentComplete = loadedSize / totalSize * 100;
+                    console.log(`Total upload progress: ${percentComplete}%`);
+
+                    // Assuming 'saveProjectElement' is the reference to your SaveProjectElement instance
+                    this.app.projectView.saveElement.progress(percentComplete, loadedSize, totalSize);
                 }
             });
 
@@ -269,6 +275,11 @@ export default class ProjectController {
                 if (xhr.status >= 200 && xhr.status < 300) {
                     // When the audio has been uploaded
                     console.log(`Audio ${wav.name} uploaded to ${xhr.responseText}`);
+
+                    uploadsRemaining--;
+                    if (uploadsRemaining <= 0) {
+                        this.app.projectView.saveElement.progressDone(); // Hide the progress bar when all uploads are done
+                    }
                 } else {
                     // If the request failed
                     console.log(`Failed to upload audio ${wav.name}: ${xhr.statusText}`);
@@ -283,4 +294,43 @@ export default class ProjectController {
             xhr.send(formData);
         });
     }
+
+
+    /*    uploadWav(projectId: string, wavs: { blob: Blob; name: string }[]) {
+            let url = BACKEND_URL + "/projects/" + projectId + "/audio";
+
+            wavs.forEach((wav: any) => {
+                let formData = new FormData();
+                formData.append('audio', wav.blob, wav.name);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', url, true);
+                xhr.withCredentials = true
+
+                xhr.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = e.loaded / e.total;
+                        console.log(`Audio ${wav.name} upload progress: ${percentComplete}%`);
+                    }
+                });
+
+                // Event listener for when the upload is done
+                xhr.addEventListener('load', async () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        // When the audio has been uploaded
+                        console.log(`Audio ${wav.name} uploaded to ${xhr.responseText}`);
+                    } else {
+                        // If the request failed
+                        console.log(`Failed to upload audio ${wav.name}: ${xhr.statusText}`);
+                    }
+                });
+
+                // Error listener
+                xhr.addEventListener('error', () => {
+                    console.log(`Failed to upload audio ${wav.name}: ${xhr.statusText}`);
+                });
+
+                xhr.send(formData);
+            });
+        }*/
 }

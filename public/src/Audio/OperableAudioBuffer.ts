@@ -1,3 +1,5 @@
+import {audioCtx} from "../index";
+
 class OperableAudioBuffer extends AudioBuffer {
     clone() {
         const newBuffer = new OperableAudioBuffer(this);
@@ -112,6 +114,23 @@ class OperableAudioBuffer extends AudioBuffer {
             }
         }
         return dstBuffer;
+    }
+
+    /**
+     * Transform a mono buffer to a stereo buffer.
+     * @returns {OperableAudioBuffer}
+     */
+    makeStereo() {
+        if (this.numberOfChannels != 1) return this;  // Already stereo or more.
+
+        let stereoBuf = audioCtx.createBuffer(2, this.length, this.sampleRate);
+        let stereoBuffer = Object.setPrototypeOf(stereoBuf, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+        let channelData = this.getChannelData(0);
+
+        stereoBuffer.copyToChannel(channelData, 0);  // Copy to left channel.
+        stereoBuffer.copyToChannel(channelData, 1);  // Copy to right channel.
+
+        return stereoBuffer;
     }
 }
 

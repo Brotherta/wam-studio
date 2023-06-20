@@ -142,6 +142,7 @@ export default class Loader {
         this.app.host.timer = 0;
         this.app.host.playhead = 0;
         this.app.tracksController.trackIdCount = 1;
+        this.app.host.setVolume(project.host.volume);
 
         if (project.host.plugin !== null) {
             await this.app.host.plugin.initPlugin();
@@ -207,21 +208,7 @@ export default class Loader {
             }
 
             let regions = trackJson.regions;
-            for (let region of regions) {
-                let url = `${BACKEND_URL}/projects/${data.id}/${region.path}`;
-                fetch(url, {
-                    method: "GET",
-                    credentials: "include"
-                }).then(async (response) => {
-                    if (response.ok) {
-                        let buffer = await response.arrayBuffer();
-                        let audioBuffer = await audioCtx.decodeAudioData(buffer);
-                        let opAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-                        this.app.waveFormController.createWaveform(track, opAudioBuffer, region.start);
-                    }
-                });
-            }
-
+            this.app.tracksController.loadTrackRegions(track, regions, data.id);
         }
 
         // let reader = new FileReader();

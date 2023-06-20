@@ -50,7 +50,7 @@ export default class EditorController {
                         .then(track => {
                             if (track !== undefined) {
                                 this.app.tracksController.initTrackComponents(track);
-
+                                track.element.progressDone();
                             }
                         });
                 }

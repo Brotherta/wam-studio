@@ -50,6 +50,9 @@ export default class Track {
     left: boolean = true;
     right: boolean = false;
 
+    url: string = "";
+    isDeleted: boolean = false;
+
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;
         this.element = element;

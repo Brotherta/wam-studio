@@ -201,6 +201,35 @@ template.innerHTML = /*html*/`
   box-shadow: 0 0 5px #5c69cc;
 }
 
+#loading-container {
+    width: 80%;
+    height: 20px;
+    background: #E0E0E0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#loading-bar {
+    padding: 10px;
+    height: 100%;
+    width: 0%;
+    background: rgb(92, 105, 204);
+    transition: width 0.3s ease-in-out;
+}
+
+#progress-bar-text {
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 10px;
+}
+
+
+.hidden {
+    display: none;
+}
 
 </style>
 
@@ -215,6 +244,12 @@ template.innerHTML = /*html*/`
             <i class="close-icon" style="width: 14px"></i>
         </div>
     </div>
+    
+    <div id="loading-container">
+        <div id="loading-bar"></div>
+    </div>
+    <div id="progress-bar-text"></div>
+  
     <div class="track-volume">
         <div class="icon">
 <!--            <img src="icons/volume-down-track.svg">-->
@@ -269,6 +304,7 @@ export default class TrackElement extends HTMLElement {
     isSolo: boolean = false;
     isMuted: boolean = false;
     isMonitoring: boolean = false;
+    isLoading: boolean = false;
 
     constructor() {
         super();
@@ -281,62 +317,11 @@ export default class TrackElement extends HTMLElement {
             this.shadowRoot.innerHTML = template.innerHTML;
             
             this.defineTrackNameListener();
+            this.shadowRoot.querySelectorAll(".track-volume, .track-balance, .track-controls").forEach((element) => {
+                element.classList.add("hidden");
+            });
+            this.isLoading = true;
         }
-    }
-
-    get closeBtn() {
-        return this.shadowRoot?.getElementById("close-btn") as HTMLDivElement;
-    }
-
-    get trackNameInput() {
-        return this.shadowRoot?.getElementById("name-input") as HTMLInputElement;
-    }
-
-    get soloBtn() {
-        return this.shadowRoot?.getElementById("solo-btn") as HTMLDivElement;
-    }
-
-    get muteBtn() {
-        return this.shadowRoot?.getElementById("mute-btn") as HTMLDivElement;
-    }
-
-    get volumeSlider() {
-        return this.shadowRoot?.getElementById("volume-slider") as HTMLInputElement;
-    }
-
-    get balanceSlider() {
-        return this.shadowRoot?.getElementById("balance-slider") as HTMLInputElement;
-    }
-
-    get color() {
-        return this.shadowRoot?.getElementById("color-div") as HTMLDivElement;
-    }
-
-    get automationBtn() {
-        return this.shadowRoot?.getElementById("automation") as HTMLDivElement;
-    }
-
-    get armBtn() {
-        return this.shadowRoot?.getElementById("arm") as HTMLDivElement;
-    }
-
-    get monitoringBtn() {
-        return this.shadowRoot?.getElementById("monitoring") as HTMLDivElement;
-    }
-
-    get modeBtn() {
-        return this.shadowRoot?.getElementById("mode") as HTMLDivElement;
-    }
-    get leftBtn() {
-        return this.shadowRoot?.getElementById("left") as HTMLDivElement;
-    }
-
-    get rightBtn() {
-        return this.shadowRoot?.getElementById("right") as HTMLDivElement;
-    }
-
-    get mergeBtn() {
-        return this.shadowRoot?.getElementById("merge") as HTMLDivElement;
     }
 
     defineTrackNameListener() {
@@ -400,6 +385,41 @@ export default class TrackElement extends HTMLElement {
             }
         });
     }
+
+    // Progress method that accepts a percentage and updates the width of the loading bar
+    progress(percent: number, loaded: number, total: number) {
+        if (!this.isLoading) return;
+        if (this.shadowRoot === null) return;
+
+        const loadingBar = this.shadowRoot.getElementById("loading-bar");
+        const progressBarText = this.shadowRoot.getElementById("progress-bar-text");
+        if (loadingBar === null || progressBarText === null) return;
+
+        loadingBar.style.width = `${percent}%`;
+        progressBarText.textContent = `${(loaded / (1024 * 1024)).toFixed(2)} MB of ${(total / (1024 * 1024)).toFixed(2)} MB`;
+    }
+
+    // Method to be called when progress is done
+    progressDone() {
+        if (!this.isLoading) return;
+        if (this.shadowRoot === null) return;
+
+        const progressBarText = this.shadowRoot.getElementById("progress-bar-text");
+        const loadingBar = this.shadowRoot.getElementById("loading-container");
+
+        if (loadingBar === null || progressBarText === null) return;
+
+        loadingBar.remove();
+        progressBarText.remove();
+
+        // Show the other elements
+        this.shadowRoot.querySelectorAll(".track-volume, .track-balance, .track-controls").forEach((element) => {
+            element.classList.remove("hidden");
+        });
+
+        this.isLoading = false;
+    }
+
 
     mute() {
         this.muteBtn.style.color = "red";
@@ -478,4 +498,64 @@ export default class TrackElement extends HTMLElement {
         this.rightBtn.classList.toggle("active");
     }
 
+
+
+    get closeBtn() {
+        return this.shadowRoot?.getElementById("close-btn") as HTMLDivElement;
+    }
+
+    get trackNameInput() {
+        return this.shadowRoot?.getElementById("name-input") as HTMLInputElement;
+    }
+
+    get soloBtn() {
+        return this.shadowRoot?.getElementById("solo-btn") as HTMLDivElement;
+    }
+
+    get muteBtn() {
+        return this.shadowRoot?.getElementById("mute-btn") as HTMLDivElement;
+    }
+
+    get volumeSlider() {
+        return this.shadowRoot?.getElementById("volume-slider") as HTMLInputElement;
+    }
+
+    get balanceSlider() {
+        return this.shadowRoot?.getElementById("balance-slider") as HTMLInputElement;
+    }
+
+    get color() {
+        return this.shadowRoot?.getElementById("color-div") as HTMLDivElement;
+    }
+
+    get automationBtn() {
+        return this.shadowRoot?.getElementById("automation") as HTMLDivElement;
+    }
+
+    get armBtn() {
+        return this.shadowRoot?.getElementById("arm") as HTMLDivElement;
+    }
+
+    get monitoringBtn() {
+        return this.shadowRoot?.getElementById("monitoring") as HTMLDivElement;
+    }
+
+    get modeBtn() {
+        return this.shadowRoot?.getElementById("mode") as HTMLDivElement;
+    }
+    get leftBtn() {
+        return this.shadowRoot?.getElementById("left") as HTMLDivElement;
+    }
+
+    get rightBtn() {
+        return this.shadowRoot?.getElementById("right") as HTMLDivElement;
+    }
+
+    get mergeBtn() {
+        return this.shadowRoot?.getElementById("merge") as HTMLDivElement;
+    }
+
+    get loadingBar() {
+        return this.shadowRoot?.getElementById("loading-bar") as HTMLDivElement;
+    }
 }

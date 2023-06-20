@@ -155,14 +155,14 @@ export default class HostController {
         songs.forEach((song) => {
             let name = song.name;
             let el = this.hostView.createNewSongItem(name);
-            el.onclick = () => {
+            el.onclick = async () => {
                 for (let trackSong of song.songs) {
-                    this.app.tracksController.newTrackUrl(trackSong)
-                        .then(track => {
-                            if (track !== undefined) {
-                                this.app.tracksController.initTrackComponents(track);
-                            }
-                        });
+                    let track = await this.app.tracksController.newEmptyTrack(trackSong)
+                    track.url = trackSong;
+                    this.app.tracksController.initTrackComponents(track);
+                }
+                for (let track of this.app.tracksController.trackList) {
+                    this.app.tracksController.loadTrackUrl(track);
                 }
             }
         });
@@ -182,6 +182,7 @@ export default class HostController {
                         .then(track => {
                             if (track !== undefined) {
                                 this.app.tracksController.initTrackComponents(track);
+                                track.element.progressDone();
                             }
                         });
                 }

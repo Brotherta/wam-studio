@@ -8,6 +8,8 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "../Models/Plugin";
+import Region from "../Models/Region";
+import {BACKEND_URL} from "../Env";
 
 /**
  * Controller for the track view. This controller is responsible for adding and removing tracks from the track view.
@@ -35,6 +37,7 @@ export default class TracksController {
             this.app.tracksController.newEmptyTrack()
                 .then(track => {
                     this.initTrackComponents(track);
+                    track.element.progressDone();
                 });
         });
     }
@@ -83,6 +86,7 @@ export default class TracksController {
         this.app.tracksController.deleteTrack(track);
         this.app.waveFormController.removeWaveformOfTrack(track);
         this.app.automationView.removeAutomationBpf(track.id);
+        track.isDeleted = true;
     }
 
     /**
@@ -180,8 +184,7 @@ export default class TracksController {
         let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
 
         let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-
-        node.setAudio(operableAudioBuffer.toArray());
+        operableAudioBuffer = operableAudioBuffer.makeStereo();
 
         // @ts-ignore
         let track = this.createTrack(node);
@@ -191,14 +194,17 @@ export default class TracksController {
         return track;
     }
 
-
-
-    async newEmptyTrack() {
+    async newEmptyTrack(url?: string) {
         let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
         let node = wamInstance.audioNode as WamAudioWorkletNode;
 
         let track = this.createTrack(node);
-        track.element.name = `Track ${track.id}`;
+        if (url) {
+            let urlSplit = url.split("/");
+            track.element.name = urlSplit[urlSplit.length - 1];
+        } else {
+            track.element.name = `Track ${track.id}`;
+        }
         return track;
     }
 
@@ -221,6 +227,7 @@ export default class TracksController {
                 return undefined;
             }
             let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+            operableAudioBuffer = operableAudioBuffer.makeStereo();
 
             node.setAudio(operableAudioBuffer.toArray());
 
@@ -347,4 +354,113 @@ export default class TracksController {
         }
         this.trackList = [];
     }
+
+
+    loadTrackUrl(track: Track) {
+        if (!track.url) return;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', track.url, true);
+        xhr.responseType = 'arraybuffer';
+
+        xhr.onprogress = (event) => {
+            if (event.lengthComputable) {
+                let percentComplete = event.loaded / event.total * 100;
+                // update progress bar on track element
+                // Stop the request if the track has been removed
+                if (track.isDeleted) {
+                    xhr.abort();
+                    return;
+                }
+                track.element.progress(percentComplete, event.loaded, event.total);
+            }
+        };
+
+        xhr.onload = () => {
+            if (xhr.status == 200) {
+                let audioArrayBuffer = xhr.response;
+                audioCtx.decodeAudioData(audioArrayBuffer)
+                    .then((audioBuffer) => {
+                        if (track.isDeleted) {
+                            xhr.abort();
+                            return;
+                        }
+                        let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                        operableAudioBuffer = operableAudioBuffer.makeStereo();
+                        this.app.waveFormController.createRegion(track, operableAudioBuffer, 0);
+                        track.element.progressDone();
+                    });
+            } else {
+                // Error occurred during the request
+                console.error('An error occurred fetching the track:', xhr.statusText);
+            }
+        };
+
+        xhr.onerror = () => {
+            console.error('An error occurred fetching the track');
+        };
+
+        xhr.send();
+    }
+
+    loadTrackRegions(track: Track, regions: any, projectId: string) {
+        let loadedRegions = 0;
+        let totalSize = 0;
+        let totalLoaded = 0;
+
+        for (let region of regions) {
+            let url = `${BACKEND_URL}/projects/${projectId}/${region.path}`;
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.responseType = 'arraybuffer';
+
+            xhr.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    totalSize += event.total;
+                    totalLoaded += event.loaded;
+
+                    let percentComplete = (totalLoaded / totalSize) * 100;
+
+                    if (track.isDeleted) {
+                        xhr.abort();
+                        return;
+                    }
+
+                    track.element.progress(percentComplete, totalLoaded, totalSize);
+                }
+            };
+
+            xhr.onload = async () => {
+                if (xhr.status == 200) {
+                    loadedRegions++;
+                    let audioArrayBuffer = xhr.response;
+                    let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
+
+                    if (track.isDeleted) {
+                        xhr.abort();
+                        return;
+                    }
+
+                    let opAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                    this.app.waveFormController.createRegion(track, opAudioBuffer, region.start);
+
+                    // All regions have been loaded, call progressDone
+                    if (loadedRegions === regions.length) {
+                        track.element.progressDone();
+                    }
+                } else {
+                    console.error('An error occurred fetching the track region:', xhr.statusText);
+                }
+            };
+
+            xhr.onerror = () => {
+                console.error('An error occurred fetching the track region');
+            };
+
+            xhr.send();
+        }
+    }
+
+
 }
