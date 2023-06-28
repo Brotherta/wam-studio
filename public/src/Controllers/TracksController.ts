@@ -405,7 +405,7 @@ export default class TracksController {
 
     loadTrackRegions(track: Track, regions: any, projectId: string) {
         let loadedRegions = 0;
-        let totalSize = 0;
+        let totalSize = new Map();
         let totalLoaded = 0;
 
         for (let region of regions) {
@@ -417,17 +417,20 @@ export default class TracksController {
 
             xhr.onprogress = (event) => {
                 if (event.lengthComputable) {
-                    totalSize += event.total;
-                    totalLoaded += event.loaded;
+                    totalLoaded -= totalSize.get(xhr) || 0;  // remove old value
+                    totalLoaded = Math.max(totalLoaded, 0);  // prevent negative values
+                    totalSize.set(xhr, event.total);  // update total size
+                    totalLoaded += event.loaded;  // update loaded size
 
-                    let percentComplete = (totalLoaded / totalSize) * 100;
+                    let totalSizeSum = Array.from(totalSize.values()).reduce((a, b) => a + b, 0);
+                    let percentComplete = (totalLoaded / totalSizeSum) * 100;
 
                     if (track.isDeleted) {
                         xhr.abort();
                         return;
                     }
 
-                    track.element.progress(percentComplete, totalLoaded, totalSize);
+                    track.element.progress(percentComplete, totalLoaded, totalSizeSum);
                 }
             };
 
