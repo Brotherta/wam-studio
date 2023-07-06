@@ -9,11 +9,11 @@ import Host from "./Models/Host";
 import PlayheadController from "./Controllers/PlayheadController";
 import PluginsController from "./Controllers/PluginsController";
 import PluginsView from "./Views/PluginsView";
-import EditorView from "./Views/EditorView";
+import EditorViewOld from "./Views/EditorViewOld";
 import AutomationController from "./Controllers/AutomationController";
 import AutomationView from "./Views/AutomationView";
-import RegionsController from "./Controllers/RegionsController";
-import WaveformController from "./Controllers/WaveformController";
+import RegionsControllerOld from "./Controllers/RegionsControllerOld";
+import WaveformControllerOld from "./Controllers/WaveformControllerOld";
 import RecorderController from "./Controllers/RecorderController";
 import LatencyController from "./Controllers/LatencyController";
 import LatencyView from "./Views/LatencyView";
@@ -34,8 +34,8 @@ export default class App {
     playheadController: PlayheadController;
     pluginsController: PluginsController;
     automationController: AutomationController;
-    waveFormController: WaveformController;
-    regionsController: RegionsController;
+    waveFormController: WaveformControllerOld;
+    regionsController: RegionsControllerOld;
     recorderController: RecorderController;
     latencyController: LatencyController;
     settingsController: SettingsController;
@@ -43,7 +43,7 @@ export default class App {
 
     hostView: HostView;
     tracksView: TracksView;
-    editorView: EditorView;
+    editorView: EditorViewOld;
     pluginsView: PluginsView;
     automationView: AutomationView;
     latencyView: LatencyView;
@@ -61,7 +61,7 @@ export default class App {
         this.hostView = new HostView();
         this.tracksView = new TracksView();
         this.pluginsView = new PluginsView();
-        this.editorView = new EditorView();
+        this.editorView = new EditorViewOld();
         this.automationView = new AutomationView();
         this.latencyView = new LatencyView();
         this.settingsView = new SettingsView();
@@ -73,8 +73,8 @@ export default class App {
         this.playheadController = new PlayheadController(this);
         this.pluginsController = new PluginsController(this);
         this.automationController = new AutomationController(this);
-        this.waveFormController = new WaveformController(this);
-        this.regionsController = new RegionsController(this);
+        this.waveFormController = new WaveformControllerOld(this);
+        this.regionsController = new RegionsControllerOld(this);
         this.recorderController = new RecorderController(this);
         this.latencyController = new LatencyController(this);
         this.settingsController = new SettingsController(this);

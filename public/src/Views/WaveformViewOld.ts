@@ -1,14 +1,14 @@
-import RegionView from "./RegionView";
+import RegionViewOld from "./RegionViewOld";
 import {Application, Container, Graphics} from "pixi.js";
-import {HEIGHT_TRACK, OFFSET_FIRST_TRACK} from "../Utils";
+import {HEIGHT_TRACK, OFFSET_FIRST_TRACK} from "../Utils/Utils";
 import Track from "../Models/Track";
 import Region from "../Models/Region";
 
 
-export default class WaveformView extends Container{
+export default class WaveformViewOld extends Container{
 
     pixiApp: Application;
-    regionViews: RegionView[];
+    regionViews: RegionViewOld[];
     trackId: number;
 
     background: Graphics;
@@ -20,7 +20,7 @@ export default class WaveformView extends Container{
     initialY: number;
     originalX: number;
     originalY: number;
-    movingRegion: RegionView | undefined;
+    movingRegion: RegionViewOld | undefined;
 
     constructor(pixiApp: Application, track: Track) {
         super();
@@ -58,7 +58,7 @@ export default class WaveformView extends Container{
     }
 
     createRegionView(region: Region) {
-        let regionView = new RegionView(this.pixiApp, this.trackId, region);
+        let regionView = new RegionViewOld(this.pixiApp, this.trackId, region);
         this.regionViews.push(regionView);
         this.addChild(regionView);
 
@@ -66,7 +66,7 @@ export default class WaveformView extends Container{
         return regionView;
     }
 
-    removeRegionView(regionView: RegionView) {
+    removeRegionView(regionView: RegionViewOld) {
         if (this.movingRegion === regionView) {
             this.movingRegion = undefined;
         }
@@ -81,7 +81,7 @@ export default class WaveformView extends Container{
         this.background.drawRect(0, 0, this.width, HEIGHT_TRACK-1);
     }
 
-    startMovingRegion(regionView: RegionView, initialX: number, initialY: number) {
+    startMovingRegion(regionView: RegionViewOld, initialX: number, initialY: number) {
         this.initialX = initialX;
         this.originalX = regionView.x;
         this.initialY = initialY;
@@ -109,7 +109,7 @@ export default class WaveformView extends Container{
         this.movingRegion = undefined;
     }
 
-    propagateMove(regionView: RegionView, oldWaveformView: WaveformView) {
+    propagateMove(regionView: RegionViewOld, oldWaveformView: WaveformViewOld) {
         this.initialX = oldWaveformView.initialX;
         this.originalX = oldWaveformView.originalX;
         this.initialY = oldWaveformView.initialY;

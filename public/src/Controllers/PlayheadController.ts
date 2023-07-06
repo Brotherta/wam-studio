@@ -1,5 +1,5 @@
 import App from "../App";
-import {RATIO_MILLS_BY_PX} from "../Utils";
+import {RATIO_MILLS_BY_PX} from "../Utils/Utils";
 import {audioCtx} from "../index";
 import PlayheadView from "../Views/PlayheadView";
 

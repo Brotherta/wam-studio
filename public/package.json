@@ -19,7 +19,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jszip": "^3.10.1",
-    "pixi.js": "^6.3.0"
+    "pixi.js": "^7.2.4"
   },
   "devDependencies": {
     "@types/jquery": "^3.5.14",

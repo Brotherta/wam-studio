@@ -2,7 +2,7 @@ import { audioCtx } from "..";
 import App from "../App";
 import AudioPlayerNode from "../Audio/AudioNode";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import { MAX_DURATION_SEC } from "../Utils";
+import { MAX_DURATION_SEC } from "../Utils/Utils";
 import Track from "./Track";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "./Plugin";

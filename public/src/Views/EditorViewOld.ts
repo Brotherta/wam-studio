@@ -1,21 +1,21 @@
 import {Application} from "pixi.js";
-import {HEIGHT_TRACK, MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
+import {HEIGHT_TRACK, MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Utils";
 import PlayheadView from "./PlayheadView";
 import Track from "../Models/Track";
-import WaveformView from "./WaveformView";
+import WaveformViewOld from "./WaveformViewOld";
 
 
 /**
  * The editor view is responsible for displaying the waveforms and the playhead.
  */
-export default class EditorView {
+export default class EditorViewOld {
 
     pixiApp: Application
     editor = document.getElementById("editor") as HTMLDivElement;
     trackContainer = document.getElementById("track-container") as HTMLDivElement;
     dragCover = document.getElementById("drag-cover") as HTMLDivElement;
 
-    waveforms: WaveformView[];
+    waveforms: WaveformViewOld[];
 
     playhead: PlayheadView;
 
@@ -24,7 +24,7 @@ export default class EditorView {
 
     constructor() {
         this.pixiApp = new Application({width: this.width, height: this.height, backgroundColor: 0x121213})
-        this.editor.appendChild(this.pixiApp.view);
+        this.editor.appendChild(this.pixiApp.view as HTMLCanvasElement);
         this.waveforms = [];
         this.playhead = new PlayheadView(this.pixiApp);
 
@@ -47,7 +47,7 @@ export default class EditorView {
      * @param track
      */
     createWaveformView(track: Track) {
-        let wave = new WaveformView(this.pixiApp, track);
+        let wave = new WaveformViewOld(this.pixiApp, track);
         this.waveforms.push(wave);
         this.resizeCanvas();
         return wave;

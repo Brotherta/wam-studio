@@ -1,22 +1,22 @@
 import App from "../App";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import Region from "../Models/Region";
-import RegionView from "../Views/RegionView";
-import WaveformView from "../Views/WaveformView";
-import {RATIO_MILLS_BY_PX} from "../Utils";
-import {InteractionEvent} from "pixi.js";
-import EditorView from "../Views/EditorView";
+import RegionViewOld from "../Views/RegionViewOld";
+import WaveformViewOld from "../Views/WaveformViewOld";
+import {RATIO_MILLS_BY_PX} from "../Utils/Utils";
+import {FederatedPointerEvent} from "pixi.js";
+import EditorViewOld from "../Views/EditorViewOld";
 
 
-export default class RegionsController {
+export default class RegionsControllerOld {
 
     app: App;
-    editorView: EditorView;
+    editorView: EditorViewOld;
 
     regionIdCounter: number;
 
     isMovingRegion: boolean = false;
-    selectedRegion: RegionView | undefined;
+    selectedRegion: RegionViewOld | undefined;
 
     constructor(app: App) {
         this.app = app;
@@ -68,7 +68,7 @@ export default class RegionsController {
         track.modified = true;
     }
 
-    selectRegion(region: RegionView) {
+    selectRegion(region: RegionViewOld) {
         if (this.selectedRegion !== region) {
             this.deselectRegion();
             this.selectedRegion = region;
@@ -84,7 +84,7 @@ export default class RegionsController {
         }
     }
 
-    defineRegionListeners(region: Region, regionView: RegionView, waveFormView: WaveformView) {
+    defineRegionListeners(region: Region, regionView: RegionViewOld, waveFormView: WaveformViewOld) {
         regionView.on("pointerdown", (_e) => {
             this.selectRegion(regionView);
             waveFormView.startMovingRegion(regionView, _e.data.global.x, _e.data.global.y);
@@ -106,7 +106,7 @@ export default class RegionsController {
         });
     }
 
-    stopMovingRegion(regionView: RegionView, region: Region, waveFormView: WaveformView, _e: InteractionEvent) {
+    stopMovingRegion(regionView: RegionViewOld, region: Region, waveFormView: WaveformViewOld, _e: FederatedPointerEvent) {
         if (this.isMovingRegion) {
             this.isMovingRegion = false;
             let track = this.app.tracksController.getTrack(region.trackId);
@@ -120,7 +120,7 @@ export default class RegionsController {
         }
     }
 
-    updateWaveformRegion(y: number, _region: Region, _regionView: RegionView, _waveFormView: WaveformView) {
+    updateWaveformRegion(y: number, _region: Region, _regionView: RegionViewOld, _waveFormView: WaveformViewOld) {
         if (y < 0) y = 0;
         if (_regionView !== _waveFormView.movingRegion) return;
         let newWaveformView = this.editorView.getWaveformView(y);
@@ -129,7 +129,7 @@ export default class RegionsController {
         }
     }
 
-    moveRegionToWaveform(_region: Region, regionView: RegionView, oldWaveformView: WaveformView, newWaveformView: WaveformView) {
+    moveRegionToWaveform(_region: Region, regionView: RegionViewOld, oldWaveformView: WaveformViewOld, newWaveformView: WaveformViewOld) {
         let oldTrack = this.app.tracksController.getTrack(oldWaveformView.trackId);
         let newTrack = this.app.tracksController.getTrack(newWaveformView.trackId);
         if (oldTrack == undefined || newTrack == undefined) {

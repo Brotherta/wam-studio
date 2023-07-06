@@ -1,5 +1,5 @@
 import App from "../App";
-import EditorView from "../Views/EditorView";
+import EditorViewOld from "../Views/EditorViewOld";
 
 
 /**
@@ -7,7 +7,7 @@ import EditorView from "../Views/EditorView";
  */
 export default class EditorController {
 
-    editorView: EditorView;
+    editorView: EditorViewOld;
     app: App;
 
     constructor(app: App) {
@@ -42,7 +42,7 @@ export default class EditorController {
             console.table(files);
             ([...files]).forEach(file => {
                 if (file.type == "application/zip") {
-                    this.generateSHAHash(file);
+                    generateSHAHash(file);
                     this.app.loader.loadProject(file);
                 }
                 else {
@@ -58,55 +58,6 @@ export default class EditorController {
         });
     }
 
-    async generateSHAHash(file: File) {
-        if (!file) {
-            console.error('No file selected');
-            return;
-        }
 
-        try {
-            const arrayBuffer = await this.readFileAsArrayBuffer(file);
-            // @ts-ignore
-            const md5Hash = await this.generateSHA(arrayBuffer);
-            console.log(`SHA Hash: ${md5Hash}`);
-        } catch (error) {
-            console.error('Error generating SHA hash', error);
-        }
-    }
-
-    readFileAsArrayBuffer(file: File) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-
-            reader.onload = (event) => {
-                // @ts-ignore
-                resolve(event.target.result);
-            };
-
-            reader.onerror = (error) => {
-                reject(error);
-            };
-
-            reader.readAsArrayBuffer(file);
-        });
-    }
-
-    async generateSHA(arrayBuffer: ArrayBuffer) {
-        console.log('Generating SHA hash...');
-        const digest = await crypto.subtle.digest('SHA-256', arrayBuffer);
-        return this.bufferToHex(digest);
-    }
-
-    bufferToHex(buffer: ArrayBuffer) {
-        const view = new DataView(buffer);
-        let hexString = '';
-
-        for (let i = 0; i < view.byteLength; i += 4) {
-            const uint32 = view.getUint32(i);
-            hexString += uint32.toString(16).padStart(8, '0');
-        }
-
-        return hexString;
-    }
 
 }

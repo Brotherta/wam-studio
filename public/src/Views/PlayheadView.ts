@@ -1,5 +1,5 @@
 import {Application, Graphics} from "pixi.js";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Utils";
 import {audioCtx} from "../index";
 
 /**

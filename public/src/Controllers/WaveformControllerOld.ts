@@ -3,13 +3,13 @@ import Track from "../Models/Track";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import Region from "../Models/Region";
 import {audioCtx} from "../index";
-import EditorView from "../Views/EditorView";
+import EditorViewOld from "../Views/EditorViewOld";
 
-export default class WaveformController {
+export default class WaveformControllerOld {
 
     app: App;
 
-    editorView: EditorView;
+    editorView: EditorViewOld;
 
     constructor(app: App) {
         this.app = app;
