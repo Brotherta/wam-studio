@@ -1,6 +1,6 @@
 import RegionViewOld from "./RegionViewOld";
 import {Application, Container, Graphics} from "pixi.js";
-import {HEIGHT_TRACK, OFFSET_FIRST_TRACK} from "../Utils/Utils";
+import {HEIGHT_TRACK, OFFSET_FIRST_TRACK} from "../Utils/Constants";
 import Track from "../Models/Track";
 import Region from "../Models/Region";
 

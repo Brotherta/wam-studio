@@ -5,7 +5,7 @@ import {audioCtx} from "../index";
 import WamEventDestination from "../Audio/WAM/WamEventDestination";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Utils";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Constants";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "../Models/Plugin";
 import Region from "../Models/Region";

@@ -3,7 +3,7 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import Region from "../Models/Region";
 import RegionViewOld from "../Views/RegionViewOld";
 import WaveformViewOld from "../Views/WaveformViewOld";
-import {RATIO_MILLS_BY_PX} from "../Utils/Utils";
+import {RATIO_MILLS_BY_PX} from "../Utils/Constants";
 import {FederatedPointerEvent} from "pixi.js";
 import EditorViewOld from "../Views/EditorViewOld";
 

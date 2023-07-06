@@ -1,5 +1,5 @@
 import {Application, Container, Graphics} from "pixi.js";
-import {HEIGHT_TRACK, RATIO_MILLS_BY_PX} from "../Utils/Utils";
+import {HEIGHT_TRACK, RATIO_MILLS_BY_PX} from "../Utils/Constants";
 import Region from "../Models/Region";
 
 export default class RegionViewOld extends Container {

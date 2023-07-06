@@ -1,5 +1,5 @@
 import {Application} from "pixi.js";
-import {HEIGHT_TRACK, MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Utils";
+import {HEIGHT_TRACK, MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Constants";
 import PlayheadView from "./PlayheadView";
 import Track from "../Models/Track";
 import WaveformViewOld from "./WaveformViewOld";
