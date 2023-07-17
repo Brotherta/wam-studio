@@ -164,19 +164,19 @@ export default class HostController {
         songs.forEach((song) => {
             let name = song.name;
             let el = this.hostView.createNewSongItem(name);
-            el.onclick = () => {
+            el.onclick = async () => {
                 if (!this.app.projectController.saved) {
                     this.app.projectController.openConfirm(
                         "If you open a new project, you will lose all your unsaved changes. Do you want to continue ?",
-                        () => {
-                            this.app.tracksController.openSong(song, name);
+                        async () => {
+                            await this.app.tracksController.openSong(song, name);
                             this.app.projectController.saved = false;
                         },
                         () => { }
                     )
                 }
                 else {
-                    this.app.tracksController.openSong(song, name);
+                    await this.app.tracksController.openSong(song, name);
                     this.app.projectController.saved = false;
                 }
             }
@@ -292,6 +292,7 @@ export default class HostController {
         else {
             this.app.automationController.applyAllAutomations();
             this.app.tracks.trackList.forEach(async (track) => {
+                console.log(track.modified);
                 if (track.modified) track.updateBuffer(this.audioCtx, this.app.host.playhead);
                 //@ts-ignore
                 track.node.parameters.get("playing").value = 1;

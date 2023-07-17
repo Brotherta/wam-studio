@@ -4,7 +4,7 @@ import Region from "../Models/Region";
 import RegionView from "../Views/RegionView";
 import WaveformView from "../Views/WaveformView";
 import {RATIO_MILLS_BY_PX} from "../Utils/Utils";
-import {InteractionEvent} from "pixi.js";
+import {FederatedPointerEvent} from "pixi.js";
 
 
 export default class RegionsController {
@@ -101,7 +101,7 @@ export default class RegionsController {
         });
     }
 
-    stopMovingRegion(regionView: RegionView, region: Region, waveFormView: WaveformView, _e: InteractionEvent) {
+    stopMovingRegion(regionView: RegionView, region: Region, waveFormView: WaveformView, _e: FederatedPointerEvent) {
         if (this.isMovingRegion) {
             this.isMovingRegion = false;
             let track = this.app.tracks.getTrack(region.trackId);

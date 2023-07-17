@@ -24,7 +24,7 @@ export default class EditorView {
 
     constructor() {
         this.pixiApp = new Application({width: this.width, height: this.height, backgroundColor: 0x121213})
-        this.editor.appendChild(this.pixiApp.view);
+        this.editor.appendChild(this.pixiApp.view as HTMLCanvasElement);
         this.waveforms = [];
         this.playhead = new PlayheadView(this.pixiApp);
 

@@ -47,12 +47,12 @@ export default class BindsView {
         }
     }
 
-    reorderControls(track: Track[]) {
-        this.controlsContainer.innerHTML = "";
-        let tracks = track.sort((a, b) => a.id - b.id);
-        for (let i = 0; i < tracks.length; i++) {
-            const track = tracks[i];
-            this.controlsContainer.appendChild(track.bindControl.trackBindElement);
-        }
-    }
+    // reorderControls(track: Track[]) {
+    //     this.controlsContainer.innerHTML = "";
+    //     let tracks = track.sort((a, b) => a.id - b.id);
+    //     for (let i = 0; i < tracks.length; i++) {
+    //         const track = tracks[i];
+    //         this.controlsContainer.appendChild(track.bindControl.trackBindElement);
+    //     }
+    // }
 }

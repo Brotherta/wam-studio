@@ -2,7 +2,10 @@ const template: HTMLTemplateElement = document.createElement("template");
 
 template.innerHTML = /*html*/`
 
+<link rel="stylesheet" href="style/instruments-icons.css">
+
 <style>
+
 .icon {
     padding-left: 23px;
     padding-right: 23px;
@@ -162,6 +165,44 @@ template.innerHTML = /*html*/`
     cursor: pointer;
 }
 
+
+#loading-container {
+    width: 80%;
+    height: 20px;
+    background: #E0E0E0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#loading-bar {
+    padding: 10px;
+    height: 100%;
+    width: 0%;
+    background: rgb(92, 105, 204);
+    transition: width 0.3s ease-in-out;
+}
+
+#progress-bar-text {
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.icon-instrument {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    flex-direction: row-reverse;
+    padding-right: 10px;
+}
+
 </style>
 
 <link rel="stylesheet" href="/style/icons.css">
@@ -179,15 +220,25 @@ template.innerHTML = /*html*/`
         </div>
       
     </div>
-    <div class="track-volume">
-        <div class="icon">
-            <img src="icons/volume-down-track.svg">
-        </div>
-        <input type="range" class="form-range tracko" id="volume-slider">
-        <div class="icon">
-            <img src="icons/volume-up-track.svg">
-        </div>
+    
+    <div id="loading-container">
+        <div id="loading-bar"></div>
     </div>
+    <div id="progress-bar-text"></div>
+  
+    
+<!--    <div class="track-volume">-->
+<!--        <div class="icon">-->
+<!--            <img src="icons/volume-down-track.svg">-->
+<!--        </div>-->
+<!--        <input type="range" class="form-range tracko" id="volume-slider">-->
+<!--        <div class="icon">-->
+<!--            <img src="icons/volume-up-track.svg">-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div class="icon-instrument">-->
+<!--        <div class="other"></div>-->
+<!--    </div>-->
     <div class="track-balance">
         <div class="letter-icon">
             L
@@ -198,8 +249,9 @@ template.innerHTML = /*html*/`
         </div>
     </div>
     <div class="track-controls">
-        <div id="mute-btn" class="mute-icon">Mute</div>
+        <div id="mute-btn" class="mute-icon" hidden>Mute</div>
         <div id="solo-btn" class="solo-icon">Solo</div>
+        <div id="instrument-icon" class="other"></div>
         <div id="arm" class="control" hidden>
             <img src="icons/mic-fill.svg">
         </div>
@@ -221,6 +273,7 @@ export default class TrackElement extends HTMLElement {
     isArmed: boolean = false;
     isSolo: boolean = false;
     isMuted: boolean = false;
+    isLoading: boolean = false;
     private initialized: Boolean;
 
     constructor() {
@@ -234,48 +287,13 @@ export default class TrackElement extends HTMLElement {
             this.shadowRoot.innerHTML = template.innerHTML;
             this.initialized = true;
             this.defineTrackNameListener();
+            this.shadowRoot.querySelectorAll(".track-volume, .track-balance, .track-controls").forEach((element) => {
+                element.classList.add("hidden");
+            });
+            this.isLoading = true;
         }
     }
 
-    get settingsBtn() {
-        return this.shadowRoot?.getElementById("settings-btn") as HTMLDivElement;
-    }
-
-    get closeBtn() {
-        return this.shadowRoot?.getElementById("close-btn") as HTMLDivElement;
-    }
-
-    get trackNameInput() {
-        return this.shadowRoot?.getElementById("name-input") as HTMLInputElement;
-    }
-
-    get soloBtn() {
-        return this.shadowRoot?.getElementById("solo-btn") as HTMLDivElement;
-    }
-
-    get muteBtn() {
-        return this.shadowRoot?.getElementById("mute-btn") as HTMLDivElement;
-    }
-
-    get volumeSlider() {
-        return this.shadowRoot?.getElementById("volume-slider") as HTMLInputElement;
-    }
-
-    get balanceSlider() {
-        return this.shadowRoot?.getElementById("balance-slider") as HTMLInputElement;
-    }
-
-    get color() {
-        return this.shadowRoot?.getElementById("color-div") as HTMLDivElement;
-    }
-
-    get automationBtn() {
-        return this.shadowRoot?.getElementById("automation") as HTMLDivElement;
-    }
-
-    get armBtn() {
-        return this.shadowRoot?.getElementById("arm") as HTMLDivElement;
-    }
 
 
     defineTrackNameListener() {
@@ -341,6 +359,41 @@ export default class TrackElement extends HTMLElement {
         });
     }
 
+    // Progress method that accepts a percentage and updates the width of the loading bar
+    progress(percent: number, loaded: number, total: number) {
+        if (!this.isLoading) return;
+        if (this.shadowRoot === null) return;
+
+        const loadingBar = this.shadowRoot.getElementById("loading-bar");
+        const progressBarText = this.shadowRoot.getElementById("progress-bar-text");
+        if (loadingBar === null || progressBarText === null) return;
+
+        loadingBar.style.width = `${percent}%`;
+        progressBarText.textContent = `${(loaded / (1024 * 1024)).toFixed(2)} MB of ${(total / (1024 * 1024)).toFixed(2)} MB`;
+    }
+
+    // Method to be called when progress is done
+    progressDone() {
+        if (!this.isLoading) return;
+        if (this.shadowRoot === null) return;
+
+        const progressBarText = this.shadowRoot.getElementById("progress-bar-text");
+        const loadingBar = this.shadowRoot.getElementById("loading-container");
+
+        if (loadingBar === null || progressBarText === null) return;
+
+        loadingBar.remove();
+        progressBarText.remove();
+
+        // Show the other elements
+        this.shadowRoot.querySelectorAll(".track-volume, .track-balance, .track-controls").forEach((element) => {
+            element.classList.remove("hidden");
+        });
+
+        this.isLoading = false;
+    }
+
+
     mute() {
         this.muteBtn.style.color = "red";
         this.muteBtn.style.backgroundColor = "#767373";
@@ -399,5 +452,50 @@ export default class TrackElement extends HTMLElement {
                 element.setAttribute("style", "display: none;");
             }
         }
+    }
+
+
+    get settingsBtn() {
+        return this.shadowRoot?.getElementById("settings-btn") as HTMLDivElement;
+    }
+
+    get closeBtn() {
+        return this.shadowRoot?.getElementById("close-btn") as HTMLDivElement;
+    }
+
+    get trackNameInput() {
+        return this.shadowRoot?.getElementById("name-input") as HTMLInputElement;
+    }
+
+    get soloBtn() {
+        return this.shadowRoot?.getElementById("solo-btn") as HTMLDivElement;
+    }
+
+    get muteBtn() {
+        return this.shadowRoot?.getElementById("mute-btn") as HTMLDivElement;
+    }
+
+    get volumeSlider() {
+        return this.shadowRoot?.getElementById("volume-slider") as HTMLInputElement;
+    }
+
+    get balanceSlider() {
+        return this.shadowRoot?.getElementById("balance-slider") as HTMLInputElement;
+    }
+
+    get color() {
+        return this.shadowRoot?.getElementById("color-div") as HTMLDivElement;
+    }
+
+    get automationBtn() {
+        return this.shadowRoot?.getElementById("automation") as HTMLDivElement;
+    }
+
+    get armBtn() {
+        return this.shadowRoot?.getElementById("arm") as HTMLDivElement;
+    }
+
+    get instrumentIcon() {
+        return this.shadowRoot?.getElementById("instrument-icon") as HTMLDivElement;
     }
 }

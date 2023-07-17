@@ -32,7 +32,7 @@ export default class Host extends Track {
         super(-1, new TrackElement(), undefined);
         this.app = app;
         this.audioCtx = audioCtx;
-        this.globalVolume = 0.5;
+        this.globalVolume = 1;
         this.oldGlobalVolume = 0.0;
         this.timer = 0;
         this.playhead = 0;
@@ -40,7 +40,7 @@ export default class Host extends Track {
         this.plugin = new Plugin(app);
         
         this.gainNode = this.audioCtx.createGain()
-        this.setVolume(0.5);    
+        this.setVolume(1);
         this.gainNode.connect(this.audioCtx.destination);
     }
 

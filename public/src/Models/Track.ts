@@ -20,8 +20,8 @@ export default class Track {
     gainNode: GainNode;
     pannerNode: StereoPannerNode;
 
-    volume: number = 0.50;
-    oldVolume: number = 0.50;
+    volume: number = 1;
+    oldVolume: number = 1;
 
     isMuted: boolean = false;
     isSolo: boolean = false;
@@ -44,6 +44,8 @@ export default class Track {
     url: string;
     tag: SongTagEnum;
 
+    isDeleted: boolean = false;
+
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;
         this.element = element;
@@ -56,7 +58,7 @@ export default class Track {
         this.tag = SongTagEnum.OTHER;
 
         this.gainNode = audioCtx.createGain();
-        this.gainNode.gain.value = 0.5;
+        this.gainNode.gain.value = 1;
         this.pannerNode = audioCtx.createStereoPanner();
         if (this.node !== undefined) {
             this.node.connect(this.pannerNode).connect(this.gainNode);

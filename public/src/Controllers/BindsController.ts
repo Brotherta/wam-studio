@@ -35,6 +35,8 @@ export default class BindsController {
         this.view.loadingZone.appendChild(advElement);
         this.view.addTrackBindElement(trackBindElement);
 
+        this.addVolumeSlider(track);
+
         this.defineBindListener(bindControl, track);
         this.app.presetsController.refreshPresetList(track.tag);
     }
@@ -43,6 +45,21 @@ export default class BindsController {
         let bindControl = track.bindControl;
         this.view.removeTrackBindElement(track.id);
         bindControl.advElement.remove();
+    }
+
+    addVolumeSlider(track: Track) {
+        let slider = document.createElement("bind-slider-element") as BindSliderElement;
+        track.bindControl.trackBindElement.addBindSliderElement(slider);
+        slider.id = "volume";
+        slider.setNameLabel("Volume");
+        slider.slider.value = "100";
+        slider.valueLabel.innerHTML = "100";
+        // set color to white
+        slider.style.backgroundColor = "#646464";
+        slider.slider.oninput = async () => {
+            let value = parseInt(slider.slider.value) / 100;
+            track.setVolume(value);
+        }
     }
 
     private defineBindListener(bindControl: BindControl, track: Track) {

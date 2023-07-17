@@ -3,6 +3,7 @@ import TracksView from "../Views/TracksView";
 import App from "../App";
 import Host from "../Models/Host";
 import {audioCtx} from "../index";
+import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 
 /**
  * Controller for the track view. This controller is responsible for adding and removing tracks from the track view.
@@ -22,8 +23,9 @@ export default class TracksController {
     defineNewTrackCallback() {
         this.tracksView.newTrackDiv.addEventListener('click', () => {
             this.app.tracks.newEmptyTrack()
-                .then(track => {
-                    this.initTrackComponents(track);
+                .then(async (track) => {
+                    await this.initTrackComponents(track);
+                    track.element.progressDone();
                 });
         });
     }
@@ -131,10 +133,10 @@ export default class TracksController {
             track.isMuted = !track.isMuted;
         }
 
-        track.element.volumeSlider.oninput = () => {
-            let value = parseInt(track.element.volumeSlider.value) / 100;
-            track.setVolume(value);
-        }
+        // track.element.volumeSlider.oninput = () => {
+        //     let value = parseInt(track.element.volumeSlider.value) / 100;
+        //     track.setVolume(value);
+        // }
 
         track.element.balanceSlider.oninput = () => {
             let value = parseFloat(track.element.balanceSlider.value);
@@ -212,22 +214,81 @@ export default class TracksController {
         this.app.tracks.trackList = [];
     }
 
-    openSong(song:any, name: string) {
+    async openSong(song:any, name: string) {
         this.app.tracksController.clearAllTracks();
         this.app.hostView.headerTitle.innerHTML = name;
         this.app.hostController.maxTime = 0;
         for (let trackSong of song.songs) {
-            this.app.tracksView.addPlaceholder();
-            this.app.tracks.newTrackUrl(trackSong)
-                .then(async track => {
-                    if (track !== undefined) {
-                        await this.app.tracksController.initTrackComponents(track);
-                        this.app.hostController.maxTime = Math.max(this.app.hostController.maxTime, track.audioBuffer!.duration*1000);
-                        this.app.tracksView.removePlaceholder();
-                    }
-                });
+            console.log(trackSong.name);
+            let track = await this.app.tracks.newEmptyTrack(trackSong);
+            await this.app.tracksController.initTrackComponents(track);
         }
+        for (let track of this.app.tracks.trackList) {
+            console.log("loading utl ", track.element.name);
+            this.app.tracksController.loadTrackUrl(track);
+        }
+        // for (let trackSong of song.songs) {
+        //     this.app.tracksView.addPlaceholder();
+        //     this.app.tracks.newTrackUrl(trackSong)
+        //         .then(async track => {
+        //             if (track !== undefined) {
+        //                 await this.app.tracksController.initTrackComponents(track);
+        //                 this.app.hostController.maxTime = Math.max(this.app.hostController.maxTime, track.audioBuffer!.duration*1000);
+        //                 this.app.tracksView.removePlaceholder();
+        //             }
+        //         });
+        // }
 
-        this.app.bindsView.reorderControls(this.app.tracks.trackList);
+        // this.app.bindsView.reorderControls(this.app.tracks.trackList);
+    }
+
+    loadTrackUrl(track: Track) {
+        if (!track.url) return;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', track.url, true);
+        xhr.responseType = 'arraybuffer';
+
+        xhr.onprogress = (event) => {
+            if (event.lengthComputable) {
+                let percentComplete = event.loaded / event.total * 100;
+                // update progress bar on track element
+                // Stop the request if the track has been removed
+                if (track.isDeleted) {
+                    xhr.abort();
+                    return;
+                }
+                track.element.progress(percentComplete, event.loaded, event.total);
+            }
+        };
+
+        xhr.onload = () => {
+            if (xhr.status == 200) {
+                let audioArrayBuffer = xhr.response;
+                audioCtx.decodeAudioData(audioArrayBuffer)
+                    .then((audioBuffer) => {
+                        if (track.isDeleted) {
+                            xhr.abort();
+                            return;
+                        }
+                        let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                        // @ts-ignore
+                        track.node.setAudio(operableAudioBuffer.toArray());
+                        track.audioBuffer = operableAudioBuffer;
+                        track.modified = false;
+                        this.app.hostController.maxTime = Math.max(this.app.hostController.maxTime, track.audioBuffer!.duration*1000);
+                        track.element.progressDone();
+                    });
+            } else {
+                // Error occurred during the request
+                console.error('An error occurred fetching the track:', xhr.statusText);
+            }
+        };
+
+        xhr.onerror = () => {
+            console.error('An error occurred fetching the track');
+        };
+
+        xhr.send();
     }
 }

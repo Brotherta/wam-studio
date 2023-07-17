@@ -7,6 +7,7 @@ import { audioCtx } from "../index";
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Utils";
 import Track from "./Track";
 import Plugin from "./Plugin";
+import {SongTagEnum} from "../Utils/SongTagEnum";
 
 /**
  * Model for the audios buffers stored in each tracks. 
@@ -57,12 +58,21 @@ export default class Tracks {
         return track;
     }
 
-    async newEmptyTrack() {
+    async newEmptyTrack(song?: any) {
         let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
         let node = wamInstance.audioNode as WamAudioWorkletNode;
 
         let track = this.createTrack(node);
-        track.element.name = `Track ${track.id}`;
+        if (song) {
+            track.url = song.url;
+            track.element.name = song.name;
+            track.tag = song.tag;
+        }
+        else {
+            track.element.name = `Track ${track.id}`;
+            track.tag = SongTagEnum.OTHER;
+        }
+
         return track;
     }
 
@@ -134,6 +144,7 @@ export default class Tracks {
         track.node!.removeAudio();
         track.node!.disconnectEvents();
         track.node!.disconnect();
+        track.isDeleted = true;
     }
 
     /**
