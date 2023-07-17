@@ -16,7 +16,7 @@ export default class HostView {
     playIcon = document.getElementById("play-icon") as HTMLDivElement;
     muteIcon = document.getElementById("mute-icon") as HTMLDivElement;
 
-    vuMeterCanvas = document.getElementById("vu-meter") as HTMLCanvasElement;
+    vuMeterCanvas = document.getElementById("vu-meter-canvas") as HTMLCanvasElement;
 
     songsContainer = document.getElementById("songs-container") as HTMLDivElement;
 

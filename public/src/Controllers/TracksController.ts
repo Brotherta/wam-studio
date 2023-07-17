@@ -72,7 +72,7 @@ export default class TracksController {
     initTrackComponents(track: Track) {
         this.app.tracksController.addNewTrackInit(track);
         this.app.automationView.addAutomationBpf(track.id);
-        this.app.waveFormController.addWaveformToTrack(track);
+        this.app.waveformController.addWaveformToTrack(track);
     }
 
     /**
@@ -84,7 +84,7 @@ export default class TracksController {
         this.app.pluginsController.removePlugins(track);
         this.tracksView.removeTrack(track.element);
         this.app.tracksController.deleteTrack(track);
-        this.app.waveFormController.removeWaveformOfTrack(track);
+        this.app.waveformController.removeWaveformOfTrack(track);
         this.app.automationView.removeAutomationBpf(track.id);
         track.isDeleted = true;
     }
@@ -346,7 +346,7 @@ export default class TracksController {
         for (let track of this.trackList) {
             this.app.pluginsController.removePlugins(track);
             this.tracksView.removeTrack(track.element);
-            this.app.waveFormController.removeWaveformOfTrack(track);
+            this.app.waveformController.removeWaveformOfTrack(track);
             this.app.automationView.removeAutomationBpf(track.id);
             track.node!.removeAudio();
             track.node!.disconnectEvents();
@@ -387,7 +387,7 @@ export default class TracksController {
                         }
                         let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
                         operableAudioBuffer = operableAudioBuffer.makeStereo();
-                        this.app.waveFormController.createRegion(track, operableAudioBuffer, 0);
+                        this.app.waveformController.createRegion(track, operableAudioBuffer, 0);
                         track.element.progressDone();
                     });
             } else {
@@ -446,7 +446,7 @@ export default class TracksController {
                     }
 
                     let opAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-                    this.app.waveFormController.createRegion(track, opAudioBuffer, region.start);
+                    this.app.waveformController.createRegion(track, opAudioBuffer, region.start);
 
                     // All regions have been loaded, call progressDone
                     if (loadedRegions === regions.length) {

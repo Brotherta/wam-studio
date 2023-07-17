@@ -25,23 +25,28 @@ export default class PluginsController {
         this.hideAllControllers();
 
         this.selectPlugins();
-        this.defineResizeListener();
         this.defineMinimizeMaximizeListener();
         this.defineNewPluginBtnListener();
     }
 
-    /**
-     * define the listeners when the window is resized.
-     */
-    defineResizeListener() {
-        this.pluginsView.resize();
-    }
 
     /**
      * Define the listeners for the minimize and maximize buttons.
      */
     defineMinimizeMaximizeListener() {
-        this.pluginsView.controlRackWindow();
+        this.pluginsView.maximized = false;
+        this.pluginsView.maxMinBtn.addEventListener("click", () => {
+            if (this.pluginsView.maximized) {
+                this.pluginsView.minimize();
+                this.pluginsView.maximized = false;
+                this.app.editorView.resizeCanvas();
+            }
+            else {
+                this.pluginsView.maximize();
+                this.pluginsView.maximized = true;
+                this.app.editorView.resizeCanvas();
+            }
+        });
     }
 
     /**

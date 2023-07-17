@@ -1,44 +1,42 @@
-import App from "../App";
-import EditorViewOld from "../Views/EditorViewOld";
+import App from "../../App";
+import EditorView from "../../Views/Editor/EditorView";
 
 
-/**
- * Controller for the canvas view. This controller is responsible for adding and removing waveforms from the canvas.
- */
 export default class EditorController {
 
-    editorView: EditorViewOld;
+    editor: EditorView;
     app: App;
 
     constructor(app: App) {
-        this.editorView = app.editorView;
+        this.editor = app.editorView;
         this.app = app;
-        this.defineDragAndDrop();
+
+        this.bindEvents();
     }
 
     /**
      * Defines the drag and drop functionality for the editor.
      * It adds the dropped files to the track view.
      */
-    defineDragAndDrop() {
+    bindEvents() {
         ["dragenter", "dragstart"].forEach(eventName => {
-           this.editorView.editor.addEventListener(eventName, () => {
-               this.editorView.dragCover.hidden = false;
-           });
+            this.editor.canvasContainer.addEventListener(eventName, () => {
+                this.editor.dragCover.hidden = false;
+            });
         });
 
 
-        this.editorView.dragCover.addEventListener("dragleave", () => {
-            this.editorView.dragCover.hidden = true;
+        this.editor.dragCover.addEventListener("dragleave", () => {
+            this.editor.dragCover.hidden = true;
         });
 
         window.ondragend = () => {
-            this.editorView.dragCover.hidden = true;
+            this.editor.dragCover.hidden = true;
         }
 
-        this.editorView.dragCover.addEventListener("drop", (e) => {
+        this.editor.dragCover.addEventListener("drop", (e) => {
             let files = e.dataTransfer!.files;
-            this.editorView.dragCover.hidden = true;
+            this.editor.dragCover.hidden = true;
             console.table(files);
             ([...files]).forEach(file => {
                 if (file.type == "application/zip") {
@@ -57,7 +55,6 @@ export default class EditorController {
             });
         });
     }
-
 
 
 }

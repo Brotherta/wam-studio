@@ -6,7 +6,7 @@ export default class PluginsView {
 
     resizeBtn = document.getElementById("resize-btn") as HTMLDivElement;
     maxMinBtn = document.getElementById("min-max-btn") as HTMLDivElement;
-    rack = document.getElementById("rack") as HTMLDivElement;
+    rack = document.getElementById("plugin-editor") as HTMLDivElement;
     newPlugin = document.getElementById("add-plugins") as HTMLDivElement;
     mount = document.getElementById("mount") as HTMLDivElement;
     floating = document.getElementById("plugin-window") as HTMLDivElement;
@@ -24,44 +24,12 @@ export default class PluginsView {
     originalHeight: number;
 
     // private dragging: boolean;
-    private maximized: boolean;
-    private currentSize: number;
+    maximized: boolean;
 
     constructor() {
         this.minHeight = 25;
-        this.maxHeight = document.body.getBoundingClientRect().height * 2/3;
-        this.currentSize = 180;
-        this.maximize();
-    }
-
-    /**
-     * Minimize the rack to the minimum height and change the icon to maximize.
-     */
-    resize() {
-        window.addEventListener("resize", () => {
-            this.maxHeight = document.body.getBoundingClientRect().height * 3/4;
-            this.originalHeight = parseFloat(getComputedStyle(this.rack, null).getPropertyValue('height').replace("px",''));
-            if (this.originalHeight > this.maxHeight) {
-                this.rack.style.minHeight = this.maxHeight+"px";
-            }
-        })
-    }
-
-    /**
-     * Add the event listener to the button that maximizes and minimizes the rack.
-     */
-    controlRackWindow() {
-        this.maximized = true;
-        this.maxMinBtn.addEventListener("click", () => {
-            if (this.maximized) {
-                this.minimize();
-                this.maximized = false;
-            }
-            else {
-                this.maximize();
-                this.maximized = true;
-            }
-        });
+        this.maxHeight = 180;
+        this.minimize();
     }
 
     /**
@@ -69,7 +37,7 @@ export default class PluginsView {
      */
     maximize() {
         this.minMaxIcon.className = "arrow-down-icon";
-        this.rack.style.minHeight = this.currentSize + "px";
+        this.rack.style.minHeight = this.maxHeight + "px";
     }
 
     /**

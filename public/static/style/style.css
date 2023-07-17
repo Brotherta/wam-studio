@@ -2,6 +2,7 @@
     --menu-color: #413e3e;
     --head-color: #3b4046;
     --main-background-color: #1C1E21;
+    --track-container-width: 161px;
 }
 
 html, body {
@@ -15,42 +16,14 @@ body {
     scrollbar-width: auto;
 }
 
-div::-webkit-scrollbar {
-    background-color: rgb(249, 249, 249);
-    width: 12px;
-    height: 12px;
-}
-
-div::-webkit-scrollbar-track {
-    background: rgb(44, 44, 44);
-}
-
-div::-webkit-scrollbar-corner {
-    background: rgb(44, 44, 44);
-}
-
-div::-webkit-scrollbar-thumb {
-    background: rgb(107, 107, 107);
-    border-radius: 9px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-}
-
-div::-webkit-scrollbar-thumb:hover {
-    background: rgb(147, 147, 147);
-    border-radius: 9px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-}
-
-.app {
+body {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.controls-bar {
+#menu-bar {
     border: 1px solid black;
     border-top: none;
     background-color: rgb(41, 42, 45);
@@ -61,7 +34,7 @@ div::-webkit-scrollbar-thumb:hover {
     height: 52px;
 }
 
-.left-controls {
+#left-controls {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -69,7 +42,7 @@ div::-webkit-scrollbar-thumb:hover {
     min-width: max-content;
 }
 
-.right-controls {
+#right-controls {
     display: flex;
     flex-direction: row-reverse;
     flex-wrap: nowrap;
@@ -77,7 +50,7 @@ div::-webkit-scrollbar-thumb:hover {
     width: 100%;
 }
 
-.editors {
+#app {
     height: 100%;
     width: 100%;
     display: flex;
@@ -85,17 +58,17 @@ div::-webkit-scrollbar-thumb:hover {
     overflow: hidden;
 }
 
-.main-editors {
+#track-editor {
     height: 100%;
     width: 100%;
     display: flex;
     flex-direction: row;
-    overflow-y: hidden;
+    overflow: hidden;
     border-bottom: 1px solid black;
 }
 
-.track-container {
-    min-width: 161px;
+#track-container {
+    min-width: var(--track-container-width);
     display: flex;
     flex-direction: column;
     border-right: 1px solid black;
@@ -105,6 +78,119 @@ div::-webkit-scrollbar-thumb:hover {
     overflow-y: scroll;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+}
+
+#track-container track-element:nth-child(2) {
+    margin-top: 25px;
+}
+
+#track-container .new-track:nth-child(2) {
+    margin-top: 34px;
+}
+
+#track-container-header {
+    position: absolute;
+    min-height: 25px;
+    min-width: 159px;
+    border-bottom: 1px solid rgb(0, 0, 0);
+    background-color: var(--head-color);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#editor {
+    width: calc(100% - var(--track-container-width));
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#editor-content {
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+}
+
+#editor-canvas {
+    flex-grow: 1;
+}
+
+#automation-container {
+    position: absolute;
+    padding-top: 25px;
+    height: auto;
+    width: 100%;
+    flex-direction: column;
+    display: flex;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    pointer-events: none;
+}
+
+#plugin-editor {
+    height: 25px;
+    border: 1px solid black;
+    background: rgb(23, 23, 26);
+}
+
+#plugin-container-header {
+    position: absolute;
+    min-height: 25px;
+    width: 100%;
+    border-bottom: 1px solid rgb(0, 0, 0);
+    background-color: var(--head-color);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#header-main-track {
+    min-width: 161px;
+    border-right: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+#plugins {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    margin-top: 24px;
+    display: flex;
+    flex-direction: row;
+}
+
+
+#main-track {
+    min-width: 161px;
+    background: rgb(23, 23, 26);
+    border: 1px solid black;
+    margin-top: 1px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+#vu-meter {
+    margin-top: 20px;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+#vu-meter-canvas{
+    border: 1px solid #313131;
+    border-radius: 3px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
 }
 
 #loading-zone {
@@ -119,109 +205,22 @@ div::-webkit-scrollbar-thumb:hover {
     max-height: 350px;
 }
 
-.track-container-header {
-    position: absolute;
-    min-height: 25px;
-    min-width: 159px;
-    border-bottom: 1px solid rgb(0, 0, 0);
-    background-color: var(--head-color);
+
+/* CUSTOM ELEMENTS */
+
+track-element {
     display: flex;
+    width: 100%;
+    min-height: 120px;
+    max-height: 120px;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
+    background: rgb(44, 44, 44);
+    border: solid 1px black;
 }
 
-.rack-container-header {
-    position: absolute;
-    min-height: 25px;
-    width: 100%;
-    border-bottom: 1px solid rgb(0, 0, 0);
-    background-color: var(--head-color);
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-#rack {
-    height: 25px;
-    border: 1px solid black;
-    background: rgb(23, 23, 26);
-}
-
-#plugins {
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll;
-    margin-top: 24px;
-    display: flex;
-    flex-direction: row;
-}
-
-.editor {
-    width: 100%;
-    overflow-y: scroll;
-    margin-top: 24px;
-    background: #121213;
-    display: grid;
-    grid-template-columns: 1fr;
-} 
-
-.test {
-    width: 100%;
-    display: flex;
-    overflow: hidden;
-    position: relative;
-    background-color: #121214;
-}
-
-.playhead {
-    position: absolute;
-    min-height: 25px;
-    max-height: 25px;
-    overflow: hidden;
-    width: 4000px;
-    border-bottom: 1px solid rgb(0, 0, 0);
-    background-color: var(--head-color);
-}
-
-.playhead-range {
-    -webkit-appearance: none;  /* Override default CSS styles */
-    appearance: none;
-    width: 100%; /* Full-width */
-    height: 25px; /* Specified height */
-    background: var(--head-color); /* Grey background */
-    outline: none; /* Remove outline */
-    cursor: pointer;
-}
-  
-  
-  /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
-.playhead-range::-webkit-slider-thumb {
-    -webkit-appearance: none; /* Override default look */
-    appearance: none;
-    width: 10px; /* Set a specific slider handle width */
-    height: 20px; /* Slider handle height */
-    background: lightgrey; /* Green background */
-    cursor: pointer; /* Cursor on hover */
-    border-bottom-right-radius: 20px 30px;
-}
-  
-.playhead-range::-moz-range-thumb {
-    -webkit-appearance: none; /* Override default look */
-    appearance: none;
-    width: 10px; /* Set a specific slider handle width */
-    height: 20px; /* Slider handle height */
-    background: lightgrey; /* Green background */
-    cursor: pointer; /* Cursor on hover */
-    border-bottom-right-radius: 20px 30px;
-}
-
-.track-container::-webkit-scrollbar {
-    display: none;
- }
 
 
 .menu-item {
@@ -316,26 +315,6 @@ div::-webkit-scrollbar-thumb:hover {
 }
 
 
-.track-container track-element:nth-child(2) {
-    margin-top: 25px;
-}
-
-.track-container .new-track:nth-child(2) {
-    margin-top: 34px;
-}
-
-track-element {
-    display: flex;
-    width: 100%;
-    min-height: 120px;
-    max-height: 120px;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    background: rgb(44, 44, 44);
-    border: solid 1px black;
-} 
 
 .text-icon {
     padding-left: 15px;
@@ -457,38 +436,7 @@ track-element {
     padding: 10px;
 }
 
-#main-track {
-    min-width: 161px;
-    background: rgb(23, 23, 26);
-    border: 1px solid black;
-    margin-top: 1px;
-    margin-bottom: 24px;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-}
 
-#header-main-track {
-    min-width: 161px;
-    border-right: 1px solid black;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-}
-
-.vu-meter {
-    margin-top: 20px;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-}
-
-#vu-meter{
-    border: 1px solid #313131;
-    border-radius: 3px;
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
-}
 
 #drag-cover {
     position: absolute;
@@ -568,18 +516,6 @@ ul {
     padding: 0 !important;
     margin: 0 !important;
     list-style-type: none;
-}
-
-#automation-container {
-    height: auto;
-    width: 12000px;
-    flex-direction: column;
-    display: flex;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    pointer-events: none;
-    grid-column-start: 1;
-    grid-row-start: 1;
 }
 
 .automation-location {

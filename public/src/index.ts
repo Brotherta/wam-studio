@@ -10,6 +10,7 @@ import LoginElement from "./Components/Project/LoginElement";
 import PlaceholderElement from "./Components/Utils/PlaceholderElement";
 import ConfirmElement from "./Components/Utils/ConfirmElement";
 import DialogElement from "./Components/Utils/DialogElement";
+import ScrollBarElement from "./Components/ScrollBarElement";
 
 customElements.define(
     "track-element",
@@ -42,6 +43,10 @@ customElements.define(
 customElements.define(
     "placeholder-element",
     PlaceholderElement
+);
+customElements.define(
+    "scrollbar-element",
+    ScrollBarElement
 );
 
 window.addEventListener('beforeunload', (e) => {
