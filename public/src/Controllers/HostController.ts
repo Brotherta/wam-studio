@@ -45,7 +45,7 @@ export default class HostController {
         this.defineMenuListeners();
         this.app.hostView.updateTimer(0)
         this.app.hostView.volumeSlider.value = "100";
-    } 
+    }
 
     /**
      * Define the listener for the timer.
@@ -142,7 +142,7 @@ export default class HostController {
                         console.warn("User " + predefinedUser + " not found");
                         this.app.projectController.predefinedUser = "";
                         alert("User " + predefinedUser + " not found, redirecting to home page");
-                        window.location.replace("/")
+                        window.location.replace("/");
                     }
                 }
                 this.defineSongs(songs);

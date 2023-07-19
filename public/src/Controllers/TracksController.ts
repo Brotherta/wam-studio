@@ -31,7 +31,7 @@ export default class TracksController {
     }
 
 
-    async newEmptyTrack(song?: any) {
+    async newEmptyTrack(song?: any, splitChannel?: string) {
         let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, audioCtx);
         let node = wamInstance.audioNode as WamAudioWorkletNode;
 
@@ -40,6 +40,10 @@ export default class TracksController {
             track.url = song.url;
             track.element.name = song.name;
             track.tag = song.tag;
+            if (splitChannel) {
+                track.splitting = true;
+                track.splitChannel = splitChannel;
+            }
         }
         else {
             track.element.name = `Track ${track.id}`;
@@ -168,10 +172,11 @@ export default class TracksController {
      * @param track Track to be added to the track view.
      */
     addNewTrackInit(track: Track) {
+        track.element.switchMode(this.app.hostController.advancedMode);
         this.tracksView.addTrack(track.element);
         this.tracksView.changeColor(track);
+        this.splitTrack(track);
         this.defineTrackListener(track);
-        track.element.switchMode(this.app.hostController.advancedMode);
     }
 
     async initTrackComponents(track: Track) {
@@ -245,6 +250,7 @@ export default class TracksController {
 
         track.element.balanceSlider.oninput = () => {
             let value = parseFloat(track.element.balanceSlider.value);
+            console.log(track.element.balanceSlider.value);
             track.setBalance(value);
         }
 
@@ -310,14 +316,27 @@ export default class TracksController {
         this.app.tracksController.clearAllTracks();
         this.app.hostView.headerTitle.innerHTML = name;
         this.app.hostController.maxTime = 0;
+        let splitting = song.splitting;
         for (let trackSong of song.songs) {
             console.log(trackSong.name);
-            let track = await this.newEmptyTrack(trackSong);
+            let track;
+            if (song.splitting) {
+                track = await this.newEmptyTrack(trackSong, trackSong.split);
+            }
+            else {
+                track = await this.newEmptyTrack(trackSong);
+            }
+
             await this.app.tracksController.initTrackComponents(track);
         }
         for (let track of this.trackList) {
             console.log("loading utl ", track.element.name);
-            this.app.tracksController.loadTrackUrl(track);
+            if (splitting) {
+                this.app.tracksController.loadTrackUrl(track);
+            }
+            else {
+                this.app.tracksController.loadTrackUrl(track);
+            }
         }
     }
 
@@ -368,5 +387,13 @@ export default class TracksController {
         };
 
         xhr.send();
+    }
+
+    splitTrack(track: Track) {
+        if (track.splitting) {
+            track.element.balanceSlider.value = track.splitChannel === "L" ? '-1' : '1';
+            track.setBalance(track.splitChannel === "L" ? -1 : 1);
+        }
+
     }
 }

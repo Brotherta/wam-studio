@@ -38,6 +38,9 @@ export default class Track {
     isDeleted: boolean = false;
     volumeSlider: BindSliderElement;
 
+    splitting: boolean;
+    splitChannel: string;
+
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;
         this.element = element;
@@ -45,6 +48,8 @@ export default class Track {
         this.node = node;
         this.removed = false;
         this.tag = SongTagEnum.OTHER;
+        this.splitting = false;
+        this.splitChannel = "L";
 
         this.gainNode = audioCtx.createGain();
         this.gainNode.gain.value = 1;
