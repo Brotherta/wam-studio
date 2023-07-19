@@ -6,6 +6,7 @@ import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import {RingBuffer} from "../Audio/Utils/ringbuf";
 import {SongTagEnum} from "../Utils/SongTagEnum";
 import BindControl from "./BindControl";
+import BindSliderElement from "../Components/Binds/BindSliderElement";
 
 export default class Track {
 
@@ -35,6 +36,7 @@ export default class Track {
     tag: SongTagEnum;
 
     isDeleted: boolean = false;
+    volumeSlider: BindSliderElement;
 
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;

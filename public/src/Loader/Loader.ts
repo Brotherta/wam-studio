@@ -63,12 +63,13 @@ export default class Loader {
     }
 
     async loadProject(json: any) {
+
         this.app.hostController.playing = false;
         this.app.hostController.stop();
         this.app.tracksController.clearAllTracks();
         this.app.host.timer = 0;
         this.app.host.playhead = 0;
-        this.app.tracksController.trackIdCount = 0;
+        this.app.tracksController.trackIdCount = 1;
 
 
         let cover = document.createElement("div");
@@ -78,51 +79,49 @@ export default class Loader {
         coverText.classList.add("cover-text");
         coverText.textContent = "Loading project";
 
-        cover.appendChild(coverText);
-        document.body.appendChild(cover);
+        // cover.appendChild(coverText);
+        // document.body.appendChild(cover);
 
         this.app.hostView.headerTitle.innerHTML = json.songName;
 
-        let trackInitializedPromise = json.tracks.map(async (trackJson: any) => {
+        for (let trackJson of json.tracks) {
             let track: Track;
             if (trackJson.url === null) {
                 track = await this.app.tracksController.newEmptyTrack();
+                await this.app.tracksController.initTrackComponents(track);
             }
             else {
-                // let song = {
-                //     "name": trackJson.name,
-                //     "url": trackJson.url,
-                //     "tag": trackJson.tag
-                // }
-                track = await this.app.tracksController.newEmptyTrack(); // TODO REPLACE WITH NEW TRACK
+                track = await this.app.tracksController.newEmptyTrack(trackJson);
+                await this.app.tracksController.initTrackComponents(track);
+                await this.app.tracksController.loadTrackUrl(track);
             }
 
             track.id = trackJson.id;
             track.tag = trackJson.tag;
-
-            await this.app.tracksController.initTrackComponents(track);
-            document.getElementById("loading-zone")!.appendChild(track.plugin.dom);
-
             track.plugin.state = trackJson.plugin;
+
             await track.plugin.instance!._audioNode.setState(trackJson.plugin);
             let state = await track.plugin.instance!._audioNode.getState();
 
             let statePlugin = new Promise<void>((resolve) => {
+                let test = 0;
+                let maxTest = 10;
                 const interval = setInterval(async () => {
+                    console.log(track.id, state.current.length, trackJson.plugin.current.length)
                     if (state.current.length === trackJson.plugin.current.length) {
                         clearInterval(interval);
                         resolve();
                     }
                     state = await track.plugin.instance!._audioNode.getState();
-                }, 100);
+                    test++;
+                    if (test > maxTest) {
+                        console.log("max test reached for", track.id);
+                        test = 0;
+                        await track.plugin.instance!._audioNode.setState(trackJson.plugin);
+                    }
+                }, 200);
             });
             await statePlugin;
-        });
-
-        await Promise.all(trackInitializedPromise);
-
-        let trackBindInitializedPromise = json.tracks.map(async (trackJson: any) => {
-            let track = this.app.tracksController.getTrack(trackJson.id)!;
 
             track.element.name = trackJson.name;
             track.element.trackNameInput.value = trackJson.name;
@@ -130,7 +129,7 @@ export default class Loader {
             if (trackJson.soloed) track.element.solo();
             track.setVolume(trackJson.volume);
             track.setBalance(trackJson.pan);
-            track.element.volumeSlider.value = (trackJson.volume*100).toString();
+            track.volumeSlider.slider.value = (trackJson.volume*100).toString();
             track.element.balanceSlider.value = trackJson.pan;
 
             if (trackJson.presetName) {
@@ -158,11 +157,12 @@ export default class Loader {
                 }
                 await this.app.bindsController.selectBind(track);
             }
-        });
-
-        await Promise.all(trackBindInitializedPromise);
+        }
+        // let trackInitializedPromise = json.tracks.map(async (trackJson: any) => {
         //
-        // this.app.bindsView.reorderControls(this.app.tracks.trackList);
+        // });
+        //
+        // await Promise.all(trackInitializedPromise);
 
         setTimeout(() => {
             this.app.pluginsView.mount.innerHTML = "";

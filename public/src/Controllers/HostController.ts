@@ -10,7 +10,6 @@ import {SONGS_FILE_URL} from "../Env";
 export default class HostController {
 
     app: App;
-    audioCtx: AudioContext;
     hostView: HostView;
 
     playing: boolean = false;
@@ -142,9 +141,10 @@ export default class HostController {
                     else {
                         console.warn("User " + predefinedUser + " not found");
                         this.app.projectController.predefinedUser = "";
+                        alert("User " + predefinedUser + " not found, redirecting to home page");
+                        window.location.replace("/")
                     }
                 }
-                console.log(songs);
                 this.defineSongs(songs);
             })
     }
@@ -242,8 +242,8 @@ export default class HostController {
     }
 
     clickOnPlayButton() {
-        if (this.audioCtx.state === "suspended") {
-            this.audioCtx.resume();
+        if (audioCtx.state === "suspended") {
+            audioCtx.resume();
         }
         if (this.playing) {
             this.app.tracksController.trackList.forEach((track) => {

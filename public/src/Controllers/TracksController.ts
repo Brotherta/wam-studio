@@ -297,8 +297,8 @@ export default class TracksController {
     clearAllTracks() {
         for (let track of this.trackList) {
             this.app.pluginsController.removePlugins(track);
-            this.tracksView.removeTrack(track.element);
             this.app.bindsController.removeBindControl(track);
+            this.tracksView.removeTrack(track.element);
             track.node!.removeAudio();
             track.node!.disconnectEvents();
             track.node!.disconnect();

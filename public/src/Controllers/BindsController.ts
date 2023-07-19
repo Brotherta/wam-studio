@@ -49,6 +49,7 @@ export default class BindsController {
 
     addVolumeSlider(track: Track) {
         let slider = document.createElement("bind-slider-element") as BindSliderElement;
+        track.volumeSlider = slider;
         track.bindControl.trackBindElement.addBindSliderElement(slider);
         slider.id = "volume";
         slider.setNameLabel("Volume");
