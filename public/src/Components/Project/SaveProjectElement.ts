@@ -164,5 +164,9 @@ export default class SaveProjectElement extends HTMLElement {
         this.confirm.style.display = "";
         this.yes.onclick = yesCallback;
     }
+
+    disableUserInput() {
+        this.user.disabled = true;
+    }
 }
 

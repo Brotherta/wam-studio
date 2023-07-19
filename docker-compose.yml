@@ -9,23 +9,16 @@ services:
       - HTTPS=false
     restart: unless-stopped
 
-  backend:
-    build: ./server
+  bank:
+    build: ./bank
     ports:
       - "6002:6002"
     environment:
+      - HTTPS=false
       - STORAGE_DIR=/data/storage
     volumes:
       - projects:/data/storage
     restart: unless-stopped
 
-  bank:
-    build: ./bank
-    ports:
-      - "7002:7002"
-    environment:
-      - HTTPS=false
-    restart: unless-stopped
-
 volumes:
-    projects:
+  projects:

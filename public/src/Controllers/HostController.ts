@@ -2,6 +2,7 @@ import HostView from "../Views/HostView";
 import App from "../App";
 import songs from "../../static/songs/songs.json";
 import {audioCtx} from "../index";
+import {SONGS_FILE_URL} from "../Env";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -50,9 +51,10 @@ export default class HostController {
         this.defineVolumeListener();
         this.defineMuteListener();
         this.defineTimerListener();
-        this.defineSongs();
+        this.searchUserSongs();
         this.defineMenuListeners();
         this.app.hostView.updateTimer(0)
+        this.app.hostView.volumeSlider.value = "100";
     } 
 
     /**
@@ -160,7 +162,39 @@ export default class HostController {
         }
     }
 
-    defineSongs() {
+    searchUserSongs() {
+        fetch(SONGS_FILE_URL)
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                }
+                else {
+                    throw new Error("Error while loading songs");
+                }
+            })
+            .then((songFile) => {
+                let songs = songFile.songs;
+                let predefinedUser = this.app.projectController.predefinedUser;
+                if (predefinedUser !== "") {
+                    // switch to user mode if a user is defined (before set to true because of the switchMode() function)
+                    this.advancedMode = true;
+                    this.switchMode();
+                    let users = songFile.users;
+                    let user = users.find((u: any) => { return u.name === predefinedUser });
+                    if (user) {
+                        songs = songs.filter((song: any) => { return user.songs.includes(song.id) });
+                    }
+                    else {
+                        console.warn("User " + predefinedUser + " not found");
+                        this.app.projectController.predefinedUser = "";
+                    }
+                }
+                console.log(songs);
+                this.defineSongs(songs);
+            })
+    }
+
+    defineSongs(songs: any[]) {
         songs.forEach((song) => {
             let name = song.name;
             let el = this.hostView.createNewSongItem(name);

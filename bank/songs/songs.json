@@ -1,0 +1,105 @@
+{
+  "users": [
+    {
+      "name": "sarah",
+      "songs": [1,2,3]
+    },
+    {
+      "name": "antoine",
+      "songs": [1,3]
+    },
+    {
+      "name": "lloyd",
+      "songs": [2,3]
+    }
+  ],
+  "songs": [
+    {
+      "id": 1,
+      "name": "Fly me to the moon 1",
+      "splitting": true,
+      "songs": [
+        {
+          "name": "Bass",
+          "tag": "bass",
+          "split": "L",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_BASS.mp3"
+        },
+        {
+          "name": "Drums",
+          "tag": "drums",
+          "split": "R",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_DRUMS.mp3"
+        },
+        {
+          "name": "Guitar",
+          "tag": "electric_guitar",
+          "split": "L",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_GUITAR.mp3"
+        },
+        {
+          "name": "Vocals",
+          "tag": "lead_vocal",
+          "split": "R",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_VOCALS.mp3"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Fly me to the moon 2",
+      "splitting": false,
+      "songs": [
+        {
+          "name": "Bass",
+          "tag": "bass",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_BASS.mp3"
+        },
+        {
+          "name": "Drums",
+          "tag": "drums",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_DRUMS.mp3"
+        },
+        {
+          "name": "Guitar",
+          "tag": "electric_guitar",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_GUITAR.mp3"
+        },
+        {
+          "name": "Vocals",
+          "tag": "lead_vocal",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_VOCALS.mp3"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Fly me to the moon 3",
+      "splitting": false,
+      "songs": [
+        {
+          "name": "Bass",
+          "tag": "bass",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_BASS.mp3"
+        },
+        {
+          "name": "Drums",
+          "tag": "drums",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_DRUMS.mp3"
+        },
+        {
+          "name": "Guitar",
+          "tag": "electric_guitar",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_GUITAR.mp3"
+        },
+        {
+          "name": "Vocals",
+          "tag": "lead_vocal",
+          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_VOCALS.mp3"
+        }
+      ]
+    }
+  ]
+}
+
+

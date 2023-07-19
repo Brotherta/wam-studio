@@ -92,7 +92,7 @@ export default class Loader {
         // this.app.tracks.trackIdCount = 1;
         //
         // this.app.pluginsView.showFloatingWindow();
-        // this.app.controlsView.showAdvancedWindow();
+        // this.app.controlsV0iew.showAdvancedWindow();
         //
         let trackInitializedPromise = json.tracks.map(async (trackJson: any) => {
             let track: Track;

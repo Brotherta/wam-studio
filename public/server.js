@@ -23,6 +23,32 @@ app.use((req, res, next) => {
 // Serve your webpack-built static files
 app.use(express.static(path.join(__dirname, 'dist')));
 
+// Handle /:id route
+app.get('/:id', (req, res, next) => {
+    // Get the id from the request params
+    const myId = req.params.id;
+
+    // Read the main HTML file
+    const filePath = path.join(__dirname, 'dist', 'index.html');
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Error reading file from disk: ${err}`);
+            res.status(500).send('Server error');
+        } else {
+            // Insert the script that sets window.myId
+            const modifiedData = data.replace(
+                '<head>',
+                `\n<head>\n<script>window.myId = "${myId}";</script>\n`
+            );
+
+            // Send the modified HTML file
+            res.send(modifiedData);
+        }
+    });
+});
+
+
+
 if (HTTPS) {
     // HTTPS server
     const keyPath = process.env.SSL_KEY_FILE;

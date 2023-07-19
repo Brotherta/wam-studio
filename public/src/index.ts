@@ -63,7 +63,6 @@ customElements.define(
     PlaceholderElement
 );
 
-
 const audioCtx = new AudioContext();
 
 window.addEventListener('beforeunload', (e) => {

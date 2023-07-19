@@ -12,9 +12,16 @@ export default class ProjectController {
     projectUser: string = "";
     isLogged: boolean = false;
 
+    predefinedUser: string = "";
+
     constructor(app: App) {
         this.app = app;
         this.isLoggedIn();
+        // @ts-ignore
+        if (window.myId) {
+            // @ts-ignore
+            this.predefinedUser = window.myId;
+        }
     }
 
     async openSaveProject() {
@@ -54,6 +61,11 @@ export default class ProjectController {
         }
 
         if (!this.app.projectView.saveElement.initialized) {
+            if (this.predefinedUser !== "") {
+                this.projectUser = this.predefinedUser;
+                this.app.projectView.saveElement.user.value = this.projectUser;
+                this.app.projectView.saveElement.disableUserInput();
+            }
             this.app.projectView.saveElement.initialized = true;
             this.app.projectView.saveElement.saveProjectButton.addEventListener("click", async () => {
                 await this.saveProject();
