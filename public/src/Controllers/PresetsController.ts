@@ -252,7 +252,7 @@ export default class PresetsController {
         this.removePreset(preset, track.tag);
         this.refreshPresetList(track.tag);
 
-        for (let track of this.app.tracks.trackList) {
+        for (let track of this.app.tracksController.trackList) {
             let bindControl = track.bindControl;
             if (bindControl.tag != track.tag) continue;
             if (bindControl.advElement.presetsSelect.value == presetName) {
@@ -267,7 +267,7 @@ export default class PresetsController {
      * @param tag
      */
     refreshPresetList(tag: SongTagEnum) {
-        for (let track of this.app.tracks.trackList) {
+        for (let track of this.app.tracksController.trackList) {
             let bindControl = track.bindControl;
             if (!bindControl || bindControl.tag != tag) continue;
 
@@ -295,7 +295,7 @@ export default class PresetsController {
             a.classList.add("dropdown-item");
 
             a.addEventListener("click", async () => {
-                for (let track of this.app.tracks.trackList) {
+                for (let track of this.app.tracksController.trackList) {
                     let bindControl = track.bindControl;
                     let tag = track.tag;
                     let preset = this.getPresetByTag(tag)?.find(p => p.name == presetString);

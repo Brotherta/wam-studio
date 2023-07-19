@@ -4,6 +4,12 @@ import App from "../App";
 import Host from "../Models/Host";
 import {audioCtx} from "../index";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
+import WamEventDestination from "../Audio/WAM/WamEventDestination";
+import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
+import {SongTagEnum} from "../Utils/SongTagEnum";
+import TrackElement from "../Components/TrackElement";
+import Plugin from "../Models/Plugin";
+import {RATIO_MILLS_BY_PX} from "../Utils/Utils";
 
 /**
  * Controller for the track view. This controller is responsible for adding and removing tracks from the track view.
@@ -12,17 +18,142 @@ export default class TracksController {
     
     app: App;
     tracksView: TracksView;
+    trackList: Track[];
+    trackIdCount: number;
 
     constructor(app: App) {
         this.app = app;
         this.tracksView = this.app.tracksView;
+        this.trackIdCount = 1;
+        this.trackList = [];
 
         this.defineNewTrackCallback();
     }
 
+
+    async newEmptyTrack(song?: any) {
+        let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, audioCtx);
+        let node = wamInstance.audioNode as WamAudioWorkletNode;
+
+        let track = this.createTrack(node);
+        if (song) {
+            track.url = song.url;
+            track.element.name = song.name;
+            track.tag = song.tag;
+        }
+        else {
+            track.element.name = `Track ${track.id}`;
+            track.tag = SongTagEnum.OTHER;
+        }
+
+        return track;
+    }
+
+    /**
+     * Create a new TracksView with the given audio node. Initialize the audio nodes and the canvas.
+     *
+     * @param node
+     * @returns the created track
+     */
+    createTrack(node: WamAudioWorkletNode) {
+        let trackElement = document.createElement("track-element") as TrackElement;
+        trackElement.trackId = this.trackIdCount;
+        trackElement.id = "track-" + this.trackIdCount;
+
+        let track = new Track(this.trackIdCount, trackElement, node);
+        track.plugin  = new Plugin(this.app);
+        track.gainNode.connect(this.app.host.gainNode);
+
+        this.trackList.push(track);
+
+        this.trackIdCount++;
+        return track;
+    }
+
+    /**
+     * Remove the given track from the track list and disconnect the audio node.
+     *
+     * @param track the track to remove
+     */
+    deleteTrack(track: Track) {
+        let trackIndex = this.trackList.indexOf(track);
+        this.trackList.splice(trackIndex, 1);
+        track.node!.removeAudio();
+        track.node!.disconnectEvents();
+        track.node!.disconnect();
+        track.isDeleted = true;
+    }
+
+    /**
+     * Jump to the given position in px.
+     *
+     * @param pos the position in px
+     */
+    jumpTo(pos: number) {
+        this.app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * audioCtx.sampleRate
+
+        this.trackList.forEach((track) => {
+            track.node!.port.postMessage({playhead: this.app.host.playhead+1})
+        });
+
+        this.app.host.hostNode?.port.postMessage({playhead: this.app.host.playhead+1});
+    }
+
+    /**
+     * Mute or unmute all tracks except the given one.
+     *
+     * @param trackToUnsolo the track to unsolo.
+     */
+
+    unsetSolo(trackToUnsolo: Track) {
+        let isHostSolo = false;
+
+        this.trackList.forEach(track => {
+            if (track.isSolo) {
+                isHostSolo = true;
+            }
+        });
+
+        if (!isHostSolo) {
+            this.trackList.forEach(track => {
+                if (!track.isSolo) {
+                    if (track.isMuted) {
+                        track.muteSolo();
+                    }
+                    else {
+                        track.unmute();
+                    }
+                }
+            });
+        } else {
+            trackToUnsolo.muteSolo();
+        }
+    }
+
+    /**
+     * Mute all tracks except the given one.
+     *
+     * @param trackToSolo the track to solo.
+     */
+    setSolo(trackToSolo: Track) {
+        this.trackList.forEach((track) => {
+            if (track !== trackToSolo && !track.isSolo) {
+                track.muteSolo();
+            }
+        });
+        if (!trackToSolo.isMuted) {
+            trackToSolo.unmute();
+        }
+    }
+
+
+    getTrack(trackId: number) {
+        return this.trackList.find(track => track.id === trackId);
+    }
+
     defineNewTrackCallback() {
         this.tracksView.newTrackDiv.addEventListener('click', () => {
-            this.app.tracks.newEmptyTrack()
+            this.newEmptyTrack()
                 .then(async (track) => {
                     await this.initTrackComponents(track);
                     track.element.progressDone();
@@ -59,7 +190,7 @@ export default class TracksController {
     removeTrack(track: Track) {
         this.app.pluginsController.removePlugins(track);
         this.tracksView.removeTrack(track.element);
-        this.app.tracks.removeTrack(track);
+        this.deleteTrack(track);
         this.app.bindsController.removeBindControl(track);
     }
 
@@ -91,11 +222,11 @@ export default class TracksController {
             track.isSolo = !track.isSolo;
 
             if (track.isSolo) {
-                this.app.tracks.setSolo(track);
+                this.setSolo(track);
                 track.element.solo();
             }
             else {
-                this.app.tracks.unsetSolo(track);
+                this.unsetSolo(track);
                 track.element.unsolo();
             }
         }
@@ -164,7 +295,7 @@ export default class TracksController {
     }
 
     clearAllTracks() {
-        for (let track of this.app.tracks.trackList) {
+        for (let track of this.trackList) {
             this.app.pluginsController.removePlugins(track);
             this.tracksView.removeTrack(track.element);
             this.app.bindsController.removeBindControl(track);
@@ -172,7 +303,7 @@ export default class TracksController {
             track.node!.disconnectEvents();
             track.node!.disconnect();
         }
-        this.app.tracks.trackList = [];
+        this.trackList = [];
     }
 
     async openSong(song:any, name: string) {
@@ -181,10 +312,10 @@ export default class TracksController {
         this.app.hostController.maxTime = 0;
         for (let trackSong of song.songs) {
             console.log(trackSong.name);
-            let track = await this.app.tracks.newEmptyTrack(trackSong);
+            let track = await this.newEmptyTrack(trackSong);
             await this.app.tracksController.initTrackComponents(track);
         }
-        for (let track of this.app.tracks.trackList) {
+        for (let track of this.trackList) {
             console.log("loading utl ", track.element.name);
             this.app.tracksController.loadTrackUrl(track);
         }

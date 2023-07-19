@@ -4,7 +4,6 @@ import TracksController from "./Controllers/TracksController";
 
 import TracksView from "./Views/TracksView";
 import { makeDivScrollSync } from "./Controllers/StaticController";
-import Tracks from "./Models/Tracks";
 import Host from "./Models/Host";
 import PlayheadController from "./Controllers/PlayheadController";
 import PluginsController from "./Controllers/PluginsController";
@@ -36,13 +35,11 @@ export default class App {
     projectView: ProjectView;
     bindsView: BindsView;
 
-    tracks: Tracks;
     host: Host;
     loader: Loader;
 
 
     constructor() {
-        this.tracks = new Tracks(this);
         this.host = new Host(this);
         this.loader = new Loader(this);
 
@@ -52,8 +49,8 @@ export default class App {
         this.projectView = new ProjectView();
         this.bindsView = new BindsView();
 
-        this.hostController = new HostController(this);
         this.tracksController = new TracksController(this);
+        this.hostController = new HostController(this);
         this.playheadController = new PlayheadController(this);
         this.pluginsController = new PluginsController(this);
         this.projectController = new ProjectController(this);

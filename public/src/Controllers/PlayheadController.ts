@@ -22,7 +22,7 @@ export default class PlayheadController {
 
             let playhead = Math.round(newValueMs / 1000 * audioCtx.sampleRate);
 
-            this.app.tracks.trackList.forEach((track) => {
+            this.app.tracksController.trackList.forEach((track) => {
                 track.node!.port.postMessage({playhead: playhead+1})
             });
             this.app.host.hostNode?.port.postMessage({playhead: playhead+1});

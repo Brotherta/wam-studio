@@ -25,7 +25,6 @@ export default class HostController {
     constructor(app: App) {
         this.app = app;
         this.hostView = app.hostView;
-        this.audioCtx = app.tracks.audioCtx;
         this.maxTime = 300000;
 
         this.defineControls();
@@ -105,7 +104,7 @@ export default class HostController {
      */
     defineBackListener() {
         this.hostView.backBtn.onclick = () => {
-            this.app.tracks.jumpTo(0);
+            this.app.tracksController.jumpTo(0);
         }
     }
 
@@ -247,7 +246,7 @@ export default class HostController {
             this.audioCtx.resume();
         }
         if (this.playing) {
-            this.app.tracks.trackList.forEach((track) => {
+            this.app.tracksController.trackList.forEach((track) => {
                 //@ts-ignore
                 track.node.parameters.get("playing").value = 0;
                 clearInterval(this.timerInterval!!);
@@ -256,7 +255,7 @@ export default class HostController {
             this.app.host.hostNode.parameters.get("playing").value = 0;
         }
         else {
-            this.app.tracks.trackList.forEach(async (track) => {
+            this.app.tracksController.trackList.forEach(async (track) => {
                 //@ts-ignore
                 track.node.parameters.get("playing").value = 1;
             });
@@ -273,7 +272,7 @@ export default class HostController {
             this.app.host.node.parameters.get("playing").value = 0;
             this.app.host.node?.port.postMessage({playhead: 0});
         }
-        this.app.tracks.trackList.forEach(async (track) => {
+        this.app.tracksController.trackList.forEach(async (track) => {
             //@ts-ignore
             track.node.parameters.get("playing").value = 0;
             track.node?.port.postMessage({playhead: 0});
@@ -283,7 +282,7 @@ export default class HostController {
     play() {
         // @ts-ignore
         this.app.host.hostNode.parameters.get("playing").value = 0;
-        this.app.tracks.trackList.forEach(async (track) => {
+        this.app.tracksController.trackList.forEach(async (track) => {
             //@ts-ignore
             track.node.parameters.get("playing").value = 1;
         });
@@ -307,7 +306,7 @@ export default class HostController {
                 element.setAttribute('style', 'display: none;');
             }
         }
-        for (let track of this.app.tracks.trackList) {
+        for (let track of this.app.tracksController.trackList) {
             track.element.switchMode(this.advancedMode);
         }
     }

@@ -128,7 +128,7 @@ export default class PluginsController {
             this.app.pluginsView.showNew();
         }
         else {
-            for (let track of this.app.tracks.trackList) {
+            for (let track of this.app.tracksController.trackList) {
                 if (track.plugin.initialized) {
                     document.getElementById("loading-zone")!.appendChild(track.plugin.dom);
                 }

@@ -11,7 +11,7 @@ export default class ExporterController {
 
     async exportSongs() {
         this.app.hostController.stop();
-        this.app.tracks.jumpTo(0);
+        this.app.tracksController.jumpTo(0);
         this.app.hostController.play();
     }
 

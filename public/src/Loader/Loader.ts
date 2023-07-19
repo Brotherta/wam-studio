@@ -11,7 +11,7 @@ export default class Loader {
 
     async saveProject() {
         let tracks = [];
-        for (let track of this.app.tracks.trackList) {
+        for (let track of this.app.tracksController.trackList) {
                 let hasPlugin = track.plugin.initialized;
                 let pluginState = null;
 
@@ -68,7 +68,7 @@ export default class Loader {
         this.app.tracksController.clearAllTracks();
         this.app.host.timer = 0;
         this.app.host.playhead = 0;
-        this.app.tracks.trackIdCount = 0;
+        this.app.tracksController.trackIdCount = 0;
 
 
         let cover = document.createElement("div");
@@ -86,7 +86,7 @@ export default class Loader {
         let trackInitializedPromise = json.tracks.map(async (trackJson: any) => {
             let track: Track;
             if (trackJson.url === null) {
-                track = await this.app.tracks.newEmptyTrack();
+                track = await this.app.tracksController.newEmptyTrack();
             }
             else {
                 // let song = {
@@ -94,7 +94,7 @@ export default class Loader {
                 //     "url": trackJson.url,
                 //     "tag": trackJson.tag
                 // }
-                track = await this.app.tracks.newEmptyTrack(); // TODO REPLACE WITH NEW TRACK
+                track = await this.app.tracksController.newEmptyTrack(); // TODO REPLACE WITH NEW TRACK
             }
 
             track.id = trackJson.id;
@@ -122,7 +122,7 @@ export default class Loader {
         await Promise.all(trackInitializedPromise);
 
         let trackBindInitializedPromise = json.tracks.map(async (trackJson: any) => {
-            let track = this.app.tracks.getTrack(trackJson.id)!;
+            let track = this.app.tracksController.getTrack(trackJson.id)!;
 
             track.element.name = trackJson.name;
             track.element.trackNameInput.value = trackJson.name;
