@@ -4,7 +4,7 @@ import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import WamEventDestination from "../Audio/WAM/WamEventDestination";
 import TrackElement from "../Components/TrackElement";
 import { audioCtx } from "../index";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Utils";
+import {RATIO_MILLS_BY_PX} from "../Utils/Utils";
 import Track from "./Track";
 import Plugin from "./Plugin";
 import {SongTagEnum} from "../Utils/SongTagEnum";
@@ -77,45 +77,9 @@ export default class Tracks {
     }
 
     /**
-     * Create the track with the given file. It verifies the type of the file and then create the track.
-     *
-     * It returns undefined if the file is not an audio file and if the duration of the file is too long.
-     *
-     * @param file
-     */
-    async newTrackWithFile(file: File) {
-        if (file.type === "audio/ogg" || file.type === "audio/wav" || file.type === "audio/mpeg" || file.type === "audio/x-wav") {
-            let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
-            let node = wamInstance.audioNode as WamAudioWorkletNode;
-
-            let audioArrayBuffer = await file.arrayBuffer();
-            let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
-            if (audioBuffer.duration > MAX_DURATION_SEC) {
-                console.warn("Audio file too long, max duration is " + MAX_DURATION_SEC + " seconds");
-                return undefined;
-            }
-            let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-
-            node.setAudio(operableAudioBuffer.toArray());
-
-            // @ts-ignore
-            let track = this.createTrack(node);
-            track.addBuffer(operableAudioBuffer);
-            track.element.name = file.name;
-            return track;
-        }
-        else {
-            console.warn("File type not supported");
-            return undefined;
-        }
-    }
-
-    /**
      * Create a new TracksView with the given audio node. Initialize the audio nodes and the canvas.
      *
      * @param node
-     * @param url
-     * @param name
      * @returns the created track
      */
     createTrack(node: WamAudioWorkletNode) {

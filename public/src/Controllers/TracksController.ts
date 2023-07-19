@@ -43,30 +43,11 @@ export default class TracksController {
         track.element.switchMode(this.app.hostController.advancedMode);
     }
 
-    /**
-     * Used to add a list of tracks to the track view. It calls the addNewTrackInit() for each track.
-     * 
-     * @param tracks List of tracks to be added to the track view.
-     */
-    addNewTrackList(tracks: Track[]) {
-        for (const track in tracks) {
-            if (Object.prototype.hasOwnProperty.call(tracks, track)) {
-                const element = tracks[track];
-                this.initTrackComponents(element);
-            }
-        }
-    }
-
     async initTrackComponents(track: Track) {
         await track.plugin.initPlugin(this.app.host.pluginWAM);
         document.getElementById("loading-zone")!.appendChild(track.plugin.dom);
         this.app.tracksController.connectPlugin(track);
-
         this.app.tracksController.addNewTrackInit(track);
-        this.app.automationView.addAutomationBpf(track.id);
-        this.app.waveFormController.addWaveformToTrack(track);
-        // this.app.trackControlController.addTrackControl(track);
-        this.app.recorderController.addRecordListener(track);
         this.app.bindsController.addBindListener(track);
     }
 
@@ -80,8 +61,6 @@ export default class TracksController {
         this.tracksView.removeTrack(track.element);
         this.app.tracks.removeTrack(track);
         this.app.bindsController.removeBindControl(track);
-        this.app.waveFormController.removeWaveformOfTrack(track);
-        this.app.automationView.removeAutomationBpf(track.id);
     }
 
     /**
@@ -133,27 +112,11 @@ export default class TracksController {
             track.isMuted = !track.isMuted;
         }
 
-        // track.element.volumeSlider.oninput = () => {
-        //     let value = parseInt(track.element.volumeSlider.value) / 100;
-        //     track.setVolume(value);
-        // }
-
         track.element.balanceSlider.oninput = () => {
             let value = parseFloat(track.element.balanceSlider.value);
             track.setBalance(value);
         }
 
-        track.element.color.onclick = () => {
-            this.tracksView.changeColor(track);
-            this.app.editorView.changeWaveFormColor(track);
-        }
-        track.element.automationBtn.onclick = async (e) => {
-            await this.app.automationController.openAutomationMenu(track);
-            e.stopImmediatePropagation();
-        }
-        track.element.armBtn.onclick = () => {
-            this.app.recorderController.clickArm(track);
-        }
         track.element.settingsBtn.onclick = () => {
             if (track.bindControl.advElement.firstOpen) {
                 this.app.presetsController.refreshPresetList(track.tag);
@@ -205,8 +168,6 @@ export default class TracksController {
             this.app.pluginsController.removePlugins(track);
             this.tracksView.removeTrack(track.element);
             this.app.bindsController.removeBindControl(track);
-            this.app.waveFormController.removeWaveformOfTrack(track);
-            this.app.automationView.removeAutomationBpf(track.id);
             track.node!.removeAudio();
             track.node!.disconnectEvents();
             track.node!.disconnect();
@@ -227,19 +188,6 @@ export default class TracksController {
             console.log("loading utl ", track.element.name);
             this.app.tracksController.loadTrackUrl(track);
         }
-        // for (let trackSong of song.songs) {
-        //     this.app.tracksView.addPlaceholder();
-        //     this.app.tracks.newTrackUrl(trackSong)
-        //         .then(async track => {
-        //             if (track !== undefined) {
-        //                 await this.app.tracksController.initTrackComponents(track);
-        //                 this.app.hostController.maxTime = Math.max(this.app.hostController.maxTime, track.audioBuffer!.duration*1000);
-        //                 this.app.tracksView.removePlaceholder();
-        //             }
-        //         });
-        // }
-
-        // this.app.bindsView.reorderControls(this.app.tracks.trackList);
     }
 
     loadTrackUrl(track: Track) {
@@ -275,7 +223,6 @@ export default class TracksController {
                         // @ts-ignore
                         track.node.setAudio(operableAudioBuffer.toArray());
                         track.audioBuffer = operableAudioBuffer;
-                        track.modified = false;
                         this.app.hostController.maxTime = Math.max(this.app.hostController.maxTime, track.audioBuffer!.duration*1000);
                         track.element.progressDone();
                     });

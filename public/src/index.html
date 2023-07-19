@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -38,9 +38,6 @@
 
 					<div class="dropdown-divider advanced"></div>
 
-					<a class="dropdown-item advanced" id="import-songs" >Import Song files</a>
-					<input id="new-track-input" type="file" accept=".mp3, .wav, .ogg" multiple style="display: none">
-
 					<a class="dropdown-item advanced" id="sync-presets">Sync Presets</a>
 					<a class="dropdown-item advanced" id="login">Log in</a>
 
@@ -64,14 +61,6 @@
 					<img id="unmute-img" src="icons/volume-up-fill.svg">
 					<img id="mute-img" src="icons/volume-mute-fill.svg" hidden>
 				</div>
-				<div id="record-btn" class="menu-item" hidden>
-					<span class="mytooltip">Record</span>
-					<img src="icons/record-fill.svg">
-				</div>
-				<div id="loop-btn" class="menu-item" hidden>
-					<span class="mytooltip">Loop</span>
-					<img src="/icons/repeat.svg">
-				</div>
 				<div class="playback-container">
 					<input id="playback-slider" type="range" min="0" max="100" value="0">
 				</div>
@@ -82,10 +71,6 @@
 				</div>
 				<div id="header-title">
 					Empty Project
-				</div>
-				<div id="metro-btn" class="menu-item" hidden>
-					<span class="mytooltip">Metronome</span>
-					<i class="metro-icon"></i>
 				</div>
 			</div>
 			<div class="right-controls">
@@ -125,25 +110,11 @@
 						
 					</div>
 
-					<div id="automation-menu" hidden>
-					</div>
 				</div>
 				<div class="test">
-					<div id="playhead" class="playhead">
-						<input type="range" class="playhead-range" id="playhead-range" hidden>
-					</div>
+					<div id="playhead" class="playhead"></div>
 					<div class="editor" id="editor">
-						<!-- <canvas id="pixi-canvas"></canvas> -->
-
-						<div id="automation-container">
-						</div>
-
-
-						<!-- STANFORD CONTAINER COMPONENT !!-->
-						<div id="special-controls-container">
-						</div>
-
-						<!------------------------------------>
+						<div id="special-controls-container"></div>
 					</div>
 
 					<div id="drag-cover" hidden>

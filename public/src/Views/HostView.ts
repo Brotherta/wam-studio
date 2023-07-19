@@ -5,11 +5,8 @@ import {audioCtx} from "../index";
 
 export default class HostView {
 
-    automationBtn = document.getElementById("automation-btn") as HTMLDivElement;
     playBtn = document.getElementById("play-btn") as HTMLDivElement;
     backBtn = document.getElementById("back-btn") as HTMLDivElement;
-    recordBtn = document.getElementById("record-btn") as HTMLDivElement;
-    loopBtn = document.getElementById("loop-btn") as HTMLDivElement;
     muteBtn = document.getElementById("mute-btn") as HTMLDivElement;
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
@@ -20,26 +17,16 @@ export default class HostView {
     playbackSlider = document.getElementById("playback-slider") as HTMLInputElement;
     headerTitle = document.getElementById("header-title") as HTMLDivElement;
 
-    controlsBar = document.getElementById("controls-bar") as HTMLDivElement;
-
     vuMeterCanvas = document.getElementById("vu-meter") as HTMLCanvasElement;
 
     songsContainer = document.getElementById("songs-container") as HTMLDivElement;
-    song1 = document.getElementById("song-1") as HTMLAnchorElement;
-    song2 = document.getElementById("song-2") as HTMLAnchorElement;
-    song3 = document.getElementById("song-3") as HTMLAnchorElement;
-    song4 = document.getElementById("song-4") as HTMLAnchorElement;
-    song5 = document.getElementById("song-5") as HTMLAnchorElement;
-    song6 = document.getElementById("song-6") as HTMLAnchorElement;
 
-    importSongs = document.getElementById("import-songs") as HTMLInputElement;
     saveProject = document.getElementById("save-project") as HTMLInputElement;
     loadProject = document.getElementById("load-project") as HTMLInputElement;
     login = document.getElementById("login") as HTMLInputElement;
     importProject = document.getElementById("import-project") as HTMLInputElement;
     exportProject = document.getElementById("export-project") as HTMLInputElement;
     syncPresets = document.getElementById("sync-presets") as HTMLInputElement;
-    newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
     importInput: HTMLInputElement = document.getElementById("import-input") as HTMLInputElement;
     switchMode = document.getElementById("switch-mode") as HTMLDivElement;
 
@@ -90,40 +77,6 @@ export default class HostView {
             imgPlay.removeAttribute("hidden");
             imgPause.setAttribute("hidden", "hidden");
             tooltip.innerHTML = "Play";
-        }
-    }
-
-    /**
-     * Change the icon of the loop button when the user press it.
-     * @param looping
-     */
-    pressLoopButton(looping: boolean) {
-        let tooltip = this.loopBtn.firstElementChild as HTMLSpanElement;
-
-        if (looping) {
-            this.loopBtn.style.background = "black";
-            tooltip.innerHTML = "Turn&nbsp;off&nbsp;looping";
-        }
-        else {
-            this.loopBtn.style.background = "";
-            tooltip.innerHTML = "Loop";
-        }
-    }
-
-    /**
-     * Change the icon of the record button when the user press it.
-     * @param recording
-     */
-    pressRecordingButton(recording: boolean) {
-        let tooltip = this.recordBtn.firstElementChild as HTMLSpanElement;
-
-        if (recording) {
-            this.recordBtn.style.background = "black";
-            tooltip.innerHTML = "Stop&nbsp;recording";
-        }
-        else {
-            this.recordBtn.style.background = "";
-            tooltip.innerHTML = "Record";
         }
     }
 

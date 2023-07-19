@@ -1,16 +1,6 @@
 import TrackElement from "../Components/TrackElement";
 import Track from "../Models/Track";
 import {SongTagEnum} from "../Utils/SongTagEnum";
-import PlaceholderElement from "../Components/PlaceholderElement";
-
-function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
 
 /**
  * Class that is responsible for the view of the tracks.
@@ -21,8 +11,6 @@ export default class TracksView {
     trackContainerDiv: HTMLDivElement = document.getElementById("track-container") as HTMLDivElement;
     newTrackDiv: HTMLDivElement = document.getElementById("new-track") as HTMLDivElement;
 
-    placeholders: PlaceholderElement[] = [];
-
     constructor() {
         // TODO
     }
@@ -32,12 +20,7 @@ export default class TracksView {
      * @param trackElement
      */
     addTrack(trackElement: TrackElement) {
-        if (this.placeholders.length > 0) {
-            const lastPlaceholder = this.placeholders[this.placeholders.length - 1];
-            this.trackContainerDiv.insertBefore(trackElement, lastPlaceholder);
-        } else {
-            this.trackContainerDiv.insertBefore(trackElement, this.newTrackDiv);
-        }
+        this.trackContainerDiv.insertBefore(trackElement, this.newTrackDiv);
     }
     /**
      * Remove a track from the track view.
@@ -45,25 +28,6 @@ export default class TracksView {
      */
     removeTrack(el: TrackElement) {
         el.remove();
-    }
-
-    /**
-     * add a placeholder betweem tracks and the new track button.
-     */
-
-    addPlaceholder() {
-        const placeholder = new PlaceholderElement();
-        this.placeholders.push(placeholder);
-        this.trackContainerDiv.insertBefore(placeholder, this.newTrackDiv);
-    }
-
-    removePlaceholder() {
-        if (this.placeholders.length > 0) {
-            const placeholder = this.placeholders.pop();
-            if (placeholder) {
-                placeholder.remove();
-            }
-        }
     }
 
     /**

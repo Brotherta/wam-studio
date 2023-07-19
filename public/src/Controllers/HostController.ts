@@ -1,6 +1,5 @@
 import HostView from "../Views/HostView";
 import App from "../App";
-import songs from "../../static/songs/songs.json";
 import {audioCtx} from "../index";
 import {SONGS_FILE_URL} from "../Env";
 
@@ -15,17 +14,12 @@ export default class HostController {
     hostView: HostView;
 
     playing: boolean = false;
-    looping: boolean = false;
     muted: boolean = false;
     pauseInterval = false;
 
     timerInterval: NodeJS.Timer | undefined;
-
     vuMeter: VuMeter;
-
-    // The maximum time of the song in milliseconds.
-    maxTime: number;
-
+    maxTime: number; // The maximum time of the song in milliseconds.
     advancedMode: boolean = false;
 
     constructor(app: App) {
@@ -46,8 +40,6 @@ export default class HostController {
     defineControls() {
         this.definePlayListener();
         this.defineBackListener();
-        this.defineRecordListener();
-        this.defineLoopListener();
         this.defineVolumeListener();
         this.defineMuteListener();
         this.defineTimerListener();
@@ -108,48 +100,12 @@ export default class HostController {
     }
 
     /**
-     * Define the listener for the loop button. It loops or unloops the host.
-     */
-    defineLoopListener() {
-        this.hostView.loopBtn.onclick = () => {
-            if (this.looping) {
-                this.app.tracks.trackList.forEach((track) => {
-                    //@ts-ignore
-                    track.node.parameters.get("loop").value = 0;
-                });
-                //@ts-ignore
-                this.app.host.hostNode.parameters.get("loop").value = 0;
-            }
-            else {
-                this.app.tracks.trackList.forEach((track) => {
-                    //@ts-ignore
-                    track.node.parameters.get("loop").value = 1;
-                });
-                //@ts-ignore
-                this.app.host.hostNode.parameters.get("loop").value = 1;
-            }
-            this.looping = !this.looping;
-            this.hostView.pressLoopButton(this.looping);
-        }
-    }
-
-    /**
-     * TODO : Not implemented yet.
-     */
-    defineRecordListener() {
-        this.hostView.recordBtn.onclick = () => {
-            this.app.recorderController.clickRecord();
-        }
-    }
-
-    /**
      * Define the listener for the back button. It goes back to the first beat.
      * 
      */
     defineBackListener() {
         this.hostView.backBtn.onclick = () => {
             this.app.tracks.jumpTo(0);
-            this.app.automationController.applyAllAutomations();
         }
     }
 
@@ -218,26 +174,6 @@ export default class HostController {
     }
 
     defineMenuListeners() {
-
-        this.hostView.importSongs.addEventListener('click', () => {
-            this.hostView.newTrackInput.click();
-        });
-        this.hostView.newTrackInput.addEventListener('change', (e) => {
-            // @ts-ignore
-            for (let i = 0; i < e.target.files.length; i++) {
-                // @ts-ignore
-                let file = e.target.files[i];
-                if (file !== undefined) {
-                    this.app.tracks.newTrackWithFile(file)
-                        .then(track => {
-                            if (track !== undefined) {
-                                this.app.tracksController.initTrackComponents(track);
-                            }
-                        });
-                }
-
-            }
-        });
         this.app.pluginsView.mainTrack.addEventListener("click", () => {
             this.app.pluginsController.selectHost();
         });
@@ -315,22 +251,14 @@ export default class HostController {
                 //@ts-ignore
                 track.node.parameters.get("playing").value = 0;
                 clearInterval(this.timerInterval!!);
-                if (track.isArmed && this.app.recorderController.recording) {
-                    this.app.recorderController.stopRecording(track);
-                    this.hostView.pressRecordingButton(false);
-                }
             });
             //@ts-ignore
             this.app.host.hostNode.parameters.get("playing").value = 0;
         }
         else {
-            this.app.automationController.applyAllAutomations();
             this.app.tracks.trackList.forEach(async (track) => {
-                console.log(track.modified);
-                if (track.modified) track.updateBuffer(this.audioCtx, this.app.host.playhead);
                 //@ts-ignore
                 track.node.parameters.get("playing").value = 1;
-                this.defineTimerListener();
             });
             //@ts-ignore
             this.app.host.hostNode.parameters.get("playing").value = 1;

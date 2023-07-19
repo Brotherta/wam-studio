@@ -3,9 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 import TrackElement from './Components/TrackElement';
 
-// @ts-ignore
-import BPF from './Components/BPF';
-
 import SaveProjectElement from "./Components/Project/SaveProjectElement";
 import LoadProjectElement from "./Components/Project/LoadProjectElement";
 
@@ -15,15 +12,10 @@ import ParameterElement from "./Components/Binds/ParameterElement";
 import TrackBindElement from "./Components/Binds/TrackBindElement";
 import LoginElement from "./Components/Project/LoginElement";
 import ConfirmElement from "./Components/ConfirmElement";
-import PlaceholderElement from "./Components/PlaceholderElement";
 
 customElements.define(
     "track-element",
     TrackElement
-);
-customElements.define(
-    "bpf-automation",
-    BPF
 );
 customElements.define(
     "save-project-element",
@@ -57,10 +49,6 @@ customElements.define(
 customElements.define(
     "confirm-element",
     ConfirmElement
-);
-customElements.define(
-    "placeholder-element",
-    PlaceholderElement
 );
 
 const audioCtx = new AudioContext();

@@ -1,6 +1,5 @@
 import HostView from "./Views/HostView";
 import HostController from "./Controllers/HostController";
-import EditorController from "./Controllers/EditorController";
 import TracksController from "./Controllers/TracksController";
 
 import TracksView from "./Views/TracksView";
@@ -10,12 +9,7 @@ import Host from "./Models/Host";
 import PlayheadController from "./Controllers/PlayheadController";
 import PluginsController from "./Controllers/PluginsController";
 import PluginsView from "./Views/PluginsView";
-import EditorView from "./Views/EditorView";
-import AutomationController from "./Controllers/AutomationController";
-import AutomationView from "./Views/AutomationView";
-import RegionsController from "./Controllers/RegionsController";
-import WaveformController from "./Controllers/WaveformController";
-import RecorderController from "./Controllers/RecorderController";
+
 import Loader from "./Loader/Loader";
 import ProjectView from "./Views/ProjectView";
 import ProjectController from "./Controllers/ProjectController";
@@ -29,23 +23,16 @@ import BindsView from "./Views/BindsView";
 export default class App {
     
     hostController: HostController;
-    editorController: EditorController;
     tracksController: TracksController;
     playheadController: PlayheadController;
     pluginsController: PluginsController;
-    automationController: AutomationController;
-    waveFormController: WaveformController;
-    regionsController: RegionsController;
-    recorderController: RecorderController;
     projectController: ProjectController;
     bindsController: BindsController;
     presetsController: PresetsController;
 
     hostView: HostView;
     tracksView: TracksView;
-    editorView: EditorView;
     pluginsView: PluginsView;
-    automationView: AutomationView;
     projectView: ProjectView;
     bindsView: BindsView;
 
@@ -62,20 +49,13 @@ export default class App {
         this.hostView = new HostView();
         this.tracksView = new TracksView();
         this.pluginsView = new PluginsView();
-        this.editorView = new EditorView();
-        this.automationView = new AutomationView();
         this.projectView = new ProjectView();
         this.bindsView = new BindsView();
 
         this.hostController = new HostController(this);
-        this.editorController = new EditorController(this);
         this.tracksController = new TracksController(this);
         this.playheadController = new PlayheadController(this);
         this.pluginsController = new PluginsController(this);
-        this.automationController = new AutomationController(this);
-        this.waveFormController = new WaveformController(this);
-        this.regionsController = new RegionsController(this);
-        this.recorderController = new RecorderController(this);
         this.projectController = new ProjectController(this);
         this.bindsController = new BindsController(this);
         this.presetsController = new PresetsController(this);

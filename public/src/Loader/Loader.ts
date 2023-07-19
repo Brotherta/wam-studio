@@ -1,6 +1,5 @@
 import App from "../App";
 import Track from "../Models/Track";
-import {WamParameterInfoMap} from "@webaudiomodules/api";
 import Parameter from "../Models/Parameter";
 
 export default class Loader {
@@ -84,28 +83,18 @@ export default class Loader {
 
         this.app.hostView.headerTitle.innerHTML = json.songName;
 
-        // this.app.hostController.playing = false;
-        // this.app.hostController.stop();
-        // this.app.tracksController.clearAllTracks();
-        // this.app.host.timer = 0;
-        // this.app.host.playhead = 0;
-        // this.app.tracks.trackIdCount = 1;
-        //
-        // this.app.pluginsView.showFloatingWindow();
-        // this.app.controlsV0iew.showAdvancedWindow();
-        //
         let trackInitializedPromise = json.tracks.map(async (trackJson: any) => {
             let track: Track;
             if (trackJson.url === null) {
                 track = await this.app.tracks.newEmptyTrack();
             }
             else {
-                let song = {
-                    "name": trackJson.name,
-                    "url": trackJson.url,
-                    "tag": trackJson.tag
-                }
-                track = await this.app.tracks.newTrackUrl(song);
+                // let song = {
+                //     "name": trackJson.name,
+                //     "url": trackJson.url,
+                //     "tag": trackJson.tag
+                // }
+                track = await this.app.tracks.newEmptyTrack(); // TODO REPLACE WITH NEW TRACK
             }
 
             track.id = trackJson.id;

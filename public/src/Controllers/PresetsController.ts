@@ -4,7 +4,6 @@ import Preset from "../Models/Preset";
 import Track from "../Models/Track";
 import BindControl from "../Models/BindControl";
 import {verifyString} from "../Utils/Normalizer";
-import {param} from "jquery";
 import {WamParameterInfoMap} from "@webaudiomodules/api";
 import {BACKEND_URL} from "../Env";
 import Bind from "../Models/Bind";
@@ -70,6 +69,11 @@ export default class PresetsController {
      * Get all plugin state of each preset and each parameter of each bind.
      */
     syncPresets() {
+        if (!this.app.projectController.isLogged) {
+            alert("You need to be logged in to save your presets.");
+            return;
+        }
+
         let data = [];
 
         for (let tag of Object.values(SongTagEnum)) {
@@ -280,7 +284,6 @@ export default class PresetsController {
     /**
      * Add the preset to the preset list.
      *
-     * @param presetsSet
      */
     updateGlobalPresetList() {
         this.app.hostView.presetsDropdown.innerHTML = "";

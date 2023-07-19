@@ -16,11 +16,4 @@ export default class Preset {
     addBind(bind: Bind) {
         this.binds.push(bind);
     }
-
-    removeBind(bind: Bind) {
-        const index = this.binds.indexOf(bind);
-        if (index > -1) {
-            this.binds.splice(index, 1);
-        }
-    }
 }

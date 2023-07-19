@@ -36,12 +36,6 @@ export default class ProjectController {
         this.app.projectView.show();
     }
 
-    openNewProject() {
-        this.app.projectView.mountNew();
-        this.initNewProject();
-        this.app.projectView.show();
-    }
-
     async openLogin() {
         this.app.projectView.mountLogin();
         await this.initLogin();
@@ -147,24 +141,6 @@ export default class ProjectController {
         this.app.projectView.updateLogin(this.isLogged);
     }
 
-    async initNewProject() {
-        if (!this.app.projectView.saveElement.initialized) {
-            this.app.projectView.saveElement.initialized = true;
-            this.app.projectView.saveElement.saveProjectButton.addEventListener("click", async () => {
-                await this.saveProject();
-            });
-        }
-
-        if (this.inProject && !this.saved) {
-            this.app.projectView.saveElement.user.value = this.projectUser;
-            this.app.projectView.saveElement.project.value = this.projectName;
-            await this.saveProject(true);
-        }
-
-        await this.newProject();
-        await this.saveProject();
-    }
-
     initConfirm(message: string, confirm: () => void, cancel: () => void) {
         this.app.projectView.confirmElement.setMessage(message);
         this.app.projectView.confirmElement.confirmButton.onclick = () => {
@@ -175,13 +151,6 @@ export default class ProjectController {
             cancel();
             this.app.projectView.close();
         }
-    }
-
-    async newProject() {
-        // await this.app.loader.loadProject({
-        //     "tracks": [],
-        //     "trackIdCount": 1
-        // });
     }
 
     async saveProject(override: boolean = false) {
