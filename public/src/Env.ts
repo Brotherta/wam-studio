@@ -1,6 +1,5 @@
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:6002";
-const BANK_PLUGIN_URL = process.env.BANK_PLUGIN_URL || "http://localhost:6002";
 const SONGS_FILE_URL = process.env.SONGS_FILE_URL || "http://localhost:6002/songs/songs.json";
 
 
-export { BACKEND_URL, BANK_PLUGIN_URL, SONGS_FILE_URL };
+export { BACKEND_URL, SONGS_FILE_URL };

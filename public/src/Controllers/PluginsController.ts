@@ -1,7 +1,6 @@
 import App from "../App";
 import Track from "../Models/Track";
 import Host from "../Models/Host";
-import {BANK_PLUGIN_URL} from "../Env";
 
 /**
  * Controller for the plugins view. This controller is responsible for selecting and removing plugins.
