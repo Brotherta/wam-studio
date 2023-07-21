@@ -2,6 +2,8 @@ import App from "../App";
 import {audioCtx} from "../index";
 import Plugin from "../Models/Plugin";
 import JSZip from "jszip";
+import Track from "../Models/Track";
+import AudioNode from "../Audio/AudioNode";
 
 
 export default class ExporterController {
@@ -16,133 +18,85 @@ export default class ExporterController {
         if (!masterTrack && tracksIds.length == 0) {
             return;
         }
+        if (name == "") name = "project";
 
-        const zip = new JSZip();
-
+        let buffers = [];
         let maxDuration = this.app.hostController.maxTime / 1000; // in seconds
-        let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate);
-
         const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
-        const [hostGroupId] = await initializeWamHost(offlineCtx);
 
-        const masterGainNode = offlineCtx.createGain();
-
-        let nodes: AudioNode[] = [];
-        let sources: AudioBufferSourceNode[] = [];
-        let plugins: Plugin[] = [];
-        let tracks = this.app.tracksController.trackList.filter((track) => tracksIds.includes(track.id));
-
-        for (let track of tracks) {
+        for (let track of this.app.tracksController.trackList) {
             console.log("Exporting track " + track.id);
-            let gainNode = offlineCtx.createGain();
-            let pannerNode = offlineCtx.createStereoPanner();
-            let sourceNode = offlineCtx.createBufferSource();
-            let plugin = new Plugin(this.app);
+            if (!masterTrack && !tracksIds.includes(track.id)) continue;
 
-            nodes.push(gainNode, pannerNode);
-            sources.push(sourceNode);
-            plugins.push(plugin);
-
-            sourceNode.buffer = track.audioBuffer as AudioBuffer;
-            gainNode.gain.value = track.gainNode.gain.value;
-            pannerNode.pan.value = track.pannerNode.pan.value;
-
-            await plugin.initPlugin(this.app.host.pluginWAM, audioCtx, offlineCtx, hostGroupId)
-            document.getElementById("loading-zone")!.appendChild(plugin.dom);
-            let state = await track.plugin.instance!._audioNode.getState();
-            if (state.current.length > 0) {
-                await plugin.setStateAsync(state);
-            }
+            let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate);
+            const [hostGroupId] = await initializeWamHost(offlineCtx);
+            let {
+                gainNode,
+                pannerNode,
+                sourceNode,
+                plugin
+            } = await this.rebuildTrackGraph(offlineCtx, track, hostGroupId);
 
             sourceNode.connect(plugin.instance?._audioNode!).connect(gainNode).connect(pannerNode).connect(offlineCtx.destination);
             sourceNode.start();
 
             let renderedBuffer = await offlineCtx.startRendering()
-            // blobs.push(this.bufferToWave(renderedBuffer));
             let blob = this.bufferToWave(renderedBuffer);
-            zip.file(`Track-${track.element.name}.wav`, blob);
+            buffers.push(renderedBuffer);
 
+            gainNode.disconnect();
+            pannerNode.disconnect();
+            sourceNode.disconnect();
+            plugin.instance?._audioNode.disconnect();
+            plugin.instance?._audioNode.disconnect();
+            plugin.unloadPlugin();
 
-            pannerNode.disconnect(offlineCtx.destination);
-            if (masterTrack) {
-                pannerNode.connect(masterGainNode);
-            }
+            downloadBlob(blob, `${name}_track_${track.element.name}.wav`);
         }
 
         if (masterTrack) {
-            masterGainNode.connect(offlineCtx.destination);
-            for (let source of sources) {
-                source.start(0);
-            }
-            await offlineCtx.startRendering().then((renderedBuffer) => {
-                // blobs.push(this.bufferToWave(renderedBuffer));
-                let blob = this.bufferToWave(renderedBuffer);
-                zip.file(`Master.wav`, blob);
-            });
-        }
+            console.log("Exporting track master");
 
-        for (let node of nodes) {
-            node.disconnect();
-        }
-        for (let source of sources) {
-            source.disconnect();
-        }
-        for (let plugin of plugins) {
-            plugin.instance?._audioNode.disconnect();
-            plugin.unloadPlugin();
-        }
+            let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate);
+            let masterBuffer = combineBuffers(buffers);
 
-        let content = await zip.generateAsync({type:"blob"});
-        const newFile = URL.createObjectURL(content);
-        const link = document.createElement("a");
-        link.href = newFile;
-        link.download = name;
-        link.click();
-        link.remove();
+            const masterGainNode = offlineCtx.createGain();
+            masterGainNode.gain.value = this.app.host.gainNode.gain.value;
 
-        /*let track = this.app.tracksController.trackList[0]!;
+            let masterSourceNode = offlineCtx.createBufferSource();
+            masterSourceNode.buffer = masterBuffer;
 
+            masterSourceNode.connect(masterGainNode).connect(offlineCtx.destination);
+            masterSourceNode.start();
+
+            let renderedBuffer = await offlineCtx.startRendering()
+            let blob = this.bufferToWave(renderedBuffer);
+
+            masterGainNode.disconnect();
+            masterSourceNode.disconnect();
+
+            downloadBlob(blob, `${name}_master.wav`);
+        }
+    }
+
+    async rebuildTrackGraph(offlineCtx: OfflineAudioContext, track: Track, hostGroupId: string) {
         let gainNode = offlineCtx.createGain();
         let pannerNode = offlineCtx.createStereoPanner();
-
-        // const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
-        // const [hostGroupId] = await initializeWamHost(offlineCtx);
-
+        let sourceNode = offlineCtx.createBufferSource();
         let plugin = new Plugin(this.app);
-        await plugin.initPlugin(this.app.host.pluginWAM, audioCtx, offlineCtx, hostGroupId)
-        document.getElementById("loading-zone")!.appendChild(plugin.dom);
 
-        let state = await track.plugin.instance!._audioNode.getState();
-        await plugin.setStateAsync(state);
-
-        let source = offlineCtx.createBufferSource();
-        source.buffer = track.audioBuffer as AudioBuffer;
-        source.connect(plugin.instance?._audioNode!).connect(gainNode).connect(pannerNode).connect(offlineCtx.destination);
-
+        sourceNode.buffer = track.audioBuffer as AudioBuffer;
         gainNode.gain.value = track.gainNode.gain.value;
         pannerNode.pan.value = track.pannerNode.pan.value;
 
-        source.start();
-
-        offlineCtx.startRendering().then((renderedBuffer) => {
-            console.log('Rendering completed successfully');
-
-            let blob = this.bufferToWave(renderedBuffer);
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement("a");
-            document.body.appendChild(a);
-            a.href = url;
-            a.download = name;
-            a.click();
-            a.remove();
-        })*/
+        await plugin.initPlugin(this.app.host.pluginWAM, audioCtx, offlineCtx, hostGroupId)
+        document.getElementById("loading-zone")!.appendChild(plugin.dom);
+        let state = await track.plugin.instance!._audioNode.getState();
+        if (state.current.length > 0) {
+            await plugin.setStateAsync(state);
+        }
+        return {gainNode, pannerNode, sourceNode, plugin};
     }
-
-    async exportProject() {
-
-    }
-
-
 
     bufferToWave(abuffer: AudioBuffer) {
         var numOfChan = abuffer.numberOfChannels,
@@ -197,4 +151,38 @@ export default class ExporterController {
             pos += 4;
         }
     }
+}
+
+function combineBuffers(buffers: AudioBuffer[]) {
+    // Get the max length from all buffers
+    let maxLength = Math.max(...buffers.map(buffer => buffer.length));
+
+    // Create a new buffer with the max length
+    let outputBuffer = audioCtx.createBuffer(
+        buffers[0].numberOfChannels,
+        maxLength,
+        buffers[0].sampleRate
+    );
+
+    // For each buffer, for each channel, copy the data into the outputBuffer
+    buffers.forEach(buffer => {
+        for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+            let outputData = outputBuffer.getChannelData(channel);
+            let inputData = buffer.getChannelData(channel);
+
+            for (let i = 0; i < inputData.length; i++) {
+                outputData[i] += inputData[i];
+            }
+        }
+    });
+    return outputBuffer;
+}
+
+function downloadBlob(blob: Blob, fileName: string) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    link.remove();
 }
