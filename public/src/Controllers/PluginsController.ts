@@ -1,6 +1,7 @@
 import App from "../App";
 import Track from "../Models/Track";
 import Host from "../Models/Host";
+import {audioCtx} from "../index";
 
 /**
  * Controller for the plugins view. This controller is responsible for selecting and removing plugins.
@@ -48,7 +49,7 @@ export default class PluginsController {
         this.app.pluginsView.newPlugin.addEventListener("click", async () => {
             if (this.selectedTrack != undefined) {
                 this.app.pluginsView.hideNew();
-                await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM);
+                await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
                 this.app.tracksController.connectPlugin(this.selectedTrack);
                 this.selectPlugins();
             }

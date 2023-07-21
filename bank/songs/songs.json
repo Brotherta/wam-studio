@@ -23,25 +23,25 @@
           "name": "Bass",
           "tag": "bass",
           "split": "L",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_BASS.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/BASS.mp3"
         },
         {
           "name": "Drums",
           "tag": "drums",
           "split": "R",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_DRUMS.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/DRUMS.mp3"
         },
         {
           "name": "Guitar",
           "tag": "electric_guitar",
           "split": "L",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_GUITAR.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/GUITAR.mp3"
         },
         {
           "name": "Vocals",
           "tag": "lead_vocal",
           "split": "R",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_VOCALS.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/VOCALS.mp3"
         }
       ]
     },
@@ -53,22 +53,22 @@
         {
           "name": "Bass",
           "tag": "bass",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_BASS.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/BASS.mp3"
         },
         {
           "name": "Drums",
           "tag": "drums",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_DRUMS.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/DRUMS.mp3"
         },
         {
           "name": "Guitar",
           "tag": "electric_guitar",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_GUITAR.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/GUITAR.mp3"
         },
         {
           "name": "Vocals",
           "tag": "lead_vocal",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_VOCALS.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/VOCALS.mp3"
         }
       ]
     },
@@ -80,22 +80,34 @@
         {
           "name": "Bass",
           "tag": "bass",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_BASS.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/BASS.mp3"
         },
         {
           "name": "Drums",
           "tag": "drums",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_DRUMS.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/DRUMS.mp3"
         },
         {
           "name": "Guitar",
           "tag": "electric_guitar",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_GUITAR.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/GUITAR.mp3"
         },
         {
           "name": "Vocals",
           "tag": "lead_vocal",
-          "url": "https://ccrma.stanford.edu/~lloyd/Emp/Test/FLY_ME_TO_THE_MOON_(RNB)_VOCALS.mp3"
+          "url": "http://localhost:6002/songs/FlyToTheMoon/VOCALS.mp3"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "test",
+      "splitting": false,
+      "songs": [
+        {
+          "name": "Test",
+          "tag": "other",
+          "url": "http://localhost:6002/songs/FlyToTheMoon/GUITAR.mp3"
         }
       ]
     }

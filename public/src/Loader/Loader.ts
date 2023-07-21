@@ -100,7 +100,9 @@ export default class Loader {
             track.tag = trackJson.tag;
             track.plugin.state = trackJson.plugin;
 
-            await track.plugin.instance!._audioNode.setState(trackJson.plugin);
+            await track.plugin.setStateAsync(trackJson.plugin);
+
+/*            await track.plugin.instance!._audioNode.setState(trackJson.plugin);
             let state = await track.plugin.instance!._audioNode.getState();
 
             let statePlugin = new Promise<void>((resolve) => {
@@ -121,7 +123,7 @@ export default class Loader {
                     }
                 }, 200);
             });
-            await statePlugin;
+            await statePlugin;*/
 
             track.element.name = trackJson.name;
             track.element.trackNameInput.value = trackJson.name;

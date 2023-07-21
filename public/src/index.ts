@@ -12,6 +12,7 @@ import ParameterElement from "./Components/Binds/ParameterElement";
 import TrackBindElement from "./Components/Binds/TrackBindElement";
 import LoginElement from "./Components/Project/LoginElement";
 import ConfirmElement from "./Components/ConfirmElement";
+import ExportProjectElement from "./Components/Project/ExportProjectElement";
 
 customElements.define(
     "track-element",
@@ -49,6 +50,10 @@ customElements.define(
 customElements.define(
     "confirm-element",
     ConfirmElement
+);
+customElements.define(
+    "export-project-element",
+    ExportProjectElement
 );
 
 const audioCtx = new AudioContext();

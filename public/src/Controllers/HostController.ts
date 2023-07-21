@@ -191,17 +191,18 @@ export default class HostController {
         this.app.hostView.syncPresets.onclick = async () => {
             await this.app.presetsController.syncPresets();
         }
-        this.app.hostView.exportProject.onclick = async () => {
-            let project = await this.app.loader.saveProject();
-            let date = new Date().toISOString().slice(0, 10);
-            let fileName = `WAM-Project_${date}.json`;
-            let blob = new Blob([JSON.stringify(project)], {type: "application/json"});
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement("a");
-            a.href = url;
-            a.download = fileName;
-            a.click();
-            a.remove();
+        this.app.hostView.exportProject.onclick = () => {
+            this.app.projectController.openExportProject();
+            // let project = await this.app.loader.saveProject();
+            // let date = new Date().toISOString().slice(0, 10);
+            // let fileName = `WAM-Project_${date}.json`;
+            // let blob = new Blob([JSON.stringify(project)], {type: "application/json"});
+            // let url = URL.createObjectURL(blob);
+            // let a = document.createElement("a");
+            // a.href = url;
+            // a.download = fileName;
+            // a.click();
+            // a.remove();
         }
         this.app.hostView.importInput.onchange = async (e) => {
             // @ts-ignore

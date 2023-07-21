@@ -126,9 +126,10 @@ export default class PresetsController {
             if (response.ok) {
                 let data = await response.json()
                 console.log(data);
+                alert("Presets successfully synced.");
             }
             else {
-                console.log("An error occurred in the process of syncing the presets.")
+                console.error("An error occurred in the process of syncing the presets.");
             }
         });
     }
@@ -167,21 +168,29 @@ export default class PresetsController {
         track.plugin.instance!.id = 0;
 
         if (preset.name !== "Default") {
-            await track.plugin.instance!._audioNode.setState(preset.pluginState);
-            let testState = await track.plugin.instance!._audioNode.getState();
+            // await track.plugin.instance!._audioNode.setState(preset.pluginState);
+            // let testState = await track.plugin.instance!._audioNode.getState();
+            //
+            // let readyPromise = new Promise<WamParameterInfoMap>((resolve) => {
+            //    let interval = setInterval(async () => {
+            //        if (testState.current.length === preset!.pluginState.current.length) {
+            //            let paramInfo = await track.plugin.instance!._audioNode.getParameterInfo();
+            //            clearInterval(interval);
+            //            resolve(paramInfo);
+            //        }
+            //        testState = await track.plugin.instance!._audioNode.getState();
+            //    }, 100);
+            // });
 
-            let readyPromise = new Promise<WamParameterInfoMap>((resolve) => {
-               let interval = setInterval(async () => {
-                   if (testState.current.length === preset!.pluginState.current.length) {
-                       let paramInfo = await track.plugin.instance!._audioNode.getParameterInfo();
-                       clearInterval(interval);
-                       resolve(paramInfo);
-                   }
-                   testState = await track.plugin.instance!._audioNode.getState();
-               }, 100);
-            });
-            let paramInfo = await readyPromise;
+            // let paramInfo = await readyPromise;
 
+            await track.plugin.setStateAsync(preset.pluginState);
+            let paramInfo = await track.plugin.instance?._audioNode.getParameterInfo();
+
+            if (!paramInfo) {
+                console.error("Could not get parameter info");
+                return;
+            }
 
             for (let bindPreset of preset.binds) {
                 let bind = await this.app.bindsController.createBind(track, bindPreset.name, bindPreset.currentValue);

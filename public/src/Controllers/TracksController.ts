@@ -180,7 +180,7 @@ export default class TracksController {
     }
 
     async initTrackComponents(track: Track) {
-        await track.plugin.initPlugin(this.app.host.pluginWAM);
+        await track.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
         document.getElementById("loading-zone")!.appendChild(track.plugin.dom);
         this.app.tracksController.connectPlugin(track);
         this.app.tracksController.addNewTrackInit(track);

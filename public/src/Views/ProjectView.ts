@@ -2,6 +2,7 @@ import SaveProjectElement from "../Components/Project/SaveProjectElement";
 import LoadProjectElement from "../Components/Project/LoadProjectElement";
 import LoginElement from "../Components/Project/LoginElement";
 import ConfirmElement from "../Components/ConfirmElement";
+import ExportProjectElement from "../Components/Project/ExportProjectElement";
 
 
 export default class ProjectView {
@@ -13,9 +14,8 @@ export default class ProjectView {
 
     saveElement: SaveProjectElement;
     loadElement: LoadProjectElement;
+    exportElement: ExportProjectElement;
     loginElement: LoginElement;
-    newElement: HTMLDivElement;
-    manageElement: HTMLDivElement;
     confirmElement: ConfirmElement;
 
 
@@ -28,6 +28,7 @@ export default class ProjectView {
 
         this.saveElement = new SaveProjectElement();
         this.loadElement = new LoadProjectElement();
+        this.exportElement = new ExportProjectElement();
         this.loginElement = new LoginElement();
         this.confirmElement = new ConfirmElement();
     }
@@ -53,10 +54,10 @@ export default class ProjectView {
         this.mount.appendChild(this.saveElement);
     }
 
-    mountNew() {
-        this.title.innerText = "New Project";
+    mountExport() {
+        this.title.innerText = "Export Project";
         this.mount.innerHTML = "";
-        this.mount.appendChild(this.saveElement);
+        this.mount.appendChild(this.exportElement);
     }
 
     mountLogin() {
@@ -70,6 +71,8 @@ export default class ProjectView {
         this.mount.innerHTML = "";
         this.mount.appendChild(this.confirmElement);
     }
+
+
 
     updateLogin(isLogged: boolean) {
         this.loginElement.logInButton.hidden = isLogged;
