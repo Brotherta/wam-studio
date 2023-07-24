@@ -4,7 +4,7 @@ services:
   frontend:
     build: ./public
     ports:
-      - "5002:5002"
+      - "7002:7002"
     environment:
       - HTTPS=false
     restart: unless-stopped
@@ -12,7 +12,7 @@ services:
   bank:
     build: ./bank
     ports:
-      - "6002:6002"
+      - "8002:8002"
     environment:
       - HTTPS=false
       - STORAGE_DIR=/data/storage

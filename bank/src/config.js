@@ -24,7 +24,7 @@ module.exports = {
     adminPassword: process.env.ADMIN_PASSWORD,
     jwtSecret: process.env.JWT_SECRET,
     HTTPS: process.env.HTTPS === "true",
-    port: process.env.PORT || 6002,
+    port: process.env.PORT || 8002,
     corsOptions: CORS_OPTIONS[ENV],
     SongTagEnum: {
         LEAD_VOCAL: "lead_vocal",
