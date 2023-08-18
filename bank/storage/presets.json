@@ -1,7 +1,464 @@
 [
   {
     "tag": "lead_vocal",
-    "presets": []
+    "presets": [
+      {
+        "name": "test",
+        "pluginState": {
+          "current": [
+            {
+              "name": "Equalizer",
+              "state": {
+                "enabled": 1,
+                "highpass_0_Q": 0.000009999999747378752,
+                "highpass_0_detune": 0,
+                "highpass_0_frequency": 40,
+                "highpass_0_gain": 12,
+                "lowshelf_1_Q": 0,
+                "lowshelf_1_detune": 0,
+                "lowshelf_1_frequency": 80,
+                "lowshelf_1_gain": 0,
+                "peaking_2_Q": 1,
+                "peaking_2_detune": 0,
+                "peaking_2_frequency": 204.92576599121094,
+                "peaking_2_gain": -29.017669677734375,
+                "peaking_3_Q": 1,
+                "peaking_3_detune": 0,
+                "peaking_3_frequency": 2500,
+                "peaking_3_gain": 0,
+                "peaking_4_Q": 1,
+                "peaking_4_detune": 0,
+                "peaking_4_frequency": 5000,
+                "peaking_4_gain": 0,
+                "highshelf_5_Q": 1,
+                "highshelf_5_detune": 0,
+                "highshelf_5_frequency": 10000,
+                "highshelf_5_gain": 0,
+                "lowpass_6_Q": 0.000009999999747378752,
+                "lowpass_6_detune": 0,
+                "lowpass_6_frequency": 18000,
+                "lowpass_6_gain": 12
+              }
+            }
+          ],
+          "presets": {
+            "Rock": {
+              "Black Sabbath": [
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 0,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                },
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 1,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                }
+              ],
+              "Nirvana": [
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 0,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                },
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 1,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                },
+                {
+                  "name": "Faust PingPongDelay",
+                  "state": {
+                    "/PingPongDelayFaust/bypass": 0,
+                    "/PingPongDelayFaust/time": 0.5,
+                    "/PingPongDelayFaust/feedback": 0.5,
+                    "/PingPongDelayFaust/mix": 0.5
+                  }
+                },
+                {
+                  "name": "Faust PingPongDelay",
+                  "state": {
+                    "/PingPongDelayFaust/bypass": 0,
+                    "/PingPongDelayFaust/time": 0.5,
+                    "/PingPongDelayFaust/feedback": 0.5,
+                    "/PingPongDelayFaust/mix": 0.5
+                  }
+                },
+                {
+                  "name": "Faust PingPongDelay",
+                  "state": {
+                    "/PingPongDelayFaust/bypass": 0,
+                    "/PingPongDelayFaust/time": 0.5,
+                    "/PingPongDelayFaust/feedback": 0.5,
+                    "/PingPongDelayFaust/mix": 0.5
+                  }
+                },
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 0.5,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                }
+              ]
+            },
+            "Pop": {
+              "Queen": [
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 0,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                },
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 1,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                }
+              ],
+              "The Beatles": [
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 0,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                },
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 1,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                }
+              ],
+              "AC/DC": [
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 0,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                },
+                {
+                  "name": "PingPongDelay",
+                  "state": {
+                    "feedback": 0.5,
+                    "mix": 1,
+                    "time": 0.5,
+                    "enabled": 1
+                  }
+                }
+              ]
+            },
+            "Jordan": {
+              "Stonesour": [
+                {
+                  "name": "DeathGate",
+                  "state": {
+                    "/deathgate/DeadZone": -100,
+                    "/deathgate/NoiseGate": -76.875
+                  }
+                },
+                {
+                  "name": "WeirdPhaser",
+                  "state": {
+                    "/weirdPhaser/L-ROffset": 0.6010000109672546,
+                    "/weirdPhaser/Feedback": 0.6399999856948853,
+                    "/weirdPhaser/Rate": 0.10100000351667404,
+                    "/weirdPhaser/bypass": 0,
+                    "/weirdPhaser/RateScalar": 12.27299976348877
+                  }
+                },
+                {
+                  "name": "ThruZeroFlanger",
+                  "state": {
+                    "/ThruZeroFlanger/Delay": 11.670000076293945,
+                    "/ThruZeroFlanger/bypass": 0,
+                    "/ThruZeroFlanger/Rate": 0.12200000137090683,
+                    "/ThruZeroFlanger/L-ROffset": 0.578000009059906,
+                    "/ThruZeroFlanger/Depth": 42
+                  }
+                },
+                {
+                  "name": "KPP distorder",
+                  "state": {
+                    "/compressor/bass": 0,
+                    "/compressor/treble": 0,
+                    "/compressor/volume": 0.5,
+                    "/compressor/voice": 0.5,
+                    "/compressor/drive": 63,
+                    "/compressor/middle": 0,
+                    "/compressor/99_bypass": 1
+                  }
+                },
+                {
+                  "name": "DistoMachine (No builder)",
+                  "state": {
+                    "reverb": 2.200000047683716,
+                    "volume": 2,
+                    "enabled": 1,
+                    "drive": 5.199999809265137,
+                    "middle": 8,
+                    "bass": 8.699999809265137,
+                    "preset": 5,
+                    "presence": 9.399999618530273,
+                    "treble": 3.799999952316284,
+                    "master": 5.5
+                  }
+                }
+              ],
+              "AlienWave": [
+                {
+                  "name": "DeathGate",
+                  "state": {
+                    "/deathgate/DeadZone": -100,
+                    "/deathgate/NoiseGate": -76.875
+                  }
+                },
+                {
+                  "name": "StonePhaser",
+                  "state": {
+                    "/StonePhaserStereo/Stereo_phase": 0,
+                    "/StonePhaserStereo/Mix": 50,
+                    "/StonePhaserStereo/LFO": 0.20000000298023224,
+                    "/StonePhaserStereo/Color": 0,
+                    "/StonePhaserStereo/Bypass": 0,
+                    "/StonePhaserStereo/Lo-cut": 500,
+                    "/StonePhaserStereo/Feedback": 75
+                  }
+                },
+                {
+                  "name": "Sweet Wah",
+                  "state": {
+                    "/Sweet/Low": 0.3199999928474426,
+                    "/Sweet/High": 0.800000011920929,
+                    "/Sweet/bypass": 0,
+                    "/Sweet/Mix": 0.7300000190734863,
+                    "/Sweet/Frequency": 4
+                  }
+                },
+                {
+                  "name": "DistoMachine (No builder)",
+                  "state": {
+                    "reverb": 2.200000047683716,
+                    "volume": 4.099999904632568,
+                    "enabled": 1,
+                    "drive": 0.699999988079071,
+                    "middle": 8,
+                    "bass": 8.699999809265137,
+                    "preset": 5,
+                    "presence": 9.399999618530273,
+                    "treble": 3.799999952316284,
+                    "master": 8
+                  }
+                },
+                {
+                  "name": "OwlDirty",
+                  "state": {
+                    "/OwlDirty/MIX": 0.44999998807907104,
+                    "/OwlDirty/DRIVE": 0,
+                    "/OwlDirty/bypass": 1,
+                    "/OwlDirty/TONE": 4610.1298828125,
+                    "/OwlDirty/DECAY": 0.5199999809265137
+                  }
+                },
+                {
+                  "name": "GreyHole",
+                  "state": {
+                    "/greyhole/diffusion": 0.5,
+                    "/greyhole/delayTime": 0.14329999685287476,
+                    "/greyhole/bypass": 1,
+                    "/greyhole/size": 0.9218000173568726,
+                    "/greyhole/damping": 0.12300000339746475,
+                    "/greyhole/modDepth": 0.5450000166893005,
+                    "/greyhole/feedback": 0.1599999964237213,
+                    "/greyhole/modFreq": 5.03000020980835
+                  }
+                }
+              ],
+              "Chilling Dude": [
+                {
+                  "name": "Faust PingPongDelay",
+                  "state": {
+                    "/PingPongDelayFaust/bypass": 0,
+                    "/PingPongDelayFaust/time": 0.27000001072883606,
+                    "/PingPongDelayFaust/feedback": 0.23999999463558197,
+                    "/PingPongDelayFaust/mix": 0.5
+                  }
+                },
+                {
+                  "name": "DistoMachine (No builder)",
+                  "state": {
+                    "reverb": 0.699999988079071,
+                    "volume": 2,
+                    "enabled": 1,
+                    "drive": 2.9000000953674316,
+                    "middle": 8,
+                    "bass": 8.699999809265137,
+                    "preset": 5,
+                    "presence": 3.4000000953674316,
+                    "treble": 3.799999952316284,
+                    "master": 2.799999952316284
+                  }
+                },
+                {
+                  "name": "Equalizer",
+                  "state": {
+                    "peaking_3_detune": 0,
+                    "enabled": 1,
+                    "highpass_0_detune": 0,
+                    "lowshelf_1_frequency": 80,
+                    "highpass_0_Q": 0.000009999999747378752,
+                    "lowpass_6_gain": 12,
+                    "peaking_3_Q": 1,
+                    "highshelf_5_gain": 0,
+                    "peaking_2_gain": 0,
+                    "highshelf_5_Q": 1,
+                    "lowshelf_1_gain": 0,
+                    "highpass_0_frequency": 40,
+                    "peaking_2_frequency": 230,
+                    "lowshelf_1_detune": 0,
+                    "lowshelf_1_Q": 0,
+                    "lowpass_6_Q": -6.863999843597412,
+                    "peaking_4_frequency": 5000,
+                    "peaking_3_gain": 0,
+                    "lowpass_6_frequency": 3018.591796875,
+                    "highshelf_5_detune": 0,
+                    "peaking_2_detune": 0,
+                    "highshelf_5_frequency": 10000,
+                    "peaking_3_frequency": 2500,
+                    "peaking_4_Q": 1,
+                    "peaking_2_Q": 1,
+                    "highpass_0_gain": 12,
+                    "peaking_4_gain": 0,
+                    "lowpass_6_detune": 0,
+                    "peaking_4_detune": 0
+                  }
+                }
+              ],
+              "Subwater": [
+                {
+                  "name": "StonePhaser",
+                  "state": {
+                    "/StonePhaserStereo/Stereo_phase": 0,
+                    "/StonePhaserStereo/Mix": 50,
+                    "/StonePhaserStereo/LFO": 0.20000000298023224,
+                    "/StonePhaserStereo/Color": 0,
+                    "/StonePhaserStereo/Bypass": 1,
+                    "/StonePhaserStereo/Lo-cut": 500,
+                    "/StonePhaserStereo/Feedback": 75
+                  }
+                },
+                {
+                  "name": "Quadrafuzz",
+                  "state": {
+                    "midHighGain": 0.5,
+                    "enabled": 0,
+                    "midLowGain": 0.800000011920929,
+                    "lowGain": 0.6000000238418579,
+                    "highGain": 0.5
+                  }
+                },
+                {
+                  "name": "GuitarAmpSim60s",
+                  "state": {
+                    "/GuitarAmpSim60s/Bright": 1,
+                    "/GuitarAmpSim60s/bypass": 0,
+                    "/GuitarAmpSim60s/Bass": 0.5,
+                    "/GuitarAmpSim60s/Master": 0.3499999940395355,
+                    "/GuitarAmpSim60s/Treble": 0.5,
+                    "/GuitarAmpSim60s/Middle": 0.5,
+                    "/GuitarAmpSim60s/Volume": 0.33000001311302185
+                  }
+                },
+                {
+                  "name": "ThruZeroFlanger",
+                  "state": {
+                    "/ThruZeroFlanger/Delay": 10,
+                    "/ThruZeroFlanger/bypass": 0,
+                    "/ThruZeroFlanger/Rate": 0.17000000178813934,
+                    "/ThruZeroFlanger/L-ROffset": 0.5460000038146973,
+                    "/ThruZeroFlanger/Depth": 90
+                  }
+                }
+              ],
+              "KnockKnock": [
+                {
+                  "name": "Sweet Wah",
+                  "state": {
+                    "/Sweet/Low": 0.800000011920929,
+                    "/Sweet/High": 0.800000011920929,
+                    "/Sweet/bypass": 0,
+                    "/Sweet/Mix": 0.5,
+                    "/Sweet/Frequency": 4
+                  }
+                },
+                {
+                  "name": "GuitarAmpSim60s",
+                  "state": {
+                    "/GuitarAmpSim60s/Bright": 0,
+                    "/GuitarAmpSim60s/bypass": 0,
+                    "/GuitarAmpSim60s/Bass": 0.5,
+                    "/GuitarAmpSim60s/Master": 0.3100000023841858,
+                    "/GuitarAmpSim60s/Treble": 0.5,
+                    "/GuitarAmpSim60s/Middle": 0.5,
+                    "/GuitarAmpSim60s/Volume": 0.5
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "binds": [
+          {
+            "name": "Bind",
+            "currentValue": "50",
+            "parameters": [
+              {
+                "parameterName": "n°0 Equalizer -> highpass_0_Q",
+                "max": 40,
+                "min": -60,
+                "currentMax": 40,
+                "currentMin": -60,
+                "discreteStep": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "tag": "backing_vocal",

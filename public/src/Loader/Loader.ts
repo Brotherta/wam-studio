@@ -72,16 +72,6 @@ export default class Loader {
         this.app.tracksController.trackIdCount = 1;
 
 
-        let cover = document.createElement("div");
-        cover.classList.add("cover");
-
-        let coverText = document.createElement("div");
-        coverText.classList.add("cover-text");
-        coverText.textContent = "Loading project";
-
-        // cover.appendChild(coverText);
-        // document.body.appendChild(cover);
-
         this.app.hostView.headerTitle.innerHTML = json.songName;
 
         for (let trackJson of json.tracks) {
@@ -101,29 +91,6 @@ export default class Loader {
             track.plugin.state = trackJson.plugin;
 
             await track.plugin.setStateAsync(trackJson.plugin);
-
-/*            await track.plugin.instance!._audioNode.setState(trackJson.plugin);
-            let state = await track.plugin.instance!._audioNode.getState();
-
-            let statePlugin = new Promise<void>((resolve) => {
-                let test = 0;
-                let maxTest = 10;
-                const interval = setInterval(async () => {
-                    console.log(track.id, state.current.length, trackJson.plugin.current.length)
-                    if (state.current.length === trackJson.plugin.current.length) {
-                        clearInterval(interval);
-                        resolve();
-                    }
-                    state = await track.plugin.instance!._audioNode.getState();
-                    test++;
-                    if (test > maxTest) {
-                        console.log("max test reached for", track.id);
-                        test = 0;
-                        await track.plugin.instance!._audioNode.setState(trackJson.plugin);
-                    }
-                }, 200);
-            });
-            await statePlugin;*/
 
             track.element.name = trackJson.name;
             track.element.trackNameInput.value = trackJson.name;
@@ -160,16 +127,10 @@ export default class Loader {
                 await this.app.bindsController.selectBind(track);
             }
         }
-        // let trackInitializedPromise = json.tracks.map(async (trackJson: any) => {
-        //
-        // });
-        //
-        // await Promise.all(trackInitializedPromise);
 
         setTimeout(() => {
             this.app.pluginsView.mount.innerHTML = "";
             this.app.pluginsView.hideFloatingWindow();
-            cover.remove();
         }, 500);
 
     }

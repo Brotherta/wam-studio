@@ -16,26 +16,19 @@ Wam-Studio’s is an online tool for creating audio projects that you can imagin
    - `PORT`: The port number that the frontend server will run on. For example, `5002`.
    - `HTTPS`: Set this to `true` if you want to enable HTTPS. If `true`, you must create a certificate and set the `SSL_CRT_FILE` and `SSL_KEY_FILE` variables.
    - `BACKEND_URL`: The URL of the backend server. For example, `http://localhost:6002`.
-   - `BANK_PLUGIN_URL`: The URL of the bank plugin. For example, `http://localhost:7002`.
+   - `BANK_PLUGIN_URL`: The URL of the bank plugin. For example, `http://localhost:6002`.
 5. Start the frontend server by running `npm start`.
-
-### Backend
-1. Navigate to the `server` folder.
-2. Install dependencies by running `npm install`.
-3. Configure the following variables in the `.env` file:
-   - `PORT`: The port number that the backend server will run on. For example, `6002`.
-   - `STORAGE_DIR`: The directory where the backend will store data. For example, `/data/storage`.
-   - `ADMIN_PASSWORD`: The password for the admin user.
-   - `JWT_SECRET`: The secret for JSON Web Tokens (JWT).
-4. Start the backend server by running `npm start`.
 
 ### Bank Plugin
 1. Navigate to the `bank` folder.
 2. Install dependencies by running `npm install`.
 3. Create a `.env.local` file in the root directory of the `bank` folder.
 4. Configure the following variables in the `.env.local` file:
-   - `PORT`: The port number that the bank plugin server will run on. For example, `7002`.
-   - `HTTPS`: Set this to `false` to disable HTTPS.
+   - `PORT`: The port number that the bank plugin server will run on. For example, `6002`.
+   - `STORAGE_DIR`: The directory where the bank plugin will store data. For example, `storage`.
+   - `ADMIN_PASSWORD`: The password for the admin user.
+   - `JWT_SECRET`: The secret for JSON Web Tokens (JWT).
+   - `NODE_ENV`: The environment that the bank plugin is running in. For example, `development`.
 5. Start the bank plugin server by running `npm start`.
 
 ## Running the Application with Docker

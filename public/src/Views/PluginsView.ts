@@ -38,42 +38,6 @@ export default class PluginsView {
      * Minimize the rack to the minimum height and change the icon to maximize.
      */
     resize() {
-        // this.resizeBtn.addEventListener("mousedown", (e) => {
-        //     this.minHeight = 25;
-        //     this.maxHeight = document.body.getBoundingClientRect().height * 3/4;
-        //     this.dragging = true;
-        //     let rackDiv = this.rack;
-        //     this.originalHeight = parseFloat(getComputedStyle(rackDiv, null).getPropertyValue('height').replace("px",''));
-        //     this.originalY = rackDiv.getBoundingClientRect().top;
-        //     this.originalMouseY = e.pageY;
-        //     this.event = e;
-        // });
-        //
-        // document.body.addEventListener("mouseup", () => {
-        //     if (this.dragging) {
-        //         this.dragging = false;
-        //         this.currentSize = parseFloat(getComputedStyle(this.rack, null).getPropertyValue('height').replace("px",''));
-        //     }
-        // });
-        //
-        // document.body.addEventListener("mousemove", (e) => {
-        //     if (this.dragging) {
-        //         let height = this.originalHeight - (e.pageY - this.originalMouseY);
-        //         if (height < this.maxHeight) {
-        //             this.rack.style.minHeight = height+"px";
-        //         }
-        //
-        //         if (height < this.minHeight) {
-        //             this.minimize();
-        //         }
-        //         else {
-        //             this.maximized = true;
-        //             let icon = document.getElementById("min-max-btn-icon") as HTMLImageElement;
-        //             icon.src = "icons/chevron-compact-down.svg";
-        //         }
-        //     }
-        // });
-
         window.addEventListener("resize", () => {
             this.maxHeight = document.body.getBoundingClientRect().height * 3/4;
             this.originalHeight = parseFloat(getComputedStyle(this.rack, null).getPropertyValue('height').replace("px",''));

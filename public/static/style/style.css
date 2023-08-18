@@ -355,29 +355,7 @@ div::-webkit-scrollbar-thumb:hover {
 }
 
 
-track-element {
-    display: flex;
-    width: 100%;
-    min-height: 130px;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    background: rgb(44, 44, 44);
-    border: solid 1px black;
-}
 
-placeholder-element {
-    display: flex;
-    width: 100%;
-    min-height: 130px;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    background: rgb(44, 44, 44);
-    border: solid 1px black;
-}
 
 .text-icon {
     padding-left: 25px;
@@ -577,16 +555,7 @@ placeholder-element {
     cursor: pointer;
 }
 
-li {
-    list-style-type: none;
-    padding: 0;
-}
 
-ul {
-    padding: 0 !important;
-    margin: 0 !important;
-    list-style-type: none;
-}
 
 #automation-container {
     height: auto;
@@ -613,10 +582,7 @@ ul {
     background-color: rgba(0, 0, 0, 0.21);
 }
 
-canvas {
-    grid-column-start: 1;
-    grid-row-start: 1;
-}
+
 
 .form-range {
     transform: scale(1.5);
@@ -642,6 +608,51 @@ canvas {
     border-left: solid 1px rgb(111, 111, 111);
 }
 
+
+#advanced-window {
+    z-index: 21;
+}
+
+li {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul {
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style-type: none;
+}
+
+track-element {
+    display: flex;
+    width: 100%;
+    min-height: 130px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    background: rgb(44, 44, 44);
+    border: solid 1px black;
+}
+
+placeholder-element {
+    display: flex;
+    width: 100%;
+    min-height: 130px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    background: rgb(44, 44, 44);
+    border: solid 1px black;
+}
+
+canvas {
+    grid-column-start: 1;
+    grid-row-start: 1;
+}
+
 track-bind-element {
     width: 100%;
     min-height: 130px;
@@ -649,15 +660,6 @@ track-bind-element {
     border-top: 1px solid black;
     border-bottom: 1px solid black;
     border-right: 1px solid black;
-    /*display: flex;*/
-    /*flex-direction: row;*/
-    /*flex-wrap: nowrap;*/
-    /*align-items: center;*/
-    /*overflow: auto;*/
-}
-
-#advanced-window {
-    z-index: 21;
 }
 
 advanced-element {
@@ -669,101 +671,3 @@ advanced-element {
     height: max-content;
 }
 
-/*#advanced-buttons {*/
-/*    display: flex;*/
-/*    flex-direction: row;*/
-/*    flex-wrap: nowrap;*/
-/*    justify-content: center;*/
-/*    align-items: center;*/
-/*    width: 100%;*/
-/*    padding: 10px;*/
-/*}*/
-
-/*.dropdown-container {*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    flex-wrap: nowrap;*/
-/*    overflow-y: scroll;*/
-/*    align-items: flex-start;*/
-/*    width: 100%;*/
-/*    height: 100%;*/
-/*    border: solid 1px lightgray;*/
-/*    border-radius: 3px;*/
-/*}*/
-
-/*.parameter-item {*/
-/*    display: flex;*/
-/*    flex-direction: row;*/
-/*    flex-wrap: nowrap;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-/*    padding: 5px;*/
-/*}*/
-
-/*.btn-advanced {*/
-/*    margin: 5px;*/
-/*    border-radius: 6px;*/
-/*}*/
-
-/*.select-advanced {*/
-/*    margin: 5px;*/
-/*    border-radius: 4px;*/
-/*    width: 190px;*/
-/*    text-overflow: ellipsis;*/
-/*}*/
-
-.cover {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(1000px);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.cover::before {
-    content: '';
-    display: block;
-    position: absolute;
-    width: 200%;
-    height: 200%;
-    top: -50%;
-    left: -50%;
-    background-color: rgba(0, 0, 0, 0.5);
-    opacity: 0.5;
-    filter: blur(1000px);
-}
-
-.cover::after {
-    content: '';
-    display: block;
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    border-top-color: transparent;
-    animation: rotate 1s linear infinite;
-    z-index: 1;
-    margin-bottom: 100px;
-}
-
-.cover-text {
-    color: #fff;
-    font-size: 24px;
-    margin-top: 50px;
-}
-
-@keyframes rotate {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}

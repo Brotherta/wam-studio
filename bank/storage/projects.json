@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "username": "test",
+    "name": "test",
+    "date": "2023-08-18T14:47:18.055Z",
+    "path": "storage\\test\\test.json",
+    "id": "b5d23067-2778-4195-86c1-4376199e65ee"
+  }
+]

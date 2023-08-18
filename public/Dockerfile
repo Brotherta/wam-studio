@@ -20,7 +20,7 @@ RUN npm run build
 
 
 # Expose the port used by the HTTP server
-EXPOSE 7002
+EXPOSE 5002
 
 # Start the HTTP server
 CMD ["npm", "run", "start:prod"]

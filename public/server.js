@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 const HTTPS = process.env.HTTPS === "true";
-const PORT = process.env.PORT || 8002;
+const PORT = process.env.PORT || 5002;
 console.log("FRONT: ", process.env.BACKEND_URL);
 
 
