@@ -1,0 +1,54 @@
+[
+  {
+    "tag": "lead_vocal",
+    "presets": []
+  },
+  {
+    "tag": "backing_vocal",
+    "presets": []
+  },
+  {
+    "tag": "electric_guitar",
+    "presets": []
+  },
+  {
+    "tag": "acoustic_guitar",
+    "presets": []
+  },
+  {
+    "tag": "bass",
+    "presets": []
+  },
+  {
+    "tag": "drums",
+    "presets": []
+  },
+  {
+    "tag": "piano",
+    "presets": []
+  },
+  {
+    "tag": "synth",
+    "presets": []
+  },
+  {
+    "tag": "strings",
+    "presets": []
+  },
+  {
+    "tag": "brass",
+    "presets": []
+  },
+  {
+    "tag": "snares",
+    "presets": []
+  },
+  {
+    "tag": "kicks",
+    "presets": []
+  },
+  {
+    "tag": "other",
+    "presets": []
+  }
+]
