@@ -27,7 +27,6 @@ template.innerHTML = `
   width: 8px; /* If the scrollbar is vertical */
   height: 8px; /* If the scrollbar is horizontal */
   transition: background-color 0.2s ease-in-out;
-
 }
 
 #handle:hover {
