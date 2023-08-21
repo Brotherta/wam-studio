@@ -2,7 +2,7 @@
  * Class responsible for the host view. It displays the host controls and the host track.
  */
 import {audioCtx} from "../index";
-import {RATIO_MILLS_BY_PX} from "../Utils/Constants";
+import {RATIO_MILLS_BY_PX} from "../Utils/Variables";
 
 export default class HostView {
 

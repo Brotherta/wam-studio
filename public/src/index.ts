@@ -57,7 +57,27 @@ const audioCtx = new AudioContext({latencyHint: 0.00001});
 const app = new App();
 
 (async () => {
+    const showLoading = () => {
+        // Find the loading overlay and display it
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        if (loadingOverlay) {
+            (loadingOverlay as HTMLElement).style.display = 'flex';
+            document.body.classList.add('loading'); // This class is added to blur the content behind the overlay
+        }
+    }
+
+    const hideLoading = () => {
+        // Find the loading overlay and hide it
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        if (loadingOverlay) {
+            (loadingOverlay as HTMLElement).style.display = 'none';
+            document.body.classList.remove('loading'); // Remove the class to un-blur the content
+        }
+    }
+
+    showLoading();
     await app.initHost();
+    hideLoading();
     let interval: NodeJS.Timer;
 
     interval = setInterval(() => {
@@ -65,6 +85,10 @@ const app = new App();
             clearInterval(interval);
         });
     }, 100);
+
+
 })();
+
+
 
 export {app, audioCtx};

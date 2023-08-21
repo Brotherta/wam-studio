@@ -4,8 +4,13 @@ import ScrollBarElement from "../../Components/ScrollBarElement";
 import WaveformView from "./WaveformView";
 import PlayheadView from "./PlayheadView";
 import Track from "../../Models/Track";
-import {HEIGHT_NEW_TRACK, HEIGHT_TRACK} from "../../Utils/Constants";
-import {makeLogger} from "ts-loader/dist/logger";
+import {
+    HEIGHT_NEW_TRACK,
+    HEIGHT_TRACK,
+    MAX_DURATION_SEC,
+    RATIO_MILLS_BY_PX,
+} from "../../Utils/Variables";
+
 
 
 export default class EditorView extends Application {
@@ -46,7 +51,6 @@ export default class EditorView extends Application {
         this.worldWidth = this.width;
         this.worldHeight = this.height;
 
-
         this.originalCenter = { x: this.width / 2, y: this.height / 2 };
 
         this.viewport = new Viewport({
@@ -73,15 +77,12 @@ export default class EditorView extends Application {
     }
 
     bindEvents() {
-        window.addEventListener("resize", () => {
-            this.resizeCanvas();
-        });
 
         window.addEventListener("wheel", (e) => {
             let target = e.target as HTMLElement;
             if (target !== this.view as HTMLCanvasElement && target !== this.canvasContainer && target !== this.editorDiv && target !== this.horizontalScrollbar && target !== this.verticalScrollbar) return;
             if (e.shiftKey) {
-                this.horizontalScrollbar.customScrollTo(e.deltaX);
+                this.horizontalScrollbar.customScrollTo(e.deltaX*2);
             }
             else {
                 this.verticalScrollbar.customScrollTo(e.deltaY);
@@ -160,16 +161,13 @@ export default class EditorView extends Application {
      * Resize the canvas when the window is resized.
      */
     resizeCanvas() {
-
-        //
-        // this.verticalScrollbar.resize(this.height, this.worldHeight);
-        // this.viewport.resize(this.width, this.height, this.worldWidth, this.worldHeight);
         let scrollbarThickness = this.horizontalScrollbar.SCROLL_THICKNESS;
         this.width += (this.editorDiv.clientWidth - this.width) - scrollbarThickness;
         this.height += (this.editorDiv.clientHeight - this.height) - scrollbarThickness;
 
         let tracksHeight = this.waveforms.length * HEIGHT_TRACK + HEIGHT_NEW_TRACK +4;
         this.worldHeight = Math.max(tracksHeight, this.height);
+        this.worldWidth = Math.max((MAX_DURATION_SEC*1000) / RATIO_MILLS_BY_PX, this.width);
 
         this.originalCenter = { x: this.width / 2, y: this.height / 2 };
 

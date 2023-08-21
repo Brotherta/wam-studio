@@ -29,6 +29,7 @@ export default class WaveformController {
     addWaveformToTrack(track: Track) {
         let waveformView = this.editor.createWaveformView(track);
         if (track.audioBuffer == undefined) return;
+
         let region = this.app.regionsController.createRegion(track.id, track.audioBuffer!, 0);
         let regionView = waveformView.createRegionView(region);
 

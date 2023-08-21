@@ -25,6 +25,9 @@ export default class EditorController {
             });
         });
 
+        window.addEventListener("resize", () => {
+            this.editor.resizeCanvas();
+        });
 
         this.editor.dragCover.addEventListener("dragleave", () => {
             this.editor.dragCover.hidden = true;

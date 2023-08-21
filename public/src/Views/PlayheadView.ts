@@ -1,6 +1,6 @@
 import {Application, Graphics} from "pixi.js";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Constants";
-import {audioCtx} from "../index";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Variables";
+import {app, audioCtx} from "../index";
 
 /**
  * Class responsible for displaying the playhead. It is a line that moves on the canvas.

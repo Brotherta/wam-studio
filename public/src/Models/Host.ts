@@ -1,12 +1,12 @@
-import { audioCtx } from "..";
+import {app, audioCtx} from "..";
 import App from "../App";
 import AudioPlayerNode from "../Audio/AudioNode";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import { MAX_DURATION_SEC } from "../Utils/Constants";
 import Track from "./Track";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "./Plugin";
 import {BACKEND_URL} from "../Env";
+import {MAX_DURATION_SEC} from "../Utils/Variables";
 
 /**
  * Host class that contains the master track.
@@ -60,7 +60,7 @@ export default class Host extends Track {
         const [hostGroupId] = await initializeWamHost(audioCtx);
         this.hostGroupId = hostGroupId;
 
-        let audio = audioCtx.createBuffer(2, MAX_DURATION_SEC * audioCtx.sampleRate, audioCtx.sampleRate)
+        let audio = audioCtx.createBuffer(2, 3600 * audioCtx.sampleRate, audioCtx.sampleRate)
         const operableAudioBuffer = Object.setPrototypeOf(audio, OperableAudioBuffer.prototype) as OperableAudioBuffer;
         
         this.hostNode = new AudioPlayerNode(this.audioCtx, 2);
@@ -79,6 +79,14 @@ export default class Host extends Track {
 
         }
         this.gainNode.connect(this.hostNode);
+    }
+
+    updateBufferDuration() {
+        if (this.hostNode) {
+            let audio = audioCtx.createBuffer(2, MAX_DURATION_SEC * audioCtx.sampleRate, audioCtx.sampleRate)
+            const operableAudioBuffer = Object.setPrototypeOf(audio, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+            this.hostNode.setAudio(operableAudioBuffer.toArray());
+        }
     }
 
     /**

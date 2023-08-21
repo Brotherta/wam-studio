@@ -1,7 +1,7 @@
 import EditorView from "./EditorView";
 import {Container, Graphics} from "pixi.js";
 import Region from "../../Models/Region";
-import {HEIGHT_TRACK, RATIO_MILLS_BY_PX} from "../../Utils/Constants";
+import {HEIGHT_TRACK, RATIO_MILLS_BY_PX} from "../../Utils/Variables";
 
 
 export default class RegionView extends Container {

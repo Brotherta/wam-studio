@@ -5,7 +5,7 @@ import {audioCtx} from "../index";
 import WamEventDestination from "../Audio/WAM/WamEventDestination";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Constants";
+import {RATIO_MILLS_BY_PX} from "../Utils/Variables";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "../Models/Plugin";
 import Region from "../Models/Region";
@@ -222,10 +222,6 @@ export default class TracksController {
 
             let audioArrayBuffer = await file.arrayBuffer();
             let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
-            if (audioBuffer.duration > MAX_DURATION_SEC) {
-                console.warn("Audio file too long, max duration is " + MAX_DURATION_SEC + " seconds");
-                return undefined;
-            }
             let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
             operableAudioBuffer = operableAudioBuffer.makeStereo();
 
@@ -388,6 +384,7 @@ export default class TracksController {
                         let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
                         operableAudioBuffer = operableAudioBuffer.makeStereo();
                         this.app.waveformController.createRegion(track, operableAudioBuffer, 0);
+                        console.log(track.audioBuffer?.duration);
                         track.element.progressDone();
                     });
             } else {

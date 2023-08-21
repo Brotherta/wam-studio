@@ -253,13 +253,10 @@ export default class HostController {
             });
             //@ts-ignore
             this.app.host.hostNode.parameters.get("playing").value = 1;
-            // this.audioCtx.resume();
         }
         this.playing = !this.playing;
         this.hostView.pressPlayButton(this.playing, stop);
     }
-
-
 
     stopAll() {
         this.app.tracksController.trackList.forEach(async (track) => {

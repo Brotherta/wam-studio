@@ -2,7 +2,7 @@ import {Container, Graphics} from "pixi.js";
 import EditorView from "./EditorView";
 import RegionView from "./RegionView";
 import Track from "../../Models/Track";
-import {HEIGHT_TRACK, OFFSET_FIRST_TRACK} from "../../Utils/Constants";
+import {HEIGHT_TRACK, OFFSET_FIRST_TRACK} from "../../Utils/Variables";
 import Region from "../../Models/Region";
 import TrackElement from "../../Components/TrackElement";
 

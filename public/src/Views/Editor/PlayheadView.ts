@@ -1,7 +1,7 @@
 import EditorView from "./EditorView";
 import {Container, Graphics} from "pixi.js";
 import {audioCtx} from "../../index";
-import {RATIO_MILLS_BY_PX} from "../../Utils/Constants";
+import {RATIO_MILLS_BY_PX} from "../../Utils/Variables";
 
 
 export default class PlayheadView extends Container {
