@@ -1,6 +1,5 @@
 import {WebAudioModule} from "@webaudiomodules/sdk";
 import App from "../App";
-import {BANK_PLUGIN_URL} from "../Env";
 
 /**
  * Class that represents a plugin.

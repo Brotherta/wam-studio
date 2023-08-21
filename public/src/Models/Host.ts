@@ -6,7 +6,7 @@ import { MAX_DURATION_SEC } from "../Utils/Constants";
 import Track from "./Track";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "./Plugin";
-import {BANK_PLUGIN_URL} from "../Env";
+import {BACKEND_URL} from "../Env";
 
 /**
  * Host class that contains the master track.
@@ -50,7 +50,7 @@ export default class Host extends Track {
      * It is asynchronous because it needs to load the WAM SDK and the AudioPlayerNode.
      */
     async initWAM() {
-        const {default: WAM} = await import(/* webpackIgnore: true */BANK_PLUGIN_URL+"/src/index.js");
+        const {default: WAM} = await import(/* webpackIgnore: true */BACKEND_URL+"/src/index.js");
         this.pluginWAM = WAM;
 
         const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
