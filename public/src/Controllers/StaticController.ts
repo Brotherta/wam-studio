@@ -73,6 +73,7 @@ function makeDivScrollSync() {
     trackDiv.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;
         automationController.scrollTop = trackDiv.scrollTop;
+        app.editorView.verticalScrollbar.customScrollTop(trackDiv.scrollTop);
     })
     automationController.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;

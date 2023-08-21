@@ -143,6 +143,12 @@ export default class ScrollBarElement extends HTMLElement {
         this.animationFrameId = window.requestAnimationFrame(animateScroll);
     }
 
+    customScrollTop(top: number) {
+        let newValue = Math.max(0, Math.min(top, this.worldSize - this.size));
+        this.value = newValue;
+        this.updateHandlePosition('propagate off');
+    }
+
     /**
      * Bind the events to the scrollbar
      * - Handle dragging
@@ -252,12 +258,13 @@ export default class ScrollBarElement extends HTMLElement {
             }
         }
 
-        this.dispatchEvent(new CustomEvent('change', {
-            detail: {value: this.handlePos, type: type},
-            bubbles: true, // Allows the event to bubble up through the shadow DOM boundary
-            composed: true // Allows the event to propagate across the shadow DOM boundary
-        }));
-        // this.dispatchChangeEvent(resize);
+        if (type !== 'propagate off') {
+            this.dispatchEvent(new CustomEvent('change', {
+                detail: {value: this.handlePos, type: type},
+                bubbles: true, // Allows the event to bubble up through the shadow DOM boundary
+                composed: true // Allows the event to propagate across the shadow DOM boundary
+            }));
+        }
     }
 
     /**

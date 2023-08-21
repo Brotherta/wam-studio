@@ -16,7 +16,6 @@ export default class PlayheadController {
     }
 
     bindEvents() {
-        console.log("bind events")
         this.view.track.on("pointerup", (e) => {
             this.app.tracksController.jumpTo(e.data.global.x);
             this.app.automationController.applyAllAutomations();

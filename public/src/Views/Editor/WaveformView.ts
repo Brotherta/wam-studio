@@ -41,15 +41,12 @@ export default class WaveformView extends Container {
     }
 
     setPos(track: Track) {
-        // let top = Math.round(track.element.getBoundingClientRect().top - OFFSET_FIRST_TRACK);
-        // let pos = top/HEIGHT_TRACK;
         let trackContainer = document.getElementById("track-container") as HTMLDivElement;
         // get the position of the track in the track container taking into account only the track-elements
         let pos = Array.from(trackContainer.children).filter(e => e instanceof TrackElement).indexOf(track.element);
 
         this.position.x = 0;
         this.position.y = pos*HEIGHT_TRACK+25;
-        console.log(this.position.y);
     }
 
     createRegionView(region: Region) {
