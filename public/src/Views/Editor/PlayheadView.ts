@@ -1,5 +1,7 @@
 import EditorView from "./EditorView";
 import {Container, Graphics} from "pixi.js";
+import {audioCtx} from "../../index";
+import {RATIO_MILLS_BY_PX} from "../../Utils/Constants";
 
 
 export default class PlayheadView extends Container {
@@ -30,6 +32,7 @@ export default class PlayheadView extends Container {
         this.height = this.worldHeight;
 
         this.track = new Container();
+        this.track.eventMode = "dynamic";
         this.track.zIndex = 99;
 
         this.zIndex = 100;
@@ -55,7 +58,7 @@ export default class PlayheadView extends Container {
         if (this.handle) this.removeChild(this.handle);
         this.handle = new Graphics();
         this.handle.moveTo(-5, 0);
-        this.handle.beginFill(0xff0000);
+        this.handle.beginFill(0x5C69CC);
         this.handle.drawRect(-5, 0, 10, 24);
         this.handle.endFill();
         this.addChild(this.handle);
@@ -64,15 +67,34 @@ export default class PlayheadView extends Container {
     drawTrack() {
         if (this.track.children.length > 0) this.track.removeChildren();
         let background = new Graphics();
-        background.beginFill(0x00ff00);
+        background.beginFill(0x3b4046);
         background.drawRect(0, 0, this.worldWidth, 25);
         background.endFill();
         background.zIndex = 99;
         this.track.addChild(background);
+        let border = new Graphics();
+        border.lineStyle(1, 0xffffff, 1);
+        border.drawRect(0, 0, this.worldWidth, 25);
+        border.zIndex = 100;
+    }
+
+    movePlayheadFromPosition(x: number) {
+        this.position.x = x;
     }
 
     movePlayhead(x: number) {
-        this.position.x = x;
+        this.position.x = this.getXfromPlayhead(x);
+    }
+
+    /**
+     * Get the x position from the given playhead position.
+     * Calculated with the ratio between the milliseconds and the pixels and the sample rate.
+     *
+     * @param playhead
+     */
+    getXfromPlayhead(playhead: number) {
+        let millis = (playhead / audioCtx.sampleRate) * 1000;
+        return millis / RATIO_MILLS_BY_PX;
     }
 
     resize(width: number, height: number) {

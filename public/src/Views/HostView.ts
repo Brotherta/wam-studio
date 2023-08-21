@@ -2,6 +2,7 @@
  * Class responsible for the host view. It displays the host controls and the host track.
  */
 import {audioCtx} from "../index";
+import {RATIO_MILLS_BY_PX} from "../Utils/Constants";
 
 export default class HostView {
 
@@ -41,6 +42,11 @@ export default class HostView {
     updateTimer(pos: number) {
         let millseconds = (pos / audioCtx.sampleRate) * 1000;
         this.timer.innerHTML = this.millisToMinutesAndSeconds(millseconds);
+    }
+
+    updateTimerFromXPos(xPos: number) {
+        let pos = (xPos * RATIO_MILLS_BY_PX) / 1000 *audioCtx.sampleRate;
+        this.updateTimer(pos);
     }
 
     /**

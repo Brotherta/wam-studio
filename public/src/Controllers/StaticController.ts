@@ -1,5 +1,6 @@
+import {app} from "../index";
+
 const trackDiv = document.getElementById("track-container") as HTMLDivElement;
-const editorDiv = document.getElementById("editor") as HTMLDivElement;
 const playhead = document.getElementById("playhead") as HTMLDivElement;
 const automationController = document.getElementById("automation-container") as HTMLElement;
 
@@ -57,35 +58,6 @@ class DraggableWindow {
     }
 }
 
-// /**
-//  * This function makes the track div and the editor div scroll synchronously.
-//  */
-//
-// function makeDivScrollSync2() {
-//
-//     let active: EventTarget | undefined = undefined;
-//
-//     let offset = 0;
-//     playhead.style.zIndex = "1";
-//     trackDiv.style.zIndex = "2";
-//
-//     playhead.addEventListener("mouseenter", function(e: Event) {
-//         active = e.target as EventTarget;
-//     })
-//     editorDiv.addEventListener("mouseenter", function(e: Event) {
-//         active = e.target as EventTarget;
-//     })
-//
-//     playhead.addEventListener("scroll", function(e: Event) {
-//         if (e.target !== active) return;
-//         editorDiv.scrollLeft = playhead.scrollLeft;
-//     })
-//     editorDiv.addEventListener("scroll", function(e: Event) {
-//         if (e.target !== active) return;
-//         playhead.style.left = `${offset -editorDiv.scrollLeft}`;
-//     })
-// }
-
 /**
  * This function makes the track div and the editor div scroll synchronously.
  */
@@ -95,30 +67,17 @@ function makeDivScrollSync() {
     trackDiv.addEventListener("mouseenter", function(e: Event) {
         active = e.target as EventTarget;
     })
-    editorDiv.addEventListener("mouseenter", function(e: Event) {
-        active = e.target as EventTarget;
-    })
     automationController.addEventListener("mouseenter", function(e: Event) {
         active = e.target as EventTarget;
     })
-
     trackDiv.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;
-        editorDiv.scrollTop = trackDiv.scrollTop;
         automationController.scrollTop = trackDiv.scrollTop;
-    })
-    editorDiv.addEventListener("scroll", function(e: Event) {
-        if (e.target !== active) return;
-        trackDiv.scrollTop = editorDiv.scrollTop;
-        automationController.scrollTop = editorDiv.scrollTop;
     })
     automationController.addEventListener("scroll", function(e: Event) {
         if (e.target !== active) return;
         trackDiv.scrollTop = automationController.scrollTop;
-        editorDiv.scrollTop = automationController.scrollTop;
     })
-
-    // makeDivScrollSync2();
 }
 
 const windowIDs = [

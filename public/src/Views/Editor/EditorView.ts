@@ -16,6 +16,7 @@ export default class EditorView extends Application {
     horizontalScrollbar = document.getElementById("horizontal-scrollbar") as ScrollBarElement;
     verticalScrollbar = document.getElementById("vertical-scrollbar") as ScrollBarElement;
     trackContainer = document.getElementById("track-container") as HTMLDivElement;
+    automationContainer = document.getElementById("automation-container") as HTMLElement;
 
     width: number;
     height: number;
@@ -67,12 +68,8 @@ export default class EditorView extends Application {
 
         this.stage.addChild(this.viewport);
 
-        let sprite = this.viewport.addChild(new Sprite(Texture.WHITE));
-        sprite.tint = 0xff0000;
-        sprite.width = sprite.height = 100;
-        sprite.position.set(100, 100);
-
         this.bindEvents();
+        this.resizeCanvas();
     }
 
     bindEvents() {
@@ -105,6 +102,7 @@ export default class EditorView extends Application {
                 x = Math.max(0, Math.min(this.worldWidth - (this.width / 2), x));
                 this.viewport.moveCenter(x, y);
             }
+            this.automationContainer.scrollLeft = scrollValue;
         });
 
         this.verticalScrollbar.addEventListener("change", (e) => {
@@ -125,6 +123,8 @@ export default class EditorView extends Application {
                 this.playhead.position.y = scrollValue;
                 this.playhead.track.position.y = scrollValue;
             }
+            this.trackContainer.scrollTop = scrollValue;
+            this.automationContainer.scrollTop = scrollValue;
         });
     }
 
@@ -182,6 +182,8 @@ export default class EditorView extends Application {
         this.canvasContainer.style.width = `${this.width}px`;
         this.canvasContainer.style.height = `${this.height}px`;
 
+        this.automationContainer.style.height = `${this.height}px`;
+        this.automationContainer.style.width = `${this.width}px`;
     }
 
 
@@ -210,5 +212,4 @@ export default class EditorView extends Application {
     getWaveformView(y: number) {
         return this.waveforms.find(wave => y >= wave.position.y && y <= wave.position.y + HEIGHT_TRACK);
     }
-
 }
