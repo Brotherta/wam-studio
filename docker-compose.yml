@@ -14,7 +14,7 @@ services:
     ports:
       - "8002:8002"
     environment:
-      - HTTPS=false
+      - HTTPS=true
       - STORAGE_DIR=/data/storage
     volumes:
       - attune-projects:/data/storage
