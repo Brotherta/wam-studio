@@ -124,11 +124,13 @@ export default class EditorView extends Application {
                 this.playhead.position.y = scrollValue;
                 this.playhead.track.position.y = scrollValue;
             }
-            this.trackContainer.scrollTop = scrollValue;
-            this.automationContainer.scrollTop = scrollValue;
+            // @ts-ignore
+            if (e.detail.type !== "propagate off") {
+                this.trackContainer.scrollTop = scrollValue;
+                this.automationContainer.scrollTop = scrollValue;
+            }
         });
     }
-
 
     /**
      * Add a waveform into the canvas fot the given track and update the position of the other waveforms.
@@ -184,7 +186,6 @@ export default class EditorView extends Application {
         this.automationContainer.style.width = `${this.width}px`;
     }
 
-
     /**
      * Change the color of the waveform for the given track.
      * @param track
@@ -202,12 +203,7 @@ export default class EditorView extends Application {
         }
     }
 
-
     getWaveFormViewById(trackId: number) {
         return this.waveforms.find(wave => wave.trackId === trackId);
-    }
-
-    getWaveformView(y: number) {
-        return this.waveforms.find(wave => y >= wave.position.y && y <= wave.position.y + HEIGHT_TRACK);
     }
 }

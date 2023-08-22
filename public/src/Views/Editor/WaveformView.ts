@@ -18,12 +18,6 @@ export default class WaveformView extends Container {
     color: string;
     myWidth: number;
 
-    initialX: number;
-    initialY: number;
-    originalX: number;
-    originalY: number;
-    movingRegion: RegionView | undefined;
-
     constructor(editor: EditorView, track: Track) {
         super();
         this.editor = editor;
@@ -59,48 +53,9 @@ export default class WaveformView extends Container {
     }
 
     removeRegionView(regionView: RegionView) {
-        if (this.movingRegion === regionView) {
-            this.movingRegion = undefined;
-        }
         let index = this.regionViews.indexOf(regionView);
         this.regionViews.splice(index, 1);
         this.removeChild(regionView);
-    }
-
-    startMovingRegion(regionView: RegionView, initialX: number, initialY: number) {
-        this.initialX = initialX;
-        this.originalX = regionView.x;
-        this.initialY = initialY;
-        this.originalY = regionView.y;
-        this.movingRegion = regionView;
-    }
-
-    moveRegion(x: number, _y: number) {
-        if (this.movingRegion !== undefined) {
-            let deltaX = x - this.initialX;
-            let move = this.originalX + deltaX;
-
-            if (move < 0) {
-                deltaX = -this.originalX;
-            }
-            if (move + this.movingRegion.width > this.myWidth) {
-                deltaX = this.myWidth - this.movingRegion.width - this.originalX;
-            }
-
-            this.movingRegion.position.x = Math.round(this.originalX + deltaX);
-        }
-    }
-
-    stopMovingRegion() {
-        this.movingRegion = undefined;
-    }
-
-    propagateMove(regionView: RegionView, oldWaveformView: WaveformView) {
-        this.initialX = oldWaveformView.initialX;
-        this.originalX = oldWaveformView.originalX;
-        this.initialY = oldWaveformView.initialY;
-        this.originalY = oldWaveformView.originalY;
-        this.movingRegion = regionView;
     }
 
     getRegionView(regionId: number) {

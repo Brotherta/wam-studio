@@ -4,22 +4,17 @@ import Track from "../../Models/Track";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import {audioCtx} from "../../index";
 import Region from "../../Models/Region";
+import WaveformView from "../../Views/Editor/WaveformView";
 
 
 export default class WaveformController {
 
     app: App;
-
     editor: EditorView;
 
     constructor(app: App) {
         this.app = app;
         this.editor = this.app.editorView;
-        this.bindEvents();
-    }
-
-    bindEvents() {
-
     }
 
     /**
@@ -119,4 +114,32 @@ export default class WaveformController {
     removeWaveformOfTrack(track: Track) {
         this.editor.removeWaveForm(track);
     }
+
+    isLast(waveformView: WaveformView) {
+        for (let waveform of this.editor.waveforms) {
+            if (waveform.position.y > waveformView.position.y) return false;
+        }
+        return true;
+    }
+
+    isFirst(waveformView: WaveformView) {
+        return (waveformView.position.y >= 0 && waveformView.position.y <= waveformView.height);
+    }
+
+    getNextWaveform(waveformView: WaveformView) {
+        for (let waveform of this.editor.waveforms) {
+            if (waveform.position.y > waveformView.position.y
+                && waveform.position.y <= waveformView.position.y + waveformView.height) return waveform;
+        }
+        return undefined;
+    }
+
+    getPreviousWaveform(waveformView: WaveformView) {
+        for (let waveform of this.editor.waveforms) {
+            if (waveform.position.y < waveformView.position.y
+                && waveform.position.y >= waveformView.position.y - waveformView.height) return waveform;
+        }
+        return undefined;
+    }
+
 }

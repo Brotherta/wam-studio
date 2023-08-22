@@ -258,23 +258,8 @@ export default class ScrollBarElement extends HTMLElement {
             }
         }
 
-        if (type !== 'propagate off') {
-            this.dispatchEvent(new CustomEvent('change', {
-                detail: {value: this.handlePos, type: type},
-                bubbles: true, // Allows the event to bubble up through the shadow DOM boundary
-                composed: true // Allows the event to propagate across the shadow DOM boundary
-            }));
-        }
-    }
-
-    /**
-     * Dispatches a change event with the current value and orientation
-     *
-     * @event change {value: number, type: string}
-     */
-    dispatchChangeEvent(resize: boolean) {
         this.dispatchEvent(new CustomEvent('change', {
-            detail: {value: this.handlePos, resize: resize},
+            detail: {value: this.handlePos, type: type},
             bubbles: true, // Allows the event to bubble up through the shadow DOM boundary
             composed: true // Allows the event to propagate across the shadow DOM boundary
         }));

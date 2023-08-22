@@ -22,6 +22,7 @@ export default class PlayheadView extends Container {
         this.editor = editor;
 
         this.eventMode = "dynamic";
+        this.sortableChildren = true;
         this.position.x = 0;
         this.position.y = 0;
 
@@ -51,6 +52,7 @@ export default class PlayheadView extends Container {
         this.line.lineStyle(1, 0xffffff, 1);
         this.line.moveTo(0, 0);
         this.line.lineTo(0, this.worldHeight);
+        this.line.zIndex = 1;
         this.addChild(this.line);
     }
 
@@ -61,6 +63,8 @@ export default class PlayheadView extends Container {
         this.handle.beginFill(0x5C69CC);
         this.handle.drawRect(-5, 0, 10, 24);
         this.handle.endFill();
+        this.handle.zIndex = 2
+        this.handle.eventMode = "dynamic";
         this.addChild(this.handle);
     }
 
@@ -102,7 +106,7 @@ export default class PlayheadView extends Container {
         this.worldHeight = height;
         this.height = this.worldHeight;
         this.drawLine();
-        this.drawHandle();
+        // this.drawHandle();
         this.drawTrack();
     }
 }

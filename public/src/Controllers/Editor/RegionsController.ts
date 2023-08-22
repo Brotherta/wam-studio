@@ -6,6 +6,7 @@ import {RATIO_MILLS_BY_PX} from "../../Utils/Variables";
 import {FederatedPointerEvent} from "pixi.js";
 import WaveformView from "../../Views/Editor/WaveformView";
 import RegionView from "../../Views/Editor/RegionView";
+import {audioCtx} from "../../index";
 
 
 export default class RegionsController {
@@ -16,7 +17,11 @@ export default class RegionsController {
     regionIdCounter: number;
 
     isMovingRegion: boolean;
-    selectedRegion: RegionView | undefined;
+    selectedRegionView: RegionView | undefined;
+    selectedRegion: Region | undefined;
+
+    offsetX: number;
+    offsetY: number;
 
     constructor(app: App) {
         this.app = app;
@@ -37,8 +42,14 @@ export default class RegionsController {
         });
         // On delete key pressed, delete the selected region
         document.addEventListener("keydown", (e) => {
-            if ((e.key === "Delete" || e.key === "Backspace") && this.selectedRegion !== undefined) {
-                this.deleteRegion(this.selectedRegion.id, this.selectedRegion.trackId);
+            if ((e.key === "Delete" || e.key === "Backspace") && this.selectedRegionView !== undefined) {
+                this.deleteSelectedRegion();
+            }
+        });
+
+        this.editor.viewport.on("pointermove", (e) => {
+            if (this.isMovingRegion) {
+                this.moveRegion(e);
             }
         });
     }
@@ -47,110 +58,121 @@ export default class RegionsController {
         return new Region(trackId, buffer, start, this.getNewId());
     }
 
+    defineRegionListeners(region: Region, regionView: RegionView, waveFormView: WaveformView) {
+        regionView.on("pointerdown", (_e) => {
+            this.selectRegion(regionView);
+            this.offsetY = _e.data.global.y - regionView.position.y;
+            this.offsetX = _e.data.global.x - regionView.position.x;
+            this.isMovingRegion = true;
+        });
+        regionView.on("pointerup", () => {
+            this.stopMovingRegion();
+        });
+        regionView.on("pointerupoutside", () => {
+            this.stopMovingRegion();
+        });
+    }
+
     getNewId() {
         return this.regionIdCounter++;
     }
 
-    deleteRegion(regionId: number, trackId: number) {
-        let track = this.app.tracksController.getTrack(trackId);
-        if (track === undefined) throw new Error("Track not found");
-        let waveformView = this.editor.getWaveFormViewById(track.id);
-        if (waveformView === undefined) throw new Error("Waveform not found");
-        let region = track.getRegion(regionId);
-        if (region === undefined) throw new Error("Region not found");
-        let regionView = waveformView.getRegionView(regionId);
-        if (regionView === undefined) throw new Error("RegionView not found");
-
-        waveformView.removeRegionView(regionView);
-        track.removeRegion(region.id);
-        if (this.selectedRegion === regionView) {
-            this.deselectRegion();
-        }
-        track.modified = true;
-    }
-
     selectRegion(region: RegionView) {
-        if (this.selectedRegion !== region) {
+        if (this.selectedRegionView !== region) {
             this.deselectRegion();
-            this.selectedRegion = region;
-            this.selectedRegion.select();
+            this.selectedRegionView = region;
+            this.selectedRegionView.select();
+            this.selectedRegion = this.app.tracksController.getTrack(region.trackId)?.getRegion(region.id);
         }
     }
 
     deselectRegion() {
-        if (this.selectedRegion !== undefined) {
-            this.selectedRegion.deselect();
-
+        if (this.selectedRegionView !== undefined) {
+            this.selectedRegionView.deselect();
+            this.selectedRegionView = undefined;
             this.selectedRegion = undefined;
         }
     }
 
-    defineRegionListeners(region: Region, regionView: RegionView, waveFormView: WaveformView) {
-        regionView.on("pointerdown", (_e) => {
-            this.selectRegion(regionView);
-            waveFormView.startMovingRegion(regionView, _e.data.global.x, _e.data.global.y);
-            this.isMovingRegion = true;
-        });
-        regionView.on("pointermove", (_e) => {
-            if (this.isMovingRegion) {
-                waveFormView.moveRegion(_e.data.global.x, _e.data.global.y);
-                region.updateStart(regionView.position.x * RATIO_MILLS_BY_PX);
-                this.updateWaveformRegion(_e.data.global.y, region, regionView, waveFormView);
-            }
-        });
-        regionView.on("pointerup", (_e) => {
-            this.stopMovingRegion(regionView, region, waveFormView, _e);
+    deleteSelectedRegion() {
+        if (!this.selectedRegionView || !this.selectedRegion || this.isMovingRegion) return;
 
-        });
-        regionView.on("pointerupoutside", (_e) => {
-            this.stopMovingRegion(regionView, region, waveFormView, _e);
-        });
+        let waveform = this.selectedRegionView.parent as WaveformView;
+        let track = this.app.tracksController.getTrack(this.selectedRegion.trackId);
+        if (track === undefined) throw new Error("Track not found");
+
+        track.removeRegion(this.selectedRegion.id);
+        waveform.removeRegionView(this.selectedRegionView);
+
+        this.selectedRegionView = undefined;
+        this.selectedRegion = undefined;
+
+        track.modified = true;
+        track.updateBuffer(audioCtx, this.app.host.playhead);
     }
 
-    stopMovingRegion(regionView: RegionView, region: Region, waveFormView: WaveformView, _e: FederatedPointerEvent) {
-        if (this.isMovingRegion) {
-            this.isMovingRegion = false;
-            let track = this.app.tracksController.getTrack(region.trackId);
-            if (track == undefined) {
+
+    moveRegion(e: FederatedPointerEvent) {
+        if (!this.selectedRegionView || !this.selectedRegion || !this.offsetX || !this.offsetY) return;
+
+        let x = e.data.global.x;
+        let y = e.data.global.y + this.editor.viewport.top;
+
+        let newX = x - this.offsetX;
+        newX = Math.max(0, Math.min(newX, this.editor.worldWidth));
+
+        let parentWaveform = this.selectedRegionView.parent as WaveformView;
+        let parentTop = parentWaveform.y;
+        let parentBottom = parentTop + parentWaveform.height;
+
+        if (y > parentBottom && !this.app.waveformController.isLast(parentWaveform)) { // if the waveform is dragged to the bottom of the screen
+            let nextWaveform = this.app.waveformController.getNextWaveform(parentWaveform);
+            if (nextWaveform) {
+                this.updateRegionWaveform(parentWaveform, nextWaveform);
+            }
+        }
+        else if (y < parentTop && !this.app.waveformController.isFirst(parentWaveform)) { // if the waveform is dragged to the top of the screen
+            let previousWaveform = this.app.waveformController.getPreviousWaveform(parentWaveform);
+            if (previousWaveform) {
+                this.updateRegionWaveform(parentWaveform, previousWaveform);
+            }
+        }
+        this.selectedRegionView.position.x = newX;
+        this.selectedRegion.start = newX * RATIO_MILLS_BY_PX;
+    }
+
+    stopMovingRegion() {
+        this.isMovingRegion = false;
+        if (!this.selectedRegionView && !this.selectedRegion) return;
+
+        if (this.selectedRegionView!.trackId !== this.selectedRegion!.trackId) {
+            let oldTrack = this.app.tracksController.getTrack(this.selectedRegion!.trackId);
+            let newTrack = this.app.tracksController.getTrack(this.selectedRegionView!.trackId);
+            if (oldTrack == undefined || newTrack == undefined) {
                 throw new Error("Track not found");
             }
-            region.updateStart(regionView.position.x * RATIO_MILLS_BY_PX);
+            oldTrack.removeRegion(this.selectedRegion!.id);
+            newTrack.addRegion(this.selectedRegion!);
+
+            oldTrack.modified = true;
+            newTrack.modified = true;
+            oldTrack.updateBuffer(audioCtx, this.app.host.playhead);
+            newTrack.updateBuffer(audioCtx, this.app.host.playhead);
+
+            this.selectedRegion!.trackId = this.selectedRegionView!.trackId;
+        }
+        else {
+            let track = this.app.tracksController.getTrack(this.selectedRegion!.trackId);
+            if (track == undefined) throw new Error("Track not found");
             track.modified = true;
-            waveFormView.stopMovingRegion();
-            track.updateBuffer(this.app.host.audioCtx, this.app.host.playhead);
+            track.updateBuffer(audioCtx, this.app.host.playhead);
         }
     }
 
-    updateWaveformRegion(y: number, _region: Region, _regionView: RegionView, _waveFormView: WaveformView) {
-        if (y < 0) y = 0;
-        if (_regionView !== _waveFormView.movingRegion) return;
-        let newWaveformView = this.editor.getWaveformView(y);
-        if (newWaveformView !== _waveFormView && newWaveformView != undefined) {
-            this.moveRegionToWaveform(_region, _regionView, _waveFormView, newWaveformView);
-        }
-    }
-
-    moveRegionToWaveform(_region: Region, regionView: RegionView, oldWaveformView: WaveformView, newWaveformView: WaveformView) {
-        let oldTrack = this.app.tracksController.getTrack(oldWaveformView.trackId);
-        let newTrack = this.app.tracksController.getTrack(newWaveformView.trackId);
-        if (oldTrack == undefined || newTrack == undefined) {
-            throw new Error("Track not found");
-        }
-
-        _region.trackId = newTrack.id;
-        oldTrack.modified = true;
-        newTrack.modified = true;
-
-        oldWaveformView.removeRegionView(regionView);
-        let newRegionView = newWaveformView.createRegionView(_region);
-        this.app.regionsController.defineRegionListeners(_region, newRegionView, newWaveformView);
-
-        oldTrack.removeRegion(_region.id);
-        newTrack.addRegion(_region);
-
-        if (this.isMovingRegion) {
-            this.selectRegion(newRegionView);
-            newWaveformView.propagateMove(newRegionView, oldWaveformView)
-        }
+    updateRegionWaveform(oldWaveForm: WaveformView, newWaveForm: WaveformView) {
+        newWaveForm.addChild(this.selectedRegionView!);
+        oldWaveForm.removeChild(this.selectedRegionView!);
+        this.selectedRegionView!.drawWave(newWaveForm.color, this.selectedRegion!);
+        this.selectedRegionView!.trackId = newWaveForm.trackId;
     }
 }

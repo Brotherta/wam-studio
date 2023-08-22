@@ -1,7 +1,7 @@
 # docker-compose.yml
 version: "3.3"
 services:
-  frontend:
+  wam-studio:
     build: ./public
     ports:
       - "5002:5002"
@@ -9,7 +9,7 @@ services:
       - HTTPS=false
     restart: unless-stopped
 
-  bank:
+  wam-bank:
     build: ./bank
     ports:
       - "6002:6002"
