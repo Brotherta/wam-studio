@@ -3,7 +3,7 @@ import App from "../App";
 import songs from "../../static/songs.json"
 import {audioCtx} from "../index";
 import {focusWindow} from "./StaticController";
-import {SONGS_URL} from "../Env";
+import {SONGS_FILE_URL} from "../Env";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -158,7 +158,7 @@ export default class HostController {
             let el = this.hostView.createNewSongItem(name);
             el.onclick = async () => {
                 for (let trackSong of song.songs) {
-                    const url = SONGS_URL + trackSong;
+                    const url = SONGS_FILE_URL + trackSong;
                     let track = await this.app.tracksController.newEmptyTrack(url);
                     track.url = url;
                     this.app.tracksController.initTrackComponents(track);
