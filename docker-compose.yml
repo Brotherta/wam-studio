@@ -17,8 +17,8 @@ services:
       - HTTPS=false
       - STORAGE_DIR=/data/storage
     volumes:
-      - projects:/data/storage
+      - attune-projects:/data/storage
     restart: unless-stopped
 
 volumes:
-  projects:
+  attune-projects:
