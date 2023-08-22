@@ -54,6 +54,7 @@ export default class Plugin {
      * @param state The state of the plugin to set (Json Object)
      */
     async setStateAsync(state: any) {
+        if (state.current.length === 0) return;
         await this.instance!._audioNode.setState(state);
 
         let curState = await this.instance!._audioNode.getState();
