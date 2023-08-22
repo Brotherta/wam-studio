@@ -1,7 +1,7 @@
 # docker-compose.yml
 version: "3.3"
 services:
-  frontend:
+  attune:
     build: ./public
     ports:
       - "7002:7002"
@@ -9,7 +9,7 @@ services:
       - HTTPS=false
     restart: unless-stopped
 
-  bank:
+  attune-bank:
     build: ./bank
     ports:
       - "8002:8002"
