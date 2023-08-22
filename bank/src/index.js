@@ -21,7 +21,10 @@ app.use((req, res, next) => {
     res.header("Cross-Origin-Resource-Policy", "cross-origin");
     next();
 });
-
+app.use((req, res, next) => {
+    console.log('Request Origin:', req.get('Origin'));
+    next();
+});
 
 utils.checkEnvVars();
 utils.createDirectories();
