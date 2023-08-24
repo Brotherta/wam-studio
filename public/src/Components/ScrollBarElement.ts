@@ -49,8 +49,9 @@ template.innerHTML = `
  */
 export default class ScrollBarElement extends HTMLElement {
 
-    private static SENSITIVITY: number = 0.03;
+    private static SENSITIVITY: number = 1;
     public readonly SCROLL_THICKNESS: number = 12;
+    private readonly MIN_HANDLE_SIZE: number = 5;
 
     private isDragging: boolean = false; // Is the scrollbar being dragged
     private dragStart: number = 0; // Where did the drag start
@@ -165,31 +166,6 @@ export default class ScrollBarElement extends HTMLElement {
             e.preventDefault();
         });
 
-        track.addEventListener('mousedown', (e) => {
-            if (this.isDragging) return; // If the handle is being dragged, don't do anything
-
-            let clickPos = this.orientation === 'vertical' ? e.clientY : e.clientX; // Where did the click happen
-            let direction = clickPos < this.handlePos ? -1 : 1; // Is the click before or after the handle
-
-            const scroll = () => {
-                // this.customScrollTo(direction === 1);
-                let newHandlePos = this.orientation === 'vertical' ? handle.offsetTop : handle.offsetLeft;
-
-                // If the handle has moved past the click position, stop scrolling
-                if ((direction === 1 && newHandlePos >= clickPos) || (direction === -1 && newHandlePos <= clickPos)) {
-                    window.clearInterval(scrollIntervalId);
-                }
-            }
-
-            let scrollIntervalId = window.setInterval(scroll, 50);
-            const mouseupListener = () => {
-                window.clearInterval(scrollIntervalId);
-                document.removeEventListener('mouseup', mouseupListener);
-            };
-            document.addEventListener('mouseup', mouseupListener);
-            e.preventDefault();
-        });
-
         document.addEventListener('mousemove', (e) => {
             if (!this.isDragging) return;
 
@@ -216,6 +192,7 @@ export default class ScrollBarElement extends HTMLElement {
     updateHandleSize() {
         const handle = this.shadowRoot!.querySelector('#handle') as HTMLElement;
         let handleSize = this.size / this.worldSize * 100;
+        handleSize = Math.max(handleSize, this.MIN_HANDLE_SIZE);
         if (this.worldSize <= this.size) {
             this.worldSize = this.size;
             handleSize = 0;

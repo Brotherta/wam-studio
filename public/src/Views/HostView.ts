@@ -13,6 +13,8 @@ export default class HostView {
     muteBtn = document.getElementById("mute-btn") as HTMLDivElement;
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
+    zoomInBtn = document.getElementById("zoom-in-btn") as HTMLDivElement;
+    zoomOutBtn = document.getElementById("zoom-out-btn") as HTMLDivElement;
 
     playIcon = document.getElementById("play-icon") as HTMLDivElement;
     muteIcon = document.getElementById("mute-icon") as HTMLDivElement;

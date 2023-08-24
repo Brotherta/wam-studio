@@ -203,6 +203,27 @@ export default class EditorView extends Application {
         }
     }
 
+    drawRegions(track: Track) {
+        let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
+        if (!waveFormView) return
+        for (let regionView of waveFormView.regionViews) {
+            let region = track.getRegion(regionView.id);
+            if (region) {
+                regionView.drawWave(track.color, region);
+                regionView.drawBackground();
+            }
+        }
+    }
+
+    stretchRegions(track: Track) {
+        let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
+        if (!waveFormView) return
+        for (let regionView of waveFormView.regionViews) {
+            if (!track.audioBuffer) return;
+            regionView.stretch(track.audioBuffer?.duration);
+        }
+    }
+
     getWaveFormViewById(trackId: number) {
         return this.waveforms.find(wave => wave.trackId === trackId);
     }

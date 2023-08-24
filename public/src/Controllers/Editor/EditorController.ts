@@ -1,11 +1,21 @@
 import App from "../../App";
 import EditorView from "../../Views/Editor/EditorView";
+import {RATIO_MILLS_BY_PX, updateRatioMillsByPx} from "../../Utils/Variables";
+import {audioCtx} from "../../index";
 
 
 export default class EditorController {
 
     editor: EditorView;
     app: App;
+
+    private readonly MIN_RATIO = 5;
+    private readonly MAX_RATIO = 500;
+    private readonly ZOOM_STEPS = 10;
+
+    private zoomRenderTimeOut: NodeJS.Timeout;
+    private currentLevel = 5;
+
 
     constructor(app: App) {
         this.editor = app.editorView;
@@ -59,5 +69,41 @@ export default class EditorController {
         });
     }
 
+    getZoomRatioByLevel(level: number) {
+        const range = Math.log(this.MAX_RATIO) - Math.log(this.MIN_RATIO);
+        const step = range / (this.ZOOM_STEPS - 1);
+        return Math.exp(Math.log(this.MIN_RATIO) + step * level);
+    }
+
+    zoomIn() {
+        if (this.zoomRenderTimeOut) clearInterval(this.zoomRenderTimeOut);
+        this.currentLevel = Math.max(this.currentLevel - 1, 0);
+        const ratio = this.getZoomRatioByLevel(this.currentLevel);
+        updateRatioMillsByPx(ratio);
+        this.updateZoom();
+    }
+
+    zoomOut() {
+        if (this.zoomRenderTimeOut) clearInterval(this.zoomRenderTimeOut);
+        this.currentLevel = Math.min(this.ZOOM_STEPS - 1, this.currentLevel + 1);
+        const ratio = this.getZoomRatioByLevel(this.currentLevel);
+        updateRatioMillsByPx(ratio);
+        this.updateZoom();
+    }
+
+    async updateZoom() {
+        this.editor.resizeCanvas();
+        this.app.tracksController.trackList.forEach(track => {
+            track.updateBuffer(audioCtx, this.app.host.playhead);
+            this.editor.stretchRegions(track);
+        });
+
+        this.zoomRenderTimeOut = setTimeout(()=> {
+            this.app.tracksController.trackList.forEach(track => {
+                track.updateBuffer(audioCtx, this.app.host.playhead);
+                this.editor.drawRegions(track);
+            });
+        }, 300);
+    }
 
 }

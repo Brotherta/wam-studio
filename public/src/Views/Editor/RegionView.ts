@@ -1,7 +1,7 @@
 import EditorView from "./EditorView";
 import {Container, Graphics} from "pixi.js";
 import Region from "../../Models/Region";
-import {HEIGHT_TRACK, RATIO_MILLS_BY_PX} from "../../Utils/Variables";
+import {HEIGHT_TRACK, MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../../Utils/Variables";
 
 
 export default class RegionView extends Container {
@@ -40,6 +40,7 @@ export default class RegionView extends Container {
      */
     drawWave(colorStr: string, region: Region) {
         let range = region.duration * 1000 / RATIO_MILLS_BY_PX;
+        this.scale.x = 1;
 
         let color = +("0x" + colorStr.slice(1));
         this.wave.clear();
@@ -75,5 +76,11 @@ export default class RegionView extends Container {
 
     deselect() {
         this.drawBackground();
+    }
+
+    stretch(duration: number) {
+        const newWidth = duration * 1000 / RATIO_MILLS_BY_PX;
+        const scaleFactor = newWidth / this.width
+        this.scale.x *= scaleFactor;
     }
 }

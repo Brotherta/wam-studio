@@ -384,7 +384,6 @@ export default class TracksController {
                         let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
                         operableAudioBuffer = operableAudioBuffer.makeStereo();
                         this.app.waveformController.createRegion(track, operableAudioBuffer, 0);
-                        console.log(track.audioBuffer?.duration);
                         track.element.progressDone();
                     });
             } else {

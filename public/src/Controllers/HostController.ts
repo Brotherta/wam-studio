@@ -207,6 +207,12 @@ export default class HostController {
         this.app.hostView.aboutCloseBtn.onclick = () => {
             this.app.hostView.aboutWindow.hidden = true;
         }
+        this.app.hostView.zoomInBtn.onclick = () => {
+            this.app.editorController.zoomIn();
+        }
+        this.app.hostView.zoomOutBtn.onclick = () => {
+            this.app.editorController.zoomOut();
+        }
     }
 
 
