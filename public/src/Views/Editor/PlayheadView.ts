@@ -42,8 +42,6 @@ export default class PlayheadView extends Container {
         this.drawTrack();
         this.editor.viewport.addChild(this.track);
         this.editor.viewport.addChild(this);
-
-        this.movePlayhead(30); // TODO: remove this
     }
 
     drawLine() {

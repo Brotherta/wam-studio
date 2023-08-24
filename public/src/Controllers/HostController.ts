@@ -21,8 +21,11 @@ export default class HostController {
     pauseInterval = false;
 
     timerInterval: NodeJS.Timer | undefined;
+    lastExecutedZoom = 0
 
     vuMeter: VuMeter;
+
+    private readonly THROTTLE_TIME = 10;
 
     constructor(app: App) {
         this.app = app;
@@ -207,12 +210,25 @@ export default class HostController {
         this.app.hostView.aboutCloseBtn.onclick = () => {
             this.app.hostView.aboutWindow.hidden = true;
         }
-        this.app.hostView.zoomInBtn.onclick = () => {
+        this.app.hostView.zoomInBtn.onclick = async () => {
             this.app.editorController.zoomIn();
         }
-        this.app.hostView.zoomOutBtn.onclick = () => {
+        this.app.hostView.zoomOutBtn.onclick = async () => {
             this.app.editorController.zoomOut();
         }
+        window.addEventListener('wheel', (e) => {
+            const currentTime = Date.now();
+            if (currentTime - this.lastExecutedZoom < this.THROTTLE_TIME) return;
+
+            this.lastExecutedZoom = currentTime;
+
+            const isMac = navigator.platform.toUpperCase().includes('MAC');
+            if (isMac && e.metaKey || !isMac && e.ctrlKey) {
+                const zoomIn = e.deltaY > 0;
+                if (zoomIn) this.app.editorController.zoomIn(e.deltaY);
+                else this.app.editorController.zoomOut(e.deltaY*-1);
+            }
+        });
     }
 
 

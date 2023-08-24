@@ -163,27 +163,30 @@ export default class EditorView extends Application {
      * Resize the canvas when the window is resized.
      */
     resizeCanvas() {
-        let scrollbarThickness = this.horizontalScrollbar.SCROLL_THICKNESS;
-        this.width += (this.editorDiv.clientWidth - this.width) - scrollbarThickness;
-        this.height += (this.editorDiv.clientHeight - this.height) - scrollbarThickness;
+        requestAnimationFrame(() => {
+            this.stage.scale.x = 1;
+            let scrollbarThickness = this.horizontalScrollbar.SCROLL_THICKNESS;
+            this.width += (this.editorDiv.clientWidth - this.width) - scrollbarThickness;
+            this.height += (this.editorDiv.clientHeight - this.height) - scrollbarThickness;
 
-        let tracksHeight = this.waveforms.length * HEIGHT_TRACK + HEIGHT_NEW_TRACK +4;
-        this.worldHeight = Math.max(tracksHeight, this.height);
-        this.worldWidth = Math.max((MAX_DURATION_SEC*1000) / RATIO_MILLS_BY_PX, this.width);
+            let tracksHeight = this.waveforms.length * HEIGHT_TRACK + HEIGHT_NEW_TRACK +4;
+            this.worldHeight = Math.max(tracksHeight, this.height);
+            this.worldWidth = Math.max((MAX_DURATION_SEC*1000) / RATIO_MILLS_BY_PX, this.width);
 
-        this.originalCenter = { x: this.width / 2, y: this.height / 2 };
+            this.originalCenter = { x: this.width / 2, y: this.height / 2 };
 
-        this.viewport.resize(this.width, this.height, this.worldWidth, this.worldHeight);
-        this.renderer.resize(this.width, this.height);
-        this.horizontalScrollbar.resize(this.width, this.worldWidth);
-        this.verticalScrollbar.resize(this.height, this.worldHeight);
-        this.playhead.resize(Math.max(this.worldWidth, this.width), Math.max(this.worldHeight, this.height));
+            this.viewport.resize(this.width, this.height, this.worldWidth, this.worldHeight);
+            this.renderer.resize(this.width, this.height);
+            this.horizontalScrollbar.resize(this.width, this.worldWidth);
+            this.verticalScrollbar.resize(this.height, this.worldHeight);
+            this.playhead.resize(Math.max(this.worldWidth, this.width), Math.max(this.worldHeight, this.height));
 
-        this.canvasContainer.style.width = `${this.width}px`;
-        this.canvasContainer.style.height = `${this.height}px`;
+            this.canvasContainer.style.width = `${this.width}px`;
+            this.canvasContainer.style.height = `${this.height}px`;
 
-        this.automationContainer.style.height = `${this.height}px`;
-        this.automationContainer.style.width = `${this.width}px`;
+            this.automationContainer.style.height = `${this.height}px`;
+            this.automationContainer.style.width = `${this.width}px`;
+        })
     }
 
     /**
@@ -204,24 +207,30 @@ export default class EditorView extends Application {
     }
 
     drawRegions(track: Track) {
-        let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
-        if (!waveFormView) return
-        for (let regionView of waveFormView.regionViews) {
-            let region = track.getRegion(regionView.id);
-            if (region) {
-                regionView.drawWave(track.color, region);
-                regionView.drawBackground();
+        requestAnimationFrame(() => {
+            let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
+            if (!waveFormView) return
+            for (let regionView of waveFormView.regionViews) {
+                let region = track.getRegion(regionView.id);
+                if (region) {
+                    regionView.initRegion(track.color, region);
+                }
             }
-        }
+        });
     }
 
     stretchRegions(track: Track) {
-        let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
-        if (!waveFormView) return
-        for (let regionView of waveFormView.regionViews) {
-            if (!track.audioBuffer) return;
-            regionView.stretch(track.audioBuffer?.duration);
-        }
+        requestAnimationFrame(()=> {
+            let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
+            if (!waveFormView) return
+            for (let regionView of waveFormView.regionViews) {
+                if (!track.audioBuffer) return;
+                let region = track.getRegion(regionView.id);
+                if (region) {
+                    regionView.stretch(region.duration, region);
+                }
+            }
+        });
     }
 
     getWaveFormViewById(trackId: number) {

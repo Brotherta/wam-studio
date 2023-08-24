@@ -58,6 +58,11 @@ export default class WaveformView extends Container {
         this.removeChild(regionView);
     }
 
+    addRegionView(regionView: RegionView) {
+        this.regionViews.push(regionView);
+        this.addChild(regionView);
+    }
+
     getRegionView(regionId: number) {
         return this.regionViews.find(regionView => regionView.id === regionId);
     }

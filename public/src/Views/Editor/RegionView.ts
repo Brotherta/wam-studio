@@ -12,6 +12,7 @@ export default class RegionView extends Container {
 
     trackId: number;
     id: number;
+    private selected: boolean = false;
 
     constructor(editor: EditorView, trackId: number, region: Region) {
         super();
@@ -63,7 +64,9 @@ export default class RegionView extends Container {
         }
     }
 
-    drawBackground(color: number = 0x000000) {
+
+    drawBackground() {
+        let color = this.selected ? 0xffffff : 0x000000
         this.background.clear();
         this.background.beginFill(0xffffff, 0.2);
         this.background.lineStyle({width: 1, color: color});
@@ -71,16 +74,20 @@ export default class RegionView extends Container {
     }
 
     select() {
-        this.drawBackground(0xffffff);
-    }
-
-    deselect() {
+        this.selected = true;
         this.drawBackground();
     }
 
-    stretch(duration: number) {
-        const newWidth = duration * 1000 / RATIO_MILLS_BY_PX;
+    deselect() {
+        this.selected = false;
+        this.drawBackground();
+    }
+
+    stretch(duration: number, region: Region) {
+        this.scale.x = 1;
+        const newWidth = (duration * 1000) / RATIO_MILLS_BY_PX;
         const scaleFactor = newWidth / this.width
         this.scale.x *= scaleFactor;
+        this.position.x = region.start / RATIO_MILLS_BY_PX;
     }
 }

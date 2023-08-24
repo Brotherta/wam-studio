@@ -170,9 +170,9 @@ export default class RegionsController {
     }
 
     updateRegionWaveform(oldWaveForm: WaveformView, newWaveForm: WaveformView) {
-        newWaveForm.addChild(this.selectedRegionView!);
-        oldWaveForm.removeChild(this.selectedRegionView!);
-        this.selectedRegionView!.drawWave(newWaveForm.color, this.selectedRegion!);
+        newWaveForm.addRegionView(this.selectedRegionView!);
+        oldWaveForm.removeRegionView(this.selectedRegionView!);
         this.selectedRegionView!.trackId = newWaveForm.trackId;
+        this.selectedRegionView!.drawWave(newWaveForm.color, this.selectedRegion!);
     }
 }
