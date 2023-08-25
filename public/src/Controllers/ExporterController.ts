@@ -27,7 +27,7 @@ export default class ExporterController {
 
         for (let track of this.app.tracksController.trackList) {
             console.log("Exporting track " + track.id);
-            if (!masterTrack && !tracksIds.includes(track.id)) continue;
+            if (!tracksIds.includes(track.id)) continue;
 
             let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate);
             const [hostGroupId] = await initializeWamHost(offlineCtx);
