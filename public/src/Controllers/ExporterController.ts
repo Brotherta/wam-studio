@@ -27,7 +27,6 @@ export default class ExporterController {
 
         for (let track of this.app.tracksController.trackList) {
             console.log("Exporting track " + track.id);
-            if (!tracksIds.includes(track.id)) continue;
 
             let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate);
             const [hostGroupId] = await initializeWamHost(offlineCtx);
@@ -52,6 +51,7 @@ export default class ExporterController {
             plugin.instance?._audioNode.disconnect();
             plugin.unloadPlugin();
 
+            if (!tracksIds.includes(track.id)) continue;
             downloadBlob(blob, `${name}_track_${track.element.name}.wav`);
         }
 
