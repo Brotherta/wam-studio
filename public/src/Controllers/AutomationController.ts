@@ -2,6 +2,7 @@ import App from "../App";
 import Track from "../Models/Track";
 import {audioCtx} from "../index";
 import AutomationView from "../Views/AutomationView";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Variables";
 
 
 /**
@@ -86,6 +87,7 @@ export default class AutomationController {
                     () => {
                         let bpf = track.automation.getBpfOfparam(param);
                         if (bpf !== undefined) {
+                            bpf.setSizeBPF(this.app.editorView.worldWidth);
                             this.automationView.mountBpf(track.id, bpf);
                         }
                         else {
@@ -149,6 +151,14 @@ export default class AutomationController {
         let frac = point - integPoint;
         if (frac < 0.5) return integPoint;
         else return integPoint+1;
+    }
+
+    updateWidthOpenedBPF() {
+        const newWidth = (MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX;
+
+        for (const track of this.app.tracksController.trackList) {
+            this.automationView.updateWidthBPF(track.id, newWidth);
+        }
     }
 }
 

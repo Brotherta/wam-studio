@@ -53,7 +53,6 @@ export default class Automation {
         // remove parameters that doesn't exist anymore.
         this.bpfList = this.bpfList.filter((_, index) => recordUpdated[index] == 1);
         this.bpfList = this.bpfList.concat(newBpf);
-        console.table(this.bpfList);
     }
 
     /**

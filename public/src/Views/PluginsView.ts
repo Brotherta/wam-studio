@@ -25,6 +25,8 @@ export default class PluginsView {
 
     // private dragging: boolean;
     maximized: boolean;
+    pluginMounted: boolean = false;
+    windowOpened: boolean = false;
 
     constructor() {
         this.minHeight = 25;
@@ -55,6 +57,7 @@ export default class PluginsView {
     showPlugins(track: Track) {
         // this.deletePluginView()
         this.mount.appendChild(track.plugin.dom);
+        this.pluginMounted = true;
     }
 
     /**
@@ -62,6 +65,7 @@ export default class PluginsView {
      */
     deletePluginView() {
         this.mount.innerHTML = '';
+        this.pluginMounted = false;
     }
 
     /**
@@ -84,6 +88,7 @@ export default class PluginsView {
     showFloatingWindow() {
         this.floating.hidden = false;
         focusWindow(this.floating);
+        this.windowOpened = true;
     }
 
     /**
@@ -91,6 +96,7 @@ export default class PluginsView {
      */
     hideFloatingWindow() {
         this.floating.hidden = true;
+        this.windowOpened = false;
     }
 
     /**

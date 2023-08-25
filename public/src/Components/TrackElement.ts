@@ -76,8 +76,8 @@ template.innerHTML = /*html*/`
     color: lightgrey;
     font-familiy: Helvetica, monospace;
     font-weight: bold;
-    max-width: 118px;
-    min-width: 118px;
+    max-width: 100px;
+    min-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     transition: all 2s linear;
@@ -238,9 +238,11 @@ template.innerHTML = /*html*/`
 <div class="track-utils">
     <div class="track-header">
         <input id="name-input" class="track-name">
-    
+        
+        <div id="hand-btn" class="track-close">
+            <i class="hand-icon" style="width: 14px"></i>
+        </div>
         <div id="close-btn" class="track-close">
-<!--            <img src="/icons/x-circle-fill.svg">-->
             <i class="close-icon" style="width: 14px"></i>
         </div>
     </div>
@@ -273,13 +275,13 @@ template.innerHTML = /*html*/`
     <div class="track-controls">
         <div id="mute-btn" class="mute-icon">M</div>
         <div id="solo-btn" class="solo-icon">S</div>
-        <div id="monitoring" class="control">
+        <div id="monitoring" class="control" style="padding-top: 6px">
             <i class="monitor-icon"></i>
         </div>
-        <div id="arm" class="control">
+        <div id="arm" class="control" style="padding-top: 3px">
             <i class="mic-icon" style="width: 15px"></i>
         </div>
-        <div id="automation" class="control">
+        <div id="automation" class="control" style="padding-top: 1px">
             <i class="automation-icon" style="width: 15px"></i>
         </div>
     </div>
@@ -288,6 +290,9 @@ template.innerHTML = /*html*/`
         <div id="left" class="toggle-control active">L</div>
         <div id="right" class="toggle-control">R</div>
         <div id="merge" class="toggle-control active">merge L / R</div>
+        <div id="fx" class="control" style="padding-top: 1px">
+            <i class="fx-icon" style="width: 15px"></i>
+        </div>
     </div>
 </div>
 <div id="color-div" class="track-color">
@@ -372,6 +377,13 @@ export default class TrackElement extends HTMLElement {
         });
         this.automationBtn.addEventListener("mouseleave", () => {
             this.automationBtn.style.filter = "none";
+        });
+
+        this.fxBtn.addEventListener("mouseenter", () => {
+            this.fxBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
+        });
+        this.fxBtn.addEventListener("mouseleave", () => {
+            this.fxBtn.style.filter = "none";
         });
 
         this.monitoringBtn.addEventListener("mouseenter", () => {
@@ -540,6 +552,10 @@ export default class TrackElement extends HTMLElement {
         return this.shadowRoot?.getElementById("monitoring") as HTMLDivElement;
     }
 
+    get fxBtn() {
+        return this.shadowRoot?.getElementById("fx") as HTMLDivElement;
+    }
+
     get modeBtn() {
         return this.shadowRoot?.getElementById("mode") as HTMLDivElement;
     }
@@ -558,4 +574,5 @@ export default class TrackElement extends HTMLElement {
     get loadingBar() {
         return this.shadowRoot?.getElementById("loading-bar") as HTMLDivElement;
     }
+
 }

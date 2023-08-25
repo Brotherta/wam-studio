@@ -54,12 +54,11 @@ export default class PluginsController {
      */
     defineNewPluginBtnListener() {
         this.pluginsView.newPlugin.addEventListener("click", async () => {
-            if (this.selectedTrack != undefined) {
-                this.pluginsView.hideNew();
-                await this.selectedTrack.plugin.initPlugin();
-                this.app.pluginsController.connectPlugin(this.selectedTrack);
-                this.selectPlugins();
-            }
+            if (!this.selectedTrack) return;
+            this.pluginsView.hideNew();
+            await this.selectedTrack.plugin.initPlugin();
+            this.app.pluginsController.connectPlugin(this.selectedTrack);
+            this.selectPlugins();
         });
 
         this.pluginsView.removePlugin.addEventListener("click", () => {
@@ -69,21 +68,15 @@ export default class PluginsController {
         });
 
         this.pluginsView.showPlugin.addEventListener("click", () => {
-            this.pluginsView.showHidePlugin();
-            this.pluginsView.hideShowPlugin();
-            this.pluginsView.showFloatingWindow();
+            this.showPedalboard();
         });
 
         this.pluginsView.hidePlugin.addEventListener("click", () => {
-            this.pluginsView.showShowPlugin();
-            this.pluginsView.hideHidePlugin();
-            this.pluginsView.hideFloatingWindow();
+            this.hidePedalBoard();
         });
 
         this.pluginsView.closeWindowButton.addEventListener("click", () => {
-            this.pluginsView.showShowPlugin();
-            this.pluginsView.hideHidePlugin();
-            this.pluginsView.hideFloatingWindow();
+            this.hidePedalBoard();
         })
     }
 
@@ -219,6 +212,43 @@ export default class PluginsController {
                 track.mergerNode.disconnect(track.plugin.instance?._audioNode!);
                 track.mergerNode.connect(track.pannerNode);
             }
+        }
+    }
+
+    async addPedalboard() {
+        if (!this.selectedTrack) return;
+        this.pluginsView.hideNew();
+        await this.selectedTrack.plugin.initPlugin();
+        this.app.pluginsController.connectPlugin(this.selectedTrack);
+        this.selectPlugins();
+        this.showPedalboard();
+    }
+
+    showPedalboard() {
+        this.pluginsView.showHidePlugin();
+        this.pluginsView.hideShowPlugin();
+        this.pluginsView.showFloatingWindow();
+    }
+
+    hidePedalBoard() {
+        this.pluginsView.showShowPlugin();
+        this.pluginsView.hideHidePlugin();
+        this.pluginsView.hideFloatingWindow();
+    }
+
+
+    async handleFxClick(track: Track) {
+        this.selectTrack(track);
+        if (track.plugin.initialized) {
+            if (this.app.pluginsView.windowOpened) {
+                this.hidePedalBoard();
+            }
+            else {
+                this.showPedalboard();
+            }
+        }
+        else {
+            await this.addPedalboard();
         }
     }
 }

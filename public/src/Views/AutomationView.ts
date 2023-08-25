@@ -1,4 +1,5 @@
 import Track from "../Models/Track";
+import BPF from "../Components/BPF";
 
 
 /**
@@ -115,6 +116,14 @@ export default class AutomationView {
         if (location !== null) {
             location.classList.remove("event-active");
             location.innerHTML = '';
+        }
+    }
+
+    updateWidthBPF(trackId:number, width: number) {
+        let location = document.getElementById(`automation-${trackId}`);
+        if (location !== null && location.children) {
+            const bpf = location.firstChild as BPF;
+            bpf.setSizeBPF(width);
         }
     }
 }

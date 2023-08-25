@@ -117,6 +117,7 @@ export default class EditorController {
         let offsetPlayhead = this.editor.playhead.position.x;
         this.editor.resizeCanvas();
         this.editor.playhead.movePlayhead(this.app.host.playhead);
+        this.app.automationController.updateWidthOpenedBPF();
         this.editor.horizontalScrollbar.customScrollTo(this.editor.playhead.position.x - offsetPlayhead);
         this.app.tracksController.trackList.forEach(track => {
             track.updateBuffer(audioCtx, this.app.host.playhead);

@@ -95,6 +95,7 @@ export default class TracksController {
      */
     defineTrackListener(track: Track) {
         track.element.addEventListener("click", () => {
+            console.log("CLICK");
             if (!track.removed) {
                 this.app.pluginsController.selectTrack(track);
             }
@@ -106,6 +107,7 @@ export default class TracksController {
         }
 
         track.element.soloBtn.onclick = () => {
+            this.app.pluginsController.selectTrack(track);
             track.isSolo = !track.isSolo;
 
             if (track.isSolo) {
@@ -119,6 +121,8 @@ export default class TracksController {
         }
 
         track.element.muteBtn.onclick = () => {
+            this.app.pluginsController.selectTrack(track);
+            console.log("mute");
             if (track.isMuted) {
                 track.unmute();
                 track.element.unmute();
@@ -141,30 +145,41 @@ export default class TracksController {
         }
 
         track.element.color.onclick = () => {
+            this.app.pluginsController.selectTrack(track);
             this.tracksView.changeColor(track);
             this.app.editorView.changeWaveFormColor(track);
         }
         track.element.automationBtn.onclick = async (e) => {
+            this.app.pluginsController.selectTrack(track);
             await this.app.automationController.openAutomationMenu(track);
             e.stopImmediatePropagation();
         }
         track.element.armBtn.onclick = () => {
+            this.app.pluginsController.selectTrack(track);
             this.app.recorderController.clickArm(track);
         }
         track.element.monitoringBtn.onclick = () => {
+            this.app.pluginsController.selectTrack(track);
             this.app.recorderController.clickMonitoring(track);
         }
         track.element.modeBtn.onclick = () => {
+            this.app.pluginsController.selectTrack(track);
             this.app.recorderController.clickMode(track);
         }
         track.element.leftBtn.onclick = () => {
+            this.app.pluginsController.selectTrack(track);
             this.app.recorderController.clickLeft(track);
         }
         track.element.rightBtn.onclick = () => {
+            this.app.pluginsController.selectTrack(track);
             this.app.recorderController.clickRight(track);
         }
         track.element.mergeBtn.onclick = () => {
+            this.app.pluginsController.selectTrack(track);
             this.app.recorderController.clickMerge(track);
+        }
+        track.element.fxBtn.onclick = () => {
+            this.app.pluginsController.handleFxClick(track);
         }
     }
 
