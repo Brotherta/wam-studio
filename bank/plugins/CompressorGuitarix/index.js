@@ -4,7 +4,7 @@
       import ParamMgrFactory from '../utils/sdk-parammgr/src/ParamMgrFactory.js';
       import fetchModule from './fetchModule.js';
       import { createElement } from './Gui/index.js';
-  
+  // coucou
       class CompressorGuitarixNode extends CompositeAudioNode {
           _wamNode;
 
