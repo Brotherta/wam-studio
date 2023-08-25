@@ -301,30 +301,58 @@ export default class BindsController {
         else {
             let parameter = parameterElement.parameter;
             let paramName =  parameterElement.options.value;
-            if (parameter === undefined || parameter.parameterName !== parameterElement.options.value) {
-                // @ts-ignore
-                let paramInfo = await track.plugin.instance?._audioNode.getParameterInfo([paramName]);
-                if (paramInfo === undefined) {
-                    alert("The parameter "+paramName+" doesn't exist");
-                    return;
-                }
-                // @ts-ignore
-                let {minValue, maxValue, discreteStep} = paramInfo[paramName];
 
-                // Normalize values for the equalizer...
-                let minMaxNormalized = getMinMax(paramName);
-                if (minMaxNormalized !== undefined) {
-                    minValue = minMaxNormalized.min;
-                    maxValue = minMaxNormalized.max;
+            if (parameter === undefined && paramName !== "none") {
+                parameter = await this.getNewParameterByName(track, paramName);
+                if (parameter) {
+                    parameterElement.selectParam(parameter);
+                    bind.parameters.push(parameter);
                 }
+            }
 
-                parameter = new Parameter(paramName, maxValue, minValue, discreteStep);
-                parameterElement.selectParam(parameter);
-                bind.parameters.splice(bind.parameters.indexOf(parameterElement.parameter!), 1);
-                bind.parameters.push(parameter);
+           else if (parameter !== undefined && parameter.parameterName !== parameterElement.options.value) {
+                if (paramName === "none")  { // empty param
+                    bind.parameters.splice(bind.parameters.indexOf(parameterElement.parameter!), 1);
+                }
+                else { // there is a parameter already, we need to replace it by the new one
+                    parameter = await this.getNewParameterByName(track, paramName);
+                    if (parameter) {
+                        bind.parameters.splice(bind.parameters.indexOf(parameterElement.parameter!), 1);
+                        parameterElement.selectParam(parameter);
+                        bind.parameters.push(parameter);
+                    }
+                }
+                    
             }
         }
     }
+
+    /**
+     * Create a new parameter object by fetching the plugin with the corresponding parameter name.
+     * 
+     * @param track The track where belongs the bind and the parameter
+     * @param paramName the name of the selected parameter.
+     * @returns Parameter | undefined
+     */
+    async getNewParameterByName(track: Track, paramName: string): Promise<Parameter | undefined> {
+        // @ts-ignore
+        let paramInfo = await track.plugin.instance?._audioNode.getParameterInfo([paramName]);
+        if (paramInfo === undefined) {
+            alert("The parameter "+paramName+" doesn't exist");
+            return;
+        }
+        // @ts-ignore
+        let {minValue, maxValue, discreteStep} = paramInfo[paramName];
+
+        // Normalize values for the equalizer...
+        let minMaxNormalized = getMinMax(paramName);
+        if (minMaxNormalized !== undefined) {
+            minValue = minMaxNormalized.min;
+            maxValue = minMaxNormalized.max;
+        }
+        return new Parameter(paramName, maxValue, minValue, discreteStep);
+    }
+
 
     /**
      * Delete the parameter from the bind. It removes the parameter from the bindControl if it was already added.
