@@ -95,7 +95,6 @@ export default class TracksController {
      */
     defineTrackListener(track: Track) {
         track.element.addEventListener("click", () => {
-            console.log("CLICK");
             if (!track.removed) {
                 this.app.pluginsController.selectTrack(track);
             }
@@ -122,7 +121,6 @@ export default class TracksController {
 
         track.element.muteBtn.onclick = () => {
             this.app.pluginsController.selectTrack(track);
-            console.log("mute");
             if (track.isMuted) {
                 track.unmute();
                 track.element.unmute();

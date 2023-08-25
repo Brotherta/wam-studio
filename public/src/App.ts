@@ -22,6 +22,7 @@ import WaveformController from "./Controllers/Editor/WaveformController";
 import RegionsController from "./Controllers/Editor/RegionsController";
 import PlayheadController from "./Controllers/Editor/PlayheadController";
 import EditorView from "./Views/Editor/EditorView";
+import KeyboardController from "./Controllers/KeyboardController";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -40,7 +41,7 @@ export default class App {
     waveformController: WaveformController;
     regionsController: RegionsController;
     playheadController: PlayheadController
-
+    keyboardController: KeyboardController;
 
     hostView: HostView;
     tracksView: TracksView;
@@ -80,6 +81,7 @@ export default class App {
         this.latencyController = new LatencyController(this);
         this.settingsController = new SettingsController(this);
         this.projectController = new ProjectController(this);
+        this.keyboardController = new KeyboardController(this);
 
         makeDivScrollSync();
     }
