@@ -232,6 +232,7 @@ export default class PresetsController {
         }
         for (let bind of bindControl.binds) {
             let newBind = bind.clone();
+            console.log("saving preset", newBind);
             preset.addBind(newBind);
         }
 

@@ -320,6 +320,7 @@ export default class BindsController {
 
                 parameter = new Parameter(paramName, maxValue, minValue, discreteStep);
                 parameterElement.selectParam(parameter);
+                bind.parameters.splice(bind.parameters.indexOf(parameterElement.parameter!), 1);
                 bind.parameters.push(parameter);
             }
         }
@@ -335,11 +336,13 @@ export default class BindsController {
      * @private
      */
     private async deleteParameter(track: Track, bind: Bind, parameterElement: ParameterElement) {
+        console.log("before delete", bind.parameters);
         if (parameterElement.parameter !== undefined) {
             bind.parameters.splice(bind.parameters.indexOf(parameterElement.parameter!), 1);
         }
         parameterElement.parameter = undefined;
         track.bindControl.advElement.removeParameterElement(parameterElement);
+        console.log("after delete", bind.parameters)
     }
 
     /**
