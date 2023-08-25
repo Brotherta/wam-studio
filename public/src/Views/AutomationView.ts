@@ -121,7 +121,7 @@ export default class AutomationView {
 
     updateWidthBPF(trackId:number, width: number) {
         let location = document.getElementById(`automation-${trackId}`);
-        if (location !== null && location.children) {
+        if (location !== null && location.children.length > 0) {
             const bpf = location.firstChild as BPF;
             bpf.setSizeBPF(width);
         }
