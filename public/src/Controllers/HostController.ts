@@ -2,6 +2,8 @@ import HostView from "../Views/HostView";
 import App from "../App";
 import {audioCtx} from "../index";
 import {SONGS_FILE_URL} from "../Env";
+import {MAX_DURATION_SEC} from "../Utils/Utils";
+import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -312,6 +314,21 @@ export default class HostController {
         for (let track of this.app.tracksController.trackList) {
             track.element.switchMode(this.advancedMode);
         }
+    }
+
+    /**
+     * Update buffer timer of the with the new duration
+     * @param duration in milliseconds
+     */
+    updateBufferTime(duration: number) {
+        if (this.maxTime === duration) return;
+        this.maxTime = duration;
+
+        console.log("updating duration", duration);
+        let audio = audioCtx.createBuffer(2, (duration/1000) * audioCtx.sampleRate, audioCtx.sampleRate)
+        const operableAudioBuffer = Object.setPrototypeOf(audio, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+
+        this.app.host.hostNode!.setAudio(operableAudioBuffer.toArray());
     }
 }
 

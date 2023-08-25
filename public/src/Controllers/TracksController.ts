@@ -370,7 +370,8 @@ export default class TracksController {
                         // @ts-ignore
                         track.node.setAudio(operableAudioBuffer.toArray());
                         track.audioBuffer = operableAudioBuffer;
-                        this.app.hostController.maxTime = Math.max(this.app.hostController.maxTime, track.audioBuffer!.duration*1000);
+                        // this.app.hostController.maxTime = (Math.max(this.app.hostController.maxTime, track.audioBuffer!.duration*1000));
+                        this.app.hostController.updateBufferTime(Math.max(this.app.hostController.maxTime, track.audioBuffer!.duration*1000));
                         track.element.progressDone();
                     });
             } else {
