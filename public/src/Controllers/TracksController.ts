@@ -172,7 +172,6 @@ export default class TracksController {
      * @param track Track to be added to the track view.
      */
     addNewTrackInit(track: Track) {
-        track.element.switchMode(this.app.hostController.advancedMode);
         this.tracksView.addTrack(track.element);
         this.tracksView.changeColor(track);
         this.splitTrack(track);
@@ -185,6 +184,7 @@ export default class TracksController {
         this.app.tracksController.connectPlugin(track);
         this.app.tracksController.addNewTrackInit(track);
         this.app.bindsController.addBindListener(track);
+        track.element.switchMode(this.app.hostController.advancedMode);
     }
 
     /**
@@ -250,7 +250,6 @@ export default class TracksController {
 
         track.element.balanceSlider.oninput = () => {
             let value = parseFloat(track.element.balanceSlider.value);
-            console.log(track.element.balanceSlider.value);
             track.setBalance(value);
         }
 
@@ -318,7 +317,6 @@ export default class TracksController {
         this.app.hostController.maxTime = 0;
         let splitting = song.splitting;
         for (let trackSong of song.songs) {
-            console.log(trackSong.name);
             let track;
             if (song.splitting) {
                 track = await this.newEmptyTrack(trackSong, trackSong.split);
@@ -330,7 +328,6 @@ export default class TracksController {
             await this.app.tracksController.initTrackComponents(track);
         }
         for (let track of this.trackList) {
-            console.log("loading utl ", track.element.name);
             if (splitting) {
                 this.app.tracksController.loadTrackUrl(track);
             }
@@ -364,7 +361,7 @@ export default class TracksController {
             if (xhr.status == 200) {
                 let audioArrayBuffer = xhr.response;
                 audioCtx.decodeAudioData(audioArrayBuffer)
-                    .then((audioBuffer) => {
+                     .then((audioBuffer) => {
                         if (track.isDeleted) {
                             xhr.abort();
                             return;

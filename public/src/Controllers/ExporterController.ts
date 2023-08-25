@@ -15,13 +15,14 @@ export default class ExporterController {
     }
 
     async exportSongs(masterTrack: boolean, tracksIds: number[], name: string) {
-        if (!masterTrack && tracksIds.length == 0) {
+        if (!masterTrack && tracksIds.length === 0) {
             return;
         }
         if (name == "") name = "project";
 
         let buffers = [];
         let maxDuration = this.app.hostController.maxTime / 1000; // in seconds
+        console.log(maxDuration/60);
         const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
 
         for (let track of this.app.tracksController.trackList) {

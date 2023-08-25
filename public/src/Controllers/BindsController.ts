@@ -53,8 +53,8 @@ export default class BindsController {
         track.bindControl.trackBindElement.addBindSliderElement(slider);
         slider.id = "volume";
         slider.setNameLabel("Volume");
-        slider.slider.value = "100";
-        slider.valueLabel.innerHTML = "100";
+        slider.slider.value = "50";
+        slider.valueLabel.innerHTML = "50";
         // set color to white
         slider.style.backgroundColor = "#646464";
         slider.slider.oninput = async () => {

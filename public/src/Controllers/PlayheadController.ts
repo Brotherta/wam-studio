@@ -16,7 +16,6 @@ export default class PlayheadController {
         }
 
         this.app.hostView.playbackSlider.onchange = () => {
-            console.log(this.app.hostView.playbackSlider.value);
             let value = this.app.hostView.playbackSlider.valueAsNumber;
             let newValueMs = this.app.hostController.maxTime * value / 100;
 

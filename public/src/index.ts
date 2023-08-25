@@ -64,7 +64,27 @@ window.addEventListener('beforeunload', (e) => {
 
 const app = new App();
 (async () => {
+    const showLoading = () => {
+        // Find the loading overlay and display it
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        if (loadingOverlay) {
+            (loadingOverlay as HTMLElement).style.display = 'flex';
+            document.body.classList.add('loading'); // This class is added to blur the content behind the overlay
+        }
+    }
+
+    const hideLoading = () => {
+        // Find the loading overlay and hide it
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        if (loadingOverlay) {
+            (loadingOverlay as HTMLElement).style.display = 'none';
+            document.body.classList.remove('loading'); // Remove the class to un-blur the content
+        }
+    }
+
+    showLoading();
     await app.initHost();
+    hideLoading();
 })();
 
 export { app, audioCtx };

@@ -29,6 +29,7 @@ export default class HostController {
         this.defineControls();
         this.advancedMode = localStorage.getItem("advancedMode") === "true";
         localStorage.setItem("advancedMode", this.advancedMode.toString());
+        console.log(this.advancedMode)
         this.switchToAdvancedMode();
     }
 
@@ -44,7 +45,7 @@ export default class HostController {
         this.searchUserSongs();
         this.defineMenuListeners();
         this.app.hostView.updateTimer(0)
-        this.app.hostView.volumeSlider.value = "100";
+        this.app.hostView.volumeSlider.value = "75";
     }
 
     /**
@@ -296,6 +297,7 @@ export default class HostController {
     }
 
     switchToAdvancedMode() {
+        console.log("Swithing mode ", this.advancedMode);
         let advanced = document.getElementsByClassName('advanced');
         for (let element of advanced) {
             if (this.advancedMode) {
