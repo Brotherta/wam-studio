@@ -78,6 +78,12 @@ export default class BindsController {
         bindControl.advElement.deletePresetBtn.onclick = async () => {
             await this.app.presetsController.deletePreset(bindControl, track);
         }
+        bindControl.advElement.copyPresetBtn.onclick = async () => {
+            await this.app.presetsController.copyPreset(bindControl, track);
+        }
+        bindControl.advElement.pastePresetBtn.onclick = async () => {
+            await this.app.presetsController.pastePreset(bindControl, track);
+        }
 
         // Binds Controllers
         bindControl.advElement.newBindBtn.onclick = async () => {

@@ -95,7 +95,10 @@ select {
             <button class="btn-advanced" id="save-preset" type="button">Save preset</button>
             <button class="btn-advanced" id="delete-preset" type="button">Delete preset</button>
         </div>
-        
+        <div class="horizontal-grp">
+            <button class="btn-advanced" id="copy-preset-btn" type="button">Copy preset</button>
+            <button class="btn-advanced" id="paste-preset-btn" type="button">Paste preset</button>
+        </div>
         <div class="sep-line"></div>
     </section>
     
@@ -176,6 +179,14 @@ export default class AdvancedElement extends HTMLElement {
 
     get parametersContainer(): HTMLDivElement {
         return this.shadowRoot!.querySelector("#parameters-container") as HTMLDivElement;
+    }
+
+    get copyPresetBtn(): HTMLButtonElement {
+        return this.shadowRoot!.querySelector("#copy-preset-btn") as HTMLButtonElement;
+    }
+
+    get pastePresetBtn(): HTMLButtonElement {
+        return this.shadowRoot!.querySelector("#paste-preset-btn") as HTMLButtonElement;
     }
 
     addBindOption(name: string) {

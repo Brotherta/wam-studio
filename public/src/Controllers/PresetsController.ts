@@ -15,6 +15,8 @@ export default class PresetsController {
     presets: Map<SongTagEnum, Preset[]>
     presetsSet = new Set<string>();
 
+    copiedPreset: Preset | undefined;
+
     constructor(app: App) {
         this.app = app;
         this.presets = new Map<SongTagEnum, Preset[]>();
@@ -168,22 +170,6 @@ export default class PresetsController {
         track.plugin.instance!.id = 0;
 
         if (preset.name !== "Default") {
-            // await track.plugin.instance!._audioNode.setState(preset.pluginState);
-            // let testState = await track.plugin.instance!._audioNode.getState();
-            //
-            // let readyPromise = new Promise<WamParameterInfoMap>((resolve) => {
-            //    let interval = setInterval(async () => {
-            //        if (testState.current.length === preset!.pluginState.current.length) {
-            //            let paramInfo = await track.plugin.instance!._audioNode.getParameterInfo();
-            //            clearInterval(interval);
-            //            resolve(paramInfo);
-            //        }
-            //        testState = await track.plugin.instance!._audioNode.getState();
-            //    }, 100);
-            // });
-
-            // let paramInfo = await readyPromise;
-
             await track.plugin.setStateAsync(preset.pluginState);
             let paramInfo = await track.plugin.instance?._audioNode.getParameterInfo();
 
@@ -272,6 +258,39 @@ export default class PresetsController {
         }
     }
 
+    async copyPreset(bindControl: BindControl, track: Track) {
+        let presetName = bindControl.advElement.presetName.value;
+        if (presetName !== "Default" && presetName) {
+            let preset = new Preset(presetName);
+
+            for (let bind of bindControl.binds) {
+                let newBind = bind.clone();
+                console.log("saving preset", newBind);
+                preset.addBind(newBind);
+            }
+
+            preset.pluginState = await track.plugin.instance!._audioNode.getState();
+            this.copiedPreset = preset;
+        }
+    }
+
+    async pastePreset(bindControl: BindControl, track: Track) {
+        let tag = track.tag;
+
+        let preset = this.copiedPreset
+        if (!preset) return;
+        let existing = this.presets.get(tag)?.find(p => p.name == preset?.name);
+        if (existing) {
+            if (!confirm("A preset with this name already exists. Do you want to replace it?")) return;
+            this.removePreset(existing, tag);
+        }
+        this.addPreset(preset, tag);
+        this.refreshPresetList(tag);
+        bindControl.advElement.selectPreset(preset.name);
+        bindControl.advElement.presetName.value = preset.name;
+        await this.changePreset(bindControl, track);
+    }
+
     /**
      * Refresh the preset list of all the tracks with the given tag.
      * @param tag
@@ -320,5 +339,4 @@ export default class PresetsController {
             this.app.hostView.presetsDropdown.appendChild(a);
         }
     }
-
 }
