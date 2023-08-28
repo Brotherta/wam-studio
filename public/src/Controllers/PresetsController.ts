@@ -259,7 +259,7 @@ export default class PresetsController {
     }
 
     async copyPreset(bindControl: BindControl, track: Track) {
-        let presetName = bindControl.advElement.presetName.value;
+        let presetName = bindControl.advElement.presetsSelect.value;
         if (presetName !== "Default" && presetName) {
             let preset = new Preset(presetName);
 
