@@ -3,6 +3,7 @@ import LoadProjectElement from "../Components/Project/LoadProjectElement";
 import SaveProjectElement from "../Components/Project/SaveProjectElement";
 import ConfirmElement from "../Components/Utils/ConfirmElement";
 import {focusWindow} from "../Controllers/StaticController";
+import ExportProjectElement from "../Components/Project/ExportProjectElement";
 
 
 export default class ProjectView {
@@ -15,6 +16,7 @@ export default class ProjectView {
     saveElement: SaveProjectElement;
     loadElement: LoadProjectElement;
     loginElement: LoginElement;
+    exportElement: ExportProjectElement;
 
     login: HTMLDivElement;
 
@@ -28,6 +30,7 @@ export default class ProjectView {
         this.saveElement = new SaveProjectElement();
         this.loadElement = new LoadProjectElement();
         this.loginElement = new LoginElement();
+        this.exportElement = new ExportProjectElement();
 
         this.login = document.getElementById("login") as HTMLDivElement;
     }
@@ -59,6 +62,13 @@ export default class ProjectView {
         this.mount.innerHTML = "";
         this.mount.appendChild(this.loginElement);
     }
+
+    mountExport() {
+        this.title.innerText = "Export Project";
+        this.mount.innerHTML = "";
+        this.mount.appendChild(this.exportElement);
+    }
+
 
     updateLogin(isLoggedIn: boolean) {
         this.loginElement.logInButton.hidden = isLoggedIn;

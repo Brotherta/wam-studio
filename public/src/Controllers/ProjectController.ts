@@ -28,6 +28,12 @@ export default class ProjectController {
         this.app.projectView.show();
     }
 
+    openExportProject() {
+        this.app.projectView.mountExport();
+        this.initExportProject();
+        this.app.projectView.show();
+    }
+
     async openLogin() {
         this.app.projectView.mountLogin();
         await this.initLogin();
@@ -59,6 +65,21 @@ export default class ProjectController {
                 await this.searchProject();
             });
         }
+    }
+
+    initExportProject() {
+        let exportElement = this.app.projectView.exportElement;
+        if (!exportElement.initialized) {
+            exportElement.initialized = true;
+            exportElement.exportBtn.addEventListener("click", async () => {
+                let trackIds = exportElement.getSelectedTracks();
+                let masterTrack = exportElement.isMasterTrackSelected();
+                let name = exportElement.nameInput.value;
+                await this.app.exportController.exportSongs(masterTrack, trackIds, name);
+            });
+        }
+        exportElement.setTitle("export project");
+        exportElement.update(this.app.tracksController.trackList);
     }
 
     initLogin() {

@@ -99,16 +99,6 @@ export default class Loader {
             "tracks": tracks
         }
 
-        // zip.file("project.json", JSON.stringify(project));
-        //
-        // let content = await zip.generateAsync({type: "blob"})
-        //
-        // const new_file = URL.createObjectURL(content);
-        // const link = document.createElement("a")
-        // link.href = new_file
-        // link.download = "project.zip"
-        // link.click()
-        // link.remove()
         return {
             "project": project,
             "wavs": wavs
@@ -145,7 +135,7 @@ export default class Loader {
         this.app.host.setVolume(project.host.volume);
 
         if (project.host.plugin !== null) {
-            await this.app.host.plugin.initPlugin();
+            await this.app.host.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
             this.app.pluginsController.connectPlugin(this.app.host);
             this.app.pluginsView.movePluginLoadingZone(this.app.host);
             await this.app.host.plugin.instance?._audioNode.setState(project.host.plugin);
@@ -179,24 +169,26 @@ export default class Loader {
 
             let plugins = trackJson.plugins;
             if (plugins !== null) {
-                await track.plugin.initPlugin();
+                await track.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
                 this.app.pluginsController.connectPlugin(track);
                 this.app.pluginsView.movePluginLoadingZone(track);
                 await track.plugin.instance?._audioNode.setState(plugins);
 
                 let state = await track.plugin.instance?._audioNode.getState();
 
-                let statePluginPromise = new Promise<void>((resolve, reject) => {
-                    const interval = setInterval(async () => {
-                        if (state.current.length === plugins.current.length) {
-                            await this.app.automationController.getAllAutomations(track);
-                            clearInterval(interval);
-                            resolve();
-                        }
-                        state = await track.plugin.instance?._audioNode.getState();
-                    }, 100);
-                });
-                await statePluginPromise;
+                await track.plugin.setStateAsync(state);
+
+                // let statePluginPromise = new Promise<void>((resolve, reject) => {
+                //     const interval = setInterval(async () => {
+                //         if (state.current.length === plugins.current.length) {
+                //             await this.app.automationController.getAllAutomations(track);
+                //             clearInterval(interval);
+                //             resolve();
+                //         }
+                //         state = await track.plugin.instance?._audioNode.getState();
+                //     }, 100);
+                // });
+                // await statePluginPromise;
 
                 let automations = trackJson.automations;
                 for (let automation of automations) {
@@ -210,17 +202,5 @@ export default class Loader {
             let regions = trackJson.regions;
             this.app.tracksController.loadTrackRegions(track, regions, data.id);
         }
-
-        // let reader = new FileReader();
-        // reader.onload = async (e) => {
-        //     let zip = await JSZip.loadAsync(e.target!.result);
-        //     let project = JSON.parse(await zip.file("project.json")!.async("string"));
-        //     let audio = zip.folder("audio")!;
-        // ...
-        // ...
-        // ...
-        // }
-        //
-        // reader.readAsArrayBuffer(file);
     }
 }

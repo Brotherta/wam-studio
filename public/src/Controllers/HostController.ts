@@ -194,6 +194,9 @@ export default class HostController {
 
             }
         });
+        this.app.hostView.exportProject.onclick = () => {
+            this.app.projectController.openExportProject();
+        }
         this.app.hostView.saveBtn.onclick = async () => {
             await this.app.projectController.openSaveProject();
         }
@@ -285,6 +288,19 @@ export default class HostController {
             //@ts-ignore
             track.node.parameters.get("playing").value = 0;
         });
+    }
+
+    getMaxDurationRegions() {
+        let maxTime = 0;
+        for (let track of this.app.tracksController.trackList) {
+            for (let region of track.regions) {
+                let end = region.start*1000 + region.duration;
+                if (end > maxTime) {
+                    maxTime = end;
+                }
+            }
+        }
+        return maxTime;
     }
 }
 

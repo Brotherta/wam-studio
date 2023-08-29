@@ -122,7 +122,7 @@ export default class AutomationController {
                 for (let x = 0; x < point[0]; x += 0.1) {
                     list.push(bpf.getYfromX(x));
                 }
-                let start = this.getStartingPoint(point[0]*1000, time, list.length);
+                let start = AutomationController.getStartingPoint(point[0]*1000, time, list.length);
                 let paramID = bpf.paramID;
                 let t = 0;
                 for (let i = start; i < list.length; i++) {
@@ -145,7 +145,7 @@ export default class AutomationController {
      *
      * @returns The index of the starting point.
      */
-    getStartingPoint(totalDuration: number, currentTime: number, totalPoint: number) {
+    static getStartingPoint(totalDuration: number, currentTime: number, totalPoint: number) {
         let point = (totalPoint * currentTime) / totalDuration;
         let integPoint = Math.floor(point);
         let frac = point - integPoint;

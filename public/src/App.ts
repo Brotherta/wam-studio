@@ -23,6 +23,7 @@ import RegionsController from "./Controllers/Editor/RegionsController";
 import PlayheadController from "./Controllers/Editor/PlayheadController";
 import EditorView from "./Views/Editor/EditorView";
 import KeyboardController from "./Controllers/KeyboardController";
+import ExporterController from "./Controllers/ExportController";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -42,6 +43,7 @@ export default class App {
     regionsController: RegionsController;
     playheadController: PlayheadController
     keyboardController: KeyboardController;
+    exportController: ExporterController;
 
     hostView: HostView;
     tracksView: TracksView;
@@ -82,6 +84,7 @@ export default class App {
         this.settingsController = new SettingsController(this);
         this.projectController = new ProjectController(this);
         this.keyboardController = new KeyboardController(this);
+        this.exportController = new ExporterController(this);
 
         makeDivScrollSync();
     }

@@ -11,6 +11,7 @@ import PlaceholderElement from "./Components/Utils/PlaceholderElement";
 import ConfirmElement from "./Components/Utils/ConfirmElement";
 import DialogElement from "./Components/Utils/DialogElement";
 import ScrollBarElement from "./Components/ScrollBarElement";
+import ExportProjectElement from "./Components/Project/ExportProjectElement";
 
 customElements.define(
     "track-element",
@@ -48,6 +49,11 @@ customElements.define(
     "scrollbar-element",
     ScrollBarElement
 );
+customElements.define(
+    "export-project-element",
+    ExportProjectElement
+);
+
 
 window.addEventListener('beforeunload', (e) => {
     e.returnValue = 'test';

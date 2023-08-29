@@ -3,8 +3,8 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 
 export default class Region {
 
-    start: number;
-    duration: number;
+    start: number; // in milliseconds
+    duration: number; // in seconds
 
     buffer: OperableAudioBuffer;
     trackId: number;

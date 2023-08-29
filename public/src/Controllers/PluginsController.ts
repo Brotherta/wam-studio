@@ -56,7 +56,7 @@ export default class PluginsController {
         this.pluginsView.newPlugin.addEventListener("click", async () => {
             if (!this.selectedTrack) return;
             this.pluginsView.hideNew();
-            await this.selectedTrack.plugin.initPlugin();
+            await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
             this.app.pluginsController.connectPlugin(this.selectedTrack);
             this.selectPlugins();
         });
@@ -218,7 +218,7 @@ export default class PluginsController {
     async addPedalboard() {
         if (!this.selectedTrack) return;
         this.pluginsView.hideNew();
-        await this.selectedTrack.plugin.initPlugin();
+        await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
         this.app.pluginsController.connectPlugin(this.selectedTrack);
         this.selectPlugins();
         this.showPedalboard();

@@ -94,7 +94,7 @@ export default class PedalBoardPlugin extends WebAudioModule {
   }
 
   async loadPreset(nodes) {
-    if (this.gui.presetsMenu) await this.gui.presetsMenu.loadMenu()
+    // if (this.gui.presetsMenu) await this.gui.presetsMenu.loadMenu()
     this.gui.loadingPreset = true;
     this.gui.setPreviewFullness(true);
     let board = this.gui.board;
