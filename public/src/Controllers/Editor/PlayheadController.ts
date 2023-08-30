@@ -55,7 +55,7 @@ export default class PlayheadController {
                 let pos = e.data.global.x + this._app.editorView.viewport.left;
                 if (pos < 0) pos = 0;
                 this._view.moveTo(pos);
-                this._app.hostView.updateTimerFromXPos(pos);
+                this._app.hostView.updateTimerByPixelsPos(pos);
             }
         });
     }
@@ -67,7 +67,7 @@ export default class PlayheadController {
      */
     private handlePointerDown(e: FederatedPointerEvent) {
         let pos = e.data.global.x + this._app.editorView.viewport.left;
-        this._app.hostController.pauseUpdateInterval();
+        this._app.hostController.pauseTimerInterval();
         this._movingPlayhead = true;
         this._view.moveTo(pos);
     }
@@ -83,8 +83,8 @@ export default class PlayheadController {
         if (pos < 0) pos = 0;
         this._app.tracksController.jumpTo(pos);
         this._movingPlayhead = false;
-        this._app.hostController.resumeUpdateInteravel();
-        if (this._app.hostController.playing) {
+        this._app.hostController.resumeTimerInteravel();
+        if (this._app.host.playing) {
             this._app.automationController.applyAllAutomations();
         }
     }

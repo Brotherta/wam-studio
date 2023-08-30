@@ -1,9 +1,9 @@
-/**
- * Class responsible for the host view. It displays the host controls and the host track.
- */
 import {audioCtx} from "../index";
 import {RATIO_MILLS_BY_PX} from "../Utils/Variables";
 
+/**
+ * Class responsible for the host view. It displays the host controls and the host track.
+ */
 export default class HostView {
 
     playBtn = document.getElementById("play-btn") as HTMLDivElement;
@@ -23,6 +23,7 @@ export default class HostView {
 
     songsContainer = document.getElementById("songs-container") as HTMLDivElement;
 
+    // Menu buttons
     importSongs = document.getElementById("import-songs") as HTMLInputElement;
     newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
     latencyBtn = document.getElementById("latency-btn") as HTMLDivElement;
@@ -32,48 +33,36 @@ export default class HostView {
     loginBtn = document.getElementById("login") as HTMLDivElement;
     exportProject = document.getElementById("export-project") as HTMLInputElement;
 
-
     aboutBtn = document.getElementById("about-btn") as HTMLDivElement;
     aboutCloseBtn = document.getElementById("about-close-button") as HTMLDivElement;
     aboutWindow = document.getElementById("about-window") as HTMLDivElement;
 
     /**
-     * Update the timer of the host view.
+     * Updates the timer of the host view.
      *
-     * @param pos current pos of the playhead. It is used to calculate the time.
+     * @param pos - The current pos of the playhead. It is used to calculate the time.
      */
-    updateTimer(pos: number) {
+    public updateTimer(pos: number) {
         let millseconds = (pos / audioCtx.sampleRate) * 1000;
-        this.timer.innerHTML = this.millisToMinutesAndSeconds(millseconds);
-    }
-
-    updateTimerFromXPos(xPos: number) {
-        let pos = (xPos * RATIO_MILLS_BY_PX) / 1000 *audioCtx.sampleRate;
-        this.updateTimer(pos);
+        this.timer.innerHTML = HostView.millisToMinutesAndSeconds(millseconds);
     }
 
     /**
-     * Convert milliseconds to minutes and seconds.
+     * Updates the timer of the host view from the x position of the playhead.
      *
-     * @param millis milliseconds to convert
+     * @param pos - The position of the playhead in pixels.
      */
-    millisToMinutesAndSeconds(millis: number) {
-        const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, millis)),
-            parts = [
-                d.getUTCHours(),
-                d.getUTCMinutes(),
-                d.getUTCSeconds()
-            ];
-        return parts.map(s => String(s).padStart(2, '0')).join(':') + "." + String(d.getMilliseconds()).padStart(3, '0');
+    public updateTimerByPixelsPos(pos: number) {
+        this.updateTimer((pos * RATIO_MILLS_BY_PX) / 1000 *audioCtx.sampleRate);
     }
 
     /**
-     * Change the icon of the play button when the user press it.
-     * @param playing
+     * Changes the icon of the play button when the user press it.
+     *
+     * @param playing - true if the track is playing, false otherwise.
+     * @param stop - true if the track is stopped, false otherwise.
      */
-    pressPlayButton(playing: boolean, stop: boolean) {
-        // let imgPlay = document.getElementById("play-img") as HTMLImageElement;
-        // let imgPause = document.getElementById("pause-img") as HTMLImageElement;
+    public updatePlayButton(playing: boolean, stop: boolean) {
         let tooltip = this.playBtn.firstElementChild as HTMLSpanElement;
 
         if (playing) {
@@ -91,10 +80,11 @@ export default class HostView {
     }
 
     /**
-     * Change the icon of the loop button when the user press it.
-     * @param looping
+     * Changes the icon of the loop button when the user press it.
+     *
+     * @param looping - true if the track is looping, false otherwise.
      */
-    pressLoopButton(looping: boolean) {
+    public updateLoopButton(looping: boolean) {
         let tooltip = this.loopBtn.firstElementChild as HTMLSpanElement;
 
         if (looping) {
@@ -108,10 +98,11 @@ export default class HostView {
     }
 
     /**
-     * Change the icon of the record button when the user press it.
-     * @param recording
+     * Changes the icon of the record button when the user press it.
+     *
+     * @param recording - true if the track is recording, false otherwise.
      */
-    pressRecordingButton(recording: boolean) {
+    public updateRecordButton(recording: boolean) {
         let tooltip = this.recordBtn.firstElementChild as HTMLSpanElement;
 
         if (recording) {
@@ -125,10 +116,11 @@ export default class HostView {
     }
 
     /**
-     * Change the icon of the mute button when the user press it.
-     * @param muted
+     * Changes the icon of the mute button when the user press it.
+     *
+     * @param muted - true if the track is muted, false otherwise.
      */
-    pressMuteButton(muted: boolean) {
+    public updateMuteButton(muted: boolean): void {
         let tooltip = this.muteBtn.firstElementChild as HTMLSpanElement;
 
         if (muted) {
@@ -140,11 +132,31 @@ export default class HostView {
         }
     }
 
-    createNewSongItem(name: string) {
+    /**
+     * Creates a new song item in the songs' container. It is used to display the songs in the dropdown menu.
+     *
+     * @param name - The name of the song.
+     */
+    public createNewSongItem(name: string): HTMLAnchorElement {
         let item = document.createElement("a");
         item.classList.add("dropdown-item");
         item.innerHTML = name;
         this.songsContainer.appendChild(item);
         return item;
+    }
+
+    /**
+     * Converts milliseconds to minutes and seconds.
+     *
+     * @param millis - The milliseconds to convert.
+     */
+    private static millisToMinutesAndSeconds(millis: number) {
+        const d = new Date(Date.UTC(0, 0, 0, 0, 0, 0, millis)),
+            parts = [
+                d.getUTCHours(),
+                d.getUTCMinutes(),
+                d.getUTCSeconds()
+            ];
+        return parts.map(s => String(s).padStart(2, '0')).join(':') + "." + String(d.getMilliseconds()).padStart(3, '0');
     }
 }

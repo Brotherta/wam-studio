@@ -1,21 +1,20 @@
 import Track from "../Models/Track";
 import BPF from "../Components/BPF";
 
-
 /**
  * Class for the automation view. This class is responsible for displaying the automation menu and the automation bpf.
  */
 export default class AutomationView {
 
-    automationMenu = document.getElementById("automation-menu") as HTMLDivElement;
-    itemList = document.getElementById("list-automation") as HTMLElement;
-    automationContainer = document.getElementById("automation-container") as HTMLDivElement;
+    public automationMenu = document.getElementById("automation-menu") as HTMLDivElement;
+    public itemList = document.getElementById("list-automation") as HTMLElement;
+    public automationContainer = document.getElementById("automation-container") as HTMLDivElement;
 
     /**
-     * Open the automation menu next to the track.
-     * @param track the track to which the automation menu is associated.
+     * Opens the automation menu next to the track.
+     * @param track - The track to which the automation menu is associated.
      */
-    openAutomationMenu(track: Track) {
+    public openAutomationMenu(track: Track): void {
         let trackElement = track.element;
         let bd = trackElement.getBoundingClientRect();
         this.automationMenu.style.transform = `translate(${bd.left + bd.width - 15}px, ${bd.top+15}px)`;
@@ -23,20 +22,21 @@ export default class AutomationView {
     }
 
     /**
-     * Close the automation menu.
+     * Closes the automation menu. The menu is hidden.
      */
-    closeAutomationMenu() {
+    public closeAutomationMenu(): void {
         this.automationMenu.hidden = true;
     }
 
     /**
-     * Create an item in the automation menu.
+     * Creates an item in the automation menu.
      *
-     * @param text the text of the item.
-     * @param id the id of the item.
-     * @param callback the callback for the onclick event.
+     * @param text - The text of the item.
+     * @param id - The id of the item.
+     * @param callback - The callback function when the item is clicked.
+     * @param active - Whether the item is active or not.
      */
-    createItem(text: string, id: string, callback: any, active: boolean = false) {
+    public createItem(text: string, id: string, callback: any, active: boolean = false): void {
         let el = document.createElement("li");
         el.id = id;
         el.className = "automation-item";
@@ -62,9 +62,9 @@ export default class AutomationView {
     }
 
     /**
-     * Clear the automation menu.
+     * Clears the automation menu.
      */
-    clearMenu() {
+    public clearMenu(): void {
         this.automationMenu.innerHTML = '';
         this.itemList = document.createElement("ul");
         this.itemList.id = "list-automation";
@@ -72,11 +72,11 @@ export default class AutomationView {
     }
 
     /**
-     * Add a bpf placeholder to the automation container.
+     * Adds a bpf placeholder to the automation container.
      *
-     * @param trackId the id of the track to which the bpf is associated.
+     * @param trackId - The id of the track to which the bpf is associated.
      */
-    addAutomationBpf(trackId: number) {
+    public addAutomationBpf(trackId: number): void {
         let automationLocation = document.createElement("div");
         automationLocation.className = "automation-location";
         automationLocation.id = "automation-"+ trackId;
@@ -84,20 +84,21 @@ export default class AutomationView {
     }
 
     /**
-     * Remove the bpf placeholder from the automation container.
+     * Removes the bpf placeholder from the automation container.
+     *
      * @param trackId the id of the track to which the bpf is associated.
      */
-    removeAutomationBpf(trackId: number) {
+    public removeAutomationBpf(trackId: number): void {
         document.getElementById(`automation-${trackId}`)?.remove();
     }
 
     /**
-     * Mount the bpf to the automation bpf placeholder.
+     * Mounts the bpf to the automation bpf placeholder.
      *
-     * @param trackId the id of the track to which the bpf is associated.
-     * @param bpf the bpf to mount.
+     * @param trackId - The id of the track to which the bpf is associated.
+     * @param bpf - The bpf to mount.
      */
-    mountBpf(trackId: number, bpf: any) {
+    public mountBpf(trackId: number, bpf: BPF): void {
         let location = document.getElementById(`automation-${trackId}`);
         if (location !== null) {
             location.classList.add("event-active");
@@ -107,11 +108,11 @@ export default class AutomationView {
     }
 
     /**
-     * Hide the bpf placeholder.
+     * Hides the bpf placeholder. The bpf is not removed from the DOM.
      *
-     * @param trackId the id of the track to which the bpf is associated.
+     * @param trackId - The id of the track to which the bpf is associated.
      */
-    hideBpf(trackId: number) {
+    public hideBpf(trackId: number): void {
         let location = document.getElementById(`automation-${trackId}`);
         if (location !== null) {
             location.classList.remove("event-active");
@@ -119,7 +120,13 @@ export default class AutomationView {
         }
     }
 
-    updateWidthBPF(trackId:number, width: number) {
+    /**
+     * Updates the width of the bpf.
+     *
+     * @param trackId - The id of the track to which the bpf is associated.
+     * @param width - The new width of the bpf.
+     */
+    public updateBPFWidth(trackId:number, width: number): void {
         let location = document.getElementById(`automation-${trackId}`);
         if (location !== null && location.children.length > 0) {
             const bpf = location.firstChild as BPF;

@@ -77,12 +77,9 @@ export default class Loader {
         let project = {
             "host": {
                 "version": APP_VERSION,
-                "timer": this.app.host.timer,
                 "playhead": this.app.host.playhead,
                 "muted": this.app.host.isMuted,
                 "volume": this.app.host.volume,
-                "playing": this.app.hostController.playing,
-                "recording": this.app.recorderController.recording,
                 "trackAcc": this.app.tracksController.trackIdCount,
                 "regionAcc": this.app.regionsController.regionIdCounter,
                 "plugin": pluginHostState
@@ -109,10 +106,9 @@ export default class Loader {
 
         let tracksJson = project.tracks;
 
-        this.app.hostController.playing = false;
-        this.app.hostController.stopAll();
+        this.app.host.playing = false;
+        this.app.hostController.stopAllTracks();
         this.app.tracksController.clearAllTracks();
-        this.app.host.timer = 0;
         this.app.host.playhead = 0;
         this.app.tracksController.trackIdCount = 1;
         this.app.host.setVolume(project.host.volume);

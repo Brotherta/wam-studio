@@ -8,11 +8,9 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 export default class RecorderController {
 
     app: App;
-    recording: boolean;
 
     constructor(app: App) {
         this.app = app;
-        this.recording = false;
     }
 
     /**
@@ -102,7 +100,7 @@ export default class RecorderController {
      * @param playhead - The current playhead position.
      */
     startRecording(track: Track, playhead: number) {
-        this.recording = true;
+        this.app.host.recording = true;
         track.mergerNode.connect(track.node!);
 
         let start = (playhead / audioCtx.sampleRate) * 1000;
@@ -173,7 +171,7 @@ export default class RecorderController {
      * @param track
      */
     stopRecording(track: Track) {
-        this.recording = false;
+        this.app.host.recording = false;
         track.worker?.postMessage({
             command: "stopAndSendAsBuffer"
         });
@@ -199,7 +197,7 @@ export default class RecorderController {
         }
         else {
             track.element.unArm();
-            if (this.app.hostController.playing) {
+            if (this.app.host.playing) {
                 this.stopRecording(track);
             }
             track.worker?.terminate();
@@ -213,22 +211,17 @@ export default class RecorderController {
     /**
      * Toggles the recording status of the controller.
      */
-    clickRecord() {
-        if (this.recording) {
-            this.stopRecordingAllTracks();
-            this.recording = false;
-            this.app.hostController.clickOnPlayButton();
-        }
-        else {
+    record() {
+        const recording = !this.app.host.recording;
+        this.app.host.recording = recording;
+        if (recording) {
             let armed = this.app.tracksController.trackList.find((e) => e.isArmed);
             if (armed === undefined) {
                 alert("No track armed");
                 return;
             }
-
-            this.recording = true;
-            if (!this.app.hostController.playing) {
-                this.app.hostController.clickOnPlayButton(true);
+            if (!this.app.host.playing) {
+                this.app.hostController.play(true);
             }
             for (let track of this.app.tracksController.trackList) {
                 if (track.isArmed) {
@@ -236,7 +229,11 @@ export default class RecorderController {
                 }
             }
         }
-        this.app.hostView.pressRecordingButton(this.recording);
+        else {
+            this.stopRecordingAllTracks();
+            this.app.hostController.play();
+        }
+        this.app.hostView.updateRecordButton(recording);
     }
 
     /**

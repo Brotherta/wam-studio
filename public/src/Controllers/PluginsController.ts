@@ -27,6 +27,9 @@ export default class PluginsController {
         this.selectPlugins();
         this.defineMinimizeMaximizeListener();
         this.defineNewPluginBtnListener();
+        this.view.mainTrack.addEventListener("click", () => {
+            this.selectHost();
+        });
     }
 
 
@@ -181,7 +184,7 @@ export default class PluginsController {
             host.gainNode.disconnect(audioCtx.destination);
             host.gainNode
                 .connect(host.plugin.instance!._audioNode)
-                .connect(host.audioCtx.destination);
+                .connect(audioCtx.destination);
         }
         else {
             track.node!.disconnect(track.pannerNode);
@@ -203,7 +206,7 @@ export default class PluginsController {
         if (track.plugin.initialized && track.id === -1) {
             let host = track as Host;
             host.gainNode.disconnect(host.plugin.instance!._audioNode);
-            host.gainNode.connect(host.audioCtx.destination);
+            host.gainNode.connect(audioCtx.destination);
         }
         else if (track.plugin.initialized) {
             track.node!.disconnect(track.plugin.instance!._audioNode);

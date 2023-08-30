@@ -2,6 +2,7 @@ import App from "../../App";
 import EditorView from "../../Views/Editor/EditorView";
 import {RATIO_MILLS_BY_PX, updateRatioMillsByPx} from "../../Utils/Variables";
 import {audioCtx} from "../../index";
+import VuMeter from "../../Components/VuMeterElement";
 
 /**
  * Interface of the custom event of the ScrollBarElement.
@@ -26,33 +27,35 @@ export default class EditorController {
      * View of the editor.
      */
     private _view: EditorView;
-
-    /**
-     * Minimum ratio of pixels by milliseconds.
-     * @private
-     */
-    private readonly MIN_RATIO = 1;
-    /**
-     * Maximum ratio of pixels by milliseconds.
-     * @private
-     */
-    private readonly MAX_RATIO = 500;
-    /**
-     * Number of zoom step.
-     * @private
-     */
-    private readonly ZOOM_STEPS = 12;
-
     /**
      * Timeout for the zoom to be rendered. Contains the callback of the final render for the waveforms.
-     * @private
      */
     private _timeout: NodeJS.Timeout;
     /**
      * Pointer to the current zoom level.
-     * @private
      */
     private _currentLevel = 5;
+    /**
+     * Last zoom level executed.
+     */
+    private _lastExecutedZoom = 0
+
+    /**
+     * Minimum ratio of pixels by milliseconds.
+     */
+    private readonly MIN_RATIO = 1;
+    /**
+     * Maximum ratio of pixels by milliseconds.
+     */
+    private readonly MAX_RATIO = 500;
+    /**
+     * Number of zoom step.
+     */
+    private readonly ZOOM_STEPS = 12;
+    /**
+     * Last zoom level executed.
+     */
+    private readonly THROTTLE_TIME = 10;
 
     constructor(app: App) {
         this._view = app.editorView;
@@ -126,7 +129,20 @@ export default class EditorController {
             this._view.dragCover.hidden = true;
         }
         window.addEventListener("wheel", (e) => {
-            this._view.handleWheel(e);
+            const currentTime = Date.now();
+            if (currentTime - this._lastExecutedZoom < this.THROTTLE_TIME) return;
+
+            this._lastExecutedZoom = currentTime;
+
+            const isMac = navigator.platform.toUpperCase().includes('MAC');
+            if (isMac && e.metaKey || !isMac && e.ctrlKey) {
+                const zoomIn = e.deltaY > 0;
+                if (zoomIn) this._app.editorController.zoomIn(e.deltaY);
+                else this._app.editorController.zoomOut(e.deltaY*-1);
+            }
+            else {
+                this._view.handleWheel(e);
+            }
         });
         this._view.horizontalScrollbar.addEventListener("change", (e: ScrollEvent) => {
             this._view.handleHorizontalScroll(e);

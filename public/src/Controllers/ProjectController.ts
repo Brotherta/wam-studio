@@ -20,13 +20,13 @@ export default class ProjectController {
         this.checkLogin();
     }
 
-    async openSaveProject() {
+    openSaveProject() {
         this.app.projectView.mountSave();
         this.initSaveProject();
         this.app.projectView.show();
     }
 
-    async openLoadProject() {
+    openLoadProject() {
         this.app.projectView.mountLoad();
         this.initLoadProject();
         this.app.projectView.show();
@@ -38,9 +38,9 @@ export default class ProjectController {
         this.app.projectView.show();
     }
 
-    async openLogin() {
+    openLogin() {
         this.app.projectView.mountLogin();
-        await this.initLogin();
+        this.initLogin();
         this.app.projectView.show();
     }
 

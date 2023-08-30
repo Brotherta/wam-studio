@@ -15,12 +15,10 @@ import {MAX_DURATION_SEC} from "../Utils/Variables";
 export default class Host extends Track {
 
     app: App;
-    audioCtx: AudioContext;
     hostGroupId: string = "";
 
     oldGlobalVolume: number;
     globalVolume: number;
-    timer: number;
     playhead: number;
 
     latency: number = 0;
@@ -28,21 +26,28 @@ export default class Host extends Track {
     hostNode: AudioPlayerNode | undefined;
     override gainNode: GainNode;
     pluginWAM: any;
+
+    muted: boolean;
+    playing: boolean;
+    recording: boolean;
+    looping: boolean;
     
     constructor(app: App) {
         super(-1, new TrackElement(), undefined);
         this.app = app;
-        this.audioCtx = audioCtx;
         this.globalVolume = 0.5;
-        this.oldGlobalVolume = 0.0;
-        this.timer = 0;
+        this.oldGlobalVolume = this.globalVolume
         this.playhead = 0;
 
+        this.muted = false;
+        this.playing = false;
+        this.recording = false;
+        this.looping = false;
+
+        this.setVolume(1);
         this.plugin = new Plugin(app);
-        
-        this.gainNode = this.audioCtx.createGain()
-        this.setVolume(1);    
-        this.gainNode.connect(this.audioCtx.destination);
+        this.gainNode = audioCtx.createGain()
+        this.gainNode.connect(audioCtx.destination);
     }
 
     /**
@@ -55,7 +60,7 @@ export default class Host extends Track {
 
         const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
         const {default: AudioPlayerNode} = await import("../Audio/AudioNode");
-        await this.audioCtx.audioWorklet.addModule(new URL('../Audio/HostProcessor.js', import.meta.url));
+        await audioCtx.audioWorklet.addModule(new URL('../Audio/HostProcessor.js', import.meta.url));
 
         const [hostGroupId] = await initializeWamHost(audioCtx);
         this.hostGroupId = hostGroupId;
@@ -63,9 +68,8 @@ export default class Host extends Track {
         let audio = audioCtx.createBuffer(2, 3600 * audioCtx.sampleRate, audioCtx.sampleRate)
         const operableAudioBuffer = Object.setPrototypeOf(audio, OperableAudioBuffer.prototype) as OperableAudioBuffer;
         
-        this.hostNode = new AudioPlayerNode(this.audioCtx, 2);
+        this.hostNode = new AudioPlayerNode(audioCtx, 2);
         this.hostNode.setAudio(operableAudioBuffer.toArray());
-        this.app.hostController.initVuMeter();
 
         this.hostNode.port.onmessage = ev => {
             if (ev.data.playhead) {
@@ -79,14 +83,6 @@ export default class Host extends Track {
 
         }
         this.gainNode.connect(this.hostNode);
-    }
-
-    updateBufferDuration() {
-        if (this.hostNode) {
-            let audio = audioCtx.createBuffer(2, MAX_DURATION_SEC * audioCtx.sampleRate, audioCtx.sampleRate)
-            const operableAudioBuffer = Object.setPrototypeOf(audio, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-            this.hostNode.setAudio(operableAudioBuffer.toArray());
-        }
     }
 
     /**

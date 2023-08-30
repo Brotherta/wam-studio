@@ -149,6 +149,24 @@ export default class RegionsController {
     }
 
     /**
+     * Get the maximum duration of all the regions in the editor.
+     *
+     * @returns The maximum duration of all the regions in the editor.
+     */
+    public getMaxDurationRegions(): number {
+        let maxTime = 0;
+        for (let track of this._app.tracksController.trackList) {
+            for (let region of track.regions) {
+                let end = region.start*1000 + region.duration;
+                if (end > maxTime) {
+                    maxTime = end;
+                }
+            }
+        }
+        return maxTime;
+    }
+
+    /**
      * Binds the event of a regionView. Used when a new regionView is created.
      *
      * @param region - The data object of the region.

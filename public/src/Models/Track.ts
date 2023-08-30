@@ -18,8 +18,6 @@ export default class Track {
     gainNode: GainNode;
     pannerNode: StereoPannerNode;
 
-    monitorSlitterNode: ChannelSplitterNode;
-    panRecNode: StereoPannerNode;
     micRecNode: MediaStreamAudioSourceNode | undefined;
 
     splitterNode: ChannelSplitterNode;

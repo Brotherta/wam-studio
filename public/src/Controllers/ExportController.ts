@@ -7,103 +7,175 @@ import AudioNode from "../Audio/AudioNode";
 import AutomationController from "./AutomationController";
 import {bufferToWave, combineBuffers, downloadBlob} from "../Audio/Utils/audioBufferToWave";
 
-
+/**
+ * Controller class that binds the events of the exporter.
+ */
 export default class ExporterController {
 
-    app: App;
+    /**
+     * Route Application.
+     */
+    _app: App;
 
     constructor(app: App) {
-        this.app = app;
+        this._app = app;
     }
 
-    async exportSongs(masterTrack: boolean, tracksIds: number[], name: string) {
+    /**
+     * Exports the project to audio files. If masterTrack is true, it will export the master track.
+     *
+     * @param masterTrack - If true, it will export the master track.
+     * @param tracksIds - List of tracks ID to export.
+     * @param name - Name of the project that will prefix the name of the files.
+     */
+    public async exportSongs(masterTrack: boolean, tracksIds: number[], name: string): Promise<void> {
+        // Check if there are no tracks to export and if so, return early.
         if (!masterTrack && tracksIds.length === 0) {
             return;
         }
+        // Set default name if empty.
         if (name == "") name = "project";
 
         let buffers = [];
-        let maxDuration = this.app.hostController.getMaxDurationRegions();
+
+        // Check if there's content to export.
+        let maxDuration = this._app.regionsController.getMaxDurationRegions();
         if (maxDuration == 0) {
             alert("You can't export nothing...");
             return;
         }
 
-        const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
+        const { default: initializeWamHost } = await import("@webaudiomodules/sdk/src/initializeWamHost");
 
-        for (let track of this.app.tracksController.trackList) {
-            console.log("Exporting track " + track.id);
-
-            let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate);
-            const [hostGroupId] = await initializeWamHost(offlineCtx);
-            let {
-                gainNode,
-                pannerNode,
-                sourceNode,
-                plugin
-            } = await this.rebuildTrackGraph(offlineCtx, track, hostGroupId);
-
-            if (plugin.initialized) {
-                sourceNode.connect(plugin.instance?._audioNode!).connect(gainNode).connect(pannerNode).connect(offlineCtx.destination);
-                this.applyAutomation(track, plugin, offlineCtx); // TODO: Doesn't work on offline audio context. Must investigate.
+        // Process and export individual tracks.
+        for (let track of this._app.tracksController.trackList) {
+            let buffer = await this.processTrack(track, maxDuration, initializeWamHost);
+            if (buffer) buffers.push(buffer);
+            if (tracksIds.includes(track.id)) {
+                this.exportTrackBuffer(buffer, `${name}_track_${track.element.name}.wav`);
             }
-            else {
-                sourceNode.connect(gainNode).connect(pannerNode).connect(offlineCtx.destination);
-            }
-            sourceNode.start();
-
-            let renderedBuffer = await offlineCtx.startRendering()
-            let blob = bufferToWave(renderedBuffer);
-            buffers.push(renderedBuffer);
-
-            gainNode.disconnect();
-            pannerNode.disconnect();
-            sourceNode.disconnect();
-            plugin.instance?._audioNode.disconnect();
-            plugin.instance?._audioNode.disconnect();
-            plugin.unloadPlugin();
-
-            if (!tracksIds.includes(track.id)) continue;
-            downloadBlob(blob, `${name}_track_${track.element.name}.wav`);
         }
 
+        // Process and export the master track if requested.
         if (masterTrack) {
-            console.log("Exporting track master");
-
-            let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate);
-            let masterBuffer = combineBuffers(buffers);
-
-            const masterGainNode = offlineCtx.createGain();
-            masterGainNode.gain.value = this.app.host.gainNode.gain.value;
-
-            let masterSourceNode = offlineCtx.createBufferSource();
-            masterSourceNode.buffer = masterBuffer;
-
-            masterSourceNode.connect(masterGainNode).connect(offlineCtx.destination);
-            masterSourceNode.start();
-
-            let renderedBuffer = await offlineCtx.startRendering()
-            let blob = bufferToWave(renderedBuffer);
-
-            masterGainNode.disconnect();
-            masterSourceNode.disconnect();
-
-            downloadBlob(blob, `${name}_master.wav`);
+            await this.exportMasterTrack(buffers, name, maxDuration);
         }
     }
 
-    async rebuildTrackGraph(offlineCtx: OfflineAudioContext, track: Track, hostGroupId: string) {
+    /**
+     * Processes a track and return its audio buffer.
+     *
+     * @param track - Track to process.
+     * @param maxDuration - Maximum duration of the track.
+     * @param initializeWamHost - Function to initialize the WAM host.
+     *
+     * @returns The audio buffer of the track.
+     */
+    private async processTrack(track: Track, maxDuration: number, initializeWamHost: any): Promise<AudioBuffer> {
+        console.log("Exporting track " + track.id);
+
+        // Create offline audio context.
+        let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate);
+        const [hostGroupId] = await initializeWamHost(offlineCtx);
+
+        // Rebuild the track graph.
+        let {
+            gainNode,
+            pannerNode,
+            sourceNode,
+            plugin
+        } = await this.rebuildTrackGraph(offlineCtx, track, hostGroupId);
+
+        // Connect nodes based on plugin initialization state.
+        if (plugin.initialized) {
+            sourceNode.connect(plugin.instance?._audioNode!).connect(gainNode).connect(pannerNode).connect(offlineCtx.destination);
+            // this.applyAutomation(track, plugin, offlineCtx); // TODO: Fix for offline audio context.
+        } else {
+            sourceNode.connect(gainNode).connect(pannerNode).connect(offlineCtx.destination);
+        }
+
+        // Start source node and render.
+        sourceNode.start();
+        let renderedBuffer = await offlineCtx.startRendering();
+
+        // Clean up connections.
+        gainNode.disconnect();
+        pannerNode.disconnect();
+        sourceNode.disconnect();
+        plugin.instance?._audioNode.disconnect();
+        plugin.unloadPlugin();
+
+        return renderedBuffer;
+    }
+
+    /**
+     * Processes and export the master track.
+     *
+     * @param buffers - List of buffers to combine.
+     * @param name - Name of the project.
+     * @param maxDuration - Maximum duration of the track.
+     *
+     * @returns The audio buffer of the master track.
+     */
+    private async exportMasterTrack(buffers: AudioBuffer[], name: string, maxDuration: number): Promise<void> {
+        console.log("Exporting track master");
+
+        let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate);
+        let masterBuffer = combineBuffers(buffers);
+
+        // Create master gain and source nodes.
+        const masterGainNode = offlineCtx.createGain();
+        masterGainNode.gain.value = this._app.host.gainNode.gain.value;
+
+        let masterSourceNode = offlineCtx.createBufferSource();
+        masterSourceNode.buffer = masterBuffer;
+
+        // Connect nodes, start, and render.
+        masterSourceNode.connect(masterGainNode).connect(offlineCtx.destination);
+        masterSourceNode.start();
+
+        let renderedBuffer = await offlineCtx.startRendering();
+
+        // Clean up connections.
+        masterGainNode.disconnect();
+        masterSourceNode.disconnect();
+
+        this.exportTrackBuffer(renderedBuffer, `${name}_master.wav`);
+    }
+
+    /**
+     * Export a given audio buffer as a WAV file.
+     *
+     * @param buffer - Audio buffer to export.
+     * @param fileName - Name of the file.
+     * @private
+     */
+    private exportTrackBuffer(buffer: AudioBuffer, fileName: string): void {
+        let blob = bufferToWave(buffer);
+        downloadBlob(blob, fileName);
+    }
+
+    /**
+     * Rebuilds the track graph to export it. It will create a new gain node, panner node and source node.
+     * It uses an offline audio context to render the track. It also creates a new plugin instance if the track has one.
+     *
+     * @param offlineCtx - Offline audio context to render the track.
+     * @param track - Track to export.
+     * @param hostGroupId - Host group ID.
+     * @private
+     */
+    private async rebuildTrackGraph(offlineCtx: OfflineAudioContext, track: Track, hostGroupId: string) {
         let gainNode = offlineCtx.createGain();
         let pannerNode = offlineCtx.createStereoPanner();
         let sourceNode = offlineCtx.createBufferSource();
-        let plugin = new Plugin(this.app);
+        let plugin = new Plugin(this._app);
 
         sourceNode.buffer = track.audioBuffer as AudioBuffer;
         gainNode.gain.value = track.gainNode.gain.value;
         pannerNode.pan.value = track.pannerNode.pan.value;
 
         if (track.plugin.initialized) {
-            await plugin.initPlugin(this.app.host.pluginWAM, audioCtx, offlineCtx, hostGroupId)
+            await plugin.initPlugin(this._app.host.pluginWAM, audioCtx, offlineCtx, hostGroupId)
             document.getElementById("loading-zone")!.appendChild(plugin.dom);
             let state = await track.plugin.instance!._audioNode.getState();
             if (state.current.length > 0) {
@@ -113,7 +185,16 @@ export default class ExporterController {
         return {gainNode, pannerNode, sourceNode, plugin};
     }
 
-    applyAutomation(track:Track, plugin: Plugin, offlineAudioContext: OfflineAudioContext) {
+    /**
+     * Applies the automation to the plugin.
+     * TODO: Doesn't work on offline audio context. Must investigate.
+     *
+     * @param track - Track to export.
+     * @param plugin - Plugin to apply the automation.
+     * @param offlineAudioContext - Offline audio context to render the track.
+     * @private
+     */
+    private applyAutomation(track:Track, plugin: Plugin, offlineAudioContext: OfflineAudioContext) {
         plugin.instance?._audioNode.clearEvents();
         let automation = track.automation;
         let events = [];
@@ -138,92 +219,4 @@ export default class ExporterController {
         // @ts-ignore
         plugin.instance?._audioNode.scheduleEvents(...events);
     }
-
-    // bufferToWave(abuffer: AudioBuffer) {
-    //     var numOfChan = abuffer.numberOfChannels,
-    //         length = abuffer.length * numOfChan * 2 + 44,
-    //         buffer = new ArrayBuffer(length),
-    //         view = new DataView(buffer),
-    //         channels = [], i, sample,
-    //         offset = 0,
-    //         pos = 0;
-    //
-    //     // write WAVE header
-    //     setUint32(0x46464952);                         // "RIFF"
-    //     setUint32(length - 8);                         // file length - 8
-    //     setUint32(0x45564157);                         // "WAVE"
-    //
-    //     setUint32(0x20746d66);                         // "fmt " chunk
-    //     setUint32(16);                                 // length = 16
-    //     setUint16(1);                                  // PCM (uncompressed)
-    //     setUint16(numOfChan);
-    //     setUint32(abuffer.sampleRate);
-    //     setUint32(abuffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
-    //     setUint16(numOfChan * 2);                      // block-align
-    //     setUint16(16);                                 // 16-bit (hardcoded in this demo)
-    //
-    //     setUint32(0x61746164);                         // "data" - chunk
-    //     setUint32(length - pos - 4);                   // chunk length
-    //
-    //     // write interleaved data
-    //     for (i = 0; i < abuffer.numberOfChannels; i++)
-    //         channels.push(abuffer.getChannelData(i));
-    //
-    //     while (pos < length) {
-    //         for (i = 0; i < numOfChan; i++) {           // interleave channels
-    //             sample = Math.max(-1, Math.min(1, channels[i][offset])); // clamp
-    //             sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0; // scale to 16-bit signed int
-    //             view.setInt16(pos, sample, true);        // write 16-bit sample
-    //             pos += 2;
-    //         }
-    //         offset++                                     // next source sample
-    //     }
-    //
-    //     // create Blob
-    //     return new Blob([view], { type: "audio/wav" });
-    //
-    //     function setUint16(data: number) {
-    //         view.setUint16(pos, data, true);
-    //         pos += 2;
-    //     }
-    //
-    //     function setUint32(data: number) {
-    //         view.setUint32(pos, data, true);
-    //         pos += 4;
-    //     }
-    // }
 }
-
-// function combineBuffers(buffers: AudioBuffer[]) {
-//     // Get the max length from all buffers
-//     let maxLength = Math.max(...buffers.map(buffer => buffer.length));
-//
-//     // Create a new buffer with the max length
-//     let outputBuffer = audioCtx.createBuffer(
-//         buffers[0].numberOfChannels,
-//         maxLength,
-//         buffers[0].sampleRate
-//     );
-//
-//     // For each buffer, for each channel, copy the data into the outputBuffer
-//     buffers.forEach(buffer => {
-//         for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
-//             let outputData = outputBuffer.getChannelData(channel);
-//             let inputData = buffer.getChannelData(channel);
-//
-//             for (let i = 0; i < inputData.length; i++) {
-//                 outputData[i] += inputData[i];
-//             }
-//         }
-//     });
-//     return outputBuffer;
-// }
-//
-// function downloadBlob(blob: Blob, fileName: string) {
-//     const url = URL.createObjectURL(blob);
-//     const link = document.createElement("a");
-//     link.href = url;
-//     link.download = fileName;
-//     link.click();
-//     link.remove();
-// }

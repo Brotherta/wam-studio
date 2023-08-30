@@ -48,10 +48,10 @@ export default class SettingsController {
         this.defineListeners();
     }
 
+    public openSettings() {
+        this.view.settingsWindow.hidden = false;
+    }
     defineListeners() {
-        this.app.hostView.settingsBtn.addEventListener("click", () => {
-            this.view.settingsWindow.hidden = false;
-        });
         this.view.closeBtn.addEventListener("click", () => {
             this.view.settingsWindow.hidden = true;
         });

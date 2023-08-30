@@ -33,4 +33,31 @@ export default class WamAudioWorkletNode extends WamNode {
     removeAudio() {
         this.port.postMessage({"removeAudio": true})
     }
+
+    play() {
+        const playingParam = this.parameters.get("playing");
+        if (playingParam) {
+            playingParam.value = 1;
+        } else {
+            console.error('Parameter "playing" does not exist.');
+        }
+    }
+
+    pause() {
+        const playingParam = this.parameters.get("playing");
+        if (playingParam) {
+            playingParam.value = 0;
+        } else {
+            console.error('Parameter "playing" does not exist.');
+        }
+    }
+
+    loop(active: boolean) {
+        const loopingParam = this.parameters.get("looping");
+        if (loopingParam) {
+            loopingParam.value = active ? 1 : 0;
+        } else {
+            console.error('Parameter "looping" does not exist.');
+        }
+    }
 }

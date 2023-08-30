@@ -1,7 +1,6 @@
 import {app} from "../index";
 
 const trackDiv = document.getElementById("track-container") as HTMLDivElement;
-const playhead = document.getElementById("playhead") as HTMLDivElement;
 const automationController = document.getElementById("automation-container") as HTMLElement;
 
 class DraggableWindow {
