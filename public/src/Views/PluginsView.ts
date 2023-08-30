@@ -4,7 +4,6 @@ import {focusWindow} from "../Controllers/StaticController";
 
 export default class PluginsView {
 
-    resizeBtn = document.getElementById("resize-btn") as HTMLDivElement;
     maxMinBtn = document.getElementById("min-max-btn") as HTMLDivElement;
     rack = document.getElementById("plugin-editor") as HTMLDivElement;
     newPlugin = document.getElementById("add-plugins") as HTMLDivElement;
@@ -16,74 +15,73 @@ export default class PluginsView {
     closeWindowButton = document.getElementById("plugin-close-button") as HTMLDivElement;
     mainTrack = document.getElementById("main-track") as HTMLDivElement;
     minMaxIcon = document.getElementById("min-max-icon") as HTMLImageElement;
-
     loadingZone = document.getElementById("loading-zone") as HTMLDivElement;
 
-    maxHeight: number;
-    minHeight: number;
-    originalHeight: number;
-
-    // private dragging: boolean;
-    maximized: boolean;
-    pluginMounted: boolean = false;
-    windowOpened: boolean = false;
-
-    constructor() {
-        this.minHeight = 25;
-        this.maxHeight = 180;
-        this.minimize();
-    }
+    /**
+     * If the window is opened or not.
+     */
+    public windowOpened: boolean = false;
+    /**
+     * If the rack is maximized or not.
+     */
+    public maximized: boolean;
 
     /**
-     * Maximize the rack to the maximum height and change the icon to minimize.
+     * The maximum height of the rack.
+     */
+    private readonly MAX_HEIGHT: number = 25;
+    /**
+     * The minimum height of the rack.
+     */
+    private readonly MIN_HEIGHT: number = 180;
+
+    /**
+     * Maximizes the rack to the maximum height and change the icon to minimize.
      */
     maximize() {
         this.minMaxIcon.className = "arrow-down-icon";
-        this.rack.style.minHeight = this.maxHeight + "px";
+        this.rack.style.minHeight = this.MAX_HEIGHT + "px";
     }
 
     /**
-     * Minimize the rack to the minimum height and change the icon to maximize.
+     * Minimizes the rack to the minimum height and change the icon to maximize.
      */
     minimize() {
         this.minMaxIcon.className = "arrow-up-icon";
-        this.rack.style.minHeight = this.minHeight+"px";
+        this.rack.style.minHeight = this.MIN_HEIGHT+"px";
     }
 
     /**
-     * Remove the plugin's view from the DOM and mount the current track's plugin's view.
-     * @param track
+     * Mounts the plugin's view in the DOM.
+     * @param track - The track whom plugin will be mounted.
      */
     showPlugins(track: Track) {
-        // this.deletePluginView()
         this.mount.appendChild(track.plugin.dom);
-        this.pluginMounted = true;
     }
 
     /**
-     * Remove the plugin's view from the DOM.
+     * Removes the plugin's view from the DOM.
      */
     deletePluginView() {
         this.mount.innerHTML = '';
-        this.pluginMounted = false;
     }
 
     /**
-     * Hide the new plugins button.
+     * Hides the new plugins button.
      */
-    hideNew() {
+    hideNewButton() {
         this.newPlugin.hidden = true;
     }
 
     /**
-     * Show the new plugins button.
+     * Shows the new plugins button.
      */
     showNew() {
         this.newPlugin.hidden = false;
     }
 
     /**
-     * Show the floating window with the plugin's view.
+     * Shows the floating window with the plugin's view.
      */
     showFloatingWindow() {
         this.floating.hidden = false;
@@ -92,7 +90,7 @@ export default class PluginsView {
     }
 
     /**
-     * Hide the floating window with the plugin's view.
+     * Hides the floating window with the plugin's view.
      */
     hideFloatingWindow() {
         this.floating.hidden = true;
@@ -100,66 +98,68 @@ export default class PluginsView {
     }
 
     /**
-     * Show the show plugin button.
+     * Shows the show plugin button.
      */
     showShowPlugin() {
         this.showPlugin.hidden = false;
     }
 
     /**
-     * Hide the show plugin button.
+     * Hides the show plugin button.
      */
-    hideShowPlugin() {
+    hideShowButton() {
         this.showPlugin.hidden = true;
     }
 
     /**
-     * Show the hide plugin button.
+     * Shows the hide plugin button.
      */
     showHidePlugin() {
         this.hidePlugin.hidden = false;
     }
 
     /**
-     * Hide the hide plugin button.
+     * Hides the hide plugin button.
      */
-    hideHidePlugin() {
+    hideHideButton() {
         this.hidePlugin.hidden = true;
     }
 
     /**
-     * Show the remove plugin button.
+     * Shows the remove plugin button.
      */
     showRemovePlugin() {
         this.removePlugin.hidden = false;
     }
 
     /**
-     * Hide the remove plugin button.
+     * Hides the remove plugin button.
      */
-    hideRemovePlugin() {
+    hideRemoveButton() {
         this.removePlugin.hidden = true;
     }
 
     /**
-     * Select the main track and set the border to lightgrey.
+     * Selects the main track and set the border to lightgrey.
      */
     selectHost() {
         this.mainTrack.style.border = "1px solid lightgrey";
     }
 
     /**
-     * Unselect the main track and set the border to black.
+     * Unselects the main track and set the border to black.
      */
     unselectHost() {
         this.mainTrack.style.border = "1px solid black";
     }
 
-    async movePluginLoadingZone(track: Track) {
+    /**
+     * Moves the plugin's view of the given track to the loading zone.
+     * @param track - The track to move the plugin's view from.
+     */
+    movePluginLoadingZone(track: Track) {
         if (track.plugin.initialized) {
             this.loadingZone.appendChild(track.plugin.dom);
-            // @ts-ignore
-            await track.plugin.dom._isConnected;
         }
     }
 }

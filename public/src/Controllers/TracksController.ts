@@ -78,7 +78,7 @@ export default class TracksController {
      * @param track Track to be removed from the track view.
      */
     removeTrack(track: Track) {
-        this.app.pluginsController.removePlugins(track);
+        this.app.pluginsController.removePedalBoard(track);
         this.view.removeTrack(track.element);
         this.app.tracksController.deleteTrack(track);
         this.app.waveformController.removeWaveformOfTrack(track);
@@ -174,7 +174,7 @@ export default class TracksController {
             this.app.recorderController.clickMerge(track);
         }
         track.element.fxBtn.onclick = () => {
-            this.app.pluginsController.handleFxClick(track);
+            this.app.pluginsController.fxButtonClicked(track);
         }
     }
 
@@ -350,7 +350,7 @@ export default class TracksController {
 
     clearAllTracks() {
         for (let track of this.trackList) {
-            this.app.pluginsController.removePlugins(track);
+            this.app.pluginsController.removePedalBoard(track);
             this.view.removeTrack(track.element);
             this.app.waveformController.removeWaveformOfTrack(track);
             this.app.automationView.removeAutomationBpf(track.id);

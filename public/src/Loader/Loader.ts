@@ -115,7 +115,7 @@ export default class Loader {
 
         if (project.host.plugin !== null) {
             await this.app.host.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
-            this.app.pluginsController.connectPlugin(this.app.host);
+            this.app.pluginsController.connectPedalBoard(this.app.host);
             this.app.pluginsView.movePluginLoadingZone(this.app.host);
             await this.app.host.plugin.instance?._audioNode.setState(project.host.plugin);
         }
@@ -147,7 +147,7 @@ export default class Loader {
             let plugins = trackJson.plugins;
             if (plugins !== null) {
                 await track.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
-                this.app.pluginsController.connectPlugin(track);
+                this.app.pluginsController.connectPedalBoard(track);
                 this.app.pluginsView.movePluginLoadingZone(track);
                 await track.plugin.instance?._audioNode.setState(plugins);
 

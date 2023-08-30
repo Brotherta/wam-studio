@@ -227,16 +227,16 @@ export default class HostController {
 
         // MENU BUTTONS
         this._view.exportProject.addEventListener("click", () => {
-            this._app.projectController.openExportProject();
+            this._app.projectController.openExportWindow();
         });
         this._view.saveBtn.addEventListener("click",  () => {
-            this._app.projectController.openSaveProject();
+            this._app.projectController.openSaveWindow();
         });
         this._view.loadBtn.addEventListener("click", () => {
-            this._app.projectController.openLoadProject();
+            this._app.projectController.openLoadWindow();
         });
         this._view.loginBtn.addEventListener("click",  () => {
-            this._app.projectController.openLogin();
+            this._app.projectController.openLoginWindow();
         });
         this._view.settingsBtn.addEventListener("click",   () => {
             this._app.settingsController.openSettings();

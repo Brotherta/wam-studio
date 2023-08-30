@@ -2,118 +2,162 @@ import App from "../App";
 import {BACKEND_URL} from "../Env";
 import ProjectView from "../Views/ProjectView";
 
-
+/**
+ * Controller for the project window. Handles saving, loading, exporting and logging in.
+ */
 export default class ProjectController {
 
-    app: App;
-    view: ProjectView;
-    
-    saved: boolean = true;
-    projectId: string = "";
-    projectName: string = "";
-    projectUser: string = "";
-    isLogged: boolean = false;
+    /**
+     * Application instance.
+     */
+    private _app: App;
+    /**
+     * View instance of the project window.
+     */
+    private _view: ProjectView;
+    /**
+     * Whether the user is logged in or not.
+     */
+    private _logged: boolean = false;
 
     constructor(app: App) {
-        this.app = app;
-        this.view = this.app.projectView;
+        this._app = app;
+        this._view = this._app.projectView;
         this.checkLogin();
+        this._view.closeBtn.addEventListener("click", () => this._view.close());
     }
 
-    openSaveProject() {
-        this.app.projectView.mountSave();
-        this.initSaveProject();
-        this.app.projectView.show();
+    /**
+     * Mounts the project window and shows the save project view.
+     * Binds the save project events.
+     */
+    public openSaveWindow(): void {
+        this._view.mountSave();
+        this.bindSaveEvents();
+        this._view.show();
     }
 
-    openLoadProject() {
-        this.app.projectView.mountLoad();
-        this.initLoadProject();
-        this.app.projectView.show();
+    /**
+     * Mounts the project window and shows the load project view.
+     * Binds the load project events.
+     */
+    public openLoadWindow(): void {
+        this._view.mountLoad();
+        this.bindLoadEvents();
+        this._view.show();
     }
 
-    openExportProject() {
-        this.app.projectView.mountExport();
-        this.initExportProject();
-        this.app.projectView.show();
+    /**
+     * Mounts the project window and shows the export project view.
+     * Binds the export project events.
+     */
+    public openExportWindow(): void {
+        this._view.mountExport();
+        this.bindExportEvents();
+        this._view.show();
     }
 
-    openLogin() {
-        this.app.projectView.mountLogin();
-        this.initLogin();
-        this.app.projectView.show();
+    /**
+     * Mounts the project window and shows the login view.
+     * Binds the login events.
+     */
+    public openLoginWindow(): void {
+        this._view.mountLogin();
+        this.bindLoginEvents();
+        this._view.show();
     }
 
-    initSaveProject() {
-        if (!this.app.projectView.saveElement.initialized) {
-            this.app.projectView.saveElement.initialized = true;
-            this.app.projectView.saveElement.saveProjectButton.addEventListener("click", async () => {
+    /**
+     * If the save element is not initialized, it will be initialized and the save button will be bound.
+     * @private
+     */
+    private bindSaveEvents(): void {
+        if (!this._view.saveElement.initialized) {
+            this._view.saveElement.initialized = true;
+            this._view.saveElement.saveProjectButton.addEventListener("click", async () => {
                 await this.saveProject();
             });
         }
     }
 
-    initLoadProject() {
-        if (!this.app.projectView.loadElement.initialized) {
-            this.app.projectView.loadElement.initialized = true;
+    /**
+     * If the load element is not initialized, it will be initialized and the load, delete and search buttons will be bound.
+     * @private
+     */
+    private bindLoadEvents(): void {
+        if (!this._view.loadElement.initialized) {
+            this._view.loadElement.initialized = true;
 
-            this.app.projectView.loadElement.loadButton.addEventListener("click", async () => {
+            this._view.loadElement.loadButton.addEventListener("click", async () => {
                 await this.loadProject();
             });
 
-            this.app.projectView.loadElement.deleteButton.addEventListener("click", async () => {
+            this._view.loadElement.deleteButton.addEventListener("click", async () => {
                 await this.deleteProject();
             });
 
-            this.app.projectView.loadElement.searchButton.addEventListener("click", async () => {
+            this._view.loadElement.searchButton.addEventListener("click", async () => {
                 await this.searchProject();
             });
         }
     }
 
-    initExportProject() {
-        let exportElement = this.app.projectView.exportElement;
+    /**
+     * If the export element is not initialized, it will be initialized and the export button will be bound.
+     * @private
+     */
+    private bindExportEvents(): void {
+        let exportElement = this._view.exportElement;
         if (!exportElement.initialized) {
             exportElement.initialized = true;
             exportElement.exportBtn.addEventListener("click", async () => {
                 let trackIds = exportElement.getSelectedTracks();
                 let masterTrack = exportElement.isMasterTrackSelected();
                 let name = exportElement.nameInput.value;
-                await this.app.exportController.exportSongs(masterTrack, trackIds, name);
+                await this._app.exportController.exportSongs(masterTrack, trackIds, name);
             });
         }
         exportElement.setTitle("export project");
-        exportElement.update(this.app.tracksController.trackList);
+        exportElement.update(this._app.tracksController.trackList);
     }
 
-    initLogin() {
-        if (!this.app.projectView.loginElement.initialized) {
-            this.app.projectView.loginElement.initialized = true;
+    /**
+     * If the login element is not initialized, it will be initialized and the login and logout buttons will be bound.
+     * @private
+     */
+    private bindLoginEvents(): void {
+        if (!this._view.loginElement.initialized) {
+            this._view.loginElement.initialized = true;
 
-            this.app.projectView.loginElement.logInButton.addEventListener("click", async () => {
-                await this.login();
+            this._view.loginElement.logInButton.addEventListener("click",  () => {
+                this.login();
             });
 
-            this.app.projectView.loginElement.logOutButton.addEventListener("click", async () => {
-                await this.logout();
+            this._view.loginElement.logOutButton.addEventListener("click",  () => {
+                this.logout();
             });
         }
-        this.app.projectView.updateLogin(this.isLogged);
+        this._view.updateLogin(this._logged);
     }
 
-    async saveProject(override: boolean = false) {
+    /**
+     * Save the project to the backend. If the project already exists, the user will be asked if he wants to override it.
+     * If the user accepts, the project will be saved with the override flag set to true.
+     *
+     * @param override - Whether the project should be overridden or not.
+     * @private
+     */
+    private async saveProject(override: boolean = false): Promise<void> {
         let url = BACKEND_URL + "/projects";
 
-        let user = this.app.projectView.saveElement.user.value;
-        let project = this.app.projectView.saveElement.project.value;
+        let user = this._view.saveElement.user.value;
+        let project = this._view.saveElement.project.value;
         if (user === "" || project === "") {
-            this.app.projectView.saveElement.showError("Please fill in all fields");
+            this._view.saveElement.showError("Please fill in all fields");
             return;
         }
-        this.projectUser = user;
-        this.projectName = project;
 
-        let data = await this.app.loader.saveProject();
+        let data = await this._app.loader.saveProject();
         let wavs = data.wavs;
 
         let response = await fetch(url, {
@@ -130,25 +174,29 @@ export default class ProjectController {
         });
         if (response.status === 201) {
             let json = await response.json();
-            this.projectId = json.id;
             this.uploadWav(json.id, wavs);
         }
         else if (response.status === 400 && !override) {
             let json = await response.json();
             let message = `Project "${project}", last edited : ${json.date}, already exists, do you want to override it?`;
-            this.app.projectView.saveElement.showConfirm(message, async () => {
+            this._view.saveElement.showConfirm(message, async () => {
                 await this.saveProject(true);
             });
         }
         else {
-            this.app.projectView.saveElement.showError("Error while saving project");
+            this._view.saveElement.showError("Error while saving project");
         }
     }
 
-    async searchProject() {
+    /**
+     * Searches for the project in the backend and adds the results to the load view.
+     * If the user and project fields are empty, all projects will be returned.
+     * @private
+     */
+    private async searchProject(): Promise<void> {
         let url = BACKEND_URL + "/projects";
-        let user = this.app.projectView.loadElement.userInput.value;
-        let project = this.app.projectView.loadElement.projectInput.value;
+        let user = this._view.loadElement.userInput.value;
+        let project = this._view.loadElement.projectInput.value;
         let query = "";
         if (user !== "" || project !== "") {
             query = `/search?user=${user}&project=${project}`;
@@ -158,123 +206,144 @@ export default class ProjectController {
         });
         if (response.status === 200) {
             let responseData = await response.json();
-            this.app.projectView.loadElement.addResults(responseData);
+            this._view.loadElement.addResults(responseData);
         }
         else if (response.status === 400) {
             console.log("Something went wrong");
         }
     }
 
-    async loadProject() {
-        if (this.app.projectView.loadElement.selectedProject !== "") {
-            let url = BACKEND_URL + "/projects/" + this.app.projectView.loadElement.selectedProject;
+    /**
+     * Loads the project from the backend. If the project does not exist, an error will be shown.
+     * It loads the project from the backend and then calls the loader to load the project.
+     * @private
+     */
+    private async loadProject(): Promise<void> {
+        if (this._view.loadElement.selectedProject !== "") {
+            let url = BACKEND_URL + "/projects/" + this._view.loadElement.selectedProject;
             let response = await fetch(url);
             if (response.status === 200) {
                 let responseData = await response.json();
-
-                this.projectId = responseData.id;
-                this.projectName = responseData.project;
-                this.projectUser = responseData.user;
-                this.saved = true;
-                await this.app.loader.loadProject(responseData);
-                this.app.projectView.close();
+                await this._app.loader.loadProject(responseData);
+                this._view.close();
             }
         }
     }
 
-    async deleteProject() {
-        if (this.app.projectView.loadElement.selectedProject !== "") {
-            let url = BACKEND_URL + "/projects/" + this.app.projectView.loadElement.selectedProject;
+    /**
+     * Deletes the project from the backend. If the project does not exist, an error will be shown.
+     * @private
+     */
+    private async deleteProject(): Promise<void> {
+        if (this._view.loadElement.selectedProject !== "") {
+            let url = BACKEND_URL + "/projects/" + this._view.loadElement.selectedProject;
             let response = await fetch(url, {
                 method: "DELETE",
                 credentials: "include"
             });
             if (response.status === 200) {
-                this.app.projectView.loadElement.selectedProject = "";
-                this.app.projectView.loadElement.userInput.value = "";
-                this.app.projectView.loadElement.projectInput.value = "";
-                this.app.projectView.loadElement.searchButton.click();
+                this._view.loadElement.selectedProject = "";
+                this._view.loadElement.userInput.value = "";
+                this._view.loadElement.projectInput.value = "";
+                this._view.loadElement.searchButton.click();
             }
         }
     }
 
-    async login() {
-        if (!this.isLogged) {
-            let url = BACKEND_URL + "/login";
-            let user = this.app.projectView.loginElement.user.value;
-            let password = this.app.projectView.loginElement.password.value;
-            let response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                body: JSON.stringify({
-                    "username": user,
-                    "password": password
-                })
-            });
+    /**
+     * Logins the user to the backend. If the user is already logged in, nothing will happen.
+     * If the user is not logged in, the user and password fields will be read and a request will be sent to the backend.
+     * @private
+     */
+    private login(): void {
+        if (this._logged) return
+        let url = BACKEND_URL + "/login";
+        let user = this._view.loginElement.user.value;
+        let password = this._view.loginElement.password.value;
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                "username": user,
+                "password": password
+            })
+        }).then(response => {
             if (response.status === 200) {
-                this.isLogged = true;
-                this.app.projectView.loginElement.showInfo("Login successful");
+                this._logged = true;
+                this._view.loginElement.showInfo("Login successful");
             }
             else if (response.status === 401) {
-                this.app.projectView.loginElement.showError("Wrong username or password");
-                this.app.projectView.loginElement.password.value = "";
+                this._view.loginElement.showError("Wrong username or password");
+                this._view.loginElement.password.value = "";
             }
-        }
-        this.app.projectView.updateLogin(this.isLogged);
+
+            this._view.updateLogin(this._logged);
+        });
     }
 
-    async logout() {
-        if (this.isLogged) {
-            let url = BACKEND_URL + "/logout";
-            let response = await fetch(url, {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
+    /**
+     * Logouts the user from the backend. If the user is not logged in, nothing will happen.
+     * @private
+     */
+    private logout(): void {
+        if (!this._logged) return;
+        let url = BACKEND_URL + "/logout";
+        fetch(url, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
             if (response.status === 200) {
-                this.isLogged = false;
-                this.app.projectView.loginElement.showInfo("Logout successful");
-                this.app.projectView.loginElement.password.value = "";
+                this._logged = false;
+                this._view.loginElement.showInfo("Logout successful");
+                this._view.loginElement.password.value = "";
             }
             else if (response.status === 401) {
-                this.app.projectView.loginElement.showError("Logout failed");
+                this._view.loginElement.showError("Logout failed");
             }
-        }
-        this.app.projectView.updateLogin(this.isLogged);
+            this._view.updateLogin(this._logged);
+        });
     }
 
-    async checkLogin() {
+    /**
+     * Checks if the user is logged in and updates the login button accordingly.
+     * @private
+     */
+    private checkLogin(): void {
         let url = BACKEND_URL + "/verify";
-        let response = await fetch(url, {
+        fetch(url, {
             method: "GET",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             }
-        });
-        if (response.status === 200) {
-            this.isLogged = true;
-        }
-        else if (response.status === 401) {
-            this.isLogged = false;
-        }
-        this.app.projectView.login.innerText = this.isLogged ? "Log out" : "Log in";
+        }).then(response => {
+            this._logged = response.status === 200;
+            this._view.login.innerText = this._logged ? "Log out" : "Log in";
+        })
     }
 
-    uploadWav(projectId: string, wavs: { blob: Blob; name: string }[]) {
+    /**
+     * Uploads the waves files to the backend. If the upload is successful, the project will be saved.
+     *
+     * @param projectId - The id of the project.
+     * @param waves - The waves to upload.
+     * @private
+     */
+    private uploadWav(projectId: string, waves: { blob: Blob; name: string }[]): void {
         let url = BACKEND_URL + "/projects/" + projectId + "/audio";
 
-        let totalSize = wavs.reduce((sum, wav) => sum + wav.blob.size, 0);
-        let loadedSizes = Array(wavs.length).fill(0);
+        let totalSize = waves.reduce((sum, wav) => sum + wav.blob.size, 0);
+        let loadedSizes = Array(waves.length).fill(0);
 
-        let uploadsRemaining = wavs.length;
+        let uploadsRemaining = waves.length;
 
-        wavs.forEach((wav, index) => {
+        waves.forEach((wav, index) => {
             let formData = new FormData();
             formData.append('audio', wav.blob, wav.name);
 
@@ -291,7 +360,7 @@ export default class ProjectController {
                     console.log(`Total upload progress: ${percentComplete}%`);
 
                     // Assuming 'saveProjectElement' is the reference to your SaveProjectElement instance
-                    this.app.projectView.saveElement.progress(percentComplete, totalLoaded, totalSize);
+                    this._view.saveElement.progress(percentComplete, totalLoaded, totalSize);
                 }
             });
             // Event listener for when the upload is done
@@ -302,9 +371,8 @@ export default class ProjectController {
 
                     uploadsRemaining--;
                     if (uploadsRemaining <= 0) {
-                        this.app.projectView.saveElement.showInfo("Project saved!");
-                        this.saved = true;
-                        this.app.projectView.saveElement.progressDone(); // Hide the progress bar when all uploads are done
+                        this._view.saveElement.showInfo("Project saved!");
+                        this._view.saveElement.progressDone(); // Hide the progress bar when all uploads are done
                     }
                 } else {
                     // If the request failed
@@ -320,43 +388,4 @@ export default class ProjectController {
             xhr.send(formData);
         });
     }
-
-
-    /*    uploadWav(projectId: string, wavs: { blob: Blob; name: string }[]) {
-            let url = BACKEND_URL + "/projects/" + projectId + "/audio";
-
-            wavs.forEach((wav: any) => {
-                let formData = new FormData();
-                formData.append('audio', wav.blob, wav.name);
-
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', url, true);
-                xhr.withCredentials = true
-
-                xhr.addEventListener('progress', (e) => {
-                    if (e.lengthComputable) {
-                        const percentComplete = e.loaded / e.total;
-                        console.log(`Audio ${wav.name} upload progress: ${percentComplete}%`);
-                    }
-                });
-
-                // Event listener for when the upload is done
-                xhr.addEventListener('load', async () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        // When the audio has been uploaded
-                        console.log(`Audio ${wav.name} uploaded to ${xhr.responseText}`);
-                    } else {
-                        // If the request failed
-                        console.log(`Failed to upload audio ${wav.name}: ${xhr.statusText}`);
-                    }
-                });
-
-                // Error listener
-                xhr.addEventListener('error', () => {
-                    console.log(`Failed to upload audio ${wav.name}: ${xhr.statusText}`);
-                });
-
-                xhr.send(formData);
-            });
-        }*/
 }

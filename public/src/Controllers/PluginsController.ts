@@ -22,151 +22,34 @@ export default class PluginsController {
         this.hostTrack = this.app.host;
         this.selectedTrack = undefined;
 
-        this.hideAllControllers();
-
+        this.hideAllButtons();
         this.selectPlugins();
-        this.defineMinimizeMaximizeListener();
-        this.defineNewPluginBtnListener();
+        this.bindEvents();
         this.view.mainTrack.addEventListener("click", () => {
             this.selectHost();
         });
-    }
-
-
-    /**
-     * Define the listeners for the minimize and maximize buttons.
-     */
-    defineMinimizeMaximizeListener() {
-        this.view.maximized = false;
-        this.view.maxMinBtn.addEventListener("click", () => {
-            if (this.view.maximized) {
-                this.view.minimize();
-                this.view.maximized = false;
-                this.app.editorView.resizeCanvas();
-            }
-            else {
-                this.view.maximize();
-                this.view.maximized = true;
-                this.app.editorView.resizeCanvas();
-            }
-        });
+        this.view.minimize();
     }
 
     /**
-     * Define the listeners for all the buttons in the plugins view.
+     * Adds a new pedalboard to the selected track.
      */
-    defineNewPluginBtnListener() {
-        this.view.newPlugin.addEventListener("click", async () => {
-            if (!this.selectedTrack) return;
-            this.view.hideNew();
-            await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
-            this.app.pluginsController.connectPlugin(this.selectedTrack);
-            this.selectPlugins();
-        });
-
-        this.view.removePlugin.addEventListener("click", () => {
-            if (this.selectedTrack !== undefined) {
-                this.removePlugins(this.selectedTrack);
-            }
-        });
-
-        this.view.showPlugin.addEventListener("click", () => {
-            this.showPedalboard();
-        });
-
-        this.view.hidePlugin.addEventListener("click", () => {
-            this.hidePedalBoard();
-        });
-
-        this.view.closeWindowButton.addEventListener("click", () => {
-            this.hidePedalBoard();
-        })
-    }
-
-    /**
-     * Select the clicked track and show the plugins of the track.
-     * @param track
-     */
-    selectTrack(track: Track) {
-        if (this.selectedTrack === undefined) {
-            this.selectedTrack = track;
-            this.selectedTrack.element.select();
-            this.selectPlugins();
-        }
-        else if (this.selectedTrack.id !== track.id) {
-            this.selectedTrack.element.unSelect();
-            this.view.unselectHost();
-            this.selectedTrack = track;
-            this.selectedTrack.element.select();
-            this.selectPlugins();
-        }
-    }
-
-    /**
-     * Select the main track and show the plugins of the main track.
-     */
-    selectHost() {
-        let host = this.app.host;
-        if (this.selectedTrack === undefined) {
-            this.selectedTrack = host;
-            this.view.selectHost();
-            this.selectPlugins();
-        }
-        else if (this.selectedTrack.id !== host.id) {
-            this.selectedTrack.element.unSelect();
-            this.selectedTrack = host;
-            this.view.selectHost();
-            this.selectPlugins();
-        }
-    }
-
-    /**
-     * Select the plugins of the selected track.
-     */
-    selectPlugins() {
-        if (this.selectedTrack === undefined) {
-            this.hideAllControllers();
-        }
-        else if (!this.selectedTrack.plugin.initialized) {
-            this.hideAllControllers();
-            this.view.showNew();
-        }
-        else {
-            this.app.tracksController.trackList.forEach(track => {
-                this.view.movePluginLoadingZone(track);
-            })
-            this.view.showPlugins(this.selectedTrack);
-            if (this.view.floating.hidden) {
-                this.hideAllControllers();
-                this.view.showShowPlugin();
-            }
-            else {
-                this.hideAllControllers();
-                this.view.showFloatingWindow();
-                this.view.showHidePlugin();
-            }
-            this.view.showRemovePlugin();
-        }
-    }
-
-    /**
-     * Hide all the controllers in the plugins view.
-     */
-    hideAllControllers() {
-        this.view.hideNew();
-        this.view.hideFloatingWindow();
-        this.view.hideShowPlugin();
-        this.view.hideRemovePlugin();
-        this.view.hideHidePlugin();
+    public async addPedalBoard(): Promise<void> {
+        if (!this.selectedTrack) return;
+        this.view.hideNewButton();
+        await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
+        this.app.pluginsController.connectPedalBoard(this.selectedTrack);
+        this.selectPlugins();
+        this.showPedalBoard();
     }
 
     /**
      * Remove the plugins of the given track.
      * @param track
      */
-    removePlugins(track: Track) {
+    public removePedalBoard(track: Track): void {
         track.plugin.instance?._audioNode.clearEvents();
-        this.app.pluginsController.disconnectPlugin(track);
+        this.app.pluginsController.disconnectPedalBoard(track);
         track.plugin.unloadPlugin();
         this.view.deletePluginView();
         if (this.selectedTrack === track) {
@@ -176,9 +59,9 @@ export default class PluginsController {
 
     /**
      * Connects the plugin to the track. If the track is the host, it connects the plugin to the host gain node.
-     * @param track
+     * @param track - The track to connect.
      */
-    connectPlugin(track: Track) {
+    public connectPedalBoard(track: Track): void {
         if (track.id === -1) {
             let host = track as Host;
             host.gainNode.disconnect(audioCtx.destination);
@@ -200,9 +83,10 @@ export default class PluginsController {
 
     /**
      * Disconnects the plugin from the track. If the track is the host, it disconnects the plugin from the host gain node.
-     * @param track
+     *
+     * @param track - The track where the plugin is connected.
      */
-    disconnectPlugin(track: Track) {
+    public disconnectPedalBoard(track: Track): void {
         if (track.plugin.initialized && track.id === -1) {
             let host = track as Host;
             host.gainNode.disconnect(host.plugin.instance!._audioNode);
@@ -218,40 +102,161 @@ export default class PluginsController {
         }
     }
 
-    async addPedalboard() {
-        if (!this.selectedTrack) return;
-        this.view.hideNew();
-        await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
-        this.app.pluginsController.connectPlugin(this.selectedTrack);
-        this.selectPlugins();
-        this.showPedalboard();
+
+    /**
+     * Selects the clicked track and show the plugins of the track.
+     *
+     * @param track - The track that was clicked.
+     */
+    public selectTrack(track: Track): void {
+        if (this.selectedTrack === undefined) {
+            this.selectedTrack = track;
+            this.selectedTrack.element.select();
+            this.selectPlugins();
+        }
+        else if (this.selectedTrack.id !== track.id) {
+            this.selectedTrack.element.unSelect();
+            this.view.unselectHost();
+            this.selectedTrack = track;
+            this.selectedTrack.element.select();
+            this.selectPlugins();
+        }
     }
 
-    showPedalboard() {
-        this.view.showHidePlugin();
-        this.view.hideShowPlugin();
-        this.view.showFloatingWindow();
+    /**
+     * Selects the main track and show the plugins of the main track.
+     */
+    public selectHost(): void {
+        let host = this.app.host;
+        if (this.selectedTrack === undefined) {
+            this.selectedTrack = host;
+            this.view.selectHost();
+            this.selectPlugins();
+        }
+        else if (this.selectedTrack.id !== host.id) {
+            this.selectedTrack.element.unSelect();
+            this.selectedTrack = host;
+            this.view.selectHost();
+            this.selectPlugins();
+        }
     }
 
-    hidePedalBoard() {
-        this.view.showShowPlugin();
-        this.view.hideHidePlugin();
-        this.view.hideFloatingWindow();
-    }
-
-
-    async handleFxClick(track: Track) {
+    /**
+     * Handler for the FX button. It shows the plugins of the track or hides them if they are already shown.
+     *
+     * @param track - The track that was clicked.
+     */
+    public fxButtonClicked(track: Track): void {
         this.selectTrack(track);
         if (track.plugin.initialized) {
             if (this.view.windowOpened) {
                 this.hidePedalBoard();
             }
             else {
-                this.showPedalboard();
+                this.showPedalBoard();
             }
         }
         else {
-            await this.addPedalboard();
+            this.addPedalBoard();
         }
+    }
+
+    /**
+     * Binds the events of the plugins view.
+     * @private
+     */
+    private bindEvents(): void {
+        this.view.newPlugin.addEventListener("click", async () => {
+            if (!this.selectedTrack) return;
+            this.view.hideNewButton();
+            await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
+            this.app.pluginsController.connectPedalBoard(this.selectedTrack);
+            this.selectPlugins();
+        });
+        this.view.removePlugin.addEventListener("click", () => {
+            if (this.selectedTrack !== undefined) {
+                this.removePedalBoard(this.selectedTrack);
+            }
+        });
+        this.view.showPlugin.addEventListener("click", () => {
+            this.showPedalBoard();
+        });
+        this.view.hidePlugin.addEventListener("click", () => {
+            this.hidePedalBoard();
+        });
+        this.view.closeWindowButton.addEventListener("click", () => {
+            this.hidePedalBoard();
+        })
+        this.view.maxMinBtn.addEventListener("click", () => {
+            if (this.view.maximized) {
+                this.view.minimize();
+                this.view.maximized = false;
+                this.app.editorView.resizeCanvas();
+            } else {
+                this.view.maximize();
+                this.view.maximized = true;
+                this.app.editorView.resizeCanvas();
+            }
+        });
+    }
+
+    /**
+     * Selects the plugins of the selected track.
+     */
+    private selectPlugins(): void {
+        if (this.selectedTrack === undefined) { // No track selected
+            this.hideAllButtons();
+        }
+        else if (!this.selectedTrack.plugin.initialized) { // Track selected but no plugin initialized
+            this.hideAllButtons();
+            this.view.showNew();
+        }
+        else { // Track selected and plugin initialized
+            this.app.tracksController.trackList.forEach(track => { // Hide all plugins to the loading zone
+                this.view.movePluginLoadingZone(track);
+            })
+            this.view.showPlugins(this.selectedTrack); // Show the plugins of the selected track
+            if (this.view.floating.hidden) { // If the floating window is hidden, show the show button
+                this.hideAllButtons();
+                this.view.showShowPlugin();
+            }
+            else { // If the floating window is shown, show the hide button
+                this.hideAllButtons();
+                this.view.showFloatingWindow();
+                this.view.showHidePlugin();
+            }
+            this.view.showRemovePlugin();
+        }
+    }
+
+    /**
+     * Hides all the buttons in the plugins view.
+     */
+    private hideAllButtons(): void {
+        this.view.hideNewButton();
+        this.view.hideFloatingWindow();
+        this.view.hideShowButton();
+        this.view.hideRemoveButton();
+        this.view.hideHideButton();
+    }
+
+    /**
+     * Shows the pedalboard.
+     * @private
+     */
+    private showPedalBoard(): void {
+        this.view.showHidePlugin();
+        this.view.hideShowButton();
+        this.view.showFloatingWindow();
+    }
+
+    /**
+     * Hides the pedalboard.
+     * @private
+     */
+    private hidePedalBoard(): void {
+        this.view.showShowPlugin();
+        this.view.hideHideButton();
+        this.view.hideFloatingWindow();
     }
 }
