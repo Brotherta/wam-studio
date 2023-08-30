@@ -159,7 +159,7 @@ export default class RecorderController {
                             right[i / 2] = pcm[i + 1];
                         }
 
-                        this.app.regionsController.renderTemporaryRegion(region, track, audioBuffer, this.app.host.latency);
+                        this.app.regionsController.renderTemporaryRegion(region, track, audioBuffer);
                         track.modified = true;
                     }
                 }

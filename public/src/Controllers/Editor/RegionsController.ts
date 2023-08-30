@@ -109,51 +109,26 @@ export default class RegionsController {
         const waveformView = this._editorView.getWaveFormViewById(track.id);
         if (waveformView === undefined) throw new Error("Waveform not found");
 
-        const regionView = waveformView.getRegionView(region.id);
+        const regionView = waveformView.getRegionViewById(region.id);
         if (regionView === undefined) throw new Error("RegionView not found");
 
-        const latency = this._app.host.latency;
         region.buffer = region.buffer.concat(buffer);
         region.duration = region.buffer.duration;
 
-        if (region.start - latency < 0) {
-            let diff = region.start - latency;
-            if (diff >= 0) {
-                region.start = 0;
-            }
-            else {
-                diff = -diff;
-                region.buffer = region.buffer.split(diff * audioCtx.sampleRate / 1000)[1]!;
-                region.duration -= diff / 1000;
-            }
-        }
-        else {
-            region.start -= latency;
-        }
         waveformView.removeRegionView(regionView);
-        const newRegionView = waveformView!.createRegionView(region);
-
-        return {region, newRegionView};
+        return waveformView!.createRegionView(region);
     }
 
     /**
+     * Updates the last piece of buffer in the region buffer and create the associated region view.
+     * Then it binds the region view events and add the new region.
      *
-     *
-     * @param region
-     * @param track
-     * @param buffer
-     * @param latency
+     * @param region - The temporary region tu update.
+     * @param track - The track where the region is.
+     * @param buffer - The new buffer for the region.
      */
-    public renderTemporaryRegion(region: Region, track: Track, buffer: OperableAudioBuffer, latency: number) {
-        let waveformView = this._editorView.getWaveFormViewById(track.id);
-        if (waveformView === undefined) throw new Error("Waveform not found");
-
-        let regionView = waveformView.getRegionView(region.id);
-        if (regionView === undefined) throw new Error("RegionView not found");
-
-        region.buffer = region.buffer.concat(buffer);
-        region.duration = region.buffer.duration;
-
+    public renderTemporaryRegion(region: Region, track: Track, buffer: OperableAudioBuffer) {
+        const latency = this._app.host.latency;
         if (region.start - latency < 0) {
             let diff = region.start - latency;
             if (diff >= 0) {
@@ -168,12 +143,8 @@ export default class RegionsController {
         else {
             region.start -= latency;
         }
-
-        waveformView.removeRegionView(regionView);
-        let newRegionView = waveformView!.createRegionView(region);
-
+        const newRegionView = this.updateTemporaryRegion(region, track, buffer);
         this._app.regionsController.bindRegionEvents(region, newRegionView);
-
         track.addRegion(region);
     }
 
