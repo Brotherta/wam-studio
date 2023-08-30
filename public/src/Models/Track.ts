@@ -26,9 +26,9 @@ export default class Track {
     volume: number = 0.50;
     oldVolume: number = 0.50;
 
-    isMuted: boolean = false;
-    isSolo: boolean = false;
-    isMonitored: boolean = false;
+    muted: boolean = false;
+    solo: boolean = false;
+    monitored: boolean = false;
 
     audioBuffer: OperableAudioBuffer | undefined;
     plugin: Plugin;
@@ -39,7 +39,7 @@ export default class Track {
     regions: Region[];
     modified: boolean;
 
-    isArmed: boolean = false;
+    armed: boolean = false;
     worker: Worker | undefined;
     sab: SharedArrayBuffer;
 

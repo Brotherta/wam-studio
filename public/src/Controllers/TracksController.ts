@@ -104,9 +104,9 @@ export default class TracksController {
 
         track.element.soloBtn.onclick = () => {
             this.app.pluginsController.selectTrack(track);
-            track.isSolo = !track.isSolo;
+            track.solo = !track.solo;
 
-            if (track.isSolo) {
+            if (track.solo) {
                 this.app.tracksController.setSolo(track);
                 track.element.solo();
             }
@@ -118,7 +118,7 @@ export default class TracksController {
 
         track.element.muteBtn.onclick = () => {
             this.app.pluginsController.selectTrack(track);
-            if (track.isMuted) {
+            if (track.muted) {
                 track.unmute();
                 track.element.unmute();
             }
@@ -126,7 +126,7 @@ export default class TracksController {
                 track.mute();
                 track.element.mute();
             }
-            track.isMuted = !track.isMuted;
+            track.muted = !track.muted;
         }
 
         track.element.volumeSlider.oninput = () => {
@@ -306,15 +306,15 @@ export default class TracksController {
         let isHostSolo = false;
 
         this.trackList.forEach(track => {
-            if (track.isSolo) {
+            if (track.solo) {
                 isHostSolo = true;
             }
         });
 
         if (!isHostSolo) {
             this.trackList.forEach(track => {
-                if (!track.isSolo) {
-                    if (track.isMuted) {
+                if (!track.solo) {
+                    if (track.muted) {
                         track.muteSolo();
                     }
                     else {
@@ -334,11 +334,11 @@ export default class TracksController {
      */
     setSolo(trackToSolo: Track) {
         this.trackList.forEach((track) => {
-            if (track !== trackToSolo && !track.isSolo) {
+            if (track !== trackToSolo && !track.solo) {
                 track.muteSolo();
             }
         });
-        if (!trackToSolo.isMuted) {
+        if (!trackToSolo.muted) {
             trackToSolo.unmute();
         }
     }

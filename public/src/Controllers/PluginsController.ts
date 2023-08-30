@@ -191,7 +191,7 @@ export default class PluginsController {
             track.node!
                 .connect(track.plugin.instance!._audioNode)
                 .connect(track.pannerNode);
-            if (track.isMonitored) {
+            if (track.monitored) {
                 track.mergerNode.disconnect(track.pannerNode);
                 track.mergerNode.connect(track.plugin.instance?._audioNode!);
             }
@@ -211,7 +211,7 @@ export default class PluginsController {
         else if (track.plugin.initialized) {
             track.node!.disconnect(track.plugin.instance!._audioNode);
             track.node!.connect(track.pannerNode);
-            if (track.isMonitored) {
+            if (track.monitored) {
                 track.mergerNode.disconnect(track.plugin.instance?._audioNode!);
                 track.mergerNode.connect(track.pannerNode);
             }

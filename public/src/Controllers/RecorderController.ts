@@ -58,7 +58,7 @@ export default class RecorderController {
      * @param track - The track to start monitoring.
      */
     startMonitoring(track: Track) {
-        if (track.isArmed) {
+        if (track.armed) {
             if (track.plugin.initialized) {
                 track.mergerNode.connect(track.plugin.instance?._audioNode!);
             } else {
@@ -86,7 +86,7 @@ export default class RecorderController {
      */
     stopRecordingAllTracks() {
         for (let track of this.app.tracksController.trackList) {
-            if (track.isArmed) {
+            if (track.armed) {
                 this.stopRecording(track);
             }
         }
@@ -187,9 +187,9 @@ export default class RecorderController {
      * @param track - The track to toggle the armed status of.
      */
     async clickArm(track: Track) {
-        track.isArmed = !track.isArmed;
+        track.armed = !track.armed;
 
-        if (track.isArmed) {
+        if (track.armed) {
             track.element.arm();
 
             await this.setupWorker(track);
@@ -202,7 +202,7 @@ export default class RecorderController {
             }
             track.worker?.terminate();
             track.node?.port.postMessage({"stopRecording": true});
-            if (track.isMonitored) {
+            if (track.monitored) {
                 this.stopMonitoring(track);
             }
         }
@@ -215,7 +215,7 @@ export default class RecorderController {
         const recording = !this.app.host.recording;
         this.app.host.recording = recording;
         if (recording) {
-            let armed = this.app.tracksController.trackList.find((e) => e.isArmed);
+            let armed = this.app.tracksController.trackList.find((e) => e.armed);
             if (armed === undefined) {
                 alert("No track armed");
                 return;
@@ -224,7 +224,7 @@ export default class RecorderController {
                 this.app.hostController.play(true);
             }
             for (let track of this.app.tracksController.trackList) {
-                if (track.isArmed) {
+                if (track.armed) {
                     this.startRecording(track, this.app.host.playhead);
                 }
             }
@@ -242,8 +242,8 @@ export default class RecorderController {
      * @param track - The track to toggle the monitoring status of.
      */
     clickMonitoring(track: Track) {
-        track.isMonitored = !track.isMonitored
-        if (track.isMonitored) {
+        track.monitored = !track.monitored
+        if (track.monitored) {
             track.element.monitorOn();
             this.startMonitoring(track);
         }

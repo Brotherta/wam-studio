@@ -48,6 +48,7 @@ export default class HostController {
         this.initializeDemoSongs();
         this.initializeVuMeter();
         this.bindEvents();
+        this.bindNodeListeners();
     }
 
     /**
@@ -111,8 +112,8 @@ export default class HostController {
     public mute(): void {
         const muted = !this._app.host.muted
         this._app.host.muted = muted;
-        if (muted) this._app.host.muteHost();
-        else this._app.host.unmuteHost();
+        if (muted) this._app.host.mute();
+        else this._app.host.unmute();
         this._view.updateMuteButton(muted);
     }
 
@@ -145,6 +146,28 @@ export default class HostController {
                         });
                 }
             }
+        }
+    }
+
+    /**
+     * Binds the events of the host node.
+     */
+    public bindNodeListeners(): void {
+        if (this._app.host.hostNode) {
+            this._app.host.hostNode.port.onmessage = ev => {
+                if (ev.data.playhead) {
+                    this._app.host.playhead = ev.data.playhead;
+                }
+                else if (ev.data.volume >= 0) {
+                    let vol = ev.data.volume;
+                    let sensitivity = 2.3;
+                    this.vuMeter.update(Math.abs(vol) * sensitivity);
+                }
+
+            }
+        }
+        else {
+            console.warn("Host node not initialized.");
         }
     }
 
@@ -230,6 +253,9 @@ export default class HostController {
         });
         this._view.newTrackInput.addEventListener('change', (e) => {
             this.importFilesSongs(e as InputEvent);
+        });
+        this._view.latencyBtn.addEventListener("click", () => {
+            this._app.latencyView.openWindow();
         });
     }
 

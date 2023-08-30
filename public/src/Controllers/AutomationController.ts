@@ -84,7 +84,7 @@ export default class AutomationController {
             })
             for (let param in params) {
                 let active = false;
-                let bpf = track.automation.getBpfOfparam(param);
+                let bpf = track.automation.getBpfOfParam(param);
                 if (bpf !== undefined && bpf.points.length > 0) {
                     active = true;
                 }
@@ -93,7 +93,7 @@ export default class AutomationController {
                     // @ts-ignore
                     params[param].nodeId,
                     () => {
-                        let bpf = track.automation.getBpfOfparam(param);
+                        let bpf = track.automation.getBpfOfParam(param);
                         if (bpf !== undefined) {
                             bpf.setSizeBPF(this._app.editorView.worldWidth);
                             this._view.mountBpf(track.id, bpf);

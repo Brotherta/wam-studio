@@ -30,7 +30,7 @@ export default class Loader {
                 pluginState = await track.plugin.instance!._audioNode.getState();
                 let parameters = await track.plugin.instance!._audioNode.getParameterInfo();
                 for (let param in parameters) {
-                    let bpf = track.automation.getBpfOfparam(param);
+                    let bpf = track.automation.getBpfOfParam(param);
                     if (bpf !== undefined) {
                         if (bpf.state.points.length > 0) {
                             automations.push({
@@ -63,8 +63,8 @@ export default class Loader {
                 "id": track.id,
                 "name": track.element.name,
                 "color": track.color,
-                "muted": track.isMuted,
-                "soloed": track.isSolo,
+                "muted": track.muted,
+                "soloed": track.solo,
                 "volume": track.volume,
                 "pan": track.pannerNode.pan.value,
                 "plugins": hasPlugin ? pluginState : null,
@@ -78,7 +78,7 @@ export default class Loader {
             "host": {
                 "version": APP_VERSION,
                 "playhead": this.app.host.playhead,
-                "muted": this.app.host.isMuted,
+                "muted": this.app.host.muted,
                 "volume": this.app.host.volume,
                 "trackAcc": this.app.tracksController.trackIdCount,
                 "regionAcc": this.app.regionsController.regionIdCounter,
@@ -134,7 +134,7 @@ export default class Loader {
                 track.element.mute();
             }
             if (trackJson.soloed) {
-                track.isSolo = true;
+                track.solo = true;
                 track.element.solo();
             }
 
@@ -169,7 +169,7 @@ export default class Loader {
 
                 let automations = trackJson.automations;
                 for (let automation of automations) {
-                    let bpf = track.automation.getBpfOfparam(automation.param);
+                    let bpf = track.automation.getBpfOfParam(automation.param);
                     if (bpf !== undefined) {
                         bpf.state = automation.state;
                     }

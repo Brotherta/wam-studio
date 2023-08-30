@@ -94,5 +94,6 @@ export default class App {
      */
     async initHost() {
         await this.host.initWAM()
+        this.hostController.bindNodeListeners();
     }
 }

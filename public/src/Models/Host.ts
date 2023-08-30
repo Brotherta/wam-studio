@@ -14,30 +14,51 @@ import {MAX_DURATION_SEC} from "../Utils/Variables";
  */
 export default class Host extends Track {
 
-    app: App;
-    hostGroupId: string = "";
+    /**
+     * Id of the host group.
+     */
+    public hostGroupId: string;
+    /**
+     * Playhead of the host.
+     */
+    public playhead: number;
+    /**
+     * Latency of the host.
+     */
+    public latency: number;
+    /**
+     * Host node.
+     */
+    public hostNode: AudioPlayerNode | undefined;
+    /**
+     * WAM instance.
+     */
+    public pluginWAM: any;
+    /**
+     * Boolean that indicates if the host is playing.
+     */
+    public playing: boolean;
+    /**
+     * Boolean that indicates if the host is recording.
+     */
+    public recording: boolean;
+    /**
+     * Boolean that indicates if the host is looping.
+     */
+    public looping: boolean;
 
-    oldGlobalVolume: number;
-    globalVolume: number;
-    playhead: number;
-
-    latency: number = 0;
-
-    hostNode: AudioPlayerNode | undefined;
-    override gainNode: GainNode;
-    pluginWAM: any;
-
-    muted: boolean;
-    playing: boolean;
-    recording: boolean;
-    looping: boolean;
+    /**
+     * Volume of the host for the mute and unmute.
+     */
+    private muteBeforeMute: number;
     
     constructor(app: App) {
         super(-1, new TrackElement(), undefined);
-        this.app = app;
-        this.globalVolume = 0.5;
-        this.oldGlobalVolume = this.globalVolume
+        this.volume = 0.5;
+        this.muteBeforeMute = this.volume
         this.playhead = 0;
+        this.latency = 0;
+        this.hostGroupId = "";
 
         this.muted = false;
         this.playing = false;
@@ -70,43 +91,6 @@ export default class Host extends Track {
         
         this.hostNode = new AudioPlayerNode(audioCtx, 2);
         this.hostNode.setAudio(operableAudioBuffer.toArray());
-
-        this.hostNode.port.onmessage = ev => {
-            if (ev.data.playhead) {
-                this.playhead = ev.data.playhead;
-            }
-            else if (ev.data.volume >= 0) {
-                let vol = ev.data.volume;
-                let sensitivity = 2.3;
-                this.app.hostController.vuMeter.update(Math.abs(vol) * sensitivity);
-            }
-
-        }
         this.gainNode.connect(this.hostNode);
-    }
-
-    /**
-     * Set the global volume of the host.
-     * 
-     * @param value the new global volume
-     */
-    override setVolume(value: number) {
-        this.globalVolume = value;
-        this.gainNode.gain.value = this.globalVolume;
-    }
-
-    /**
-     * Mute the host. It save the old global volume and set the global volume to 0.
-     */
-    muteHost() {
-        this.oldGlobalVolume = this.globalVolume;
-        this.setVolume(0);
-    }
-
-    /**
-     * Unmute the host. It set the global volume to the old global volume.
-     */
-    unmuteHost() {
-        this.setVolume(this.oldGlobalVolume);
     }
 }
