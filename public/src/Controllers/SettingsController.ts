@@ -6,7 +6,7 @@ import {audioCtx} from "../index";
 export default class SettingsController {
 
     app: App;
-    settingsView: SettingsView;
+    view: SettingsView;
 
     inputDevices: MediaDeviceInfo[];
     outputDevices: MediaDeviceInfo[];
@@ -17,7 +17,7 @@ export default class SettingsController {
 
     constructor(app: App) {
         this.app = app;
-        this.settingsView = app.settingsView;
+        this.view = app.settingsView;
         navigator.mediaDevices.getUserMedia({ audio: true }).then(() => {
             navigator.mediaDevices.enumerateDevices().then(devices => {
                 this.outputDevices = devices.filter(device => device.kind === "audiooutput");
@@ -31,8 +31,8 @@ export default class SettingsController {
                     this.selectedInputDevice = this.inputDevices[0];
                 }
 
-                this.settingsView.updateOutputDevices(this.outputDevices);
-                this.settingsView.updateInputDevices(this.inputDevices);
+                this.view.updateOutputDevices(this.outputDevices);
+                this.view.updateInputDevices(this.inputDevices);
 
                 this.constraints = {
                     audio: {
@@ -50,18 +50,18 @@ export default class SettingsController {
 
     defineListeners() {
         this.app.hostView.settingsBtn.addEventListener("click", () => {
-            this.settingsView.settingsWindow.hidden = false;
+            this.view.settingsWindow.hidden = false;
         });
-        this.settingsView.closeBtn.addEventListener("click", () => {
-            this.settingsView.settingsWindow.hidden = true;
+        this.view.closeBtn.addEventListener("click", () => {
+            this.view.settingsWindow.hidden = true;
         });
 
         navigator.mediaDevices.addEventListener("devicechange", async () => {
             const devices = await navigator.mediaDevices.enumerateDevices();
             let audioInputDevices = devices.filter(device => device.kind === "audioinput");
             let audioOutputDevices = devices.filter(device => device.kind === "audiooutput");
-            this.settingsView.updateInputDevices(audioInputDevices);
-            this.settingsView.updateOutputDevices(audioOutputDevices);
+            this.view.updateInputDevices(audioInputDevices);
+            this.view.updateOutputDevices(audioOutputDevices);
             if (audioInputDevices.find(device => device.deviceId === this.selectedInputDevice.deviceId) === undefined) {
                 this.selectedInputDevice = audioInputDevices[0];
                 this.changeInputDevice(this.selectedInputDevice.deviceId);
@@ -73,13 +73,13 @@ export default class SettingsController {
             }
         });
 
-        this.settingsView.selectInputDevice.addEventListener("change", () => {
-            this.selectedInputDevice = this.inputDevices.find(device => device.deviceId === this.settingsView.selectInputDevice.value)!;
+        this.view.selectInputDevice.addEventListener("change", () => {
+            this.selectedInputDevice = this.inputDevices.find(device => device.deviceId === this.view.selectInputDevice.value)!;
             this.changeInputDevice(this.selectedInputDevice.deviceId);
         });
 
-        this.settingsView.selectOutputDevice.addEventListener("change", () => {
-            this.selectedOutputDevice = this.outputDevices.find(device => device.deviceId === this.settingsView.selectOutputDevice.value)!;
+        this.view.selectOutputDevice.addEventListener("change", () => {
+            this.selectedOutputDevice = this.outputDevices.find(device => device.deviceId === this.view.selectOutputDevice.value)!;
             if (this.selectedOutputDevice !== undefined) {
                 this.changeOutputDevice(this.selectedOutputDevice.deviceId);
             }

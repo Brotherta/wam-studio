@@ -1,11 +1,8 @@
 import App from "../App";
 import JSZip from "jszip";
-import {bufferToWave} from "../Audio/Utils/audioBufferToFlac";
+import {bufferToWave} from "../Audio/Utils/audioBufferToWave";
 import APP_VERSION from "../version";
-import {BACKEND_URL} from "../Env";
-import * as path from "path";
 import {audioCtx} from "../index";
-import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 
 
 export default class Loader {
@@ -16,11 +13,7 @@ export default class Loader {
     }
 
     async saveProject() {
-        const zip = new JSZip();
-        const audio = zip.folder("audio")!;
-
         let wavs = [];
-        // TODO Total TRACK ACC
         let tracks = [];
 
         let pluginHostState = null;
@@ -49,12 +42,10 @@ export default class Loader {
                 }
             }
 
-            // TODO Total REGION ACC
             let regions = [];
             for (let region of track.regions) {
                 let name = `Track-${track.id}_Region-${region.id}.wav`
                 let blob = bufferToWave(region.buffer);
-                // audio.file(name, blob);
                 wavs.push({
                     "name": name,
                     "blob": blob
@@ -115,14 +106,6 @@ export default class Loader {
             alert("Incompatible project version");
             return;
         }
-        let muted = project.host.muted;
-        let volume = project.host.volume;
-        let playing = project.host.playing;
-        let recording = project.host.recording;
-        let timer = project.host.timer;
-        let playhead = project.host.playhead;
-        let trackAcc = project.host.trackAcc;
-        let regionAcc = project.host.regionAcc;
 
         let tracksJson = project.tracks;
 
@@ -141,13 +124,11 @@ export default class Loader {
             await this.app.host.plugin.instance?._audioNode.setState(project.host.plugin);
         }
 
-        // TODO WORKER FOR LOADING
         for (const trackJson of tracksJson) {
             let track = await this.app.tracksController.newEmptyTrack();
             track.id = trackJson.id;
 
             await this.app.tracksController.initTrackComponents(track);
-
 
             track.element.name = trackJson.name;
             track.element.trackNameInput.value = trackJson.name;

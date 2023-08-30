@@ -297,7 +297,6 @@ template.innerHTML = /*html*/`
 </div>
 <div id="color-div" class="track-color">
 </div>
-
 `
 
 export default class TrackElement extends HTMLElement {
@@ -321,7 +320,7 @@ export default class TrackElement extends HTMLElement {
         if (this.shadowRoot !== null) {
             this.shadowRoot.innerHTML = template.innerHTML;
             
-            this.defineTrackNameListener();
+            this.defineTrackElementListeners();
             this.shadowRoot.querySelectorAll(".track-volume, .track-balance, .track-controls").forEach((element) => {
                 element.classList.add("hidden");
             });
@@ -329,7 +328,7 @@ export default class TrackElement extends HTMLElement {
         }
     }
 
-    defineTrackNameListener() {
+    defineTrackElementListeners() {
         this.trackNameInput.value = this.name;
 
         this.trackNameInput.addEventListener("keyup", (ev: KeyboardEvent) => {
@@ -495,7 +494,6 @@ export default class TrackElement extends HTMLElement {
         this.mergeBtn.hidden = false;
         this.leftBtn.hidden = true;
         this.rightBtn.hidden = true;
-        // this.mergeBtn.classList.add("active");
     }
 
     clickMerge() {
@@ -509,8 +507,6 @@ export default class TrackElement extends HTMLElement {
     clickRight() {
         this.rightBtn.classList.toggle("active");
     }
-
-
 
     get closeBtn() {
         return this.shadowRoot?.getElementById("close-btn") as HTMLDivElement;
@@ -570,9 +566,4 @@ export default class TrackElement extends HTMLElement {
     get mergeBtn() {
         return this.shadowRoot?.getElementById("merge") as HTMLDivElement;
     }
-
-    get loadingBar() {
-        return this.shadowRoot?.getElementById("loading-bar") as HTMLDivElement;
-    }
-
 }

@@ -10,31 +10,63 @@ import {
     MAX_DURATION_SEC,
     RATIO_MILLS_BY_PX,
 } from "../../Utils/Variables";
+import {ScrollEvent} from "../../Controllers/Editor/EditorController";
 
-
-
+/**
+ * Class that Override PIXI.Application. Represents the main editor and handle all events about the editor.
+ * Use to store the waveforms and the playhead.
+ */
 export default class EditorView extends Application {
 
-    canvasContainer = document.getElementById("editor-canvas") as HTMLDivElement;
-    editorDiv = document.getElementById("editor") as HTMLDivElement;
-    dragCover = document.getElementById("drag-cover") as HTMLDivElement;
-    horizontalScrollbar = document.getElementById("horizontal-scrollbar") as ScrollBarElement;
-    verticalScrollbar = document.getElementById("vertical-scrollbar") as ScrollBarElement;
-    trackContainer = document.getElementById("track-container") as HTMLDivElement;
-    automationContainer = document.getElementById("automation-container") as HTMLElement;
+    /**
+     * Accessors from the index.html
+     */
+    public canvasContainer = document.getElementById("editor-canvas") as HTMLDivElement;
+    public editorDiv = document.getElementById("editor") as HTMLDivElement;
+    public dragCover = document.getElementById("drag-cover") as HTMLDivElement;
+    public horizontalScrollbar = document.getElementById("horizontal-scrollbar") as ScrollBarElement;
+    public verticalScrollbar = document.getElementById("vertical-scrollbar") as ScrollBarElement;
+    public trackContainer = document.getElementById("track-container") as HTMLDivElement;
+    public automationContainer = document.getElementById("automation-container") as HTMLElement;
 
-    width: number;
-    height: number;
+    /**
+     * The width of the editor in pixels. It's the size of the viewport minus the scrollbars.
+     */
+    public width: number;
+    /**
+     * The height of the editor in pixels. It's the size of the viewport minus the scrollbars.
+     */
+    public height: number;
 
-    worldWidth: number;
-    worldHeight: number;
+    /**
+     * The width of the content of the viewport in pixels. This size is computed with the current ration of pixels by
+     * milliseconds.
+     */
+    public worldWidth: number;
+    /**
+     * The height of the content of the viewport in pixels. This size is computed with the number of tracks multiplied
+     * by the number of the tracks.
+     */
+    public worldHeight: number;
 
-    originalCenter : { x: number, y: number };
+    /**
+     * The viewport of the editor, that handle the canvas to be drawn at the correct given position.
+     */
+    public viewport: Viewport;
+    /**
+     * Array of PIXI Containers that contains the waveforms of each tracks.
+     */
+    public waveforms: WaveformView[];
+    /**
+     * The PIXI Container that handle the playhead behavior.
+     */
+    public playhead: PlayheadView;
 
-    viewport: Viewport;
-
-    waveforms: WaveformView[];
-    playhead: PlayheadView;
+    /**
+     * The center of the viewport. Used to store where the center of the current viewport size is.
+     * @private
+     */
+    private _originalCenter : { x: number, y: number };
 
     constructor() {
         super({
@@ -51,7 +83,7 @@ export default class EditorView extends Application {
         this.worldWidth = this.width;
         this.worldHeight = this.height;
 
-        this.originalCenter = { x: this.width / 2, y: this.height / 2 };
+        this._originalCenter = { x: this.width / 2, y: this.height / 2 };
 
         this.viewport = new Viewport({
             screenWidth: this.width,
@@ -72,71 +104,84 @@ export default class EditorView extends Application {
 
         this.stage.addChild(this.viewport);
 
-        this.bindEvents();
         this.resizeCanvas();
     }
 
-    bindEvents() {
+    /**
+     * Handler for the wheel event on the editor. It will scroll vertically or horizontally depending on the
+     * shiftKey.
+     *
+     * @param e Event that contains information of the wheel event.
+     */
+    public handleWheel(e: WheelEvent): void {
+        let target = e.target as HTMLElement;
+        if (target !== this.view as HTMLCanvasElement && target !== this.canvasContainer && target !== this.editorDiv && target !== this.horizontalScrollbar && target !== this.verticalScrollbar) return;
+        if (e.shiftKey) {
+            this.horizontalScrollbar.customScrollTo(e.deltaX*2);
+        }
+        else {
+            this.verticalScrollbar.customScrollTo(e.deltaY);
+        }
+    }
 
-        window.addEventListener("wheel", (e) => {
-            let target = e.target as HTMLElement;
-            if (target !== this.view as HTMLCanvasElement && target !== this.canvasContainer && target !== this.editorDiv && target !== this.horizontalScrollbar && target !== this.verticalScrollbar) return;
-            if (e.shiftKey) {
-                this.horizontalScrollbar.customScrollTo(e.deltaX*2);
-            }
-            else {
-                this.verticalScrollbar.customScrollTo(e.deltaY);
-            }
-        });
+    /**
+     * Handler for the horizontal scroll. It will scroll the automations
+     * the editor and the playhead to the left or right.
+     *
+     * @param e Event that contains the value of the change of the scrollbar.
+     */
+    public handleHorizontalScroll(e: ScrollEvent): void {
+        let ratio = this.worldWidth / this.width;
+        if (!e.detail) throw new Error("The event on the scrollbar is not properly set. Missing the detail property.");
+        let scrollValue = e.detail.value * ratio;
+        if (isNaN(scrollValue)) return;
+        if (scrollValue === 0) {
+            this.viewport.position.set(0, this.viewport.position.y);
+        }
+        else {
+            let x = this._originalCenter.x + scrollValue;
+            let y = this.viewport.center.y;
+            x = Math.max(0, Math.min(this.worldWidth - (this.width / 2), x));
+            this.viewport.moveCenter(x, y);
+        }
+        this.automationContainer.scrollLeft = scrollValue;
+    }
 
-        this.horizontalScrollbar.addEventListener("change", (e) => {
-            let ratio = this.worldWidth / this.width;
-            // @ts-ignore
-            let scrollValue = e.detail.value * ratio;
-            if (isNaN(scrollValue)) return;
-            if (scrollValue === 0) {
-                this.viewport.position.set(0, this.viewport.position.y);
-            }
-            else {
-                let x = this.originalCenter.x + scrollValue;
-                let y = this.viewport.center.y;
-                x = Math.max(0, Math.min(this.worldWidth - (this.width / 2), x));
-                this.viewport.moveCenter(x, y);
-            }
-            this.automationContainer.scrollLeft = scrollValue;
-        });
-
-        this.verticalScrollbar.addEventListener("change", (e) => {
-            let ratio = this.worldHeight / this.height;
-            // @ts-ignore
-            let scrollValue = e.detail.value * ratio
-            if (isNaN(scrollValue)) return;
-            if (scrollValue === 0) {
-                this.viewport.position.set(this.viewport.position.x, 0);
-                this.playhead.position.y = 0;
-                this.playhead.track.position.y = 0;
-            }
-            else {
-                let x = this.viewport.center.x;
-                let y = this.originalCenter.y + scrollValue;
-                y = Math.max(0, Math.min(this.worldHeight - (this.height / 2), y));
-                this.viewport.moveCenter(x, y);
-                this.playhead.position.y = scrollValue;
-                this.playhead.track.position.y = scrollValue;
-            }
-            // @ts-ignore
-            if (e.detail.type !== "propagate off") {
-                this.trackContainer.scrollTop = scrollValue;
-                this.automationContainer.scrollTop = scrollValue;
-            }
-        });
+    /**
+     * Handler for the vertical scroll. It will scroll the automations
+     * the editor and the playhead to the top or bottom.
+     *
+     * @param e Event that contains the value of the change of the scrollbar.
+     */
+    public handleVerticalScroll(e: ScrollEvent): void {
+        let ratio = this.worldHeight / this.height;
+        if (!e.detail) throw new Error("The event on the scrollbar is not properly set. Missing the detail property.");
+        let scrollValue = e.detail.value * ratio
+        if (isNaN(scrollValue)) return;
+        if (scrollValue === 0) {
+            this.viewport.position.set(this.viewport.position.x, 0);
+            this.playhead.position.y = 0;
+            this.playhead.track.position.y = 0;
+        }
+        else {
+            let x = this.viewport.center.x;
+            let y = this._originalCenter.y + scrollValue;
+            y = Math.max(0, Math.min(this.worldHeight - (this.height / 2), y));
+            this.viewport.moveCenter(x, y);
+            this.playhead.position.y = scrollValue;
+            this.playhead.track.position.y = scrollValue;
+        }
+        if (e.detail.type !== "propagate off") {
+            this.trackContainer.scrollTop = scrollValue;
+            this.automationContainer.scrollTop = scrollValue;
+        }
     }
 
     /**
      * Add a waveform into the canvas fot the given track and update the position of the other waveforms.
-     * @param track
+     * @param track - The track where the new waveform will be created.
      */
-    createWaveformView(track: Track) {
+    public createWaveformView(track: Track): WaveformView {
         let wave = new WaveformView(this, track);
         this.waveforms.push(wave);
         this.resizeCanvas();
@@ -145,9 +190,9 @@ export default class EditorView extends Application {
 
     /**
      * Remove the waveform from the canvas for the given track and update the position of the other waveforms.
-     * @param track
+     * @param track - The track that contain the waveform to delete.
      */
-    removeWaveForm(track: Track) {
+    public removeWaveForm(track: Track): void {
         let wave = this.waveforms.find(wave => wave.trackId === track.id);
         let index = this.waveforms.indexOf(wave!);
 
@@ -160,9 +205,10 @@ export default class EditorView extends Application {
     }
 
     /**
-     * Resize the canvas when the window is resized.
+     * Resize the canvas when the window is resized. It will resize the playhead, the viewport, the PIXI.Renderer,
+     * the canvas and the automation div.
      */
-    resizeCanvas() {
+    public resizeCanvas(): void {
         requestAnimationFrame(() => {
             this.stage.scale.x = 1;
             let scrollbarThickness = this.horizontalScrollbar.SCROLL_THICKNESS;
@@ -173,7 +219,7 @@ export default class EditorView extends Application {
             this.worldHeight = Math.max(tracksHeight, this.height);
             this.worldWidth = Math.max((MAX_DURATION_SEC*1000) / RATIO_MILLS_BY_PX, this.width);
 
-            this.originalCenter = { x: this.width / 2, y: this.height / 2 };
+            this._originalCenter = { x: this.width / 2, y: this.height / 2 };
 
             this.viewport.resize(this.width, this.height, this.worldWidth, this.worldHeight);
             this.renderer.resize(this.width, this.height);
@@ -191,9 +237,9 @@ export default class EditorView extends Application {
 
     /**
      * Change the color of the waveform for the given track.
-     * @param track
+     * @param track - The track where the Waveform must be redrawn.
      */
-    changeWaveFormColor(track: Track) {
+    public changeWaveFormColor(track: Track): void {
         let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
         if (waveFormView !== undefined) {
             waveFormView.color = track.color;
@@ -206,20 +252,29 @@ export default class EditorView extends Application {
         }
     }
 
-    drawRegions(track: Track) {
+    /**
+     * Draw the waveform of all the regions of a track. Mind that this method has a high impact on performances.
+     *
+     * @param track - The track that contains the regions.
+     */
+    public drawRegions(track: Track): void {
         requestAnimationFrame(() => {
             let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
             if (!waveFormView) return
             for (let regionView of waveFormView.regionViews) {
                 let region = track.getRegion(regionView.id);
                 if (region) {
-                    regionView.initRegion(track.color, region);
+                    regionView.initializeRegionView(track.color, region);
                 }
             }
         });
     }
 
-    stretchRegions(track: Track) {
+    /**
+     * Take the waveform of the given track, and stretch the waveform to the current Ratio of pixels by milliseconds.
+     * @param track - The track that contains the regions.
+     */
+    public stretchRegions(track: Track): void {
         requestAnimationFrame(()=> {
             let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
             if (!waveFormView) return
@@ -227,13 +282,17 @@ export default class EditorView extends Application {
                 if (!track.audioBuffer) return;
                 let region = track.getRegion(regionView.id);
                 if (region) {
-                    regionView.stretch(region.duration, region);
+                    regionView.stretch(region.duration, region.start);
                 }
             }
         });
     }
 
-    getWaveFormViewById(trackId: number) {
+    /**
+     * Get the waveform by the given track ID.
+     * @param trackId - The track ID of the waveform.
+     */
+    public getWaveFormViewById(trackId: number): WaveformView | undefined {
         return this.waveforms.find(wave => wave.trackId === trackId);
     }
 }

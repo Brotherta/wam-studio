@@ -11,14 +11,14 @@ import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Variables";
 export default class AutomationController {
 
     app: App;
-    automationView: AutomationView;
+    view: AutomationView;
 
     automationOpened: boolean = false;
 
     constructor(app: App) {
         this.app = app;
-        this.automationView = this.app.automationView;
-        this.definesEvents();
+        this.view = this.app.automationView;
+        this.bindEvents();
     }
 
     /**
@@ -26,20 +26,20 @@ export default class AutomationController {
      * @param track
      */
     async openAutomationMenu(track: Track) {
-        this.automationView.clearMenu();
+        this.view.clearMenu();
         await this.getAllAutomations(track);
-        this.automationView.openAutomationMenu(track);
+        this.view.openAutomationMenu(track);
         this.automationOpened = true;
     }
 
     /**
      * Define all the listeners for the automation menu.
      */
-    definesEvents() {
+    bindEvents() {
         window.addEventListener("click", (e) => {
-            if (e.target === this.automationView.automationMenu ) return;
+            if (e.target === this.view.automationMenu ) return;
             if (this.automationOpened) {
-                this.automationView.closeAutomationMenu();
+                this.view.closeAutomationMenu();
                 this.automationOpened = false;
             }
         });
@@ -48,8 +48,8 @@ export default class AutomationController {
             if (track != undefined) {
                 track.automation.removeAutomation();
                 track.automation.updateAutomation([]);
-                this.automationView.clearMenu();
-                this.automationView.hideBpf(track.id);
+                this.view.clearMenu();
+                this.view.hideBpf(track.id);
             }
         });
     }
@@ -64,13 +64,13 @@ export default class AutomationController {
         if (plugin.initialized) {
             let params = await plugin.instance?._audioNode.getParameterInfo();
             track.automation.updateAutomation(params);
-            this.automationView.clearMenu();
+            this.view.clearMenu();
 
-            this.automationView.createItem("Hide Automation", "hide-automation", () => {
-                this.automationView.hideBpf(track.id);
+            this.view.createItem("Hide Automation", "hide-automation", () => {
+                this.view.hideBpf(track.id);
             });
-            this.automationView.createItem("Clear All Automations", "clear-all", () => {
-                this.automationView.hideBpf(track.id);
+            this.view.createItem("Clear All Automations", "clear-all", () => {
+                this.view.hideBpf(track.id);
                 track.automation.clearAllAutomation(params);
                 track.plugin.instance?._audioNode.clearEvents();
             })
@@ -80,7 +80,7 @@ export default class AutomationController {
                 if (bpf !== undefined && bpf.points.length > 0) {
                     active = true;
                 }
-                this.automationView.createItem(
+                this.view.createItem(
                     param,
                     // @ts-ignore
                     params[param].nodeId,
@@ -88,7 +88,7 @@ export default class AutomationController {
                         let bpf = track.automation.getBpfOfparam(param);
                         if (bpf !== undefined) {
                             bpf.setSizeBPF(this.app.editorView.worldWidth);
-                            this.automationView.mountBpf(track.id, bpf);
+                            this.view.mountBpf(track.id, bpf);
                         }
                         else {
                             console.warn("There is no bpf associated with the track "+track.id);
@@ -136,6 +136,14 @@ export default class AutomationController {
         }
     }
 
+    updateBPFWidth() {
+        const newWidth = (MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX;
+
+        for (const track of this.app.tracksController.trackList) {
+            this.view.updateWidthBPF(track.id, newWidth);
+        }
+    }
+
     /**
      * Get the starting point of the automation according to the current time of the host.
      *
@@ -153,13 +161,6 @@ export default class AutomationController {
         else return integPoint+1;
     }
 
-    updateWidthOpenedBPF() {
-        const newWidth = (MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX;
-
-        for (const track of this.app.tracksController.trackList) {
-            this.automationView.updateWidthBPF(track.id, newWidth);
-        }
-    }
 }
 
 

@@ -146,6 +146,40 @@ export default class SaveProjectElement extends HTMLElement {
         this.progressBarContainer.style.display = "none";
         this.progressText.style.display = "none";
     }
+    
+    private _placeHolderErrorLog() {
+        this.log.innerHTML = "<br>";
+    }
+
+    private _showLog(message: string, color: string) {
+        this.log.innerHTML = message;
+        this.log.style.backgroundColor = color;
+        this.log.style.transition = "opacity 1s ease-in-out"; // add transition property
+        setTimeout(() => {
+            this.log.style.opacity = "0"; // fade out the element
+            setTimeout(() => {
+                this._placeHolderErrorLog();
+                this.log.style.backgroundColor = "transparent";
+                this.log.style.opacity = "1"; // reset opacity for future use
+            }, 1000); // wait for 1s before hiding the element
+        }, 3000);
+    }
+
+    // Method animate error log with red background, fade out after few seconds
+    showError(message: string) {
+        this._showLog(message, "red");
+    }
+
+    showInfo(message: string) {
+        this._showLog(message, "green");
+    }
+
+    showConfirm(message: string, yesCallback: ()=>void) {
+        this.log.innerHTML = message;
+        this.saveProjectButton.style.display = "none";
+        this.confirm.style.display = "";
+        this.yes.onclick = yesCallback;
+    }
 
     get progressBar() {
         return this.shadowRoot?.getElementById("progress-bar") as HTMLDivElement;
@@ -189,40 +223,6 @@ export default class SaveProjectElement extends HTMLElement {
 
     get no() {
         return this.shadowRoot?.getElementById("no") as HTMLButtonElement;
-    }
-
-    private _placeHolderErrorLog() {
-        this.log.innerHTML = "<br>";
-    }
-
-    private _showLog(message: string, color: string) {
-        this.log.innerHTML = message;
-        this.log.style.backgroundColor = color;
-        this.log.style.transition = "opacity 1s ease-in-out"; // add transition property
-        setTimeout(() => {
-            this.log.style.opacity = "0"; // fade out the element
-            setTimeout(() => {
-                this._placeHolderErrorLog();
-                this.log.style.backgroundColor = "transparent";
-                this.log.style.opacity = "1"; // reset opacity for future use
-            }, 1000); // wait for 1s before hiding the element
-        }, 3000);
-    }
-
-    // Method animate error log with red background, fade out after few seconds
-    showError(message: string) {
-        this._showLog(message, "red");
-    }
-
-    showInfo(message: string) {
-        this._showLog(message, "green");
-    }
-
-    showConfirm(message: string, yesCallback: ()=>void) {
-        this.log.innerHTML = message;
-        this.saveProjectButton.style.display = "none";
-        this.confirm.style.display = "";
-        this.yes.onclick = yesCallback;
     }
 }
 

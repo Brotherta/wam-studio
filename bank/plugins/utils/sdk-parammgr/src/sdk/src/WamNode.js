@@ -1,3 +1,4 @@
+// @ts-nocheck
 /** @typedef {import('@webaudiomodules/api').WamNode} IWamNode */
 /** @typedef {import('@webaudiomodules/api').WebAudioModule} WebAudioModule */
 /** @typedef {import('@webaudiomodules/api').WamParameterInfoMap} WamParameterInfoMap */

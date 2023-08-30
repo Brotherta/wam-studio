@@ -48,7 +48,7 @@ export default class WaveformView extends Container {
         this.regionViews.push(regionView);
         this.addChild(regionView);
 
-        regionView.initRegion(this.color, region);
+        regionView.initializeRegionView(this.color, region);
         return regionView;
     }
 

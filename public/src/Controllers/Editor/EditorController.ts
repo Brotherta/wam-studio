@@ -2,137 +2,181 @@ import App from "../../App";
 import EditorView from "../../Views/Editor/EditorView";
 import {RATIO_MILLS_BY_PX, updateRatioMillsByPx} from "../../Utils/Variables";
 import {audioCtx} from "../../index";
-import {offset} from "@popperjs/core";
 
+/**
+ * Interface of the custom event of the ScrollBarElement.
+ */
+export interface ScrollEvent extends Event {
+    detail?: {
+        value: number,
+        type: string
+    }
+}
 
+/**
+ * Controller class that binds the events of the editor. It controls the zoom and the render of the editor.
+ */
 export default class EditorController {
 
-    editor: EditorView;
-    app: App;
+    /**
+     * Route Application.
+     */
+    private _app: App;
+    /**
+     * View of the editor.
+     */
+    private _view: EditorView;
 
+    /**
+     * Minimum ratio of pixels by milliseconds.
+     * @private
+     */
     private readonly MIN_RATIO = 1;
+    /**
+     * Maximum ratio of pixels by milliseconds.
+     * @private
+     */
     private readonly MAX_RATIO = 500;
+    /**
+     * Number of zoom step.
+     * @private
+     */
     private readonly ZOOM_STEPS = 12;
 
-    private zoomRenderTimeOut: NodeJS.Timeout;
-    private currentLevel = 5;
-
+    /**
+     * Timeout for the zoom to be rendered. Contains the callback of the final render for the waveforms.
+     * @private
+     */
+    private _timeout: NodeJS.Timeout;
+    /**
+     * Pointer to the current zoom level.
+     * @private
+     */
+    private _currentLevel = 5;
 
     constructor(app: App) {
-        this.editor = app.editorView;
-        this.app = app;
+        this._view = app.editorView;
+        this._app = app;
 
         this.bindEvents();
     }
 
     /**
-     * Defines the drag and drop functionality for the editor.
-     * It adds the dropped files to the track view.
+     * Zoom in the editor. If the value is not passed, it will take the current level of zoom.
+     *
+     * @param value the of the zoom in pixel
      */
-    bindEvents() {
+    public zoomIn(value?: number): void {
+        if (this._timeout) clearInterval(this._timeout);
+        let ratio;
+        if (value) { // Scroll - Linear zoom
+            ratio = Math.max(RATIO_MILLS_BY_PX - (value) / 2, this.MIN_RATIO);
+        } else { // Button pressed - Find nearest step and adjust to that step
+            this._currentLevel = this.getNearestZoomLevel();
+            let level = this._currentLevel;
+            this._currentLevel = Math.max(this._currentLevel - 1, 0);
+            if (level === this._currentLevel) return;
+            ratio = this.getZoomRatioByLevel(this._currentLevel);
+        }
+        updateRatioMillsByPx(ratio);
+        this.updateZoom();
+    }
+
+    /**
+     * Zoom out the editor. If the value is not passed, it will take the current level of zoom.
+     *
+     * @param value the of the zoom in pixel
+     */
+    public zoomOut(value?: number): void {
+        if (this._timeout) clearInterval(this._timeout);
+        let ratio;
+        if (value) { // Scroll - Linear zoom
+            ratio = Math.min(RATIO_MILLS_BY_PX + (value) / 2, this.MAX_RATIO);
+        } else { // Button pressed - Find nearest step and adjust to that step
+            this._currentLevel = this.getNearestZoomLevel();
+            let level = this._currentLevel;
+            this._currentLevel = Math.min(this.ZOOM_STEPS - 1, this._currentLevel + 1);
+            if (level === this._currentLevel) return;
+            ratio = this.getZoomRatioByLevel(this._currentLevel);
+        }
+        updateRatioMillsByPx(ratio);
+        this.updateZoom();
+    }
+
+
+    /**
+     * Defines the drag and drop functionality for the editor.
+     * It adds the dropped files to the track _view.
+     */
+    private bindEvents(): void {
         ["dragenter", "dragstart"].forEach(eventName => {
-            this.editor.canvasContainer.addEventListener(eventName, () => {
-                this.editor.dragCover.hidden = false;
+            this._view.canvasContainer.addEventListener(eventName, () => {
+                this._view.dragCover.hidden = false;
             });
         });
 
         window.addEventListener("resize", () => {
-            this.editor.resizeCanvas();
+            this._view.resizeCanvas();
         });
 
-        this.editor.dragCover.addEventListener("dragleave", () => {
-            this.editor.dragCover.hidden = true;
+        this._view.dragCover.addEventListener("dragleave", () => {
+            this._view.dragCover.hidden = true;
         });
-
         window.ondragend = () => {
-            this.editor.dragCover.hidden = true;
+            this._view.dragCover.hidden = true;
         }
-
-        this.editor.dragCover.addEventListener("drop", (e) => {
-            let files = e.dataTransfer!.files;
-            this.editor.dragCover.hidden = true;
-            ([...files]).forEach(file => {
-                if (file.type == "application/zip") {
-                    generateSHAHash(file);
-                    this.app.loader.loadProject(file);
-                }
-                else {
-                    this.app.tracksController.newTrackWithFile(file)
-                        .then(track => {
-                            if (track !== undefined) {
-                                this.app.tracksController.initTrackComponents(track);
-                                track.element.progressDone();
-                            }
-                        });
-                }
-            });
+        window.addEventListener("wheel", (e) => {
+            this._view.handleWheel(e);
+        });
+        this._view.horizontalScrollbar.addEventListener("change", (e: ScrollEvent) => {
+            this._view.handleHorizontalScroll(e);
+        });
+        this._view.verticalScrollbar.addEventListener("change", (e: ScrollEvent) => {
+            this._view.handleVerticalScroll(e);
         });
     }
 
-    getZoomRatioByLevel(level: number) {
+    /**
+     * Given the level, returns the ratio px / ms. The steps are logarithmic. More the level is high, more the steps are
+     * large.
+     *
+     * @param level - The current level to determines the corresponding ratio.
+     * @return the ratio of pixels by milliseconds.
+     */
+    private getZoomRatioByLevel(level: number): number {
         const range = Math.log(this.MAX_RATIO) - Math.log(this.MIN_RATIO);
         const step = range / (this.ZOOM_STEPS - 1);
         return Math.exp(Math.log(this.MIN_RATIO) + step * level);
     }
 
-    zoomIn(value?: number) {
-        if (this.zoomRenderTimeOut) clearInterval(this.zoomRenderTimeOut);
-        let ratio;
-        if (value) {
-            // Scroll - Linear zoom
-            ratio = Math.max(RATIO_MILLS_BY_PX - (value)/2, this.MIN_RATIO);
-        }
-        else {
-            // Button pressed - Find nearest step and adjust to that step
-            this.currentLevel = this.getNearestZoomLevel();
-            let level = this.currentLevel;
-            this.currentLevel = Math.max(this.currentLevel - 1, 0);
-            if (level === this.currentLevel) return;
-            ratio = this.getZoomRatioByLevel(this.currentLevel);
-        }
-        updateRatioMillsByPx(ratio);
-        this.updateZoom();
-    }
-
-    zoomOut(value?: number) {
-        if (this.zoomRenderTimeOut) clearInterval(this.zoomRenderTimeOut);
-        let ratio;
-        if (value) {
-            // Scroll - Linear zoom
-            ratio = Math.min(RATIO_MILLS_BY_PX + (value)/2, this.MAX_RATIO);
-        }
-        else {
-            // Button pressed - Find nearest step and adjust to that step
-            this.currentLevel = this.getNearestZoomLevel();
-            let level = this.currentLevel;
-            this.currentLevel = Math.min(this.ZOOM_STEPS - 1, this.currentLevel + 1);
-            if (level === this.currentLevel) return;
-            ratio = this.getZoomRatioByLevel(this.currentLevel);
-        }
-        updateRatioMillsByPx(ratio);
-        this.updateZoom();
-    }
-
-    async updateZoom() {
-        let offsetPlayhead = this.editor.playhead.position.x;
-        this.editor.resizeCanvas();
-        this.editor.playhead.movePlayhead(this.app.host.playhead);
-        this.app.automationController.updateWidthOpenedBPF();
-        this.editor.horizontalScrollbar.customScrollTo(this.editor.playhead.position.x - offsetPlayhead);
-        this.app.tracksController.trackList.forEach(track => {
-            track.updateBuffer(audioCtx, this.app.host.playhead);
-            this.editor.stretchRegions(track);
+    /**
+     * Updates the zoom according to the new size and the new ratio of pixels by milliseconds.
+     * It first stretches the waveforms and set a timeout for the renderer. If a new zoom is recored before the timeout
+     * has been called, it will cancel the current timeout to set a new one.
+     */
+    private async updateZoom(): Promise<void> {
+        let offsetPlayhead = this._view.playhead.position.x;
+        this._view.resizeCanvas();
+        this._view.playhead.moveToFromPlayhead(this._app.host.playhead);
+        this._app.automationController.updateBPFWidth();
+        this._view.horizontalScrollbar.customScrollTo(this._view.playhead.position.x - offsetPlayhead);
+        this._app.tracksController.trackList.forEach(track => {
+            track.updateBuffer(audioCtx, this._app.host.playhead);
+            this._view.stretchRegions(track);
         });
 
-        this.zoomRenderTimeOut = setTimeout(()=> {
-            this.app.tracksController.trackList.forEach(track => {
-                track.updateBuffer(audioCtx, this.app.host.playhead);
-                this.editor.drawRegions(track);
+        this._timeout = setTimeout(() => {
+            this._app.tracksController.trackList.forEach(track => {
+                track.updateBuffer(audioCtx, this._app.host.playhead);
+                this._view.drawRegions(track);
             });
         }, 500);
     }
 
-    getNearestZoomLevel() {
+    /**
+     * @return the nearest zoom level depending on the current ration of pixels by milliseconds.
+     */
+    private getNearestZoomLevel(): number {
         let nearestLevel = 0;
         let smallestDifference = Number.MAX_VALUE;
 
@@ -145,8 +189,6 @@ export default class EditorController {
                 nearestLevel = i;
             }
         }
-
         return nearestLevel;
     }
-
 }

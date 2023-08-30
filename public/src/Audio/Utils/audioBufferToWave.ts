@@ -1,22 +1,6 @@
-import JSZip from "jszip";
-import OperableAudioBuffer from "../OperableAudioBuffer";
+import {audioCtx} from "../../index";
 
-function myMakeZip(adbuffer: OperableAudioBuffer) {
-    const zip = new JSZip();
-    zip.file("test.wav", bufferToWave(adbuffer));
-
-    zip.generateAsync({type: "blob"})
-        .then(function (content) {
-            const new_file = URL.createObjectURL(content);
-            const link = document.createElement("a")
-            link.href = new_file
-            link.download = "example.zip"
-            link.click()
-            link.remove()
-        });
-}
-
-function bufferToWave(abuffer: OperableAudioBuffer) {
+function bufferToWave(abuffer: AudioBuffer) {
     var numOfChan = abuffer.numberOfChannels,
         length = abuffer.length * numOfChan * 2 + 44,
         buffer = new ArrayBuffer(length),
@@ -70,4 +54,39 @@ function bufferToWave(abuffer: OperableAudioBuffer) {
     }
 }
 
-export { bufferToWave, myMakeZip }
+function combineBuffers(buffers: AudioBuffer[]) {
+    // Get the max length from all buffers
+    let maxLength = Math.max(...buffers.map(buffer => buffer.length));
+
+    // Create a new buffer with the max length
+    let outputBuffer = audioCtx.createBuffer(
+        buffers[0].numberOfChannels,
+        maxLength,
+        buffers[0].sampleRate
+    );
+
+    // For each buffer, for each channel, copy the data into the outputBuffer
+    buffers.forEach(buffer => {
+        for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+            let outputData = outputBuffer.getChannelData(channel);
+            let inputData = buffer.getChannelData(channel);
+
+            for (let i = 0; i < inputData.length; i++) {
+                outputData[i] += inputData[i];
+            }
+        }
+    });
+    return outputBuffer;
+}
+
+function downloadBlob(blob: Blob, fileName: string) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    link.remove();
+}
+
+
+export {downloadBlob, combineBuffers, bufferToWave}

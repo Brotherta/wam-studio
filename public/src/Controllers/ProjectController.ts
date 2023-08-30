@@ -1,10 +1,13 @@
 import App from "../App";
 import {BACKEND_URL} from "../Env";
+import ProjectView from "../Views/ProjectView";
 
 
 export default class ProjectController {
 
     app: App;
+    view: ProjectView;
+    
     saved: boolean = true;
     projectId: string = "";
     projectName: string = "";
@@ -13,6 +16,7 @@ export default class ProjectController {
 
     constructor(app: App) {
         this.app = app;
+        this.view = this.app.projectView;
         this.checkLogin();
     }
 

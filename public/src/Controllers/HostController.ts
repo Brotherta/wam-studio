@@ -12,8 +12,7 @@ import {SONGS_FILE_URL} from "../Env";
 export default class HostController {
 
     app: App;
-    audioCtx: AudioContext;
-    hostView: HostView;
+    view: HostView;
 
     playing: boolean = false;
     looping: boolean = false;
@@ -29,9 +28,8 @@ export default class HostController {
 
     constructor(app: App) {
         this.app = app;
-        this.hostView = app.hostView;
-        this.audioCtx = audioCtx;
-        
+        this.view = app.hostView;
+
         this.defineControls();
     }
 
@@ -64,8 +62,8 @@ export default class HostController {
             if (lastPos !== newPos) {
                 lastPos = newPos;
                 if (!this.pauseInterval) {
-                    this.app.editorView.playhead.movePlayhead(newPos);
-                    this.hostView.updateTimer(newPos);
+                    this.app.editorView.playhead.moveToFromPlayhead(newPos);
+                    this.view.updateTimer(newPos);
                 }
             }
         }, 1000/60)
@@ -76,7 +74,7 @@ export default class HostController {
      * It mutes or unmutes the host.
      */
     defineMuteListener() {
-        this.hostView.muteBtn.onclick = () => {
+        this.view.muteBtn.onclick = () => {
             if (this.muted) {
                 this.app.host.unmuteHost();
             }
@@ -84,7 +82,7 @@ export default class HostController {
                 this.app.host.muteHost();
             }
             this.muted = !this.muted;
-            this.hostView.pressMuteButton(this.muted);
+            this.view.pressMuteButton(this.muted);
         }
     }
 
@@ -92,9 +90,9 @@ export default class HostController {
      * Define the listener for the volume slider. It controls the volume of the host.
      */
     defineVolumeListener() {
-        this.hostView.volumeSlider.oninput = () => {
+        this.view.volumeSlider.oninput = () => {
             
-            let value = parseInt(this.hostView.volumeSlider.value) / 100;
+            let value = parseInt(this.view.volumeSlider.value) / 100;
             this.app.host.setVolume(value);
         }
     }
@@ -103,7 +101,7 @@ export default class HostController {
      * Define the listener for the loop button. It loops or unloops the host.
      */
     defineLoopListener() {
-        this.hostView.loopBtn.onclick = () => {
+        this.view.loopBtn.onclick = () => {
             if (this.looping) {
                 this.app.tracksController.trackList.forEach((track) => {
                     //@ts-ignore
@@ -121,13 +119,13 @@ export default class HostController {
                 this.app.host.hostNode.parameters.get("loop").value = 1;
             }
             this.looping = !this.looping;
-            this.hostView.pressLoopButton(this.looping);
+            this.view.pressLoopButton(this.looping);
         }
     }
 
 
     defineRecordListener() {
-        this.hostView.recordBtn.onclick = () => {
+        this.view.recordBtn.onclick = () => {
             this.app.recorderController.clickRecord();
         }
     }
@@ -137,7 +135,7 @@ export default class HostController {
      * 
      */
     defineBackListener() {
-        this.hostView.backBtn.onclick = () => {
+        this.view.backBtn.onclick = () => {
             this.app.tracksController.jumpTo(1);
             this.app.automationController.applyAllAutomations();
         }
@@ -147,7 +145,7 @@ export default class HostController {
      * Define the listener for the play button. It plays or pauses the host.
      */
     definePlayListener() {
-        this.hostView.playBtn.onclick = () => {
+        this.view.playBtn.onclick = () => {
             this.clickOnPlayButton();
         }
     }
@@ -158,7 +156,7 @@ export default class HostController {
     defineSongsDemoListener() {
         songs.forEach((song) => {
             let name = song.name;
-            let el = this.hostView.createNewSongItem(name);
+            let el = this.view.createNewSongItem(name);
             el.onclick = async () => {
                 for (let trackSong of song.songs) {
                     const url = SONGS_FILE_URL + trackSong;
@@ -174,10 +172,10 @@ export default class HostController {
     }
 
     defineMenuListener() {
-        this.hostView.importSongs.addEventListener('click', () => {
-            this.hostView.newTrackInput.click();
+        this.view.importSongs.addEventListener('click', () => {
+            this.view.newTrackInput.click();
         });
-        this.hostView.newTrackInput.addEventListener('change', (e) => {
+        this.view.newTrackInput.addEventListener('change', (e) => {
             // @ts-ignore
             for (let i = 0; i < e.target.files.length; i++) {
                 // @ts-ignore
@@ -194,29 +192,29 @@ export default class HostController {
 
             }
         });
-        this.app.hostView.exportProject.onclick = () => {
+        this.view.exportProject.onclick = () => {
             this.app.projectController.openExportProject();
         }
-        this.app.hostView.saveBtn.onclick = async () => {
+        this.view.saveBtn.onclick = async () => {
             await this.app.projectController.openSaveProject();
         }
-        this.app.hostView.loadBtn.onclick = async () => {
+        this.view.loadBtn.onclick = async () => {
             await this.app.projectController.openLoadProject();
         }
-        this.app.hostView.loginBtn.onclick = async () => {
+        this.view.loginBtn.onclick = async () => {
             await this.app.projectController.openLogin();
         }
-        this.app.hostView.aboutBtn.onclick = async () => {
-            this.app.hostView.aboutWindow.hidden = false;
-            focusWindow(this.app.hostView.aboutWindow);
+        this.view.aboutBtn.onclick = async () => {
+            this.view.aboutWindow.hidden = false;
+            focusWindow(this.view.aboutWindow);
         }
-        this.app.hostView.aboutCloseBtn.onclick = () => {
-            this.app.hostView.aboutWindow.hidden = true;
+        this.view.aboutCloseBtn.onclick = () => {
+            this.view.aboutWindow.hidden = true;
         }
-        this.app.hostView.zoomInBtn.onclick = async () => {
+        this.view.zoomInBtn.onclick = async () => {
             this.app.editorController.zoomIn();
         }
-        this.app.hostView.zoomOutBtn.onclick = async () => {
+        this.view.zoomOutBtn.onclick = async () => {
             this.app.editorController.zoomOut();
         }
         window.addEventListener('wheel', (e) => {
@@ -250,7 +248,7 @@ export default class HostController {
     }
 
     initVuMeter() {
-        this.vuMeter = new VuMeter(this.hostView.vuMeterCanvas, 30, 157);
+        this.vuMeter = new VuMeter(this.view.vuMeterCanvas, 30, 157);
     }
 
     clickOnPlayButton(stop: boolean = false) {
@@ -263,7 +261,7 @@ export default class HostController {
             }
             if (this.app.recorderController.recording) {
                 this.app.recorderController.stopRecordingAllTracks();
-                this.hostView.pressRecordingButton(false);
+                this.view.pressRecordingButton(false);
             }
             //@ts-ignore
             this.app.host.hostNode.parameters.get("playing").value = 0;
@@ -271,7 +269,7 @@ export default class HostController {
         else {
             this.app.automationController.applyAllAutomations();
             this.app.tracksController.trackList.forEach(async (track) => {
-                if (track.modified) track.updateBuffer(this.audioCtx, this.app.host.playhead);
+                if (track.modified) track.updateBuffer(audioCtx, this.app.host.playhead);
                 //@ts-ignore
                 track.node.parameters.get("playing").value = 1;
                 this.defineTimerListener();
@@ -280,7 +278,7 @@ export default class HostController {
             this.app.host.hostNode.parameters.get("playing").value = 1;
         }
         this.playing = !this.playing;
-        this.hostView.pressPlayButton(this.playing, stop);
+        this.view.pressPlayButton(this.playing, stop);
     }
 
     stopAll() {

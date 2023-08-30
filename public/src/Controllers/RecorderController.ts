@@ -106,7 +106,7 @@ export default class RecorderController {
         track.mergerNode.connect(track.node!);
 
         let start = (playhead / audioCtx.sampleRate) * 1000;
-        let region = this.app.waveformController.createTemporaryRegion(track, start);
+        let region = this.app.regionsController.createTemporaryRegion(track, start);
 
         track.worker?.postMessage({
             command: "startWorker"
@@ -136,7 +136,7 @@ export default class RecorderController {
                             right[i / 2] = pcm[i + 1];
                         }
 
-                        this.app.waveformController.updateTemporaryRegion(region, track, audioBuffer)
+                        this.app.regionsController.updateTemporaryRegion(region, track, audioBuffer)
                     }
                     break;
                 }
@@ -159,7 +159,7 @@ export default class RecorderController {
                             right[i / 2] = pcm[i + 1];
                         }
 
-                        this.app.waveformController.renderTemporaryRegion(region, track, audioBuffer, this.app.host.latency);
+                        this.app.regionsController.renderTemporaryRegion(region, track, audioBuffer, this.app.host.latency);
                         track.modified = true;
                     }
                 }

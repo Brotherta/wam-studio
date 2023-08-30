@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-const HTTPS = process.env.HTTPS === "true";
+const HTTPS_DEV = process.env.HTTPS_DEV === "true";
 const PORT = process.env.PORT || 5002;
 
 // Set headers
@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 app.use(express.json());
 
-if (HTTPS) {
+if (HTTPS_DEV) {
     // HTTPS server
     const keyPath = process.env.SSL_KEY_FILE;
     const certPath = process.env.SSL_CERT_FILE;

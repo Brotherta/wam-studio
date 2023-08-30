@@ -8,7 +8,6 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import {RATIO_MILLS_BY_PX} from "../Utils/Variables";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "../Models/Plugin";
-import Region from "../Models/Region";
 import {BACKEND_URL} from "../Env";
 
 /**
@@ -17,15 +16,13 @@ import {BACKEND_URL} from "../Env";
 export default class TracksController {
     
     app: App;
-    tracksView: TracksView;
-    audioCtx: AudioContext;
+    view: TracksView;
     trackIdCount: number;
     trackList: Track[];
 
     constructor(app: App) {
         this.app = app;
-        this.tracksView = this.app.tracksView;
-        this.audioCtx = audioCtx;
+        this.view = app.tracksView;
         this.trackIdCount = 1;
         this.trackList = [];
 
@@ -33,7 +30,7 @@ export default class TracksController {
     }
 
     defineNewTrackCallback() {
-        this.tracksView.newTrackDiv.addEventListener('click', () => {
+        this.view.newTrackDiv.addEventListener('click', () => {
             this.app.tracksController.newEmptyTrack()
                 .then(track => {
                     this.initTrackComponents(track);
@@ -49,8 +46,8 @@ export default class TracksController {
      * @param track Track to be added to the track view.
      */
     addNewTrackInit(track: Track) {
-        this.tracksView.addTrack(track.element);
-        this.tracksView.changeColor(track);
+        this.view.addTrack(track.element);
+        this.view.changeColor(track);
         this.defineTrackListener(track);
         this.app.recorderController.clickMode(track);
     }
@@ -82,7 +79,7 @@ export default class TracksController {
      */
     removeTrack(track: Track) {
         this.app.pluginsController.removePlugins(track);
-        this.tracksView.removeTrack(track.element);
+        this.view.removeTrack(track.element);
         this.app.tracksController.deleteTrack(track);
         this.app.waveformController.removeWaveformOfTrack(track);
         this.app.automationView.removeAutomationBpf(track.id);
@@ -144,7 +141,7 @@ export default class TracksController {
 
         track.element.color.onclick = () => {
             this.app.pluginsController.selectTrack(track);
-            this.tracksView.changeColor(track);
+            this.view.changeColor(track);
             this.app.editorView.changeWaveFormColor(track);
         }
         track.element.automationBtn.onclick = async (e) => {
@@ -189,7 +186,7 @@ export default class TracksController {
      * @returns the new tracks that have been created
      */
     async newTrackUrl(url: string) {
-        let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
+        let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, audioCtx);
         let node = wamInstance.audioNode as WamAudioWorkletNode;
 
         let response = await fetch(url);
@@ -208,7 +205,7 @@ export default class TracksController {
     }
 
     async newEmptyTrack(url?: string) {
-        let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
+        let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, audioCtx);
         let node = wamInstance.audioNode as WamAudioWorkletNode;
 
         let track = this.createTrack(node);
@@ -230,7 +227,7 @@ export default class TracksController {
      */
     async newTrackWithFile(file: File) {
         if (file.type === "audio/ogg" || file.type === "audio/wav" || file.type === "audio/mpeg" || file.type === "audio/x-wav") {
-            let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, this.audioCtx);
+            let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, audioCtx);
             let node = wamInstance.audioNode as WamAudioWorkletNode;
 
             let audioArrayBuffer = await file.arrayBuffer();
@@ -354,7 +351,7 @@ export default class TracksController {
     clearAllTracks() {
         for (let track of this.trackList) {
             this.app.pluginsController.removePlugins(track);
-            this.tracksView.removeTrack(track.element);
+            this.view.removeTrack(track.element);
             this.app.waveformController.removeWaveformOfTrack(track);
             this.app.automationView.removeAutomationBpf(track.id);
             track.node!.removeAudio();
@@ -396,7 +393,7 @@ export default class TracksController {
                         }
                         let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
                         operableAudioBuffer = operableAudioBuffer.makeStereo();
-                        this.app.waveformController.createRegion(track, operableAudioBuffer, 0);
+                        this.app.regionsController.createRegion(track, operableAudioBuffer, 0);
                         track.element.progressDone();
                     });
             } else {
@@ -455,7 +452,7 @@ export default class TracksController {
                     }
 
                     let opAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-                    this.app.waveformController.createRegion(track, opAudioBuffer, region.start);
+                    this.app.regionsController.createRegion(track, opAudioBuffer, region.start);
 
                     // All regions have been loaded, call progressDone
                     if (loadedRegions === regions.length) {

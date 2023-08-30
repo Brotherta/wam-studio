@@ -49,7 +49,6 @@ template.innerHTML = `
  */
 export default class ScrollBarElement extends HTMLElement {
 
-    private static SENSITIVITY: number = 1;
     public readonly SCROLL_THICKNESS: number = 12;
     private readonly MIN_HANDLE_SIZE: number = 5;
 
