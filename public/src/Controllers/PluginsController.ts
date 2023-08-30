@@ -9,26 +9,32 @@ import PluginsView from "../Views/PluginsView";
  * It also defines the listeners for the plugins view.
  */
 export default class PluginsController {
-    app: App;
-    view: PluginsView;
 
-    selectedTrack: Track | undefined;
-    hostTrack: Host;
+    /**
+     * App instance.
+     */
+    private _app: App;
+    /**
+     * Plugins view.
+     */
+    private _view: PluginsView;
+
+    /**
+     * Selected track. It is undefined if the host is selected.
+     */
+    public selectedTrack: Track | undefined;
 
     constructor(app: App) {
-        this.app = app;
-        this.view = this.app.pluginsView;
+        this._app = app;
+        this._view = this._app.pluginsView;
 
-        this.hostTrack = this.app.host;
         this.selectedTrack = undefined;
 
-        this.hideAllButtons();
-        this.selectPlugins();
         this.bindEvents();
-        this.view.mainTrack.addEventListener("click", () => {
-            this.selectHost();
-        });
-        this.view.minimize();
+        this.hideAllButtons();
+
+        this._view.maximized = false;
+        this.updateRackSize();
     }
 
     /**
@@ -36,9 +42,9 @@ export default class PluginsController {
      */
     public async addPedalBoard(): Promise<void> {
         if (!this.selectedTrack) return;
-        this.view.hideNewButton();
-        await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
-        this.app.pluginsController.connectPedalBoard(this.selectedTrack);
+        this._view.hideNewButton();
+        await this.selectedTrack.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
+        this._app.pluginsController.connectPedalBoard(this.selectedTrack);
         this.selectPlugins();
         this.showPedalBoard();
     }
@@ -49,9 +55,9 @@ export default class PluginsController {
      */
     public removePedalBoard(track: Track): void {
         track.plugin.instance?._audioNode.clearEvents();
-        this.app.pluginsController.disconnectPedalBoard(track);
+        this._app.pluginsController.disconnectPedalBoard(track);
         track.plugin.unloadPlugin();
-        this.view.deletePluginView();
+        this._view.deletePluginView();
         if (this.selectedTrack === track) {
             this.selectPlugins();
         }
@@ -116,7 +122,7 @@ export default class PluginsController {
         }
         else if (this.selectedTrack.id !== track.id) {
             this.selectedTrack.element.unSelect();
-            this.view.unselectHost();
+            this._view.unselectHost();
             this.selectedTrack = track;
             this.selectedTrack.element.select();
             this.selectPlugins();
@@ -127,16 +133,16 @@ export default class PluginsController {
      * Selects the main track and show the plugins of the main track.
      */
     public selectHost(): void {
-        let host = this.app.host;
+        let host = this._app.host;
         if (this.selectedTrack === undefined) {
             this.selectedTrack = host;
-            this.view.selectHost();
+            this._view.selectHost();
             this.selectPlugins();
         }
         else if (this.selectedTrack.id !== host.id) {
             this.selectedTrack.element.unSelect();
             this.selectedTrack = host;
-            this.view.selectHost();
+            this._view.selectHost();
             this.selectPlugins();
         }
     }
@@ -149,7 +155,7 @@ export default class PluginsController {
     public fxButtonClicked(track: Track): void {
         this.selectTrack(track);
         if (track.plugin.initialized) {
-            if (this.view.windowOpened) {
+            if (this._view.windowOpened) {
                 this.hidePedalBoard();
             }
             else {
@@ -166,37 +172,32 @@ export default class PluginsController {
      * @private
      */
     private bindEvents(): void {
-        this.view.newPlugin.addEventListener("click", async () => {
+        this._view.newPlugin.addEventListener("click", async () => {
             if (!this.selectedTrack) return;
-            this.view.hideNewButton();
-            await this.selectedTrack.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
-            this.app.pluginsController.connectPedalBoard(this.selectedTrack);
+            this._view.hideNewButton();
+            await this.selectedTrack.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
+            this._app.pluginsController.connectPedalBoard(this.selectedTrack);
             this.selectPlugins();
         });
-        this.view.removePlugin.addEventListener("click", () => {
+        this._view.removePlugin.addEventListener("click", () => {
             if (this.selectedTrack !== undefined) {
                 this.removePedalBoard(this.selectedTrack);
             }
         });
-        this.view.showPlugin.addEventListener("click", () => {
+        this._view.showPlugin.addEventListener("click", () => {
             this.showPedalBoard();
         });
-        this.view.hidePlugin.addEventListener("click", () => {
+        this._view.hidePlugin.addEventListener("click", () => {
             this.hidePedalBoard();
         });
-        this.view.closeWindowButton.addEventListener("click", () => {
+        this._view.closeWindowButton.addEventListener("click", () => {
             this.hidePedalBoard();
         })
-        this.view.maxMinBtn.addEventListener("click", () => {
-            if (this.view.maximized) {
-                this.view.minimize();
-                this.view.maximized = false;
-                this.app.editorView.resizeCanvas();
-            } else {
-                this.view.maximize();
-                this.view.maximized = true;
-                this.app.editorView.resizeCanvas();
-            }
+        this._view.maxMinBtn.addEventListener("click", () => {
+            this.updateRackSize();
+        });
+        this._view.mainTrack.addEventListener("click", () => {
+            this.selectHost();
         });
     }
 
@@ -209,23 +210,24 @@ export default class PluginsController {
         }
         else if (!this.selectedTrack.plugin.initialized) { // Track selected but no plugin initialized
             this.hideAllButtons();
-            this.view.showNew();
+            this._view.showNew();
         }
         else { // Track selected and plugin initialized
-            this.app.tracksController.trackList.forEach(track => { // Hide all plugins to the loading zone
-                this.view.movePluginLoadingZone(track);
+            this._app.tracksController.trackList.forEach(track => { // Hide all plugins to the loading zone
+                this._view.movePluginLoadingZone(track);
             })
-            this.view.showPlugins(this.selectedTrack); // Show the plugins of the selected track
-            if (this.view.floating.hidden) { // If the floating window is hidden, show the show button
+            this._view.movePluginLoadingZone(this._app.host); // Hide the host plugin to the loading zone
+            this._view.showPlugins(this.selectedTrack); // Show the plugins of the selected track
+            if (this._view.floating.hidden) { // If the floating window is hidden, show the show button
                 this.hideAllButtons();
-                this.view.showShowPlugin();
+                this._view.showShowPlugin();
             }
             else { // If the floating window is shown, show the hide button
                 this.hideAllButtons();
-                this.view.showFloatingWindow();
-                this.view.showHidePlugin();
+                this._view.showFloatingWindow();
+                this._view.showHidePlugin();
             }
-            this.view.showRemovePlugin();
+            this._view.showRemovePlugin();
         }
     }
 
@@ -233,11 +235,11 @@ export default class PluginsController {
      * Hides all the buttons in the plugins view.
      */
     private hideAllButtons(): void {
-        this.view.hideNewButton();
-        this.view.hideFloatingWindow();
-        this.view.hideShowButton();
-        this.view.hideRemoveButton();
-        this.view.hideHideButton();
+        this._view.hideNewButton();
+        this._view.hideFloatingWindow();
+        this._view.hideShowButton();
+        this._view.hideRemoveButton();
+        this._view.hideHideButton();
     }
 
     /**
@@ -245,9 +247,9 @@ export default class PluginsController {
      * @private
      */
     private showPedalBoard(): void {
-        this.view.showHidePlugin();
-        this.view.hideShowButton();
-        this.view.showFloatingWindow();
+        this._view.showHidePlugin();
+        this._view.hideShowButton();
+        this._view.showFloatingWindow();
     }
 
     /**
@@ -255,8 +257,26 @@ export default class PluginsController {
      * @private
      */
     private hidePedalBoard(): void {
-        this.view.showShowPlugin();
-        this.view.hideHideButton();
-        this.view.hideFloatingWindow();
+        this._view.showShowPlugin();
+        this._view.hideHideButton();
+        this._view.hideFloatingWindow();
     }
+
+
+    /**
+     * Shows or hides the plugins rack.
+     * @private
+     */
+    private updateRackSize(): void {
+        const maximized = !this._view.maximized;
+        this._view.maximized = maximized;
+        if (maximized) {
+            this._view.maximize();
+            this._app.editorView.resizeCanvas();
+        } else {
+            this._view.minimize();
+            this._app.editorView.resizeCanvas();
+        }
+    }
+
 }
