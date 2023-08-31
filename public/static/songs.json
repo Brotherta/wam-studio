@@ -1,11 +1,20 @@
 [
   {
-    "name": "Fly me to the moon",
+    "name": "Fly me to the moon [RNB]",
     "songs": [
       "/songs/FlyToTheMoon/BASS.mp3",
       "/songs/FlyToTheMoon/DRUMS.mp3",
       "/songs/FlyToTheMoon/GUITAR.mp3",
       "/songs/FlyToTheMoon/VOCALS.mp3"
+    ]
+  },
+  {
+    "name": "Save Brubeck - Take Five [Jazz]",
+    "songs": [
+      "/songs/DaveBrubeck_TakeFive_Master/bass.mp3",
+      "/songs/DaveBrubeck_TakeFive_Master/drum.mp3",
+      "/songs/DaveBrubeck_TakeFive_Master/brass.mp3",
+      "/songs/DaveBrubeck_TakeFive_Master/piano.mp3"
     ]
   },
   {
