@@ -33,7 +33,7 @@ export default class PluginsController {
         this.bindEvents();
         this.hideAllButtons();
 
-        this._view.maximized = false;
+        this._view.maximized = true;
         this.updateRackSize();
     }
 

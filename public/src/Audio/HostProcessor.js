@@ -32,6 +32,9 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
     playhead = 0;
     playheadCount = 0;
     blockCount = 0;
+    loopStart = 0;
+    loopEnd = 0;
+
     
     constructor(options) {
         super(options);
@@ -40,8 +43,12 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             if (e.data.audio) {
                 this.audio = e.data.audio;
             }
-            if (e.data.playhead) {
+            else if (e.data.playhead) {
                 this.playhead = e.data.playhead;
+            }
+            else if (e.data.loop) {
+                this.loopStart = e.data.loopStart;
+                this.loopEnd = e.data.loopEnd;
             }
         };
     }
@@ -58,8 +65,8 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             if (!playing) continue; // Not playing
             const audioLength = this.audio[0].length;
 
-            if (this.playhead >= audioLength) { // Play was finished
-                if (loop) this.playhead = 0; // Loop just enabled, reset playhead
+            if (this.playhead >= audioLength || (loop && this.playhead > this.loopEnd)) { // Play was finished
+                if (loop) this.playhead = this.loopStart; // Loop just enabled, reset playhead
                 else continue; // EOF without loop
             }
 

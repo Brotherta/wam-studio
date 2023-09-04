@@ -24,6 +24,8 @@ import PlayheadController from "./Controllers/Editor/PlayheadController";
 import EditorView from "./Views/Editor/EditorView";
 import KeyboardController from "./Controllers/KeyboardController";
 import ExporterController from "./Controllers/ExportController";
+import LoopView from "./Views/Editor/LoopView";
+import LoopController from "./Controllers/Editor/LoopController";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -44,6 +46,7 @@ export default class App {
     playheadController: PlayheadController
     keyboardController: KeyboardController;
     exportController: ExporterController;
+    loopController: LoopController;
 
     hostView: HostView;
     tracksView: TracksView;
@@ -71,6 +74,7 @@ export default class App {
         this.projectView = new ProjectView();
         this.editorView = new EditorView();
 
+
         this.editorController = new EditorController(this);
         this.waveformController = new WaveformController(this);
         this.regionsController = new RegionsController(this);
@@ -85,6 +89,7 @@ export default class App {
         this.projectController = new ProjectController(this);
         this.keyboardController = new KeyboardController(this);
         this.exportController = new ExporterController(this);
+        this.loopController = new LoopController(this);
 
         makeDivScrollSync();
     }

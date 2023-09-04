@@ -11,6 +11,7 @@ import {
     RATIO_MILLS_BY_PX,
 } from "../../Utils/Variables";
 import {ScrollEvent} from "../../Controllers/Editor/EditorController";
+import LoopView from "./LoopView";
 
 /**
  * Class that Override PIXI.Application. Represents the main editor and handle all events about the editor.
@@ -61,6 +62,15 @@ export default class EditorView extends Application {
      * The PIXI Container that handle the playhead behavior.
      */
     public playhead: PlayheadView;
+    /**
+     * The PIXI Container that handle the loop behavior.
+     */
+    public loop: LoopView;
+
+    public static readonly PLAYHEAD_HEIGHT = 17;
+    public static readonly PLAYHEAD_WIDTH = 10;
+    public static readonly LOOP_HEIGHT = 7;
+
 
     /**
      * The center of the viewport. Used to store where the center of the current viewport size is.
@@ -98,6 +108,7 @@ export default class EditorView extends Application {
 
         this.waveforms = [];
         this.playhead = new PlayheadView(this);
+        this.loop = new LoopView(this);
 
         this.viewport.sortableChildren = true;
         this.stage.sortableChildren = true;
@@ -162,6 +173,8 @@ export default class EditorView extends Application {
             this.viewport.position.set(this.viewport.position.x, 0);
             this.playhead.position.y = 0;
             this.playhead.track.position.y = 0;
+            this.loop.position.y = 0;
+            this.loop.track.position.y = 0;
         }
         else {
             let x = this.viewport.center.x;
@@ -170,6 +183,8 @@ export default class EditorView extends Application {
             this.viewport.moveCenter(x, y);
             this.playhead.position.y = scrollValue;
             this.playhead.track.position.y = scrollValue;
+            this.loop.position.y = scrollValue;
+            this.loop.track.position.y = scrollValue;
         }
         if (e.detail.type !== "propagate off") {
             this.trackContainer.scrollTop = scrollValue;
@@ -225,13 +240,15 @@ export default class EditorView extends Application {
             this.renderer.resize(this.width, this.height);
             this.horizontalScrollbar.resize(this.width, this.worldWidth);
             this.verticalScrollbar.resize(this.height, this.worldHeight);
-            this.playhead.resize(Math.max(this.worldWidth, this.width), Math.max(this.worldHeight, this.height));
 
             this.canvasContainer.style.width = `${this.width}px`;
             this.canvasContainer.style.height = `${this.height}px`;
 
             this.automationContainer.style.height = `${this.height}px`;
             this.automationContainer.style.width = `${this.width}px`;
+
+            this.playhead.resize();
+            this.loop.resize();
         })
     }
 

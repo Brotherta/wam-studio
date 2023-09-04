@@ -93,4 +93,21 @@ export default class Host extends Track {
         this.hostNode.setAudio(operableAudioBuffer.toArray());
         this.gainNode.connect(this.hostNode);
     }
+
+    /**
+     * Set the start and end of the loop.
+     *
+     * @param leftTime - Start of the loop in milliseconds.
+     * @param rightTime - End of the loop in milliseconds.
+     */
+    public override updateLoopTime(leftTime: number, rightTime: number): void {
+        this.loopStart = leftTime;
+        this.loopEnd = rightTime;
+        const startBuffer = Math.floor(this.loopStart / 1000 * audioCtx.sampleRate);
+        const endBuffer = Math.floor(this.loopEnd / 1000 * audioCtx.sampleRate);
+        if (this.hostNode) {
+            this.hostNode.port.postMessage({loop: true, loopStart: startBuffer, loopEnd: endBuffer});
+        }
+    }
+
 }

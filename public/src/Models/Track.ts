@@ -51,6 +51,15 @@ export default class Track {
     url: string = "";
     isDeleted: boolean = false;
 
+    /**
+     * Position of the loop start in milliseconds.
+     */
+    public loopStart: number
+    /**
+     * Position of the loop end in milliseconds.
+     */
+    public loopEnd: number
+
     constructor(id: number, element: TrackElement, node: WamAudioWorkletNode | undefined) {
         this.id = id;
         this.element = element;
@@ -220,5 +229,21 @@ export default class Track {
         this.audioBuffer = opBuffer;
         this.node?.setAudio(this.audioBuffer!.toArray());
         this.node?.port.postMessage({playhead: playhead});
+    }
+
+    /**
+     * Set the start and end of the loop.
+     *
+     * @param leftTime - Start of the loop in milliseconds.
+     * @param rightTime - End of the loop in milliseconds.
+     */
+    public updateLoopTime(leftTime: number, rightTime: number): void {
+        this.loopStart = leftTime;
+        this.loopEnd = rightTime;
+        const startBuffer = Math.floor(this.loopStart / 1000 * audioCtx.sampleRate);
+        const endBuffer = Math.floor(this.loopEnd / 1000 * audioCtx.sampleRate);
+        if (this.node) {
+            this.node.port.postMessage({loop: true, loopStart: startBuffer, loopEnd: endBuffer});
+        }
     }
 }

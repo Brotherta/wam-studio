@@ -104,6 +104,8 @@ export default class HostController {
         });
         this._app.host.hostNode?.loop(looping);
         this._view.updateLoopButton(looping);
+        this._app.editorView.loop.updateActive(looping);
+
     }
 
     /**
@@ -123,6 +125,19 @@ export default class HostController {
     public updateVolume(): void {
         let value = parseInt(this._view.volumeSlider.value) / 100;
         this._app.host.setVolume(value);
+    }
+
+    /**
+     * Updates the loop value of the host. It is called when the user changes the loop value.
+     *
+     * @param leftTime - Time of the left loop in milliseconds.
+     * @param rightTime - Time of the right loop in milliseconds.
+     */
+    public updateLoopValue(leftTime: number, rightTime: number): void {
+        this._app.host.updateLoopTime(leftTime, rightTime);
+        this._app.tracksController.trackList.forEach(track => {
+            track.updateLoopTime(leftTime, rightTime);
+        });
     }
 
     /**

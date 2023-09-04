@@ -38,7 +38,7 @@ class AudioPlayerNode extends AudioWorkletNode {
     }
 
     loop(active: boolean) {
-        const loopingParam = this.parameters.get("looping");
+        const loopingParam = this.parameters.get("loop");
         if (loopingParam) {
             loopingParam.value = active ? 1 : 0;
         } else {

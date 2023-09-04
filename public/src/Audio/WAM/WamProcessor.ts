@@ -16,8 +16,9 @@ const getProcessor = (moduleId: string) => {
         
         audio: Float32Array[][] | undefined;
         playhead: number = 0;
+        loopStart: number = 0;
+        loopEnd: number = 0;
         recording: boolean = false;
-
 
         interleaved: Float32Array;
         sab: SharedArrayBuffer;
@@ -81,6 +82,10 @@ const getProcessor = (moduleId: string) => {
                     this.inputChannel = channelNum;
                 }
             }
+            else if (e.data.loop) {
+                this.loopStart = e.data.loopStart;
+                this.loopEnd = e.data.loopEnd;
+            }
         }
 
         _processEvent(event) {
@@ -114,8 +119,8 @@ const getProcessor = (moduleId: string) => {
                     const loop = !!(i < parameters.loop.length ? parameters.loop[i] : parameters.loop[0]);
                     if (!playing) continue; // Not playing
                     const audioLength: number = this.audio[0].length;
-                    if (this.playhead >= audioLength) { // Play was finished
-                        if (loop) this.playhead = 0; // Loop just enabled, reset playhead
+                    if (this.playhead >= audioLength || (loop && this.playhead > this.loopEnd)) { // Play was finished
+                        if (loop) this.playhead = this.loopStart; // Loop just enabled, reset playhead
                         else continue; // EOF without loop
                     }
                     const channelCount = Math.min(this.audio.length, output.length);

@@ -27,16 +27,6 @@ export default class PlayheadView extends Container {
      * Editor's Application of PIXI.JS.
      */
     private _editor: EditorView;
-    /**
-     * Duplicated size of the world width in pixels of the container size contained in the _editor view.
-     * Must be updated by the EditorView
-     */
-    private _worldWidth: number;
-    /**
-     * Duplicated size of the world height in pixels of the container size contained in the _editor view.
-     * Must be updated by the EditorView
-     */
-    private _worldHeight: number;
 
     constructor(editor: EditorView) {
         super();
@@ -47,19 +37,12 @@ export default class PlayheadView extends Container {
         this.sortableChildren = true;
         this.position.x = 0;
         this.position.y = 0;
-
-        this._worldWidth = this._editor.worldWidth;
-        this._worldHeight = this._editor.worldHeight;
-
-        this.width = 1;
-        this.height = this._worldHeight;
+        this.zIndex = 100;
 
         this.track = new Container();
         this.track.eventMode = "dynamic";
         this.track.zIndex = 99;
 
-        this.zIndex = 100;
-        this.drawLine();
         this.drawHandle();
         this.drawTrack();
         this._editor.viewport.addChild(this.track);
@@ -67,16 +50,9 @@ export default class PlayheadView extends Container {
     }
 
     /**
-     * Resizes the playhead given the new sizes in parameters.
-     *
-     * @param width - The new width.
-     * @param height - The new height.
+     * Resizes the playhead given the new sizes of the editor.
      */
-    public resize(width: number, height: number) {
-        this._worldWidth = width;
-        this._worldHeight = height;
-        this.height = this._worldHeight;
-        this.drawLine();
+    public resize() {
         this.drawTrack();
     }
 
@@ -99,31 +75,31 @@ export default class PlayheadView extends Container {
     }
 
     /**
-     * Draws the line in the playhead, given the world size in pixels.
-     */
-    private drawLine(): void {
-        if (this.line) this.removeChild(this.line);
-        this.line = new Graphics();
-        this.line.lineStyle(1, 0xffffff, 1);
-        this.line.moveTo(0, 0);
-        this.line.lineTo(0, this._worldHeight);
-        this.line.zIndex = 1;
-        this.addChild(this.line);
-    }
-
-    /**
      * Draws the handle of the playhead and activate the PIXI events.
      */
     private drawHandle(): void {
+        const width = EditorView.PLAYHEAD_WIDTH
+        const height = EditorView.PLAYHEAD_HEIGHT
         if (this.handle) this.removeChild(this.handle);
         this.handle = new Graphics();
-        this.handle.moveTo(-5, 0);
-        this.handle.beginFill(0x5C69CC);
-        this.handle.drawRect(-5, 0, 10, 24);
+
+        this.handle.moveTo(0, 0);
+        this.handle.lineStyle(1, 0xd3d3d3, 1);
+        this.handle.beginFill(0xd3d3d3);
+        this.handle.lineTo(0, 2/3*height);
+        this.handle.lineTo(width/2, height);
+        this.handle.lineTo(width/2, 10000);
+        this.handle.lineTo(width/2, height)
+        this.handle.lineTo(width, 2/3*height);
+        this.handle.lineTo(width, 0);
         this.handle.endFill();
+
+        this.addChild(this.handle);
+
         this.handle.zIndex = 2
         this.handle.eventMode = "dynamic";
-        this.addChild(this.handle);
+        this.handle.x = -EditorView.PLAYHEAD_WIDTH/2;
+        this.handle.y = EditorView.LOOP_HEIGHT;
     }
 
     /**
@@ -133,14 +109,10 @@ export default class PlayheadView extends Container {
         if (this.track.children.length > 0) this.track.removeChildren();
         let background = new Graphics();
         background.beginFill(0x3b4046);
-        background.drawRect(0, 0, this._worldWidth, 25);
+        background.drawRect(0, 7, this._editor.worldWidth, EditorView.PLAYHEAD_HEIGHT);
         background.endFill();
         background.zIndex = 99;
         this.track.addChild(background);
-        let border = new Graphics();
-        border.lineStyle(1, 0xffffff, 1);
-        border.drawRect(0, 0, this._worldWidth, 25);
-        border.zIndex = 100;
     }
 
     /**

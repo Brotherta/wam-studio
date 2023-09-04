@@ -46,12 +46,22 @@ export default class PlayheadController {
         this._view.handle.on("pointerup", (e) => {
             this.handlePointerUp(e);
         });
+        this._view.handle.on("pointerupoutside", (e) => {
+            this.handlePointerUp(e);
+        });
         this._view.handle.on("pointerdown", (e) => {
             this.handlePointerDown(e);
+        });
+        this._view.handle.on("pointerout", () => {
+            document.body.style.cursor = "default";
+        });
+        this._view.handle.on("pointerover", () => {
+            document.body.style.cursor = "grab";
         });
 
         this._view.track.on("globalpointermove", (e) => {
             if (this._movingPlayhead) {
+                document.body.style.cursor = "grabbing";
                 let pos = e.data.global.x + this._app.editorView.viewport.left;
                 if (pos < 0) pos = 0;
                 this._view.moveTo(pos);
