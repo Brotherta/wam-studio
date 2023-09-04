@@ -158,9 +158,8 @@ export default class LoopController {
         }
 
         const leftPos = pos;
-        const rightPos = pos + this._view.leftHandle.width + this._view.background.width;
+        const rightPos = this._view.rightHandle.x + pos - this._view.leftHandle.x
         this._view.updateHandlePosition(leftPos, rightPos, false);
-
     }
 
     private handleLeftHandleMove(e: FederatedPointerEvent): void {
@@ -183,6 +182,7 @@ export default class LoopController {
         else if (pos <= this._view.leftHandle.x + this._view.leftHandle.width) {
             pos = this._view.leftHandle.x + this._view.leftHandle.width;
         }
+
         const leftPos = this._view.leftHandle.x;
         const rightPos = pos;
         this._view.updateHandlePosition(leftPos, rightPos, true);
