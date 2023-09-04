@@ -232,7 +232,7 @@ export default class RegionsController {
             this.deselectRegion();
             this._selectedRegionView = regionView;
             this._selectedRegionView.select();
-            this._selectedRegion = this._app.tracksController.getTrackById(regionView.trackId)?.getRegion(regionView.id);
+            this._selectedRegion = this._app.tracksController.getTrackById(regionView.trackId)?.getRegionById(regionView.id);
         }
     }
 
@@ -261,7 +261,7 @@ export default class RegionsController {
         let track = this._app.tracksController.getTrackById(this._selectedRegion.trackId);
         if (track === undefined) throw new Error("Track not found");
 
-        track.removeRegion(this._selectedRegion.id);
+        track.removeRegionById(this._selectedRegion.id);
         waveform.removeRegionView(this._selectedRegionView);
 
         this._selectedRegionView = undefined;
@@ -322,7 +322,7 @@ export default class RegionsController {
             if (oldTrack == undefined || newTrack == undefined) {
                 throw new Error("Track not found");
             }
-            oldTrack.removeRegion(this._selectedRegion!.id);
+            oldTrack.removeRegionById(this._selectedRegion!.id);
             newTrack.addRegion(this._selectedRegion!);
 
             oldTrack.modified = true;

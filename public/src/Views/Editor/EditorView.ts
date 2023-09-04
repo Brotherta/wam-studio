@@ -24,7 +24,6 @@ export default class EditorView extends Application {
      */
     public canvasContainer = document.getElementById("editor-canvas") as HTMLDivElement;
     public editorDiv = document.getElementById("editor") as HTMLDivElement;
-    public dragCover = document.getElementById("drag-cover") as HTMLDivElement;
     public horizontalScrollbar = document.getElementById("horizontal-scrollbar") as ScrollBarElement;
     public verticalScrollbar = document.getElementById("vertical-scrollbar") as ScrollBarElement;
     public trackContainer = document.getElementById("track-container") as HTMLDivElement;
@@ -261,7 +260,7 @@ export default class EditorView extends Application {
         if (waveFormView !== undefined) {
             waveFormView.color = track.color;
             waveFormView.regionViews.forEach(regionView => {
-                let region = track.getRegion(regionView.id);
+                let region = track.getRegionById(regionView.id);
                 if (region !== undefined) {
                     regionView.drawWave(track.color, region);
                 }
@@ -279,7 +278,7 @@ export default class EditorView extends Application {
             let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
             if (!waveFormView) return
             for (let regionView of waveFormView.regionViews) {
-                let region = track.getRegion(regionView.id);
+                let region = track.getRegionById(regionView.id);
                 if (region) {
                     regionView.initializeRegionView(track.color, region);
                 }
@@ -297,7 +296,7 @@ export default class EditorView extends Application {
             if (!waveFormView) return
             for (let regionView of waveFormView.regionViews) {
                 if (!track.audioBuffer) return;
-                let region = track.getRegion(regionView.id);
+                let region = track.getRegionById(regionView.id);
                 if (region) {
                     regionView.stretch(region.duration, region.start);
                 }

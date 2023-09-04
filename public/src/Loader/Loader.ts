@@ -203,7 +203,7 @@ export default class Loader {
                     let totalSizeSum = Array.from(totalSize.values()).reduce((a, b) => a + b, 0);
                     let percentComplete = (totalLoaded / totalSizeSum) * 100;
 
-                    if (track.isDeleted) {
+                    if (track.deleted) {
                         xhr.abort();
                         return;
                     }
@@ -218,7 +218,7 @@ export default class Loader {
                     let audioArrayBuffer = xhr.response;
                     let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
 
-                    if (track.isDeleted) {
+                    if (track.deleted) {
                         xhr.abort();
                         return;
                     }
@@ -255,7 +255,7 @@ export default class Loader {
                 let percentComplete = event.loaded / event.total * 100;
                 // update progress bar on track element
                 // Stop the request if the track has been removed
-                if (track.isDeleted) {
+                if (track.deleted) {
                     xhr.abort();
                     return;
                 }
@@ -268,7 +268,7 @@ export default class Loader {
                 let audioArrayBuffer = xhr.response;
                 audioCtx.decodeAudioData(audioArrayBuffer)
                     .then((audioBuffer) => {
-                        if (track.isDeleted) {
+                        if (track.deleted) {
                             xhr.abort();
                             return;
                         }

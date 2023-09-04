@@ -63,13 +63,13 @@ export default class TracksController {
      * @param track - Track to be removed from the track view.
      */
     public removeTrack(track: Track): void {
-        track.removed = true; // Used to stop the track to be loaded on xhr request
+        track.deleted = true; // Used to stop the track to be loaded on xhr request
         this._app.pluginsController.removePedalBoard(track);
         this._view.removeTrack(track.element);
         this._app.tracksController.deleteTrack(track);
         this._app.waveformController.removeWaveformOfTrack(track);
         this._app.automationView.removeAutomationBpf(track.id);
-        track.isDeleted = true;
+        track.deleted = true;
     }
 
     
@@ -140,7 +140,7 @@ export default class TracksController {
             node.setAudio(operableAudioBuffer.toArray());
 
             let track = this.createTrack(node);
-            track.addBuffer(operableAudioBuffer);
+            track.setAudioBuffer(operableAudioBuffer);
             track.element.name = file.name;
             return track;
         }
@@ -186,7 +186,7 @@ export default class TracksController {
      */
     private bindTrackEvents(track: Track): void {
         track.element.addEventListener("click", () => { // Select the track when it is clicked.
-            if (!track.removed) {
+            if (!track.deleted) {
                 this._app.pluginsController.selectTrack(track);
             }
         })

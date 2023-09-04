@@ -333,7 +333,7 @@ export default class HostController {
     }
 
     /**
-     * Initializes the demo songs. It creates a new song item for each demo song.
+     * Initializes the demo songs. It creates a new song item for each demo song present in the json file.
      * @private
      */
     private initializeDemoSongs(): void {

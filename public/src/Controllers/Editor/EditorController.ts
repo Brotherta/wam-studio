@@ -111,22 +111,9 @@ export default class EditorController {
      * It adds the dropped files to the track _view.
      */
     private bindEvents(): void {
-        ["dragenter", "dragstart"].forEach(eventName => {
-            this._view.canvasContainer.addEventListener(eventName, () => {
-                this._view.dragCover.hidden = false;
-            });
-        });
-
         window.addEventListener("resize", () => {
             this._view.resizeCanvas();
         });
-
-        this._view.dragCover.addEventListener("dragleave", () => {
-            this._view.dragCover.hidden = true;
-        });
-        window.ondragend = () => {
-            this._view.dragCover.hidden = true;
-        }
         window.addEventListener("wheel", (e) => {
             const currentTime = Date.now();
             if (currentTime - this._lastExecutedZoom < this.THROTTLE_TIME) return;
@@ -186,7 +173,7 @@ export default class EditorController {
                 track.updateBuffer(audioCtx, this._app.host.playhead);
                 this._view.drawRegions(track);
             });
-        }, 500);
+        }, 2000);
     }
 
     /**

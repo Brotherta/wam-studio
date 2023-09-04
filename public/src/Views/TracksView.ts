@@ -1,15 +1,6 @@
 import TrackElement from "../Components/TrackElement";
 import Track from "../Models/Track";
 
-function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
 /**
  * Class that is responsible for the view of the tracks.
  * It is responsible for adding and removing tracks from the track view.
@@ -40,7 +31,7 @@ export default class TracksView {
      * @param track - The track to change the color.
      */
     public changeColor(track: Track): void {
-        let newColor = getRandomColor();
+        let newColor = this.getRandomColor();
         track.color = newColor;
         track.element.color.style.background = newColor;
     }
@@ -50,8 +41,22 @@ export default class TracksView {
      * @param track - The track to change the color.
      * @param color - The new color.
      */
-    public setColor(track: Track, color: string) {
+    public setColor(track: Track, color: string): void {
         track.color = color;
         track.element.color.style.background = color;
+    }
+
+    /**
+     * Gets a random color in string format.
+     * @return {string} - The random color.
+     * @private
+     */
+    private getRandomColor(): string {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
     }
 }
