@@ -98,7 +98,8 @@ export default class HostController {
      * Handles the back button. It goes back to the beginning of the song.
      */
     public back(): void {
-        this._app.tracksController.jumpTo(1);
+        this._app.editorView.playhead.moveToFromPlayhead(0);
+        this._app.tracksController.jumpTo(0);
         this._app.automationController.applyAllAutomations();
     }
 
