@@ -415,9 +415,6 @@ export default class BindsController {
             else if (number < parameter.min) {
                 parameter.currentMin = parameter.min
             }
-            else if (number > parameter.currentMax) {
-                parameter.currentMin = parameter.currentMax;
-            }
             else if (number > parameter.max) {
                 parameter.currentMin = parameter.max;
             }
@@ -432,9 +429,6 @@ export default class BindsController {
             }
             if (number > parameter.max) {
                 parameter.currentMax = parameter.max
-            }
-            else if (number < parameter.currentMin) {
-                parameter.currentMax = parameter.currentMin;
             }
             else if (number < parameter.min) {
                 parameter.currentMax = parameter.min;
