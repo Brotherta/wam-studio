@@ -24,6 +24,9 @@ export default class RecorderController {
         });
 
         if (track.micRecNode === undefined) {
+            if (this.app.settingsController.constraints === undefined) {
+                await this.app.settingsController.updateMediaDevices();
+            }
             let stream = await navigator.mediaDevices.getUserMedia(this.app.settingsController.constraints);
             track.micRecNode = new MediaStreamAudioSourceNode(audioCtx, {
                 mediaStream: stream,

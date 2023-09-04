@@ -2,9 +2,9 @@ import HostView from "../Views/HostView";
 import App from "../App";
 import songs from "../../static/songs.json"
 import {audioCtx} from "../index";
-import {focusWindow} from "./StaticController";
 import {SONGS_FILE_URL} from "../Env";
 import VuMeter from "../Components/VuMeterElement";
+import DraggableWindow from "../Utils/DraggableWindow";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -16,7 +16,7 @@ export default class HostController {
      * Vu meter of the master track.
      */
     public vuMeter: VuMeter;
-
+    
     /**
      * Route application.
      */
@@ -25,7 +25,15 @@ export default class HostController {
      * View of the host.
      */
     private _view: HostView;
+    /**
+     * List of draggable windows.
+     */
+    private windows: DraggableWindow[];
 
+    /**
+     * Active HTML element when scrolling.
+     */
+    private active: EventTarget | null;
     /**
      * Boolean to know if the timer interval is paused.
      */
@@ -38,11 +46,12 @@ export default class HostController {
      * Interval time to update the vu meter.
      */
     private readonly TIMER_INTERVAL_MS = 1000/60; // 60 fps
+    
 
     constructor(app: App) {
         this._app = app;
         this._view = app.hostView;
-
+        this.windows = [];
         this._timerIntervalPaused = false;
 
         this.initializeDemoSongs();
@@ -210,6 +219,29 @@ export default class HostController {
     }
 
     /**
+     * Adds draggable windows to the host.
+     * @param windows - Windows to add.
+     */
+    public addDraggableWindow(...window: DraggableWindow[]): void {
+        this.windows.push(...window);
+        this.windows.forEach((win) => {
+            win.resizableWindow.addEventListener("mousedown", () => {
+                this.focus(win);
+            });
+        });
+    }
+
+    /**
+     * Focus the window passed in parameter.
+     * @param window - Window to focus.
+     */
+    public focus(window: DraggableWindow): void {
+        for (const win of this.windows) {
+            win.resizableWindow.style.zIndex = (win.resizableWindow === window.resizableWindow) ? "100" : "99";
+        }
+    }
+
+    /**
      * Binds the events of the host.
      * @private
      */
@@ -243,25 +275,34 @@ export default class HostController {
         // MENU BUTTONS
         this._view.exportProject.addEventListener("click", () => {
             this._app.projectController.openExportWindow();
+            this.focus(this._app.projectView);
         });
         this._view.saveBtn.addEventListener("click",  () => {
             this._app.projectController.openSaveWindow();
+            this.focus(this._app.projectView);
         });
         this._view.loadBtn.addEventListener("click", () => {
             this._app.projectController.openLoadWindow();
+            this.focus(this._app.projectView);
         });
         this._view.loginBtn.addEventListener("click",  () => {
             this._app.projectController.openLoginWindow();
+            this.focus(this._app.projectView);
         });
         this._view.settingsBtn.addEventListener("click",   () => {
             this._app.settingsController.openSettings();
+            this.focus(this._app.settingsView);
         });
         this._view.aboutBtn.addEventListener("click",  () => {
             this._view.aboutWindow.hidden = false;
-            focusWindow(this._view.aboutWindow);
+            this.focus(this._app.aboutView);
         });
         this._view.aboutCloseBtn.addEventListener("click",  () => {
             this._view.aboutWindow.hidden = true;
+        });
+        this._view.latencyBtn.addEventListener("click", () => {
+            this._app.latencyView.openWindow();
+            this.focus(this._app.latencyView);
         });
         this._view.importSongs.addEventListener('click', () => {
             this._view.newTrackInput.click();
@@ -269,8 +310,25 @@ export default class HostController {
         this._view.newTrackInput.addEventListener('change', (e) => {
             this.importFilesSongs(e as InputEvent);
         });
-        this._view.latencyBtn.addEventListener("click", () => {
-            this._app.latencyView.openWindow();
+
+        // SCROLL SYNC
+        const trackDiv = this._app.tracksView.trackContainerDiv;
+        const automationDiv = this._app.automationView.automationContainer;
+        trackDiv.addEventListener("mouseenter", (e: Event) => {
+            this.active = e.target;
+        });
+        automationDiv.addEventListener("mouseenter", (e: Event) => {
+            this.active = e.target;
+        });
+
+        trackDiv.addEventListener("scroll", (e: Event) => {
+            if (e.target !== this.active) return;
+            automationDiv.scrollTop = trackDiv.scrollTop;
+            this._app.editorView.verticalScrollbar.customScrollTop(trackDiv.scrollTop);
+        });
+        automationDiv.addEventListener("scroll", (e: Event) => {
+            if (e.target !== this.active) return;
+            trackDiv.scrollTop = automationDiv.scrollTop;
         });
     }
 

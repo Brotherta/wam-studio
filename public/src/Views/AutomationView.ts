@@ -1,5 +1,7 @@
 import Track from "../Models/Track";
 import BPF from "../Components/BPF";
+import LoopView from "./Editor/LoopView";
+import EditorView from "./Editor/EditorView";
 
 /**
  * Class for the automation view. This class is responsible for displaying the automation menu and the automation bpf.
@@ -77,6 +79,9 @@ export default class AutomationView {
      * @param trackId - The id of the track to which the bpf is associated.
      */
     public addAutomationBpf(trackId: number): void {
+        const offset = this.automationContainer.parentElement!.offsetTop + EditorView.LOOP_HEIGHT + EditorView.PLAYHEAD_HEIGHT;
+        this.automationContainer.style.top = offset + "px";
+
         let automationLocation = document.createElement("div");
         automationLocation.className = "automation-location";
         automationLocation.id = "automation-"+ trackId;

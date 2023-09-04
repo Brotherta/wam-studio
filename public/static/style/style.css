@@ -124,7 +124,7 @@ body {
 
 #automation-container {
     position: absolute;
-    padding-top: 25px;
+    /* padding-top: 25px; */
     padding-bottom: 143px;
     flex-direction: column;
     display: flex;

@@ -77,6 +77,9 @@ export default class LatencyController {
         await this._recordAudioContext.suspend();
         await this._recordAudioContext.audioWorklet.addModule(new URL('../Audio/LatencyProcessor.js', import.meta.url))
 
+        if (this._app.settingsController.constraints === undefined) {
+            await this._app.settingsController.updateMediaDevices();
+        }
         const stream = await navigator.mediaDevices.getUserMedia(this._app.settingsController.constraints);
         const mic = this._recordAudioContext.createMediaStreamSource(stream);
 

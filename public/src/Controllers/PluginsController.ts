@@ -250,6 +250,7 @@ export default class PluginsController {
         this._view.showHidePlugin();
         this._view.hideShowButton();
         this._view.showFloatingWindow();
+        this._app.hostController.focus(this._view);
     }
 
     /**

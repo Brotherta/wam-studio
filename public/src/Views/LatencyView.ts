@@ -1,9 +1,9 @@
-import {focusWindow} from "../Controllers/StaticController";
+import DraggableWindow from "../Utils/DraggableWindow";
 
 /**
  * View for the latency window. It contains all the elements of the latency window.
  */
-export default class LatencyView {
+export default class LatencyView extends DraggableWindow {
 
     latencyInput = document.getElementById("manual-latency") as HTMLInputElement;
     closeWindowButton = document.getElementById("latency-close-button") as HTMLButtonElement;
@@ -13,6 +13,10 @@ export default class LatencyView {
     inputLatencyLabel = document.getElementById("input-latency-label") as HTMLLabelElement;
     roundtripLatencyLabel = document.getElementById("roundtrip-latency-label") as HTMLLabelElement;
     outputLatencyLabel = document.getElementById("output-latency-label") as HTMLLabelElement;
+
+    constructor() {
+        super(document.getElementById("latency-header") as HTMLDivElement, document.getElementById("latency-window") as HTMLDivElement);
+    }
 
     /**
      * Closes the latency window.
@@ -26,7 +30,6 @@ export default class LatencyView {
      */
     public openWindow() {
         this.LatencyWindow.hidden = false;
-        focusWindow(this.LatencyWindow);
     }
 
     /**

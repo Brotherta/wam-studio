@@ -1,8 +1,8 @@
 import Track from "../Models/Track";
-import {focusWindow} from "../Controllers/StaticController";
+import DraggableWindow from "../Utils/DraggableWindow";
 
 
-export default class PluginsView {
+export default class PluginsView extends DraggableWindow {
 
     maxMinBtn = document.getElementById("min-max-btn") as HTMLDivElement;
     rack = document.getElementById("plugin-editor") as HTMLDivElement;
@@ -16,6 +16,10 @@ export default class PluginsView {
     mainTrack = document.getElementById("main-track") as HTMLDivElement;
     minMaxIcon = document.getElementById("min-max-icon") as HTMLImageElement;
     loadingZone = document.getElementById("loading-zone") as HTMLDivElement;
+
+    constructor() {
+        super(document.getElementById("plugin-header") as HTMLDivElement, document.getElementById("plugin-window") as HTMLDivElement);
+    }
 
     /**
      * If the window is opened or not.
@@ -85,7 +89,6 @@ export default class PluginsView {
      */
     showFloatingWindow() {
         this.floating.hidden = false;
-        focusWindow(this.floating);
         this.windowOpened = true;
     }
 

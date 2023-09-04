@@ -3,7 +3,6 @@ import HostController from "./Controllers/HostController";
 import TracksController from "./Controllers/TracksController";
 
 import TracksView from "./Views/TracksView";
-import { makeDivScrollSync } from "./Controllers/StaticController";
 import Host from "./Models/Host";
 import PluginsController from "./Controllers/PluginsController";
 import PluginsView from "./Views/PluginsView";
@@ -24,8 +23,9 @@ import PlayheadController from "./Controllers/Editor/PlayheadController";
 import EditorView from "./Views/Editor/EditorView";
 import KeyboardController from "./Controllers/KeyboardController";
 import ExporterController from "./Controllers/ExportController";
-import LoopView from "./Views/Editor/LoopView";
 import LoopController from "./Controllers/Editor/LoopController";
+import AboutView from "./Views/AboutView";
+import { makeDivScrollSync } from "./Controllers/StaticController";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -56,6 +56,7 @@ export default class App {
     settingsView: SettingsView;
     projectView: ProjectView;
     editorView: EditorView;
+    aboutView: AboutView;
 
     host: Host;
     loader: Loader;
@@ -73,7 +74,7 @@ export default class App {
         this.settingsView = new SettingsView();
         this.projectView = new ProjectView();
         this.editorView = new EditorView();
-
+        this.aboutView = new AboutView();
 
         this.editorController = new EditorController(this);
         this.waveformController = new WaveformController(this);
@@ -90,8 +91,8 @@ export default class App {
         this.keyboardController = new KeyboardController(this);
         this.exportController = new ExporterController(this);
         this.loopController = new LoopController(this);
-
-        makeDivScrollSync();
+        
+        this.hostController.addDraggableWindow(this.pluginsView, this.latencyView, this.settingsView, this.projectView, this.aboutView);
     }
 
     /**

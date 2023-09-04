@@ -244,7 +244,7 @@ export default class EditorView extends Application {
             this.canvasContainer.style.width = `${this.width}px`;
             this.canvasContainer.style.height = `${this.height}px`;
 
-            this.automationContainer.style.height = `${this.height}px`;
+            this.automationContainer.style.height = `${this.height - EditorView.LOOP_HEIGHT - EditorView.PLAYHEAD_HEIGHT}px`;
             this.automationContainer.style.width = `${this.width}px`;
 
             this.playhead.resize();

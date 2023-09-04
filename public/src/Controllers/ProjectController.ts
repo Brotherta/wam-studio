@@ -35,6 +35,7 @@ export default class ProjectController {
         this._view.mountSave();
         this.bindSaveEvents();
         this._view.show();
+
     }
 
     /**

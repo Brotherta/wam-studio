@@ -1,14 +1,13 @@
 import LoginElement from "../Components/Project/LoginElement";
 import LoadProjectElement from "../Components/Project/LoadProjectElement";
 import SaveProjectElement from "../Components/Project/SaveProjectElement";
-import ConfirmElement from "../Components/Utils/ConfirmElement";
-import {focusWindow} from "../Controllers/StaticController";
 import ExportProjectElement from "../Components/Project/ExportProjectElement";
+import DraggableWindow from "../Utils/DraggableWindow";
 
 /**
  * View for the project window. It contains all the elements of the project window. Load, save, login and export.
  */
-export default class ProjectView {
+export default class ProjectView extends DraggableWindow {
 
     window= document.getElementById("project-window") as HTMLDivElement;
     mount= document.getElementById("project-mount") as HTMLDivElement;
@@ -21,12 +20,15 @@ export default class ProjectView {
     loginElement = new LoginElement();
     exportElement = new ExportProjectElement();
 
+    constructor() {
+        super(document.getElementById("project-header") as HTMLDivElement, document.getElementById("project-window") as HTMLDivElement);
+    }
+
     /**
      * Shows the project window.
      */
     public show() {
         this.window.hidden = false;
-        focusWindow(this.window);
     }
 
     /**
