@@ -26,7 +26,7 @@ export default class WaveformController {
      * Add the according waveform to the track in the canvas. It also resizes the canvas.
      * @param track
      */
-    public addWaveformToTrack(track: Track): void {
+    public initializeWaveform(track: Track): void {
         let waveformView = this._editorView.createWaveformView(track);
         if (track.audioBuffer !== undefined) {
             this._app.regionsController.createRegion(track, track.audioBuffer, 0, waveformView);

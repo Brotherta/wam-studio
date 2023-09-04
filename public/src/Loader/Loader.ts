@@ -1,15 +1,17 @@
 import App from "../App";
-import JSZip from "jszip";
 import {bufferToWave} from "../Audio/Utils/audioBufferToWave";
 import APP_VERSION from "../version";
 import {audioCtx} from "../index";
+import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
+import Track from "../Models/Track";
+import { BACKEND_URL } from "../Env";
 
 
 export default class Loader {
-    app: App;
+    _app: App;
 
     constructor(app: App) {
-        this.app = app;
+        this._app = app;
     }
 
     async saveProject() {
@@ -17,11 +19,11 @@ export default class Loader {
         let tracks = [];
 
         let pluginHostState = null;
-        if (this.app.host.plugin.initialized) {
-            pluginHostState = await this.app.host.plugin.instance!._audioNode.getState();
+        if (this._app.host.plugin.initialized) {
+            pluginHostState = await this._app.host.plugin.instance!._audioNode.getState();
         }
 
-        for (let track of this.app.tracksController.trackList) {
+        for (let track of this._app.tracksController.trackList) {
             let hasPlugin = track.plugin.initialized;
             let pluginState = null;
 
@@ -77,11 +79,11 @@ export default class Loader {
         let project = {
             "host": {
                 "version": APP_VERSION,
-                "playhead": this.app.host.playhead,
-                "muted": this.app.host.muted,
-                "volume": this.app.host.volume,
-                "trackAcc": this.app.tracksController.trackIdCount,
-                "regionAcc": this.app.regionsController.regionIdCounter,
+                "playhead": this._app.host.playhead,
+                "muted": this._app.host.muted,
+                "volume": this._app.host.volume,
+                "trackAcc": this._app.tracksController.trackIdCount,
+                "regionAcc": this._app.regionsController.regionIdCounter,
                 "plugin": pluginHostState
             },
             "tracks": tracks
@@ -92,8 +94,6 @@ export default class Loader {
             "wavs": wavs
         }
     }
-
-
 
     async loadProject(data: any) {
         let project = data.data;
@@ -106,25 +106,25 @@ export default class Loader {
 
         let tracksJson = project.tracks;
 
-        this.app.host.playing = false;
-        this.app.hostController.stopAllTracks();
-        this.app.tracksController.clearAllTracks();
-        this.app.host.playhead = 0;
-        this.app.tracksController.trackIdCount = 1;
-        this.app.host.setVolume(project.host.volume);
+        this._app.host.playing = false;
+        this._app.hostController.stopAllTracks();
+        this._app.tracksController.clearAllTracks();
+        this._app.host.playhead = 0;
+        this._app.tracksController.trackIdCount = 1;
+        this._app.host.setVolume(project.host.volume);
 
         if (project.host.plugin !== null) {
-            await this.app.host.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
-            this.app.pluginsController.connectPedalBoard(this.app.host);
-            this.app.pluginsView.movePluginLoadingZone(this.app.host);
-            await this.app.host.plugin.instance?._audioNode.setState(project.host.plugin);
+            await this._app.host.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
+            this._app.pluginsController.connectPedalBoard(this._app.host);
+            this._app.pluginsView.movePluginLoadingZone(this._app.host);
+            await this._app.host.plugin.instance?._audioNode.setState(project.host.plugin);
         }
 
         for (const trackJson of tracksJson) {
-            let track = await this.app.tracksController.newEmptyTrack();
+            let track = await this._app.tracksController.newEmptyTrack();
             track.id = trackJson.id;
 
-            await this.app.tracksController.initTrackComponents(track);
+            this._app.tracksController.initializeTrack(track);
 
             track.element.name = trackJson.name;
             track.element.trackNameInput.value = trackJson.name;
@@ -142,13 +142,13 @@ export default class Loader {
             track.setVolume(trackJson.volume);
             track.element.volumeSlider.value = (trackJson.volume*100).toString();
             track.element.balanceSlider.value = trackJson.pan;
-            this.app.tracksView.setColor(track, trackJson.color);
+            this._app.tracksView.setColor(track, trackJson.color);
 
             let plugins = trackJson.plugins;
             if (plugins !== null) {
-                await track.plugin.initPlugin(this.app.host.pluginWAM, audioCtx);
-                this.app.pluginsController.connectPedalBoard(track);
-                this.app.pluginsView.movePluginLoadingZone(track);
+                await track.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
+                this._app.pluginsController.connectPedalBoard(track);
+                this._app.pluginsView.movePluginLoadingZone(track);
                 await track.plugin.instance?._audioNode.setState(plugins);
 
                 let state = await track.plugin.instance?._audioNode.getState();
@@ -177,7 +177,116 @@ export default class Loader {
             }
 
             let regions = trackJson.regions;
-            this.app.tracksController.loadTrackRegions(track, regions, data.id);
+            this.loadTrackRegions(track, regions, data.id);
         }
+    }
+
+    loadTrackRegions(track: Track, regions: any, projectId: string) {
+        let loadedRegions = 0;
+        let totalSize = new Map();
+        let totalLoaded = 0;
+
+        for (let region of regions) {
+            let url = `${BACKEND_URL}/projects/${projectId}/${region.path}`;
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.responseType = 'arraybuffer';
+
+            xhr.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    totalLoaded -= totalSize.get(xhr) || 0;  // remove old value
+                    totalLoaded = Math.max(totalLoaded, 0);  // prevent negative values
+                    totalSize.set(xhr, event.total);  // update total size
+                    totalLoaded += event.loaded;  // update loaded size
+
+                    let totalSizeSum = Array.from(totalSize.values()).reduce((a, b) => a + b, 0);
+                    let percentComplete = (totalLoaded / totalSizeSum) * 100;
+
+                    if (track.isDeleted) {
+                        xhr.abort();
+                        return;
+                    }
+
+                    track.element.progress(percentComplete, totalLoaded, totalSizeSum);
+                }
+            };
+
+            xhr.onload = async () => {
+                if (xhr.status == 200) {
+                    loadedRegions++;
+                    let audioArrayBuffer = xhr.response;
+                    let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
+
+                    if (track.isDeleted) {
+                        xhr.abort();
+                        return;
+                    }
+
+                    let opAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                    this._app.regionsController.createRegion(track, opAudioBuffer, region.start);
+
+                    // All regions have been loaded, call progressDone
+                    if (loadedRegions === regions.length) {
+                        track.element.progressDone();
+                    }
+                } else {
+                    console.error('An error occurred fetching the track region:', xhr.statusText);
+                }
+            };
+
+            xhr.onerror = () => {
+                console.error('An error occurred fetching the track region');
+            };
+
+            xhr.send();
+        }
+    }
+
+    loadTrackUrl(track: Track) {
+        if (!track.url) return;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', track.url, true);
+        xhr.responseType = 'arraybuffer';
+
+        xhr.onprogress = (event) => {
+            if (event.lengthComputable) {
+                let percentComplete = event.loaded / event.total * 100;
+                // update progress bar on track element
+                // Stop the request if the track has been removed
+                if (track.isDeleted) {
+                    xhr.abort();
+                    return;
+                }
+                track.element.progress(percentComplete, event.loaded, event.total);
+            }
+        };
+
+        xhr.onload = () => {
+            if (xhr.status == 200) {
+                let audioArrayBuffer = xhr.response;
+                audioCtx.decodeAudioData(audioArrayBuffer)
+                    .then((audioBuffer) => {
+                        if (track.isDeleted) {
+                            xhr.abort();
+                            return;
+                        }
+                        let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                        operableAudioBuffer = operableAudioBuffer.makeStereo();
+                        this._app.regionsController.createRegion(track, operableAudioBuffer, 0);
+                        track.element.progressDone();
+                    });
+            } else {
+                // Error occurred during the request
+                console.error('An error occurred fetching the track:', xhr.statusText);
+            }
+        };
+
+        xhr.onerror = () => {
+            console.error('An error occurred fetching the track');
+        };
+
+        xhr.send();
     }
 }

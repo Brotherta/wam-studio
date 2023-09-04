@@ -232,7 +232,7 @@ export default class RegionsController {
             this.deselectRegion();
             this._selectedRegionView = regionView;
             this._selectedRegionView.select();
-            this._selectedRegion = this._app.tracksController.getTrack(regionView.trackId)?.getRegion(regionView.id);
+            this._selectedRegion = this._app.tracksController.getTrackById(regionView.trackId)?.getRegion(regionView.id);
         }
     }
 
@@ -258,7 +258,7 @@ export default class RegionsController {
         if (!this._selectedRegionView || !this._selectedRegion || this._isMovingRegion) return;
 
         let waveform = this._selectedRegionView.parent as WaveformView;
-        let track = this._app.tracksController.getTrack(this._selectedRegion.trackId);
+        let track = this._app.tracksController.getTrackById(this._selectedRegion.trackId);
         if (track === undefined) throw new Error("Track not found");
 
         track.removeRegion(this._selectedRegion.id);
@@ -317,8 +317,8 @@ export default class RegionsController {
         if (!this._selectedRegionView && !this._selectedRegion) return;
 
         if (this._selectedRegionView!.trackId !== this._selectedRegion!.trackId) {
-            let oldTrack = this._app.tracksController.getTrack(this._selectedRegion!.trackId);
-            let newTrack = this._app.tracksController.getTrack(this._selectedRegionView!.trackId);
+            let oldTrack = this._app.tracksController.getTrackById(this._selectedRegion!.trackId);
+            let newTrack = this._app.tracksController.getTrackById(this._selectedRegionView!.trackId);
             if (oldTrack == undefined || newTrack == undefined) {
                 throw new Error("Track not found");
             }
@@ -333,7 +333,7 @@ export default class RegionsController {
             this._selectedRegion!.trackId = this._selectedRegionView!.trackId;
         }
         else {
-            let track = this._app.tracksController.getTrack(this._selectedRegion!.trackId);
+            let track = this._app.tracksController.getTrackById(this._selectedRegion!.trackId);
             if (track == undefined) throw new Error("Track not found");
             track.modified = true;
             track.updateBuffer(audioCtx, this._app.host.playhead);

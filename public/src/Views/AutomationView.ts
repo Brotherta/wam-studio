@@ -78,7 +78,7 @@ export default class AutomationView {
      *
      * @param trackId - The id of the track to which the bpf is associated.
      */
-    public addAutomationBpf(trackId: number): void {
+    public initializeAutomation(trackId: number): void {
         const offset = this.automationContainer.parentElement!.offsetTop + EditorView.LOOP_HEIGHT + EditorView.PLAYHEAD_HEIGHT;
         this.automationContainer.style.top = offset + "px";
 

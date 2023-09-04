@@ -10,201 +10,104 @@ import Plugin from "../Models/Plugin";
 import {BACKEND_URL, RATIO_MILLS_BY_PX} from "../Env";
 
 /**
- * Controller for the track view. This controller is responsible for adding and removing tracks from the track view.
+ * Class that controls the tracks view. It creates, removes and manages the tracks. It also defines the listeners for the tracks.
  */
 export default class TracksController {
     
-    app: App;
-    view: TracksView;
-    trackIdCount: number;
-    trackList: Track[];
+    /**
+     * The app instance.
+     */
+    private _app: App;
+    /**
+     * The tracks view instance.
+     */
+    private _view: TracksView;
+    
+    /**
+     * The account of tracks' id.
+     */
+    public trackIdCount: number;
+    /**
+     * The list of tracks.
+     */ 
+    public trackList: Track[];
 
     constructor(app: App) {
-        this.app = app;
-        this.view = app.tracksView;
+        this._app = app;
+        this._view = app.tracksView;
         this.trackIdCount = 1;
         this.trackList = [];
 
-        this.defineNewTrackCallback();
-    }
-
-    defineNewTrackCallback() {
-        this.view.newTrackDiv.addEventListener('click', () => {
-            this.app.tracksController.newEmptyTrack()
-                .then(track => {
-                    this.initTrackComponents(track);
-                    track.element.progressDone();
-                });
-        });
+        this.bindEvents();
     }
 
     /**
-     * It adds a new track to the track view. the color of the track is also changed.
-     * It also defines the listeners for the track.
+     * Initializes the track view with the given track.
+     * It also initializes the waveforms and the automations.
      * 
-     * @param track Track to be added to the track view.
+     * @param track - The track to be initialized.
      */
-    addNewTrackInit(track: Track) {
-        this.view.addTrack(track.element);
-        this.view.changeColor(track);
-        this.defineTrackListener(track);
-        this.app.recorderController.clickMode(track);
-    }
+    public initializeTrack(track: Track): void {
+        this._view.addTrack(track.element);
+        this._view.changeColor(track);
+        this.bindTrackEvents(track);
+        this._app.recorderController.clickMode(track);
 
-    /**
-     * Used to add a list of tracks to the track view. It calls the addNewTrackInit() for each track.
-     * 
-     * @param tracks List of tracks to be added to the track view.
-     */
-    addNewTrackList(tracks: Track[]) {
-        for (const track in tracks) {
-            if (Object.prototype.hasOwnProperty.call(tracks, track)) {
-                const element = tracks[track];
-                this.initTrackComponents(element);
-            }
-        }
-    }
-
-    initTrackComponents(track: Track) {
-        this.app.tracksController.addNewTrackInit(track);
-        this.app.automationView.addAutomationBpf(track.id);
-        this.app.waveformController.addWaveformToTrack(track);
+        this._app.automationView.initializeAutomation(track.id);
+        this._app.waveformController.initializeWaveform(track);
     }
 
     /**
      * Removes a track from the track view. It also removes the track from the audio controller.
      * 
-     * @param track Track to be removed from the track view.
+     * @param track - Track to be removed from the track view.
      */
-    removeTrack(track: Track) {
-        this.app.pluginsController.removePedalBoard(track);
-        this.view.removeTrack(track.element);
-        this.app.tracksController.deleteTrack(track);
-        this.app.waveformController.removeWaveformOfTrack(track);
-        this.app.automationView.removeAutomationBpf(track.id);
+    public removeTrack(track: Track): void {
+        track.removed = true; // Used to stop the track to be loaded on xhr request
+        this._app.pluginsController.removePedalBoard(track);
+        this._view.removeTrack(track.element);
+        this._app.tracksController.deleteTrack(track);
+        this._app.waveformController.removeWaveformOfTrack(track);
+        this._app.automationView.removeAutomationBpf(track.id);
         track.isDeleted = true;
     }
 
+    
+
     /**
-     * Defines the listeners for the track. It defines the listeners for the close, solo, mute, volume and balance sliders.
-     * @param track
+     * Gets the track with the given id.
+     * @param trackId - The id of the track.
+     * @returns the track with the given id if it exists, undefined otherwise.
      */
-    defineTrackListener(track: Track) {
-        track.element.addEventListener("click", () => {
-            if (!track.removed) {
-                this.app.pluginsController.selectTrack(track);
-            }
-        })
-
-        track.element.closeBtn.onclick = () => {
-            track.removed = true;
-            this.removeTrack(track);
-        }
-
-        track.element.soloBtn.onclick = () => {
-            this.app.pluginsController.selectTrack(track);
-            track.solo = !track.solo;
-
-            if (track.solo) {
-                this.app.tracksController.setSolo(track);
-                track.element.solo();
-            }
-            else {
-                this.app.tracksController.unsetSolo(track);
-                track.element.unsolo();
-            }
-        }
-
-        track.element.muteBtn.onclick = () => {
-            this.app.pluginsController.selectTrack(track);
-            if (track.muted) {
-                track.unmute();
-                track.element.unmute();
-            }
-            else {
-                track.mute();
-                track.element.mute();
-            }
-            track.muted = !track.muted;
-        }
-
-        track.element.volumeSlider.oninput = () => {
-            let value = parseInt(track.element.volumeSlider.value) / 100;
-            track.setVolume(value);
-        }
-
-        track.element.balanceSlider.oninput = () => {
-            let value = parseFloat(track.element.balanceSlider.value);
-            track.setBalance(value);
-        }
-
-        track.element.color.onclick = () => {
-            this.app.pluginsController.selectTrack(track);
-            this.view.changeColor(track);
-            this.app.editorView.changeWaveFormColor(track);
-        }
-        track.element.automationBtn.onclick = async (e) => {
-            this.app.pluginsController.selectTrack(track);
-            await this.app.automationController.openAutomationMenu(track);
-            e.stopImmediatePropagation();
-        }
-        track.element.armBtn.onclick = () => {
-            this.app.pluginsController.selectTrack(track);
-            this.app.recorderController.clickArm(track);
-        }
-        track.element.monitoringBtn.onclick = () => {
-            this.app.pluginsController.selectTrack(track);
-            this.app.recorderController.clickMonitoring(track);
-        }
-        track.element.modeBtn.onclick = () => {
-            this.app.pluginsController.selectTrack(track);
-            this.app.recorderController.clickMode(track);
-        }
-        track.element.leftBtn.onclick = () => {
-            this.app.pluginsController.selectTrack(track);
-            this.app.recorderController.clickLeft(track);
-        }
-        track.element.rightBtn.onclick = () => {
-            this.app.pluginsController.selectTrack(track);
-            this.app.recorderController.clickRight(track);
-        }
-        track.element.mergeBtn.onclick = () => {
-            this.app.pluginsController.selectTrack(track);
-            this.app.recorderController.clickMerge(track);
-        }
-        track.element.fxBtn.onclick = () => {
-            this.app.pluginsController.fxButtonClicked(track);
-        }
+    public getTrackById(trackId: number): Track | undefined {
+        return this.trackList.find(track => track.id === trackId);
     }
 
     /**
-     * Create a new TracksView for all files given in parameters with the given information. Fetching audio files and initialize
-     * the audio nodes and the canvas.
-     *
-     * @param url the url of the audio file
-     * @returns the new tracks that have been created
+     * Clears all tracks.
+     * It removes all tracks from the track list and disconnects the audio nodes.
      */
-    async newTrackUrl(url: string) {
-        let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, audioCtx);
-        let node = wamInstance.audioNode as WamAudioWorkletNode;
-
-        let response = await fetch(url);
-        let audioArrayBuffer = await response.arrayBuffer();
-        let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
-
-        let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-        operableAudioBuffer = operableAudioBuffer.makeStereo();
-
-        // @ts-ignore
-        let track = this.createTrack(node);
-        track.addBuffer(operableAudioBuffer);
-        let urlSplit = url.split("/");
-        track.element.name = urlSplit[urlSplit.length - 1];
-        return track;
+    public clearAllTracks(): void {
+        for (let track of this.trackList) {
+            this._app.pluginsController.removePedalBoard(track);
+            this._view.removeTrack(track.element);
+            this._app.waveformController.removeWaveformOfTrack(track);
+            this._app.automationView.removeAutomationBpf(track.id);
+            track.node!.removeAudio();
+            track.node!.disconnectEvents();
+            track.node!.disconnect();
+        }
+        this.trackList = [];
     }
 
-    async newEmptyTrack(url?: string) {
-        let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, audioCtx);
+    /**
+     * Creates a new empty track. It creates the audio node and the track.
+     * 
+     * @param url - The url of the track.
+     * @returns the created track
+     */
+    public async newEmptyTrack(url?: string): Promise<Track> {
+        let wamInstance = await WamEventDestination.createInstance(this._app.host.hostGroupId, audioCtx);
         let node = wamInstance.audioNode as WamAudioWorkletNode;
 
         let track = this.createTrack(node);
@@ -218,15 +121,15 @@ export default class TracksController {
     }
 
     /**
-     * Create the track with the given file. It verifies the type of the file and then create the track.
+     * Creates the track with the given file. It verifies the type of the file and then create the track.
      *
      * It returns undefined if the file is not an audio file and if the duration of the file is too long.
      *
-     * @param file
+     * @param file - The file to create the track.
      */
-    async newTrackWithFile(file: File) {
+    public async newTrackWithFile(file: File): Promise<Track | undefined> {
         if (file.type === "audio/ogg" || file.type === "audio/wav" || file.type === "audio/mpeg" || file.type === "audio/x-wav") {
-            let wamInstance = await WamEventDestination.createInstance(this.app.host.hostGroupId, audioCtx);
+            let wamInstance = await WamEventDestination.createInstance(this._app.host.hostGroupId, audioCtx);
             let node = wamInstance.audioNode as WamAudioWorkletNode;
 
             let audioArrayBuffer = await file.arrayBuffer();
@@ -236,7 +139,6 @@ export default class TracksController {
 
             node.setAudio(operableAudioBuffer.toArray());
 
-            // @ts-ignore
             let track = this.createTrack(node);
             track.addBuffer(operableAudioBuffer);
             track.element.name = file.name;
@@ -249,18 +151,198 @@ export default class TracksController {
     }
 
     /**
-     * Create a new TracksView with the given audio node. Initialize the audio nodes and the canvas.
+     * Jumps audio to the given position in px.
      *
-     * @param node
-     * @returns the created track
+     * @param pos - The position in px
      */
-    createTrack(node: WamAudioWorkletNode) {
+    public jumpTo(pos: number): void {
+        this._app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * audioCtx.sampleRate
+        this.trackList.forEach((track) => {
+            track.node!.port.postMessage({playhead: this._app.host.playhead+1})
+        });
+
+        this._app.host.hostNode?.port.postMessage({playhead: this._app.host.playhead+1});
+    }
+
+    /**
+     * Bind the events of the track view.
+     * @private
+     */ 
+    private bindEvents(): void {
+        this._view.newTrackDiv.addEventListener('click', () => {
+            this._app.tracksController.newEmptyTrack()
+                .then(track => {
+                    this.initializeTrack(track);
+                    track.element.progressDone();
+                });
+        });
+    }
+
+    /**
+     * Binds all events of the given track. It defines the listeners for the close, solo, mute, volume and balance sliders etc.
+     * 
+     * @param track - Track to be binded.
+     * @private
+     */
+    private bindTrackEvents(track: Track): void {
+        track.element.addEventListener("click", () => { // Select the track when it is clicked.
+            if (!track.removed) {
+                this._app.pluginsController.selectTrack(track);
+            }
+        })
+        track.element.closeBtn.addEventListener('click', () => { // Remove the track when the close button is clicked.
+            this.removeTrack(track);
+        });
+        track.element.soloBtn.addEventListener('click', () => { // Solo the track when the solo button is clicked.
+            this.solo(track);
+        });
+        track.element.muteBtn.addEventListener('click', () => { // Mute the track when the mute button is clicked.
+           this.mute(track);
+        });
+        track.element.volumeSlider.addEventListener('input', () => { // Change the volume of the track when the volume slider is changed.
+            track.setVolume(parseInt(track.element.volumeSlider.value) / 100);
+        });
+        track.element.balanceSlider.addEventListener('input', () => { // Change the balance of the track when the balance slider is changed.
+            track.setBalance(parseFloat(track.element.balanceSlider.value));
+        });
+        track.element.color.addEventListener('click', () => { // Change the color of the track when the color button is clicked.
+            this.changeColor(track);
+        });
+        track.element.automationBtn.addEventListener('click',  async (e) => { // Open the automation menu when the automation button is clicked.
+            this.automationMenu(e, track);
+        });
+        track.element.armBtn.addEventListener('click', () => { // Arm the track when the arm button is clicked.
+            this._app.pluginsController.selectTrack(track);
+            this._app.recorderController.clickArm(track);
+        });
+        track.element.monitoringBtn.addEventListener('click', () => { // Change the monitoring of the track when the monitoring button is clicked.
+            this._app.pluginsController.selectTrack(track);
+            this._app.recorderController.clickMonitoring(track);
+        });
+        track.element.modeBtn.addEventListener('click', () => { // Change the mode of the track when the mode button is clicked.
+            this._app.pluginsController.selectTrack(track);
+            this._app.recorderController.clickMode(track);
+        });
+        track.element.leftBtn.addEventListener('click', () => {
+            this._app.pluginsController.selectTrack(track);
+            this._app.recorderController.clickLeft(track);
+        });
+        track.element.rightBtn.addEventListener('click', () => { 
+            this._app.pluginsController.selectTrack(track);
+            this._app.recorderController.clickRight(track);
+        });
+        track.element.mergeBtn.addEventListener('click', () => { 
+            this._app.pluginsController.selectTrack(track);
+            this._app.recorderController.clickMerge(track);
+        });
+        track.element.fxBtn.addEventListener('click', () => { // Open the fx menu when the fx button is clicked.
+            this._app.pluginsController.fxButtonClicked(track);
+        });
+    }
+
+    /**
+     * Handles the automation button of the given track.
+     * @param track - The track to open the automation menu.
+     * @private
+     */
+    private async automationMenu(e: Event, track: Track): Promise<void> {
+        this._app.pluginsController.selectTrack(track);
+        await this._app.automationController.openAutomationMenu(track);
+        e.stopImmediatePropagation();
+    }
+
+    /**
+     * Handles the color button of the given track.
+     * @param track - The track to change the color.
+     * @private
+     */ 
+    private changeColor(track: Track): void {
+        this._app.pluginsController.selectTrack(track);
+        this._view.changeColor(track);
+        this._app.editorView.changeWaveFormColor(track);
+    }
+
+    /**
+     * Handles the mute button of the given track.
+     * @param track - The track to mute.
+     * @private
+     */
+    private mute(track: Track): void {
+        this._app.pluginsController.selectTrack(track);
+        if (track.muted) {
+            track.unmute();
+            track.element.unmute();
+        }
+        else {
+            track.mute();
+            track.element.mute();
+        }
+        track.muted = !track.muted;
+    }
+
+    /**
+     * Handles the solo button of the given track.
+     * @param track - The track to solo.
+     * @private
+     */
+    private solo(track: Track): void {
+        this._app.pluginsController.selectTrack(track);
+        track.solo = !track.solo;
+
+        if (track.solo) { // Solo the track
+
+            this.trackList.forEach((other) => { // Mute all other tracks except the soloed one
+                if (other !== track && !other.solo) {
+                    other.muteSolo();
+                }
+            });
+            if (!track.muted) { // Unmute the soloed track if it is not muted
+                track.unmute();
+            }
+            track.element.solo();
+        }
+        else {  // Un-solo the track
+            let otherSolo = false; // Check if there is another soloed track
+
+            this.trackList.forEach(other => {
+                if (other.solo) {
+                    otherSolo = true;
+                }
+            });
+
+            if (!otherSolo) { // Unmute all tracks if there is no other soloed track
+                this.trackList.forEach(other => {
+                    if (!other.solo) {
+                        if (other.muted) {
+                            other.muteSolo();
+                        }
+                        else {
+                            other.unmute();
+                        }
+                    }
+                });
+            } else { // Else only unmute the track.
+                track.muteSolo();
+            }
+
+            track.element.unsolo();
+        }
+    }
+
+    /**
+     * Creates a new TracksView with the given audio node. Initializes the audio nodes and the canvas.
+     *
+     * @param node - The audio node of the track.
+     * @returns the created track
+     * @private
+     */
+    private createTrack(node: WamAudioWorkletNode): Track {
         let trackElement = document.createElement("track-element") as TrackElement;
         trackElement.trackId = this.trackIdCount;
 
         let track = new Track(this.trackIdCount, trackElement, node);
-        track.plugin  = new Plugin(this.app);
-        track.gainNode.connect(this.app.host.gainNode);
+        track.plugin  = new Plugin(this._app);
+        track.gainNode.connect(this._app.host.gainNode);
 
         this.trackList.push(track);
 
@@ -269,206 +351,16 @@ export default class TracksController {
     }
 
     /**
-     * Remove the given track from the track list and disconnect the audio node.
+     * Removes the given track from the track list and disconnects the audio node.
      *
-     * @param track the track to remove
+     * @param track - The track to remove
+     * @private
      */
-    deleteTrack(track: Track) {
+    private deleteTrack(track: Track): void {
         let trackIndex = this.trackList.indexOf(track);
         this.trackList.splice(trackIndex, 1);
         track.node!.removeAudio();
         track.node!.disconnectEvents();
         track.node!.disconnect();
     }
-
-    /**
-     * Jump to the given position in px.
-     *
-     * @param pos the position in px
-     */
-    jumpTo(pos: number) {
-        this.app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * audioCtx.sampleRate
-        this.trackList.forEach((track) => {
-            track.node!.port.postMessage({playhead: this.app.host.playhead+1})
-        });
-
-        this.app.host.hostNode?.port.postMessage({playhead: this.app.host.playhead+1});
-    }
-
-    /**
-     * Mute or unmute all tracks except the given one.
-     *
-     * @param trackToUnsolo the track to unsolo.
-     */
-
-    unsetSolo(trackToUnsolo: Track) {
-        let isHostSolo = false;
-
-        this.trackList.forEach(track => {
-            if (track.solo) {
-                isHostSolo = true;
-            }
-        });
-
-        if (!isHostSolo) {
-            this.trackList.forEach(track => {
-                if (!track.solo) {
-                    if (track.muted) {
-                        track.muteSolo();
-                    }
-                    else {
-                        track.unmute();
-                    }
-                }
-            });
-        } else {
-            trackToUnsolo.muteSolo();
-        }
-    }
-
-    /**
-     * Mute all tracks except the given one.
-     *
-     * @param trackToSolo the track to solo.
-     */
-    setSolo(trackToSolo: Track) {
-        this.trackList.forEach((track) => {
-            if (track !== trackToSolo && !track.solo) {
-                track.muteSolo();
-            }
-        });
-        if (!trackToSolo.muted) {
-            trackToSolo.unmute();
-        }
-    }
-
-
-    getTrack(trackId: number) {
-        return this.trackList.find(track => track.id === trackId);
-    }
-
-    clearAllTracks() {
-        for (let track of this.trackList) {
-            this.app.pluginsController.removePedalBoard(track);
-            this.view.removeTrack(track.element);
-            this.app.waveformController.removeWaveformOfTrack(track);
-            this.app.automationView.removeAutomationBpf(track.id);
-            track.node!.removeAudio();
-            track.node!.disconnectEvents();
-            track.node!.disconnect();
-        }
-        this.trackList = [];
-    }
-
-
-    loadTrackUrl(track: Track) {
-        if (!track.url) return;
-
-        let xhr = new XMLHttpRequest();
-        xhr.open('GET', track.url, true);
-        xhr.responseType = 'arraybuffer';
-
-        xhr.onprogress = (event) => {
-            if (event.lengthComputable) {
-                let percentComplete = event.loaded / event.total * 100;
-                // update progress bar on track element
-                // Stop the request if the track has been removed
-                if (track.isDeleted) {
-                    xhr.abort();
-                    return;
-                }
-                track.element.progress(percentComplete, event.loaded, event.total);
-            }
-        };
-
-        xhr.onload = () => {
-            if (xhr.status == 200) {
-                let audioArrayBuffer = xhr.response;
-                audioCtx.decodeAudioData(audioArrayBuffer)
-                    .then((audioBuffer) => {
-                        if (track.isDeleted) {
-                            xhr.abort();
-                            return;
-                        }
-                        let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-                        operableAudioBuffer = operableAudioBuffer.makeStereo();
-                        this.app.regionsController.createRegion(track, operableAudioBuffer, 0);
-                        track.element.progressDone();
-                    });
-            } else {
-                // Error occurred during the request
-                console.error('An error occurred fetching the track:', xhr.statusText);
-            }
-        };
-
-        xhr.onerror = () => {
-            console.error('An error occurred fetching the track');
-        };
-
-        xhr.send();
-    }
-
-    loadTrackRegions(track: Track, regions: any, projectId: string) {
-        let loadedRegions = 0;
-        let totalSize = new Map();
-        let totalLoaded = 0;
-
-        for (let region of regions) {
-            let url = `${BACKEND_URL}/projects/${projectId}/${region.path}`;
-
-            let xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.responseType = 'arraybuffer';
-
-            xhr.onprogress = (event) => {
-                if (event.lengthComputable) {
-                    totalLoaded -= totalSize.get(xhr) || 0;  // remove old value
-                    totalLoaded = Math.max(totalLoaded, 0);  // prevent negative values
-                    totalSize.set(xhr, event.total);  // update total size
-                    totalLoaded += event.loaded;  // update loaded size
-
-                    let totalSizeSum = Array.from(totalSize.values()).reduce((a, b) => a + b, 0);
-                    let percentComplete = (totalLoaded / totalSizeSum) * 100;
-
-                    if (track.isDeleted) {
-                        xhr.abort();
-                        return;
-                    }
-
-                    track.element.progress(percentComplete, totalLoaded, totalSizeSum);
-                }
-            };
-
-            xhr.onload = async () => {
-                if (xhr.status == 200) {
-                    loadedRegions++;
-                    let audioArrayBuffer = xhr.response;
-                    let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
-
-                    if (track.isDeleted) {
-                        xhr.abort();
-                        return;
-                    }
-
-                    let opAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-                    this.app.regionsController.createRegion(track, opAudioBuffer, region.start);
-
-                    // All regions have been loaded, call progressDone
-                    if (loadedRegions === regions.length) {
-                        track.element.progressDone();
-                    }
-                } else {
-                    console.error('An error occurred fetching the track region:', xhr.statusText);
-                }
-            };
-
-            xhr.onerror = () => {
-                console.error('An error occurred fetching the track region');
-            };
-
-            xhr.send();
-        }
-    }
-
-
 }

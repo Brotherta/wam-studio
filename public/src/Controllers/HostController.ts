@@ -164,7 +164,7 @@ export default class HostController {
                     this._app.tracksController.newTrackWithFile(file)
                         .then(track => {
                             if (track !== undefined) {
-                                this._app.tracksController.initTrackComponents(track);
+                                this._app.tracksController.initializeTrack(track);
                                 track.element.progressDone();
                             }
                         });
@@ -345,10 +345,10 @@ export default class HostController {
                     const url = SONGS_FILE_URL + trackSong;
                     let track = await this._app.tracksController.newEmptyTrack(url);
                     track.url = url;
-                    this._app.tracksController.initTrackComponents(track);
+                    this._app.tracksController.initializeTrack(track);
                 }
                 for (let track of this._app.tracksController.trackList) {
-                    this._app.tracksController.loadTrackUrl(track);
+                    this._app.loader.loadTrackUrl(track);
                 }
             }
         });
