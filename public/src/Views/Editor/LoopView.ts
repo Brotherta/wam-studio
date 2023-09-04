@@ -1,6 +1,6 @@
 import {Container, Graphics} from "pixi.js";
 import EditorView from "./EditorView";
-import {RATIO_MILLS_BY_PX} from "../../Utils/Variables";
+import {RATIO_MILLS_BY_PX} from "../../Env";
 
 /**
  * Class that represent the loop. It's a PIXI.JS Container that will contain the track, the handle and the line of the loop.

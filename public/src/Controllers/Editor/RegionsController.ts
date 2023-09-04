@@ -2,7 +2,7 @@ import App from "../../App";
 import EditorView from "../../Views/Editor/EditorView";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import Region from "../../Models/Region";
-import {RATIO_MILLS_BY_PX} from "../../Utils/Variables";
+import {RATIO_MILLS_BY_PX} from "../../Env";
 import {FederatedPointerEvent} from "pixi.js";
 import WaveformView from "../../Views/Editor/WaveformView";
 import RegionView from "../../Views/Editor/RegionView";

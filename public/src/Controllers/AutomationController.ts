@@ -2,7 +2,7 @@ import App from "../App";
 import Track from "../Models/Track";
 import {audioCtx} from "../index";
 import AutomationView from "../Views/AutomationView";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Variables";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Env";
 
 
 /**

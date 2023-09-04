@@ -25,7 +25,6 @@ import KeyboardController from "./Controllers/KeyboardController";
 import ExporterController from "./Controllers/ExportController";
 import LoopController from "./Controllers/Editor/LoopController";
 import AboutView from "./Views/AboutView";
-import { makeDivScrollSync } from "./Controllers/StaticController";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.

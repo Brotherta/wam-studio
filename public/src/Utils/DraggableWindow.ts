@@ -24,21 +24,21 @@ export default class DraggableWindow {
         window.addEventListener("mousemove", this.drag);
     }
 
-    dragStart = (e: { clientX: number; clientY: number; }) => {
+    private dragStart = (e: { clientX: number; clientY: number; }) => {
         this.initialX = e.clientX - this.xOffset;
         this.initialY = e.clientY - this.yOffset;
 
         this.isDragging = true;
     }
 
-    dragEnd = () => {
+    private dragEnd = () => {
         this.initialX = this.currentX;
         this.initialY = this.currentY;
 
         this.isDragging = false;
     }
 
-    drag = (e: { preventDefault: () => void; clientX: number; clientY: number; }) => {
+    private drag = (e: { preventDefault: () => void; clientX: number; clientY: number; }) => {
         if (this.isDragging) {
             e.preventDefault();
             this.currentX = e.clientX - this.initialX;
@@ -51,7 +51,7 @@ export default class DraggableWindow {
         }
     }
 
-    setTranslate = (xPos: string | number, yPos: string | number, el: HTMLElement | null) => {
+    private setTranslate = (xPos: string | number, yPos: string | number, el: HTMLElement | null) => {
         // @ts-ignore
         el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
     }

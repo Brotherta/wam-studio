@@ -2,7 +2,7 @@ import App from "../../App";
 import LoopView from "../../Views/Editor/LoopView";
 import EditorView from "../../Views/Editor/EditorView";
 import {FederatedPointerEvent, Graphics} from "pixi.js";
-import {RATIO_MILLS_BY_PX} from "../../Utils/Variables";
+import {RATIO_MILLS_BY_PX} from "../../Env";
 
 enum MovingHandleEnum {
     LEFT,

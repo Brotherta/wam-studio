@@ -5,10 +5,9 @@ import {audioCtx} from "../index";
 import WamEventDestination from "../Audio/WAM/WamEventDestination";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import {RATIO_MILLS_BY_PX} from "../Utils/Variables";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "../Models/Plugin";
-import {BACKEND_URL} from "../Env";
+import {BACKEND_URL, RATIO_MILLS_BY_PX} from "../Env";
 
 /**
  * Controller for the track view. This controller is responsible for adding and removing tracks from the track view.

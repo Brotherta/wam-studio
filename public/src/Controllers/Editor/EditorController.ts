@@ -1,8 +1,7 @@
 import App from "../../App";
 import EditorView from "../../Views/Editor/EditorView";
-import {RATIO_MILLS_BY_PX, updateRatioMillsByPx} from "../../Utils/Variables";
+import {RATIO_MILLS_BY_PX, updateRatioMillsByPx} from "../../Env";
 import {audioCtx} from "../../index";
-import VuMeter from "../../Components/VuMeterElement";
 
 /**
  * Interface of the custom event of the ScrollBarElement.

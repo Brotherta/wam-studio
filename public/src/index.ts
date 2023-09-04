@@ -2,7 +2,6 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 import TrackElement from './Components/TrackElement';
-// @ts-ignore
 import BPF from './Components/BPF';
 import SaveProjectElement from "./Components/Project/SaveProjectElement";
 import LoadProjectElement from "./Components/Project/LoadProjectElement";

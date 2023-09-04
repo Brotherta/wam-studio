@@ -1,5 +1,5 @@
 import {audioCtx} from "../index";
-import {RATIO_MILLS_BY_PX} from "../Utils/Variables";
+import {RATIO_MILLS_BY_PX} from "../Env";
 
 /**
  * Class responsible for the host view. It displays the host controls and the host track.

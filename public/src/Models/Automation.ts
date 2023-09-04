@@ -1,5 +1,5 @@
 import BPF from "../Components/BPF"
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Utils/Variables";
+import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Env";
 
 /**
  * Model for the automations stored in each track.

@@ -6,7 +6,6 @@ import Track from "./Track";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "./Plugin";
 import {BACKEND_URL} from "../Env";
-import {MAX_DURATION_SEC} from "../Utils/Variables";
 
 /**
  * Host class that contains the master track.

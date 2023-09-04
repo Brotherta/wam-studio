@@ -5,7 +5,7 @@ import Plugin from "./Plugin";
 import Automation from "./Automation";
 import WamAudioWorkletNode from "../Audio/WAM/WamAudioWorkletNode";
 import Region from "./Region";
-import {NUM_CHANNELS} from "../Utils/Variables";
+import {NUM_CHANNELS} from "../Env";
 import {RingBuffer} from "../Audio/Utils/ringbuf";
 
 export default class Track {

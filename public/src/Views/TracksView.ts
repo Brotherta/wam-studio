@@ -19,37 +19,38 @@ export default class TracksView {
     trackContainerDiv: HTMLDivElement = document.getElementById("track-container") as HTMLDivElement;
     newTrackDiv: HTMLDivElement = document.getElementById("new-track") as HTMLDivElement;
 
-    constructor() {
-        // TODO
-    }
-
     /**
-     * Add a track to the track view.
+     * Adds a track to the track view.
      * @param trackElement
      */
-    addTrack(trackElement: TrackElement) {
+    public addTrack(trackElement: TrackElement): void {
         this.trackContainerDiv.insertBefore(trackElement, this.newTrackDiv);
     }
 
     /**
-     * Remove a track from the track view.
-     * @param el
+     * Removes a track from the track view.
+     * @param el - The track to remove.
      */
-    removeTrack(el: TrackElement) {
+    public removeTrack(el: TrackElement): void {
         el.remove();
     }
 
     /**
-     * Change the color of a track.
-     * @param track
+     * Changes the color of a track.
+     * @param track - The track to change the color.
      */
-    changeColor(track: Track) {
+    public changeColor(track: Track): void {
         let newColor = getRandomColor();
         track.color = newColor;
         track.element.color.style.background = newColor;
     }
 
-    setColor(track: Track, color: string) {
+    /**
+     * Sets the color of a track.
+     * @param track - The track to change the color.
+     * @param color - The new color.
+     */
+    public setColor(track: Track, color: string) {
         track.color = color;
         track.element.color.style.background = color;
     }

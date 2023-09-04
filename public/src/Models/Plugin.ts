@@ -19,9 +19,6 @@ export default class Plugin {
     /**
      * Initialize the plugin by loading the WAM script and creating the instance.
      */
-    /**
-     * Initialize the plugin by loading the WAM script and creating the instance.
-     */
     async initPlugin(WAM: any, audioCtx: AudioContext, offlineAudioContext?: OfflineAudioContext, exportGroupId?: string) {
         if (offlineAudioContext && exportGroupId) {
             //@ts-ignore

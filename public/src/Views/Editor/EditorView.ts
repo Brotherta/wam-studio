@@ -9,7 +9,7 @@ import {
     HEIGHT_TRACK,
     MAX_DURATION_SEC,
     RATIO_MILLS_BY_PX,
-} from "../../Utils/Variables";
+} from "../../Env";
 import {ScrollEvent} from "../../Controllers/Editor/EditorController";
 import LoopView from "./LoopView";
 

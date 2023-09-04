@@ -1,7 +1,7 @@
 import EditorView from "./EditorView";
 import {Container, Graphics} from "pixi.js";
 import Region from "../../Models/Region";
-import {HEIGHT_TRACK, MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../../Utils/Variables";
+import {HEIGHT_TRACK, RATIO_MILLS_BY_PX} from "../../Env";
 
 /**
  * Class that extends PIXI.Container.
