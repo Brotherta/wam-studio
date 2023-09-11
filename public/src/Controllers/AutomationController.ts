@@ -35,42 +35,22 @@ export default class AutomationController {
      */
     public async openAutomationMenu(track: Track): Promise<void> {
         this._view.clearMenu();
-        await this.getAllAutomations(track);
+        await this.updateAutomations(track);
         this._view.openAutomationMenu(track);
         this._automationOpened = true;
     }
 
-    /**
-     * Defines all the listeners for the automation menu.
-     */
-    private bindEvents(): void {
-        window.addEventListener("click", (e) => {
-            if (e.target === this._view.automationMenu ) return;
-            if (this._automationOpened) {
-                this._view.closeAutomationMenu();
-                this._automationOpened = false;
-            }
-        });
-        this._app.pluginsView.removePlugin.addEventListener("click", () => {
-            let track = this._app.pluginsController.selectedTrack;
-            if (track != undefined) {
-                track.automation.removeAutomation();
-                track.automation.updateAutomation([]);
-                this._view.clearMenu();
-                this._view.hideBpf(track.id);
-            }
-        });
-    }
-
-    /**
-     * Gets all the parameters of the associated plugin and create the automation menu.
+     /**
+     * Update all the parameters of the associated plugin and create the automation menu.
      *
-     * @param track - The track to get the automations.
+     * @param track - The track to update the automations.
      */
-    private async getAllAutomations(track: Track): Promise<void> {
+     public async updateAutomations(track: Track): Promise<void> {
         let plugin = track.plugin;
         if (plugin.initialized) {
             let params = await plugin.instance?._audioNode.getParameterInfo();
+            console.log(params);
+            
             track.automation.updateAutomation(params);
             this._view.clearMenu();
 
@@ -83,6 +63,8 @@ export default class AutomationController {
                 track.plugin.instance?._audioNode.clearEvents();
             })
             for (let param in params) {
+                console.log(param);
+                
                 let active = false;
                 let bpf = track.automation.getBpfOfParam(param);
                 if (bpf !== undefined && bpf.points.length > 0) {
@@ -108,6 +90,29 @@ export default class AutomationController {
         }
     }
 
+    /**
+     * Defines all the listeners for the automation menu.
+     */
+    private bindEvents(): void {
+        window.addEventListener("click", (e) => {
+            if (e.target === this._view.automationMenu ) return;
+            if (this._automationOpened) {
+                this._view.closeAutomationMenu();
+                this._automationOpened = false;
+            }
+        });
+        this._app.pluginsView.removePlugin.addEventListener("click", () => {
+            let track = this._app.pluginsController.selectedTrack;
+            if (track != undefined) {
+                track.automation.removeAutomation();
+                track.automation.updateAutomation([]);
+                this._view.clearMenu();
+                this._view.hideBpf(track.id);
+            }
+        });
+    }
+
+   
     /**
      * Applies all the automations of each track.
      * It takes in account the playhead position and the time of the host.

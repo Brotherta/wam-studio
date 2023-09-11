@@ -6,6 +6,11 @@ const restoreState = document.getElementById("restore");
 const deleteState = document.getElementById("delete");
 const inCache = document.getElementById("inCache");
 
+const currentProtocol = window.location.protocol; // http: or https:
+const currentDomain = window.location.hostname;
+const bankUrl = `${currentProtocol}//${currentDomain}:${window.location.port}`;
+
+
 inCache.setAttribute("data", localStorage.getItem("instanceState") != null);
 
 // Safari...
@@ -31,11 +36,11 @@ const mountPlugin = (domNode) => {
 
 (async () => {
   // Init WamEnv
-  const { default: initializeWamHost } = await import("http://localhost:6002/plugins/utils/sdk/src/initializeWamHost.js");
+  const { default: initializeWamHost } = await import(bankUrl+ "/plugins/utils/sdk/src/initializeWamHost.js");
   const [hostGroupId] = await initializeWamHost(audioContext);
 
   // Import WAM
-  const { default: WAM } = await import("http://localhost:6002/src/index.js");
+  const { default: WAM } = await import(bankUrl + "/src/index.js");
   //const { default: WAM } = await import("https://wam-bank.vidalmazuy.fr/plugins/TS9_OverdriveFaustGenerated/index.js");
   // Create a new instance of the plugin
   // You can can optionnally give more options such as the initial state of the plugin

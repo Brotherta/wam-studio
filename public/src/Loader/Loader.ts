@@ -149,27 +149,17 @@ export default class Loader {
                 await track.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
                 this._app.pluginsController.connectPedalBoard(track);
                 this._app.pluginsView.movePluginLoadingZone(track);
-                await track.plugin.instance?._audioNode.setState(plugins);
 
-                let state = await track.plugin.instance?._audioNode.getState();
-
-                await track.plugin.setStateAsync(state);
-
-                // let statePluginPromise = new Promise<void>((resolve, reject) => {
-                //     const interval = setInterval(async () => {
-                //         if (state.current.length === plugins.current.length) {
-                //             await this.app.automationController.getAllAutomations(track);
-                //             clearInterval(interval);
-                //             resolve();
-                //         }
-                //         state = await track.plugin.instance?._audioNode.getState();
-                //     }, 100);
-                // });
-                // await statePluginPromise;
+                await track.plugin.setStateAsync(plugins);
+                await this._app.automationController.updateAutomations(track);
 
                 let automations = trackJson.automations;
                 for (let automation of automations) {
+                    console.log(automation.param);
+                    
                     let bpf = track.automation.getBpfOfParam(automation.param);
+                    console.log(bpf);
+                    
                     if (bpf !== undefined) {
                         bpf.state = automation.state;
                     }
