@@ -5,7 +5,7 @@ Wam-Studio’s is an online tool for creating audio projects that you can imagin
 
 Current features: robust audio track recording, track regions, loop area on tracks, track plugin fx chain, parameter automation, audio input and output device selection, latency measuring tool + inout latency compensation when recording, project saving on cloud (audio + all metadata), rendering mix with choice of tracks to render, viewport management on tracks (zoom in/out) using pixiJS/WebGL canvas.
 
-<img width="1708" alt="image" src="https://i.ibb.co/ctkbjYf/Wam-Studio-Sept2023.jpg">
+<img width="1200" alt="image" src="https://i.ibb.co/ctkbjYf/Wam-Studio-Sept2023.jpg">
 ### Citation
 If you use our resource, please cite the following articles:
 ```
