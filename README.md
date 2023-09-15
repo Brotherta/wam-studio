@@ -7,7 +7,9 @@ Current features: robust audio track recording, track regions, loop area on trac
 
 <img width="800" alt="image" src="https://i.ibb.co/DkzGZrc/Wam-Studio-Sept2023.jpg">
 ### Citation
+
 If you use our resource, please cite the following articles:
+
 ```
 @inproceedings{buffa2023wam,
   title={WAM-studio, a Digital Audio Workstation (DAW) for the Web},
