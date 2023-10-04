@@ -71,7 +71,23 @@ export default class PlayheadView extends Container {
      * @param playhead - The value of the playhead in the host. It represents the position in the buffer.
      */
     public moveToFromPlayhead(playhead: number): void {
-        this.moveTo(this.getPosFromPlayhead(playhead));
+        const pixelPos = this.getPosFromPlayhead(playhead);
+        this.moveTo(pixelPos);
+        // check if pixelPos is visible in the viewport
+        /*
+        if (pixelPos < this._editor.viewport.left || pixelPos > this._editor.viewport.right) {
+            this._editor.viewport.moveCenter(pixelPos, this._editor.viewport.center.y);
+        }
+        */
+       // scroll smoothly the viewport when playhead reaches the center of the viewport
+         if (pixelPos >= this._editor.viewport.center.x && pixelPos < this._editor.viewport.center.x + 25) {
+              this._editor.viewport.moveCenter(pixelPos, this._editor.viewport.center.y);
+         } else {
+            // if the payhead is after center +5, and goes after the right border, center the viewport
+            if (pixelPos > this._editor.viewport.center.x + 5 && pixelPos > this._editor.viewport.right) {
+                this._editor.viewport.moveCenter(pixelPos, this._editor.viewport.center.y);
+            } 
+         }
     }
 
     /**

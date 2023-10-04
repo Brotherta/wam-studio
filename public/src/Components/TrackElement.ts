@@ -1,3 +1,6 @@
+import { audioCtx } from "..";
+
+
 const template: HTMLTemplateElement = document.createElement("template");
 
 template.innerHTML = /*html*/`
@@ -29,6 +32,11 @@ template.innerHTML = /*html*/`
     width: 5%;
     height: 100%;
     cursor: pointer;
+}
+
+.track-vu-meter {
+    width: 35px;
+    height: 100%;
 }
 
 .track-header {
@@ -234,8 +242,10 @@ template.innerHTML = /*html*/`
 </style>
 
 <link rel="stylesheet" href="style/icons.css">
+<div id="vu-meter-div" class="track-vu-meter"></div>
 
 <div class="track-utils">
+
     <div class="track-header">
         <input id="name-input" class="track-name">
         
@@ -246,57 +256,60 @@ template.innerHTML = /*html*/`
             <i class="close-icon" style="width: 14px"></i>
         </div>
     </div>
+
+    <div class="track-main">
+        <div id="loading-container">
+            <div id="loading-bar"></div>
+        </div>
+        <div id="progress-bar-text"></div>
     
-    <div id="loading-container">
-        <div id="loading-bar"></div>
-    </div>
-    <div id="progress-bar-text"></div>
-  
-    <div class="track-volume">
-        <div class="icon">
-<!--            <img src="icons/volume-down-track.svg">-->
-            <i class="volume-down-icon" style="width: 20px"></i>
+        <div class="track-volume">
+            <div class="icon">
+    <!--            <img src="icons/volume-down-track.svg">-->
+                <i class="volume-down-icon" style="width: 20px"></i>
+            </div>
+            <input type="range" class="form-range tracko" id="volume-slider">
+            <div class="icon">
+    <!--            <img src="icons/volume-up-track.svg">-->
+                <i class="volume-up-icon" style="width: 20px"></i>
+            </div>
         </div>
-        <input type="range" class="form-range tracko" id="volume-slider">
-        <div class="icon">
-<!--            <img src="icons/volume-up-track.svg">-->
-            <i class="volume-up-icon" style="width: 20px"></i>
+        <div class="track-balance">
+            <div class="letter-icon">
+                L
+            </div>
+            <input type="range" min="-1" max="1" step=".1" value="0" class="form-range tracko" id="balance-slider">
+            <div class="letter-icon">
+                R
+            </div>
         </div>
-    </div>
-    <div class="track-balance">
-        <div class="letter-icon">
-            L
+        <div class="track-controls">
+            <div id="mute-btn" class="mute-icon">M</div>
+            <div id="solo-btn" class="solo-icon">S</div>
+            <div id="monitoring" class="control" style="padding-top: 6px">
+                <i class="monitor-icon"></i>
+            </div>
+            <div id="arm" class="control" style="padding-top: 3px">
+                <i class="mic-icon" style="width: 15px"></i>
+            </div>
+            <div id="automation" class="control" style="padding-top: 1px">
+                <i class="automation-icon" style="width: 15px"></i>
+            </div>
         </div>
-        <input type="range" min="-1" max="1" step=".1" value="0" class="form-range tracko" id="balance-slider">
-        <div class="letter-icon">
-            R
-        </div>
-    </div>
-    <div class="track-controls">
-        <div id="mute-btn" class="mute-icon">M</div>
-        <div id="solo-btn" class="solo-icon">S</div>
-        <div id="monitoring" class="control" style="padding-top: 6px">
-            <i class="monitor-icon"></i>
-        </div>
-        <div id="arm" class="control" style="padding-top: 3px">
-            <i class="mic-icon" style="width: 15px"></i>
-        </div>
-        <div id="automation" class="control" style="padding-top: 1px">
-            <i class="automation-icon" style="width: 15px"></i>
-        </div>
-    </div>
-     <div class="track-controls" style="padding-top: 5px">
-        <div id="mode" class="toggle-control active">mono ⇉ stereo</div>
-        <div id="left" class="toggle-control active">L</div>
-        <div id="right" class="toggle-control">R</div>
-        <div id="merge" class="toggle-control active">merge L / R</div>
-        <div id="fx" class="control" style="padding-top: 1px">
-            <i class="fx-icon" style="width: 15px"></i>
+        <div class="track-controls" style="padding-top: 5px">
+            <div id="mode" class="toggle-control active">mono ⇉ stereo</div>
+            <div id="left" class="toggle-control active">L</div>
+            <div id="right" class="toggle-control">R</div>
+            <div id="merge" class="toggle-control active">merge L / R</div>
+            <div id="fx" class="control" style="padding-top: 1px">
+                <i class="fx-icon" style="width: 15px"></i>
+            </div>
         </div>
     </div>
 </div>
-<div id="color-div" class="track-color">
-</div>
+
+<div id="color-div" class="track-color"></div>
+
 `
 
 export default class TrackElement extends HTMLElement {
@@ -309,6 +322,7 @@ export default class TrackElement extends HTMLElement {
     isMuted: boolean = false;
     isMonitoring: boolean = false;
     isLoading: boolean = false;
+    vuMeterDiv: HTMLDivElement;
 
     constructor() {
         super();
@@ -317,7 +331,10 @@ export default class TrackElement extends HTMLElement {
     }
 
     connectedCallback() {
+        console.log("TrackElement connectedCallback");
+
         if (this.shadowRoot !== null) {
+            console.log("TrackElement shadowRoot not null")
             this.shadowRoot.innerHTML = template.innerHTML;
             
             this.defineTrackElementListeners();
@@ -325,6 +342,10 @@ export default class TrackElement extends HTMLElement {
                 element.classList.add("hidden");
             });
             this.isLoading = true;
+
+            this.vuMeterDiv = this.shadowRoot.querySelector("#vu-meter-div") as HTMLDivElement;
+            console.log(this.vuMeterDiv);
+
         }
     }
 
@@ -397,6 +418,10 @@ export default class TrackElement extends HTMLElement {
         });
     }
 
+    getPeakMeterParentElement():HTMLDivElement {
+        return this.vuMeterDiv;
+    }
+    
     // Progress method that accepts a percentage and updates the width of the loading bar
     progress(percent: number, loaded: number, total: number) {
         if (!this.isLoading) return;

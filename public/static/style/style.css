@@ -2,7 +2,7 @@
     --menu-color: #413e3e;
     --head-color: #3b4046;
     --main-background-color: #1C1E21;
-    --track-container-width: 161px;
+    --track-container-width: 200px;
 }
 
 html, body {
@@ -600,4 +600,19 @@ body.loading > *:not(.loading-overlay) {
     font-size: 18px;
     font-weight: bold;
     color: lightgray;
+}
+
+.zoom-disabled {
+    pointer-events: none;
+    filter: blur(4px);
+}
+
+.zoom-enabled {
+    pointer-events: auto;
+    filter: none;
+}
+
+#vu-meter {
+    width:157px;
+    height: 35px;
 }

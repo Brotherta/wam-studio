@@ -287,7 +287,8 @@ export default class EditorView extends Application {
     }
 
     /**
-     * Take the waveform of the given track, and stretch the waveform to the current Ratio of pixels by milliseconds.
+     * Take the waveform of the given track, and stretch the waveform to the current Ratio of pixels by 
+     * milliseconds.
      * @param track - The track that contains the regions.
      */
     public stretchRegions(track: Track): void {
@@ -295,10 +296,12 @@ export default class EditorView extends Application {
             let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
             if (!waveFormView) return
             for (let regionView of waveFormView.regionViews) {
-                if (!track.audioBuffer) return;
+                // MB : prevented first click on ZoomIn to do something
+                //if (!track.audioBuffer) return;
                 let region = track.getRegionById(regionView.id);
                 if (region) {
                     regionView.stretch(region.duration, region.start);
+                    //console.log("STRECHED REGION !")
                 }
             }
         });

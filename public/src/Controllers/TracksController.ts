@@ -9,6 +9,8 @@ import TrackElement from "../Components/TrackElement";
 import Plugin from "../Models/Plugin";
 import {BACKEND_URL, RATIO_MILLS_BY_PX} from "../Env";
 
+import WebAudioPeakMeter from '../Audio/Utils/PeakMeter';
+
 /**
  * Class that controls the tracks view. It creates, removes and manages the tracks. It also defines the listeners for the tracks.
  */
@@ -337,14 +339,41 @@ export default class TracksController {
      * @private
      */
     private createTrack(node: WamAudioWorkletNode): Track {
-        let trackElement = document.createElement("track-element") as TrackElement;
+        let trackElement = new TrackElement();
         trackElement.trackId = this.trackIdCount;
 
         let track = new Track(this.trackIdCount, trackElement, node);
         track.plugin  = new Plugin(this._app);
         track.gainNode.connect(this._app.host.gainNode);
 
+     
         this.trackList.push(track);
+
+        // wait until the trackElement WebComponent is connected
+        // to the DOM before initializing the peak meter
+        let id = setInterval(() => {
+            console.log("trackElement.isConnected", trackElement.isConnected);
+            // create the peak meter
+            if (trackElement.isConnected) {
+                console.log("trackElement.isConnected", trackElement.isConnected)
+                let peakMeter = new WebAudioPeakMeter(
+                    audioCtx, 
+                    track.gainNode, 
+                    trackElement.getPeakMeterParentElement(), {
+                        borderSize: 2,
+                        fontSize: 7, // tick fontSize. If zero -> no ticks, no labels etc.
+                        backgroundColor: "rgb(23, 23, 26)",
+                        tickColor: "#ddd",
+                        labelColor: "#ddd",
+                        gradient: ["red 1%", "#ff0 16%", "lime 45%", "#080 100%"],
+                        dbRange: 48,
+                        dbTickSize: 6,
+                        maskTransition: "0.1s",
+                      }
+                    )
+                clearInterval(id);
+            }
+        }, 100);        
 
         this.trackIdCount++;
         return track;

@@ -8,6 +8,7 @@ import Region from "./Region";
 import {NUM_CHANNELS} from "../Env";
 import {RingBuffer} from "../Audio/Utils/ringbuf";
 
+
 export default class Track {
 
     /**
@@ -178,6 +179,8 @@ export default class Track {
         this.micRecNode = undefined;
         this.splitterNode = audioCtx.createChannelSplitter(NUM_CHANNELS);
         this.mergerNode = audioCtx.createChannelMerger(NUM_CHANNELS);
+
+       
 
         // Audio Buffers
         this.audioBuffer = undefined;

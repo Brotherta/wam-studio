@@ -48,7 +48,7 @@ export default class EditorController {
      */
     private readonly MAX_RATIO = 500;
     /**
-     * Number of zoom step.
+     * Number of zoom steps.
      */
     private readonly ZOOM_STEPS = 12;
     /**
@@ -69,6 +69,13 @@ export default class EditorController {
      * @param value the of the zoom in pixel
      */
     public zoomIn(value?: number): void {
+        // for the moment, do not allow zoom in/out while playing
+        if (this._app.host.playing) return;
+
+        // if zoom button has been pressed, zoom out should be enabled
+        this._app.hostView.zoomOutBtn.classList.remove("zoom-disabled");
+        this._app.hostView.zoomOutBtn.classList.add("zoom-enabled");
+
         if (this._timeout) clearInterval(this._timeout);
         let ratio;
         if (value) { // Scroll - Linear zoom
@@ -76,8 +83,18 @@ export default class EditorController {
         } else { // Button pressed - Find nearest step and adjust to that step
             this._currentLevel = this.getNearestZoomLevel();
             let level = this._currentLevel;
+            
             this._currentLevel = Math.max(this._currentLevel - 1, 0);
-            if (level === this._currentLevel) return;
+            console.log("_currentLevel", this._currentLevel)
+
+            if(this._currentLevel === 0) {
+                // level is at max zoom value
+                this._app.hostView.zoomInBtn.classList.remove("zoom-enabled");
+                this._app.hostView.zoomInBtn.classList.add("zoom-disabled");
+            }
+
+            if (level === this._currentLevel)return;
+            
             ratio = this.getZoomRatioByLevel(this._currentLevel);
         }
         updateRatioMillsByPx(ratio);
@@ -90,6 +107,13 @@ export default class EditorController {
      * @param value the of the zoom in pixel
      */
     public zoomOut(value?: number): void {
+        // for the moment, do not allow zoom in/out while playing
+        if (this._app.host.playing) return;
+
+        // if zoom ouy button has been pressed, zoom in should be enabled
+        this._app.hostView.zoomInBtn.classList.remove("zoom-disabled");
+        this._app.hostView.zoomInBtn.classList.add("zoom-enabled");
+
         if (this._timeout) clearInterval(this._timeout);
         let ratio;
         if (value) { // Scroll - Linear zoom
@@ -97,8 +121,18 @@ export default class EditorController {
         } else { // Button pressed - Find nearest step and adjust to that step
             this._currentLevel = this.getNearestZoomLevel();
             let level = this._currentLevel;
+            console.log("level", level)
+
             this._currentLevel = Math.min(this.ZOOM_STEPS - 1, this._currentLevel + 1);
+            console.log("_currentLevel", this._currentLevel)
+
+            if(this._currentLevel === this.ZOOM_STEPS - 1) {
+                this._app.hostView.zoomOutBtn.classList.remove("zoom-enabled");
+                this._app.hostView.zoomOutBtn.classList.add("zoom-disabled");
+            }
+
             if (level === this._currentLevel) return;
+            
             ratio = this.getZoomRatioByLevel(this._currentLevel);
         }
         updateRatioMillsByPx(ratio);
@@ -153,7 +187,8 @@ export default class EditorController {
 
     /**
      * Updates the zoom according to the new size and the new ratio of pixels by milliseconds.
-     * It first stretches the waveforms and set a timeout for the renderer. If a new zoom is recored before the timeout
+     * It first stretches the waveforms and sets a timeout for the renderer. If a new zoom is recorded before 
+     * the timeout
      * has been called, it will cancel the current timeout to set a new one.
      */
     private async updateZoom(): Promise<void> {
@@ -164,20 +199,22 @@ export default class EditorController {
         this._app.automationController.updateBPFWidth();
         this._view.horizontalScrollbar.customScrollTo(this._view.playhead.position.x - offsetPlayhead);
         this._app.tracksController.trackList.forEach(track => {
-            track.updateBuffer(audioCtx, this._app.host.playhead);
+            //track.updateBuffer(audioCtx, this._app.host.playhead);
             this._view.stretchRegions(track);
         });
 
         this._timeout = setTimeout(() => {
+            console.log("Dans le timeout")
+
             this._app.tracksController.trackList.forEach(track => {
                 track.updateBuffer(audioCtx, this._app.host.playhead);
                 this._view.drawRegions(track);
             });
-        }, 2000);
+        }, 1000);
     }
 
     /**
-     * @return the nearest zoom level depending on the current ration of pixels by milliseconds.
+     * @return the nearest zoom level depending on the current ratio of pixels by milliseconds.
      */
     private getNearestZoomLevel(): number {
         let nearestLevel = 0;

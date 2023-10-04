@@ -79,10 +79,11 @@ export default class RegionView extends Container {
         this._wave.clear();
         this._wave.beginFill(colorHex);
 
+        let amp = (HEIGHT_TRACK-1) / 2;
         for (let channel = 0; channel < region.buffer.numberOfChannels; channel++) {
             let data = region.buffer.getChannelData(channel);
             let step = Math.ceil(data.length / range);
-            let amp = (HEIGHT_TRACK-1) / 2;
+
             for (let i = 0; i < range; i++) {
                 let min = 1.0;
                 let max = -1.0;
