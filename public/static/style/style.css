@@ -94,7 +94,7 @@ body {
 #track-container-header {
     position: absolute;
     min-height: 25px;
-    min-width: 159px;
+    min-width: 200px;
     border-bottom: 1px solid rgb(0, 0, 0);
     background-color: var(--head-color);
     display: flex;

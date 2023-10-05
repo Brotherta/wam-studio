@@ -199,6 +199,7 @@ export default class EditorController {
         this._app.automationController.updateBPFWidth();
         this._view.horizontalScrollbar.customScrollTo(this._view.playhead.position.x - offsetPlayhead);
         this._app.tracksController.trackList.forEach(track => {
+            // MB : this seems unecessary
             //track.updateBuffer(audioCtx, this._app.host.playhead);
             this._view.stretchRegions(track);
         });
@@ -207,7 +208,8 @@ export default class EditorController {
             console.log("Dans le timeout")
 
             this._app.tracksController.trackList.forEach(track => {
-                track.updateBuffer(audioCtx, this._app.host.playhead);
+                // MB : below seems also unecessary
+                //track.updateBuffer(audioCtx, this._app.host.playhead);
                 this._view.drawRegions(track);
             });
         }, 1000);

@@ -115,6 +115,16 @@ export default class HostController {
     this._app.editorView.playhead.moveToFromPlayhead(0);
     this._app.tracksController.jumpTo(0);
     this._app.automationController.applyAllAutomations();
+
+    // recenter viewport at center of current viewport width
+    // MB FIX
+    const pos = this._app.editorView.editorDiv.clientWidth/2 ;
+    console.log("width = " + this._app.editorView.editorDiv.clientWidth)
+    this._app.editorView.viewport.moveCenter(pos, 
+        this._app.editorView.viewport.center.y);
+        // need to reposition the custom scrollbar too...
+        // adjust horizontal scrollbar
+        this._app.editorView.horizontalScrollbar.moveToBeginning();
   }
 
   /**

@@ -88,6 +88,10 @@ export default class PlayheadView extends Container {
                 this._editor.viewport.moveCenter(pixelPos, this._editor.viewport.center.y);
             } 
          }
+         // adjust horizontal scrollbar so that it corresponds to the current viewport position
+         // scrollbar pos depends on the left position of the viewport.
+         this._editor.horizontalScrollbar.moveTo(this._editor.viewport.left);
+
     }
 
     /**
