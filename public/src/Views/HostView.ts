@@ -1,5 +1,6 @@
 import {audioCtx} from "../index";
 import {RATIO_MILLS_BY_PX} from "../Env";
+import TempoSelectorElement from "../Components/TempoSelectorElement";
 
 /**
  * Class responsible for the host view. It displays the host controls and the host track.
@@ -13,6 +14,10 @@ export default class HostView {
     muteBtn = document.getElementById("mute-btn") as HTMLDivElement;
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
+
+    tempoDiv = document.getElementById("tempo-selector") as HTMLDivElement;
+    tempoSelector = new TempoSelectorElement() as TempoSelectorElement;
+
     zoomInBtn = document.getElementById("zoom-in-btn") as HTMLDivElement;
     zoomOutBtn = document.getElementById("zoom-out-btn") as HTMLDivElement;
 
@@ -38,6 +43,10 @@ export default class HostView {
     aboutCloseBtn = document.getElementById("about-close-button") as HTMLDivElement;
     aboutWindow = document.getElementById("about-window") as HTMLDivElement;
 
+    constructor() {
+        this.tempoDiv.appendChild(this.tempoSelector);
+    }
+    
     /**
      * Updates the timer of the host view.
      *

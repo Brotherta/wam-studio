@@ -92,7 +92,16 @@ export default class RegionView extends Container {
                     if (dataum < min) min = dataum;
                     if (dataum > max) max = dataum;
                 }
-                this._wave.drawRect(i, (1+min) * amp, 1, Math.max(1, (max-min) * amp));
+                const rectWidth = 1;
+                let rectHeight = Math.max(1, (max-min) * amp);
+
+                // MB: we need to clip the rectangle so that if does not go over track dimensions
+                if(rectHeight < HEIGHT_TRACK) {
+                    this._wave.drawRect(i, (1+min) * amp, rectWidth, rectHeight);
+                } else {
+                    rectHeight = HEIGHT_TRACK;
+                    this._wave.drawRect(i, 0 * amp, rectWidth, rectHeight);
+                }
             }
         }
     }

@@ -37,7 +37,7 @@ export default class PlayheadView extends Container {
         this.sortableChildren = true;
         this.position.x = 0;
         this.position.y = 0;
-        this.zIndex = 100;
+        this.zIndex = 101;
 
         this.track = new Container();
         this.track.eventMode = "dynamic";

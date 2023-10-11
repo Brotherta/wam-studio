@@ -12,6 +12,7 @@ import {
 } from "../../Env";
 import {ScrollEvent} from "../../Controllers/Editor/EditorController";
 import LoopView from "./LoopView";
+import GridView from "./GridView";
 
 /**
  * Class that Override PIXI.Application. Represents the main editor and handle all events about the editor.
@@ -65,6 +66,10 @@ export default class EditorView extends Application {
      * The PIXI Container that handle the loop behavior.
      */
     public loop: LoopView;
+    /**
+     * The PIXI Container that handle the grid of bars.
+     */
+    public grid: GridView;
 
     public static readonly PLAYHEAD_HEIGHT = 17;
     public static readonly PLAYHEAD_WIDTH = 10;
@@ -108,6 +113,7 @@ export default class EditorView extends Application {
         this.waveforms = [];
         this.playhead = new PlayheadView(this);
         this.loop = new LoopView(this);
+        this.grid = new GridView(this);
 
         this.viewport.sortableChildren = true;
         this.stage.sortableChildren = true;
@@ -248,6 +254,7 @@ export default class EditorView extends Application {
 
             this.playhead.resize();
             this.loop.resize();
+            this.grid.resize();
         })
     }
 
@@ -313,5 +320,9 @@ export default class EditorView extends Application {
      */
     public getWaveFormViewById(trackId: number): WaveformView | undefined {
         return this.waveforms.find(wave => wave.trackId === trackId);
+    }
+
+    public createBarGrid() {
+        let grid = new GridView(this);
     }
 }

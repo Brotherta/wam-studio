@@ -96,6 +96,7 @@ export default class EditorController {
             if (level === this._currentLevel)return;
             
             ratio = this.getZoomRatioByLevel(this._currentLevel);
+            console.log(ratio)
         }
         updateRatioMillsByPx(ratio);
         this.updateZoom();
@@ -198,6 +199,8 @@ export default class EditorController {
         this._view.loop.updatePositionFromTime(this._app.host.loopStart, this._app.host.loopEnd);
         this._app.automationController.updateBPFWidth();
         this._view.horizontalScrollbar.customScrollTo(this._view.playhead.position.x - offsetPlayhead);
+
+        
         this._app.tracksController.trackList.forEach(track => {
             // MB : this seems unecessary
             //track.updateBuffer(audioCtx, this._app.host.playhead);

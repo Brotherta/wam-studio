@@ -331,7 +331,7 @@ export default class TrackElement extends HTMLElement {
     }
 
     connectedCallback() {
-        console.log("TrackElement connectedCallback");
+        //console.log("TrackElement connectedCallback");
 
         if (this.shadowRoot !== null) {
             console.log("TrackElement shadowRoot not null")
@@ -548,7 +548,7 @@ export default class TrackElement extends HTMLElement {
     get muteBtn() {
         return this.shadowRoot?.getElementById("mute-btn") as HTMLDivElement;
     }
-
+ 
     get volumeSlider() {
         return this.shadowRoot?.getElementById("volume-slider") as HTMLInputElement;
     }

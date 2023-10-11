@@ -362,7 +362,7 @@ export default class TracksController {
                     trackElement.getPeakMeterParentElement(), {
                         borderSize: 2,
                         fontSize: 7, // tick fontSize. If zero -> no ticks, no labels etc.
-                        backgroundColor: "rgb(23, 23, 26)",
+                        backgroundColor: "#1C1E21",
                         tickColor: "#ddd",
                         labelColor: "#ddd",
                         gradient: ["red 1%", "#ff0 16%", "lime 45%", "#080 100%"],

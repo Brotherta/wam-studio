@@ -11,6 +11,7 @@ import ConfirmElement from "./Components/Utils/ConfirmElement";
 import DialogElement from "./Components/Utils/DialogElement";
 import ScrollBarElement from "./Components/ScrollBarElement";
 import ExportProjectElement from "./Components/Project/ExportProjectElement";
+import TempoSelectorElement from './Components/TempoSelectorElement';
 
 customElements.define(
     "track-element",
@@ -51,6 +52,11 @@ customElements.define(
 customElements.define(
     "export-project-element",
     ExportProjectElement
+);
+
+customElements.define(
+    "tempo-selector-element",
+    TempoSelectorElement
 );
 
 

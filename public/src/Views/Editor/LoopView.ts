@@ -112,7 +112,7 @@ export default class LoopView extends Container {
         background.beginFill(0x2f3439);
         background.drawRect(0, 0, this._editor.worldWidth, EditorView.LOOP_HEIGHT);
         background.endFill();
-        background.zIndex = 99;
+        background.zIndex = 105;
         this.track.addChild(background);
     }
 
@@ -136,7 +136,7 @@ export default class LoopView extends Container {
         this.leftHandle.drawRect(0, 0, LoopView.HANDLE_WIDTH, EditorView.LOOP_HEIGHT+4);
         this.leftHandle.endFill();
 
-        this.leftHandle.zIndex = 100;
+        this.leftHandle.zIndex = 105;
         this.leftHandle.x = 0;
         this.handle.addChild(this.leftHandle);
         this.leftHandle.tint = color;
@@ -151,7 +151,7 @@ export default class LoopView extends Container {
         this.rightHandle.drawRect(0, 0, LoopView.HANDLE_WIDTH, EditorView.LOOP_HEIGHT+4);
         this.rightHandle.endFill();
 
-        this.rightHandle.zIndex = 100;
+        this.rightHandle.zIndex = 105;
         this.rightHandle.x = LoopView.HANDLE_WIDTH + LoopView.BACKGROUND_WIDTH;
         this.handle.addChild(this.rightHandle);
         this.rightHandle.tint = color;
@@ -181,7 +181,7 @@ export default class LoopView extends Container {
         this._window.drawRect(this.leftHandle.x, 0, width, 10000);
         this._window.endFill();
         this._window.eventMode = "none";
-        this._window.zIndex = 98;
+        this._window.zIndex = 105;
         this.handle.addChild(this._window);
     }
 
