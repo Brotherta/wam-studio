@@ -2,10 +2,11 @@ import HostView from "../Views/HostView";
 import App from "../App";
 import songs from "../../static/songs.json";
 import { audioCtx } from "../index";
-import { SONGS_FILE_URL } from "../Env";
+import { RATIO_MILLS_BY_PX, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, SONGS_FILE_URL, updateRatioMillsByPx } from "../Env";
 import VuMeter from "../Components/VuMeterElement";
 import DraggableWindow from "../Utils/DraggableWindow";
 import WebAudioPeakMeter from "../Audio/Utils/PeakMeter";
+import PlayheadView from "../Views/Editor/PlayheadView";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -294,6 +295,51 @@ export default class HostController {
       this._app.editorController.zoomOut();
     });
 
+    // Tempo and Time Signature selectors
+    this._view.timeSignatureSelector.addEventListener("timeSignatureChanged", (event: any) => {
+      console.log("time signature changed to " + event.detail.signature);
+      console.log("nbStepsPerBar=" + event.detail.nbStepsPerBar);
+      console.log("nbStepsPerBeat=" + event.detail.nbStepsPerBeat);
+      // update grid
+      this._app.editorView.grid.updateTimeSignature(event.detail.nbStepsPerBar, event.detail.nbStepsPerBeat);
+    });
+
+    this._view.tempoSelector.addEventListener("tempoChanged", (event: any) => {
+      console.log("tempo changed to " + event.detail.tempo);
+      // update ratio ms per pixels. Let's recall that the
+      // default value of 16.28 ms per pixels corresponds to 120bpm
+      //
+      // by computing the ratio between 120bpm and the new tempo,
+      // we can adjust the RATIO_MILLS_BY_PX variable
+     const coef = 120/event.detail.tempo;
+
+      updateRatioMillsByPx(DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM*coef);
+      this._app.editorView.grid.updateTempo(event.detail.tempo);
+
+      // should update length of waveforms, time display, playhead speed, not the grid...
+
+      // update timer using playhead pos in pixels
+
+      this._view.updateTimerByPixelsPos(this._app.editorView.playhead.position.x);
+
+      // redraw all tracks according to new tempo
+      this._app.tracksController.trackList.forEach((track) => {
+        track.updateBuffer(audioCtx, this._app.host.playhead);
+
+        // update all starting times of all regions
+        track.regions.forEach((region) => {
+          // change starting time in ms of region
+          //region.start *=coef;
+          
+        });
+
+        // redraw all regions taking into account the new tempo
+        // as RATIO_MILLS_BY_PX has been updated, just this call should be sufficient
+        this._app.editorView.drawRegions(track);
+      });
+
+    });
+
     // MENU BUTTONS
     this._view.exportProject.addEventListener("click", () => {
       this._app.projectController.openExportWindow();
@@ -408,10 +454,6 @@ export default class HostController {
     // create vu-meter. Wait until parent is visible.
     let id = setInterval(() => {
       if (this._view.vuMeterDiv.isConnected) {
-        console.log(
-          "this._view.vuMeterDiv.isConnected",
-          this._view.vuMeterDiv.isConnected
-        );
         let peakMeter = new WebAudioPeakMeter(
           audioCtx,
           this._app.host.gainNode, // MB: Check, here we should use the node at the end of the chain i.e main output

@@ -129,7 +129,7 @@ export default class TempoSelectorElement extends HTMLElement {
     if (this.shadowRoot !== null) {
       this.shadowRoot.innerHTML = template.innerHTML;
 
-      this.defineTrackElementListeners();
+      this.defineListeners();
     }
   }
   
@@ -142,7 +142,26 @@ export default class TempoSelectorElement extends HTMLElement {
     this.tempoInput!.value = newTempo.toString();
   }
 
-  defineTrackElementListeners() {
+  updateTempo(newTempo: number) {
+    // value entered is a number, check range and if
+      // ok change the tempo, adjust the grid, etc.
+      if (newTempo > 0 && newTempo < 300) {
+        console.log("new tempo = " + newTempo);
+        this.currentTempo = newTempo;
+
+        // fire tempoChanged event
+        this.tempoInput?.dispatchEvent(
+          new CustomEvent("tempoChanged", {
+            detail: {
+              tempo: this.currentTempo,
+            },
+            composed: true,
+          })
+        );
+      }
+  }
+
+  defineListeners() {
     this.tempoInput = this.shadowRoot!.querySelector(
       "#tempo"
     ) as HTMLInputElement;
@@ -151,14 +170,7 @@ export default class TempoSelectorElement extends HTMLElement {
       console.log(event.target.validity)
       if (!event.target?.validity.valid) return;
 
-      const newTempo = event.target.value;
-
-      // value entered is a number, check range and if
-      // ok change the tempo, adjust the grid, etc.
-      if (newTempo > 0 && newTempo < 300) {
-        console.log("new tempo = " + newTempo);
-        this.currentTempo = newTempo;
-      }
+      this.updateTempo(event.target.value);
     };
 
     this.upArrowButton = this.shadowRoot!.querySelector(
@@ -167,6 +179,7 @@ export default class TempoSelectorElement extends HTMLElement {
     this.upArrowButton.onclick = () => {
       this.currentTempo++;
       this.tempoInput!.value = this.currentTempo.toString();
+      this.updateTempo(this.currentTempo);
     };
 
     this.downArrowButton = this.shadowRoot!.querySelector(
@@ -176,6 +189,7 @@ export default class TempoSelectorElement extends HTMLElement {
       if (this.currentTempo) {
         this.currentTempo--;
         this.tempoInput!.value = this.currentTempo.toString();
+        this.updateTempo(this.currentTempo);
       }
     };
   }

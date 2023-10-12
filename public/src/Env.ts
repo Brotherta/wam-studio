@@ -1,7 +1,11 @@
 export const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:6002";
 export const SONGS_FILE_URL = process.env.SONGS_FILE_URL || "http://localhost:6002";
 
-export let RATIO_MILLS_BY_PX = 16.85; // default value for ration/zomm in ms / pixels
+// default value for ration/zomm in ms / pixels
+// we set the default value assuming a tempo of 120bpm and a 4/4 time signature
+export let DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM = 16.85;
+
+export let RATIO_MILLS_BY_PX = DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM; 
 export let HEIGHT_TRACK = 120; // track 100px height
 
 export const MAX_DURATION_SEC = 600; // 15 minutes

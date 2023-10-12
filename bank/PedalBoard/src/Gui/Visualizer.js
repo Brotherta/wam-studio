@@ -1,4 +1,5 @@
-import "https://preview.babylonjs.com/babylon.js";
+//import "https://preview.babylonjs.com/babylon.js";
+import "./libs/babylon.js";
 
 /**
  * @param {URL} relativeURL

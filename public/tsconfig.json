@@ -27,5 +27,5 @@
     // Folder for your code
     "include": [
         "./src/**/*"
-    ]
+, "static/libs"    ]
 }

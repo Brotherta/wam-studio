@@ -12,6 +12,9 @@ export default class GridView extends Container {
    */
   public grid: Graphics;
   private listOfTextElements: Text[] = [];
+  private nbStepsPerBar: number = 4;
+  private nbStepsPerBeat: number = 4;
+  private bpm:number = 120;
 
   constructor(editor: EditorView) {
     super();
@@ -24,6 +27,28 @@ export default class GridView extends Container {
     this.draw();
   }
 
+  updateTimeSignature(nbStepsPerBar:number, nbStepsPerBeat:number) {
+    this.nbStepsPerBar = nbStepsPerBar;
+    this.nbStepsPerBeat = nbStepsPerBeat;
+    this.updateGrid();
+  }
+
+  updateTempo(bpm:number) {
+    console.log("gridView update tempo to " + bpm);
+    console.log("for the moment, we're not changing the grid.");
+    console.log("See comments in GridView/updateTempo method!");
+
+    //this.bpm = bpm;
+    //this.updateGrid();
+    
+    // MB TO FIX : the grid view should not be affected if we change the tempo, only
+    // the speed of play and current time display, and speed of playhead.
+    // so far with the current code, it changes the grid !!!
+
+    // current grid suppose a bpm of 120. If tempo changes, only impact playhed, time display,
+    // waveform lengths, not the grid !!!!!
+  }
+
   private draw(): void {
     // get width of editorView
 
@@ -34,24 +59,22 @@ export default class GridView extends Container {
 
     // using a for loop, draw vertical lines, from x = 0 to x=width, step = 100 pixels
     this.grid.lineStyle(1, "red", 0.2);
-    // Bar being drawn
-    let barNumber = 0;
-    // current step in bar
-    let step = 0;
+    
     // number of steps in bar
     // Should be taken from the rythm key signature element when it will be available
-    let nbSteps = 4;
+    let nbSteps = this.nbStepsPerBar;
 
-    // number of pixels per step
-    // Grid corresponds by default to a tempo of 120bpm and 4 steps per bar
-    let bpm = 120;
-    const stepInMs = ((bpm / 60) * 1000) / nbSteps; // 120bpm = 2 beats per second = 2*1000ms per second = 2*1000/4 = 500ms per step
+    // duration of 1 step in ms
+    const stepInMs = ((this.bpm / 60) * 1000)/4; // 120bpm = 2 beats per second = 2*1000ms per second = 2*1000/4 = 500ms per step
+    const barInMS = stepInMs * nbSteps; // 4 steps per bar = 4*500ms = 2000ms per bar at 120bpm 
     const stepWidth = stepInMs / RATIO_MILLS_BY_PX;
+    const barWidth = barInMS / RATIO_MILLS_BY_PX;
+
     let displaySteps = true;
     if (stepWidth < 6) displaySteps = false;
 
     // number of pixels per bar
-    const barWidth = nbSteps * stepWidth;
+    //const barWidth = nbSteps * stepWidth;
     //console.log("stepWidth=" + stepWidth + " barWidth=" + barWidth);
     let displayBarsEvery = 1;
     if (barWidth < 20) {
@@ -131,14 +154,21 @@ export default class GridView extends Container {
     this.addChild(this.grid);
   }
 
-  resize() {
+  clearGrid() {
     this.grid.clear();
     this.listOfTextElements.forEach((element) => {
       this.removeChild(element);
     });
 
     this.listOfTextElements = [];
+  }
 
+  updateGrid() {
+    this.clearGrid()
     this.draw();
+  }
+
+  resize() {
+      this.updateGrid();
   }
 }
