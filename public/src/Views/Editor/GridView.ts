@@ -53,7 +53,7 @@ export default class GridView extends Container {
     // get width of editorView
 
     const width = (MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX; //this._editorView.viewport.width;
-    const height = this._editorView.canvasContainer.clientHeight;
+    const height = this._editorView.viewport.height;
 
     this.grid = new Graphics();
 

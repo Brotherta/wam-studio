@@ -205,6 +205,8 @@ export default class EditorView extends Application {
         let wave = new WaveformView(this, track);
         this.waveforms.push(wave);
         this.resizeCanvas();
+        this.grid.resize();
+
         return wave;
     }
 
