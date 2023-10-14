@@ -52,7 +52,7 @@ export default class pedalboardGui extends HTMLElement {
     let canvas = document.createElement("canvas");
     canvas.on = true;
     this.main.appendChild(canvas);
-    // new Visualizer(canvas, this._plug.pedalboardNode._output);
+     new Visualizer(canvas, this._plug.pedalboardNode._output);
 
     title.addEventListener("click", () => {
       canvas.on = !canvas.on;

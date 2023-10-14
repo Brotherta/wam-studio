@@ -329,8 +329,7 @@ export default class HostController {
         // update all starting times of all regions
         track.regions.forEach((region) => {
           // change starting time in ms of region
-          //region.start *=coef;
-          
+          // region start is in samples
         });
 
         // redraw all regions taking into account the new tempo

@@ -1,7 +1,7 @@
 import EditorView from "./EditorView";
 import {Container, Graphics} from "pixi.js";
 import Region from "../../Models/Region";
-import {HEIGHT_TRACK, RATIO_MILLS_BY_PX} from "../../Env";
+import {HEIGHT_TRACK, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, RATIO_MILLS_BY_PX} from "../../Env";
 
 /**
  * Class that extends PIXI.Container.
@@ -60,7 +60,11 @@ export default class RegionView extends Container {
      * @param region - The region that will contain the buffer to draw.
      */
     public initializeRegionView(color: string, region: Region): void {
-        this.position.x = region.start / RATIO_MILLS_BY_PX;
+        // pos is always calculated for 120bpm.
+        this.position.x = region.start / DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM;
+        // MB: if tempo is not 120bpm, then RATIO_MILLS_BY_PIX is different from
+        // DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM and regions will be resized accordingly
+        // but their start position must no be changed. Cf amped studio and other DAWs.
         this.drawWave(color, region);
         this.drawBackground();
     }

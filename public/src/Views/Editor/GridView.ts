@@ -41,7 +41,7 @@ export default class GridView extends Container {
     //this.bpm = bpm;
     //this.updateGrid();
     
-    // MB TO FIX : the grid view should not be affected if we change the tempo, only
+    // MB : the grid view should not be affected if we change the tempo, only
     // the speed of play and current time display, and speed of playhead.
     // so far with the current code, it changes the grid !!!
 
