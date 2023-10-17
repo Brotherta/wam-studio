@@ -94,6 +94,12 @@ export default class PlayheadView extends Container {
 
     }
 
+    public centerViewportAround() {
+        // MB : for debugging viewport centering
+        this._editor.viewport.moveCenter(this.position.x, this._editor.viewport.center.y);
+        console.log("this._editor.viewport.center.x =" + this._editor.viewport.center.y)
+
+    }
     /**
      * Draws the handle of the playhead and activate the PIXI events.
      */

@@ -29,7 +29,7 @@ export default class EditorView extends Application {
     public verticalScrollbar = document.getElementById("vertical-scrollbar") as ScrollBarElement;
     public trackContainer = document.getElementById("track-container") as HTMLDivElement;
     public automationContainer = document.getElementById("automation-container") as HTMLElement;
-
+    public spanZoomLevel = document.getElementById("spanZoomLevel") as HTMLSpanElement;
     /**
      * The width of the editor in pixels. It's the size of the viewport minus the scrollbars.
      */

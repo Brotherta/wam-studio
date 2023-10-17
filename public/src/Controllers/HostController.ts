@@ -2,7 +2,7 @@ import HostView from "../Views/HostView";
 import App from "../App";
 import songs from "../../static/songs.json";
 import { audioCtx } from "../index";
-import { RATIO_MILLS_BY_PX, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, SONGS_FILE_URL, updateRatioMillsByPx } from "../Env";
+import { updateTempo, TEMPO_DELTA, SONGS_FILE_URL} from "../Env";
 import VuMeter from "../Components/VuMeterElement";
 import DraggableWindow from "../Utils/DraggableWindow";
 import WebAudioPeakMeter from "../Audio/Utils/PeakMeter";
@@ -305,35 +305,41 @@ export default class HostController {
     });
 
     this._view.tempoSelector.addEventListener("tempoChanged", (event: any) => {
-      console.log("tempo changed to " + event.detail.tempo);
-      // update ratio ms per pixels. Let's recall that the
-      // default value of 16.28 ms per pixels corresponds to 120bpm
-      //
-      // by computing the ratio between 120bpm and the new tempo,
-      // we can adjust the RATIO_MILLS_BY_PX variable
-     const coef = 120/event.detail.tempo;
 
-      updateRatioMillsByPx(DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM*coef);
+      const newTempo = event.detail.tempo;
+      if(newTempo < 5 || newTempo > 300) return;
+
+      updateTempo(newTempo);
       this._app.editorView.grid.updateTempo(event.detail.tempo);
 
       // should update length of waveforms, time display, playhead speed, not the grid...
 
       // update timer using playhead pos in pixels
-
       this._view.updateTimerByPixelsPos(this._app.editorView.playhead.position.x);
 
       // redraw all tracks according to new tempo
       this._app.tracksController.trackList.forEach((track) => {
-        track.updateBuffer(audioCtx, this._app.host.playhead);
-
-        // update all starting times of all regions
-        track.regions.forEach((region) => {
-          // change starting time in ms of region
-          // region start is in samples
-        });
+       
 
         // redraw all regions taking into account the new tempo
         // as RATIO_MILLS_BY_PX has been updated, just this call should be sufficient
+        // for all track regions, update their start properties
+        
+        for (const region of track.regions) {
+          // TEMPO_RATION and RATIO_MILLS_BY_PX have been updated
+          // let's change all region start properties
+          // from their previous pos in pixels position.
+          // region pos do not move when tempo changes
+          //console.log("region pos = " + region.pos + " start = " + region.start)
+          //const newStart = region.pos * RATIO_MILLS_BY_PX;
+          //console.log("new region start = " + newStart)
+          const newStart = region.start / TEMPO_DELTA;
+          region.updateStart(newStart);
+        }
+
+        // MB : is this necessary ?
+        track.updateBuffer(audioCtx, this._app.host.playhead);
+
         this._app.editorView.drawRegions(track);
       });
 

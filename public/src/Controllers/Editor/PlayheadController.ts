@@ -97,6 +97,16 @@ export default class PlayheadController {
         if (this._app.host.playing) {
             this._app.automationController.applyAllAutomations();
         }
+
+        // MB : for debugging viewport centering
+        //this._app.editorView.viewport.moveCenter(this._view.x, this._app.editorView.viewport.center.y);
+        //console.log("this._app.editorView.viewport.center.x =" + this._app.editorView.viewport.center.x)
+    }
+
+    public centerViewportAround() {
+        this._app.editorView.viewport.moveCenter(this._view.x, this._app.editorView.viewport.center.y);
+        console.log("this._app.editorView.viewport.center.x =" + this._app.editorView.viewport.center.x)
+       
     }
 }
 

@@ -1,7 +1,7 @@
 import EditorView from "./EditorView";
 import {Container, Graphics} from "pixi.js";
 import Region from "../../Models/Region";
-import {HEIGHT_TRACK, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, RATIO_MILLS_BY_PX} from "../../Env";
+import {HEIGHT_TRACK, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, RATIO_MILLS_BY_PX, TEMPO_RATIO} from "../../Env";
 
 /**
  * Class that extends PIXI.Container.
@@ -60,14 +60,17 @@ export default class RegionView extends Container {
      * @param region - The region that will contain the buffer to draw.
      */
     public initializeRegionView(color: string, region: Region): void {
-        // pos is always calculated for 120bpm.
-        this.position.x = region.start / DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM;
-        // MB: if tempo is not 120bpm, then RATIO_MILLS_BY_PIX is different from
-        // DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM and regions will be resized accordingly
-        // but their start position must no be changed. Cf amped studio and other DAWs.
+        //console.log("----")
+        //console.log("initializeRegionView start = " + region.start);
+        //console.log("initializeRegionView ratio = " + RATIO_MILLS_BY_PX);
+        region.pos = region.start / RATIO_MILLS_BY_PX;
+        //console.log("initializeRegionView pos = " + region.pos);
+        //console.log("----")
+        this.position.x = region.pos;
         this.drawWave(color, region);
         this.drawBackground();
     }
+  
 
     /**
      * Draws the waveform of the track.
@@ -76,7 +79,7 @@ export default class RegionView extends Container {
      * @param region - The region that will contain the buffer to draw.
      */
     public drawWave(color: string, region: Region): void {
-        let range = region.duration * 1000 / RATIO_MILLS_BY_PX;
+        let range = (region.duration * 1000 / RATIO_MILLS_BY_PX)  ;
         this.scale.x = 1;
 
         let colorHex = +("0x" + color.slice(1));

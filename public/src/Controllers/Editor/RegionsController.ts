@@ -304,7 +304,11 @@ export default class RegionsController {
             }
         }
         this._selectedRegionView.position.x = newX;
+        // in ms
+        this._selectedRegion.pos = newX;
+        console.log("Region Moved, new pos (pixels): " + this._selectedRegion.pos)
         this._selectedRegion.start = newX * RATIO_MILLS_BY_PX;
+        console.log("Region Moved, new start (ms): " + this._selectedRegion.start)
     }
 
     /**

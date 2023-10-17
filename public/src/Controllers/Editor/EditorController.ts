@@ -1,7 +1,6 @@
 import App from "../../App";
 import EditorView from "../../Views/Editor/EditorView";
-import {RATIO_MILLS_BY_PX, updateRatioMillsByPx} from "../../Env";
-import {audioCtx} from "../../index";
+import {RATIO_MILLS_BY_PX, ZOOM_LEVEL, decrementZoomLevel, incrementZoomLevel} from "../../Env";
 
 /**
  * Interface of the custom event of the ScrollBarElement.
@@ -98,8 +97,12 @@ export default class EditorController {
             ratio = this.getZoomRatioByLevel(this._currentLevel);
             console.log(ratio)
         }
-        updateRatioMillsByPx(ratio);
+        //updateRatioMillsByPx(ratio);
+        incrementZoomLevel();
         this.updateZoom();
+
+       //this._view.stage.scale.x *= ZOOM_LEVEL;
+
     }
 
     /**
@@ -136,7 +139,8 @@ export default class EditorController {
             
             ratio = this.getZoomRatioByLevel(this._currentLevel);
         }
-        updateRatioMillsByPx(ratio);
+        //updateRatioMillsByPx(ratio);
+        decrementZoomLevel();
         this.updateZoom();
     }
 
@@ -194,18 +198,42 @@ export default class EditorController {
      */
     private async updateZoom(): Promise<void> {
         let offsetPlayhead = this._view.playhead.position.x;
+        console.log("playhad pos before zoom = " + offsetPlayhead)
         this._view.resizeCanvas();
         this._view.playhead.moveToFromPlayhead(this._app.host.playhead);
+        console.log("playhad pos after zoom = " + this._view.playhead.position.x)
+
         this._view.loop.updatePositionFromTime(this._app.host.loopStart, this._app.host.loopEnd);
         this._app.automationController.updateBPFWidth();
         this._view.horizontalScrollbar.customScrollTo(this._view.playhead.position.x - offsetPlayhead);
-
+        
+        this._view.spanZoomLevel.innerHTML = ("x"+ZOOM_LEVEL.toFixed(2));
         
         this._app.tracksController.trackList.forEach(track => {
             // MB : this seems unecessary
             //track.updateBuffer(audioCtx, this._app.host.playhead);
             this._view.stretchRegions(track);
         });
+
+        // MB: Center the viewport around the playhead if it is visible,
+        // otherwise around the center of the viewport
+        // get playhead x pos
+        //const pos = this._view.playhead.position.x;
+        //this._view.playhead.resize();
+        //this._app.playheadController.centerViewportAround();
+/*
+        console.log("Playhead pos x after ZOOM =" + pos);
+
+        const id = setInterval(() => {
+            console.log("CENTERING pos= " + pos + " this._app.editorView.viewport.center.x = " + this._app.editorView.viewport.center.x)
+            this._app.editorView.viewport.moveCenter(pos, this._app.editorView.viewport.center.y);
+            if(Math.abs(this._app.editorView.viewport.center.x -pos) < 2) {
+                console.log("CENTERED this._app.editorView.viewport.center.x = " + this._app.editorView.viewport.center.x);
+
+                clearInterval(id);
+            }
+        }, 10);
+*/
 
         this._timeout = setTimeout(() => {
             console.log("Dans le timeout")

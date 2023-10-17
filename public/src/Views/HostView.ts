@@ -58,6 +58,7 @@ export default class HostView {
      * Updates the timer of the host view.
      *
      * @param pos - The current pos of the playhead. It is used to calculate the time.
+     * pos unit is in samples.
      */
     public updateTimer(pos: number) {
         let millseconds = (pos / audioCtx.sampleRate) * 1000;
@@ -70,7 +71,12 @@ export default class HostView {
      * @param pos - The position of the playhead in pixels.
      */
     public updateTimerByPixelsPos(pos: number) {
-        this.updateTimer((pos * RATIO_MILLS_BY_PX) / 1000 *audioCtx.sampleRate);
+        console.log("updateTimerByPixelsPos RATIO_MILLS_BY_PX" + RATIO_MILLS_BY_PX);
+        // turn the pos from pixels to ms
+        const posInMs = pos*RATIO_MILLS_BY_PX;
+        console.log("updateTimerByPixelsPos Playhead pos in pixels : " + pos + " - Playhead pos in ms : " + posInMs)
+        this.timer.innerHTML = HostView.millisToMinutesAndSeconds(posInMs);
+        //this.updateTimer((pos * RATIO_MILLS_BY_PX) / 1000 *audioCtx.sampleRate);
     }
 
     /**

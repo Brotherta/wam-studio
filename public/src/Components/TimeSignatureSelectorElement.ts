@@ -66,6 +66,7 @@ template.innerHTML = `
 `;
 
 export default class TimeSignatureSelectorElement extends HTMLElement {
+  container?: HTMLDivElement;
   timeSignatureInput?: HTMLInputElement;
 
   timeSignature: string = "4/4";
@@ -92,6 +93,12 @@ export default class TimeSignatureSelectorElement extends HTMLElement {
   }
 
   defineListeners() {
+
+    this.container = this.shadowRoot!.querySelector("#container") as HTMLDivElement;
+    this.container.onkeydown = (event: any) => {
+      event.stopPropagation();
+    }
+
     this.timeSignatureInput = this.shadowRoot!.querySelector(
       "#time-signature"
     ) as HTMLInputElement;

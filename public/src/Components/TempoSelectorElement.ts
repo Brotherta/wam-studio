@@ -115,6 +115,7 @@ template.innerHTML = `
 `;
 
 export default class TempoSelectorElement extends HTMLElement {
+  container?: HTMLDivElement;
   tempoInput?: HTMLInputElement;
   upArrowButton?: HTMLButtonElement;
   downArrowButton?: HTMLButtonElement;
@@ -162,11 +163,23 @@ export default class TempoSelectorElement extends HTMLElement {
   }
 
   defineListeners() {
+
+    this.container = this.shadowRoot!.querySelector("#container") as HTMLDivElement;
+    this.container.onkeydown = (event: any) => {
+      event.stopPropagation();
+    }
+
+    
     this.tempoInput = this.shadowRoot!.querySelector(
       "#tempo"
     ) as HTMLInputElement;
 
+    this.tempoInput.oninput = (event: any) => {
+      event.stopPropagation();
+    }
+
     this.tempoInput.onchange = (event: any) => {
+      event.stopPropagation();
       console.log(event.target.validity)
       if (!event.target?.validity.valid) return;
 

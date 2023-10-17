@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from "pixi.js";
 import EditorView from "./EditorView";
-import { RATIO_MILLS_BY_PX, MAX_DURATION_SEC } from "../../Env";
+import { RATIO_MILLS_BY_PX, MAX_DURATION_SEC, TEMPO, ZOOM_LEVEL, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM } from "../../Env";
 
 export default class GridView extends Container {
   /**
@@ -64,11 +64,17 @@ export default class GridView extends Container {
     // Should be taken from the rythm key signature element when it will be available
     let nbSteps = this.nbStepsPerBar;
 
+    /*
     // duration of 1 step in ms
-    const stepInMs = ((this.bpm / 60) * 1000)/4; // 120bpm = 2 beats per second = 2*1000ms per second = 2*1000/4 = 500ms per step
+    const stepInMs = ((TEMPO / 60) * 1000)/nbSteps; // 120bpm = 2 beats per second = 2*1000ms per second = 2*1000/4 = 500ms per step
+  
     const barInMS = stepInMs * nbSteps; // 4 steps per bar = 4*500ms = 2000ms per bar at 120bpm 
-    const stepWidth = stepInMs / RATIO_MILLS_BY_PX;
-    const barWidth = barInMS / RATIO_MILLS_BY_PX;
+    let stepWidth = stepInMs / RATIO_MILLS_BY_PX;
+    let barWidth = barInMS / RATIO_MILLS_BY_PX;
+    */
+    // MB test. Just compute width of grid for tempo = 120, adjust by multiplying by zoom level.
+    let barWidth = (2000/DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM) * ZOOM_LEVEL;
+    let stepWidth = barWidth / nbSteps
 
     let displaySteps = true;
     if (stepWidth < 6) displaySteps = false;
@@ -170,5 +176,7 @@ export default class GridView extends Container {
 
   resize() {
       this.updateGrid();
+      //this.grid.scale.x *= ZOOM_LEVEL;
+      //this.grid.scale.y *= 1;
   }
 }
