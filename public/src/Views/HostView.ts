@@ -71,12 +71,9 @@ export default class HostView {
      * @param pos - The position of the playhead in pixels.
      */
     public updateTimerByPixelsPos(pos: number) {
-        console.log("updateTimerByPixelsPos RATIO_MILLS_BY_PX" + RATIO_MILLS_BY_PX);
         // turn the pos from pixels to ms
         const posInMs = pos*RATIO_MILLS_BY_PX;
-        console.log("updateTimerByPixelsPos Playhead pos in pixels : " + pos + " - Playhead pos in ms : " + posInMs)
         this.timer.innerHTML = HostView.millisToMinutesAndSeconds(posInMs);
-        //this.updateTimer((pos * RATIO_MILLS_BY_PX) / 1000 *audioCtx.sampleRate);
     }
 
     /**

@@ -2,7 +2,7 @@ import HostView from "../Views/HostView";
 import App from "../App";
 import songs from "../../static/songs.json";
 import { audioCtx } from "../index";
-import { updateTempo, TEMPO_DELTA, SONGS_FILE_URL} from "../Env";
+import { updateTempo, TEMPO_DELTA, SONGS_FILE_URL } from "../Env";
 import VuMeter from "../Components/VuMeterElement";
 import DraggableWindow from "../Utils/DraggableWindow";
 import WebAudioPeakMeter from "../Audio/Utils/PeakMeter";
@@ -203,6 +203,9 @@ export default class HostController {
   public bindNodeListeners(): void {
     if (this._app.host.hostNode) {
       this._app.host.hostNode.port.onmessage = (ev) => {
+        // MB !
+        //if(!ev.data.volume) return;
+
         if (ev.data.playhead) {
           this._app.host.playhead = ev.data.playhead;
         } else if (ev.data.volume >= 0) {
@@ -289,6 +292,12 @@ export default class HostController {
       this.mute();
     });
     this._view.zoomInBtn.addEventListener("click", async () => {
+      let playhead = this._app.host.playhead;
+      console.log("zoomInBtn.addEventListener !!!!!!!");
+      console.log("beginning of zoomInBtn.addEventListener playhead=" + playhead + 
+      " pos="  + this._app.editorView.playhead.position.x + " ms=" + (playhead / audioCtx.sampleRate) * 1000);
+      console.log("---");
+
       this._app.editorController.zoomIn();
     });
     this._view.zoomOutBtn.addEventListener("click", async () => {
@@ -305,44 +314,46 @@ export default class HostController {
     });
 
     this._view.tempoSelector.addEventListener("tempoChanged", (event: any) => {
-
+      // sent by the tempoSelector Web Component (custom event has its data in event.detail)
       const newTempo = event.detail.tempo;
-      if(newTempo < 5 || newTempo > 300) return;
+
+      if(newTempo < 5 || newTempo > 600) return;
 
       updateTempo(newTempo);
-      this._app.editorView.grid.updateTempo(event.detail.tempo);
 
       // should update length of waveforms, time display, playhead speed, not the grid...
-
       // update timer using playhead pos in pixels
       this._view.updateTimerByPixelsPos(this._app.editorView.playhead.position.x);
 
+      // update playhead value (in samples) and post to all track nodes
+      //console.log("Tempo changed : playhead before = " + this._app.host.playhead + " pos = " + this._app.editorView.playhead.position.x + " in ms : " + (this._app.host.playhead*1000)/audioCtx.sampleRate);
+      // jumps to new playhead value
+      this._app.tracksController.jumpTo(this._app.editorView.playhead.position.x);
+
+      // update position of playhead in editorView
+      this._app.editorView.playhead.moveToFromPlayhead(this._app.host.playhead);
+      //console.log("Tempo changed : playhead AFTER= " + this._app.host.playhead + " pos = " + this._app.editorView.playhead.position.x  + " in ms : " + (this._app.host.playhead*1000)/audioCtx.sampleRate);
+
       // redraw all tracks according to new tempo
       this._app.tracksController.trackList.forEach((track) => {
-       
-
         // redraw all regions taking into account the new tempo
-        // as RATIO_MILLS_BY_PX has been updated, just this call should be sufficient
-        // for all track regions, update their start properties
+        // RATIO_MILLS_BY_PX has been updated by updateTemponew(Tempo)
         
+        // for all track regions, update their start properties
         for (const region of track.regions) {
-          // TEMPO_RATION and RATIO_MILLS_BY_PX have been updated
-          // let's change all region start properties
-          // from their previous pos in pixels position.
-          // region pos do not move when tempo changes
-          //console.log("region pos = " + region.pos + " start = " + region.start)
-          //const newStart = region.pos * RATIO_MILLS_BY_PX;
-          //console.log("new region start = " + newStart)
-          const newStart = region.start / TEMPO_DELTA;
-          region.updateStart(newStart);
+          // TEMPO_DELTA (that represents the ration newTempo/oldTempo) has been updated
+          // region pos should not change when the tempo changes
+          // a region that starts at 2000ms at 120bpm, when tempo changes to 60bpm
+          // should now start at 2000/TEMPO_DELTA, in other words 2000/0.5 = 4000ms
+          region.updateStart(region.start / TEMPO_DELTA);
         }
 
-        // MB : is this necessary ?
+        // MB : is this necessary ? Apparently yes as start of regions changed.
+        // TODO : check if this is really necessary.
         track.updateBuffer(audioCtx, this._app.host.playhead);
 
         this._app.editorView.drawRegions(track);
       });
-
     });
 
     // MENU BUTTONS

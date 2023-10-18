@@ -1,6 +1,7 @@
 import App from "../../App";
 import EditorView from "../../Views/Editor/EditorView";
-import {RATIO_MILLS_BY_PX, ZOOM_LEVEL, decrementZoomLevel, incrementZoomLevel} from "../../Env";
+import { RATIO_MILLS_BY_PX, ZOOM_LEVEL, decrementZoomLevel, incrementZoomLevel } from "../../Env";
+import { audioCtx } from "../../index";
 
 /**
  * Interface of the custom event of the ScrollBarElement.
@@ -68,6 +69,7 @@ export default class EditorController {
      * @param value the of the zoom in pixel
      */
     public zoomIn(value?: number): void {
+
         // for the moment, do not allow zoom in/out while playing
         if (this._app.host.playing) return;
 
@@ -84,7 +86,7 @@ export default class EditorController {
             let level = this._currentLevel;
             
             this._currentLevel = Math.max(this._currentLevel - 1, 0);
-            console.log("_currentLevel", this._currentLevel)
+            //console.log("_currentLevel", this._currentLevel)
 
             if(this._currentLevel === 0) {
                 // level is at max zoom value
@@ -95,7 +97,7 @@ export default class EditorController {
             if (level === this._currentLevel)return;
             
             ratio = this.getZoomRatioByLevel(this._currentLevel);
-            console.log(ratio)
+            //console.log(ratio)
         }
         //updateRatioMillsByPx(ratio);
         incrementZoomLevel();
@@ -111,6 +113,8 @@ export default class EditorController {
      * @param value the of the zoom in pixel
      */
     public zoomOut(value?: number): void {
+    
+
         // for the moment, do not allow zoom in/out while playing
         if (this._app.host.playing) return;
 
@@ -125,10 +129,10 @@ export default class EditorController {
         } else { // Button pressed - Find nearest step and adjust to that step
             this._currentLevel = this.getNearestZoomLevel();
             let level = this._currentLevel;
-            console.log("level", level)
+            //console.log("level", level)
 
             this._currentLevel = Math.min(this.ZOOM_STEPS - 1, this._currentLevel + 1);
-            console.log("_currentLevel", this._currentLevel)
+            //console.log("_currentLevel", this._currentLevel)
 
             if(this._currentLevel === this.ZOOM_STEPS - 1) {
                 this._app.hostView.zoomOutBtn.classList.remove("zoom-enabled");
@@ -198,14 +202,20 @@ export default class EditorController {
      */
     private async updateZoom(): Promise<void> {
         let offsetPlayhead = this._view.playhead.position.x;
-        console.log("playhad pos before zoom = " + offsetPlayhead)
+        //console.log("playhad pos before zoom = " + offsetPlayhead)
         this._view.resizeCanvas();
         this._view.playhead.moveToFromPlayhead(this._app.host.playhead);
-        console.log("playhad pos after zoom = " + this._view.playhead.position.x)
-
+         const playhead = this._app.host.playhead;
+         /*
+        console.log("after zoom playhead=" + playhead + 
+                " pos="  + this._view.playhead.position.x + " ms=" + (playhead / audioCtx.sampleRate) * 1000);
+        */
         this._view.loop.updatePositionFromTime(this._app.host.loopStart, this._app.host.loopEnd);
         this._app.automationController.updateBPFWidth();
-        this._view.horizontalScrollbar.customScrollTo(this._view.playhead.position.x - offsetPlayhead);
+
+        // let's scroll the viewport + recompute size and pos of the horizontal scrollbar
+        let scrollValue = this._view.playhead.position.x - offsetPlayhead;
+        this._view.horizontalScrollbar.customScrollTo(scrollValue);
         
         this._view.spanZoomLevel.innerHTML = ("x"+ZOOM_LEVEL.toFixed(2));
         
@@ -221,22 +231,9 @@ export default class EditorController {
         //const pos = this._view.playhead.position.x;
         //this._view.playhead.resize();
         //this._app.playheadController.centerViewportAround();
-/*
-        console.log("Playhead pos x after ZOOM =" + pos);
-
-        const id = setInterval(() => {
-            console.log("CENTERING pos= " + pos + " this._app.editorView.viewport.center.x = " + this._app.editorView.viewport.center.x)
-            this._app.editorView.viewport.moveCenter(pos, this._app.editorView.viewport.center.y);
-            if(Math.abs(this._app.editorView.viewport.center.x -pos) < 2) {
-                console.log("CENTERED this._app.editorView.viewport.center.x = " + this._app.editorView.viewport.center.x);
-
-                clearInterval(id);
-            }
-        }, 10);
-*/
 
         this._timeout = setTimeout(() => {
-            console.log("Dans le timeout")
+            //console.log("Dans le timeout")
 
             this._app.tracksController.trackList.forEach(track => {
                 // MB : below seems also unecessary

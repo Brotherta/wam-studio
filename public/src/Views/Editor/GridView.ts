@@ -33,22 +33,7 @@ export default class GridView extends Container {
     this.updateGrid();
   }
 
-  updateTempo(bpm:number) {
-    console.log("gridView update tempo to " + bpm);
-    console.log("for the moment, we're not changing the grid.");
-    console.log("See comments in GridView/updateTempo method!");
-
-    //this.bpm = bpm;
-    //this.updateGrid();
-    
-    // MB : the grid view should not be affected if we change the tempo, only
-    // the speed of play and current time display, and speed of playhead.
-    // so far with the current code, it changes the grid !!!
-
-    // current grid suppose a bpm of 120. If tempo changes, only impact playhed, time display,
-    // waveform lengths, not the grid !!!!!
-  }
-
+  
   private draw(): void {
     // get width of editorView
 

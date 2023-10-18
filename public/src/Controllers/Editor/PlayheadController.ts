@@ -1,4 +1,6 @@
+import { audioCtx } from "../..";
 import App from "../../App";
+import { RATIO_MILLS_BY_PX } from "../../Env";
 import PlayheadView from "../../Views/Editor/PlayheadView";
 import {FederatedPointerEvent} from "pixi.js";
 
@@ -66,6 +68,9 @@ export default class PlayheadController {
                 if (pos < 0) pos = 0;
                 this._view.moveTo(pos);
                 this._app.hostView.updateTimerByPixelsPos(pos);
+                // MB !
+                this._app.host.playhead = pos*RATIO_MILLS_BY_PX*audioCtx.sampleRate/1000;
+                //console.log("global pointermove playhead = " + this._app.host.playhead + " pos = " + pos)
             }
         });
     }
@@ -104,7 +109,9 @@ export default class PlayheadController {
     }
 
     public centerViewportAround() {
-        this._app.editorView.viewport.moveCenter(this._view.x, this._app.editorView.viewport.center.y);
+        // Center the viewport around playhead pos in pixels
+       console.log("playhead pos x = " + this._view.position.x);
+        this._app.editorView.viewport.moveCenter(this._view.position.x, this._app.editorView.viewport.center.y);
         console.log("this._app.editorView.viewport.center.x =" + this._app.editorView.viewport.center.x)
        
     }
