@@ -89,7 +89,7 @@ export default class RegionView extends Container {
         let amp = (HEIGHT_TRACK-1) / 2;
         for (let channel = 0; channel < region.buffer.numberOfChannels; channel++) {
             let data = region.buffer.getChannelData(channel);
-            let step = Math.ceil(data.length / range);
+            let step = Math.round(data.length / range);
 
             for (let i = 0; i < range; i++) {
                 let min = 1.0;
