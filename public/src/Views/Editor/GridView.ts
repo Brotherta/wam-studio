@@ -58,8 +58,13 @@ export default class GridView extends Container {
     let barWidth = barInMS / RATIO_MILLS_BY_PX;
     */
     // MB test. Just compute width of grid for tempo = 120, adjust by multiplying by zoom level.
+    // For 4/4 time signature, 4 steps per bar, 4 beats per bar, 1 beat per step
     let barWidth = (2000/DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM) * ZOOM_LEVEL;
-    let stepWidth = barWidth / nbSteps
+    let stepWidth = barWidth / 4;
+
+    // if time signature has more steps per bar, then we need to adjust the width of the bar
+    // accordingly
+    barWidth = stepWidth * nbSteps;
 
     let displaySteps = true;
     if (stepWidth < 6) displaySteps = false;
