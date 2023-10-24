@@ -70,6 +70,8 @@ export default class EditorView extends Application {
      * The PIXI Container that handle the grid of bars.
      */
     public grid: GridView;
+    /* follow grid cells "magnetically" when moving a region */
+    public snapping: boolean = true;
 
     public static readonly PLAYHEAD_HEIGHT = 17;
     public static readonly PLAYHEAD_WIDTH = 10;
@@ -123,6 +125,9 @@ export default class EditorView extends Application {
         this.resizeCanvas();
     }
 
+    get cellSize() {
+        return this.grid.cellSize;
+    }
     /**
      * Handler for the wheel event on the editor. It will scroll vertically or horizontally depending on the
      * shiftKey.

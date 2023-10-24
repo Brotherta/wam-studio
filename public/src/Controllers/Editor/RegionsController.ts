@@ -287,6 +287,12 @@ export default class RegionsController {
         let newX = x - this._offsetX;
         newX = Math.max(0, Math.min(newX, this._editorView.worldWidth));
 
+        if(this._editorView.snapping) {
+            // snapping, using cell-size
+            const cellSize = this._editorView.cellSize;
+            newX = Math.round(newX / cellSize) * cellSize;
+        }
+
         let parentWaveform = this._selectedRegionView.parent as WaveformView;
         let parentTop = parentWaveform.y;
         let parentBottom = parentTop + parentWaveform.height;

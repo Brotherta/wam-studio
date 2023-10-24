@@ -153,6 +153,15 @@ export default class HostController {
     this._view.updateMuteButton(muted);
   }
 
+  public snapOnOff(): void {
+    
+    const snapping = !this._app.editorView.snapping;
+    this._app.editorView.snapping = snapping;
+    
+    this._view.updateSnapButton(snapping);
+    
+  }
+
   /**
    * Handles the volume slider. It updates the volume of the master track.
    */
@@ -290,6 +299,9 @@ export default class HostController {
     });
     this._view.muteBtn.addEventListener("click", () => {
       this.mute();
+    });
+    this._view.snapBtn.addEventListener("click", () => {
+      this.snapOnOff();
     });
     this._view.zoomInBtn.addEventListener("click", async () => {
       let playhead = this._app.host.playhead;

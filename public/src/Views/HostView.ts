@@ -13,6 +13,8 @@ export default class HostView {
     recordBtn = document.getElementById("record-btn") as HTMLDivElement;
     loopBtn = document.getElementById("loop-btn") as HTMLDivElement;
     muteBtn = document.getElementById("mute-btn") as HTMLDivElement;
+    snapBtn = document.getElementById("snap-btn") as HTMLDivElement;
+
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
 
@@ -27,6 +29,7 @@ export default class HostView {
 
     playIcon = document.getElementById("play-icon") as HTMLDivElement;
     muteIcon = document.getElementById("mute-icon") as HTMLDivElement;
+    snapIcon = document.getElementById("snap-icon") as HTMLDivElement;
 
     vuMeterDiv = document.getElementById("vu-meter") as HTMLCanvasElement;
     vuMeterCanvas = document.getElementById("vu-meter-canvas") as HTMLCanvasElement;
@@ -149,6 +152,17 @@ export default class HostView {
         } else {
             this.muteIcon.className = "volume-up-icon";
             tooltip.innerHTML = "Mute";
+        }
+    }
+    public updateSnapButton(snapGrid: boolean): void {
+        let tooltip = this.snapBtn.firstElementChild as HTMLSpanElement;
+
+        if (snapGrid) {
+            this.snapIcon.className = "snap-icon";
+            tooltip.innerHTML = "Snap Grid Off";
+        } else {
+            this.snapIcon.className = "snap-icon-off";
+            tooltip.innerHTML = "Snap Grid On";
         }
     }
 

@@ -15,6 +15,8 @@ export default class GridView extends Container {
   private nbStepsPerBar: number = 4;
   private nbStepsPerBeat: number = 4;
   private bpm:number = 120;
+  // useful for snapping in EditorView
+  public cellSize:number = 100;
 
   constructor(editor: EditorView) {
     super();
@@ -61,6 +63,7 @@ export default class GridView extends Container {
     // For 4/4 time signature, 4 steps per bar, 4 beats per bar, 1 beat per step
     let barWidth = (2000/DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM) * ZOOM_LEVEL;
     let stepWidth = barWidth / 4;
+    this.cellSize = stepWidth;
 
     // if time signature has more steps per bar, then we need to adjust the width of the bar
     // accordingly
@@ -76,14 +79,17 @@ export default class GridView extends Container {
     if (barWidth < 20) {
       // display only one bar out of 2
       displayBarsEvery = 2;
+      this.cellSize = stepWidth * 2;
     }
     if (barWidth < 10) {
       // display only one bar out of 4
       displayBarsEvery = 4;
+      this.cellSize = stepWidth * 4;
     }
     if (barWidth < 6) {
       // display only one bar out of 4
       displayBarsEvery = 8;
+      this.cellSize = stepWidth * 8;
     }
 
     // number of bars

@@ -84,7 +84,8 @@ export default class RegionView extends Container {
 
         let colorHex = +("0x" + color.slice(1));
         this._wave.clear();
-        this._wave.beginFill(colorHex);
+        // use some color transparency as regions can overlap
+        this._wave.beginFill(colorHex, 0.8);
 
         let amp = (HEIGHT_TRACK-1) / 2;
         for (let channel = 0; channel < region.buffer.numberOfChannels; channel++) {
@@ -150,7 +151,7 @@ export default class RegionView extends Container {
     private drawBackground(): void {
         let color = this._selected ? 0xffffff : 0x000000
         this._background.clear();
-        this._background.beginFill(0xffffff, 0.2);
+        this._background.beginFill(0xffffff, 0.3);
         this._background.lineStyle({width: 1, color: color});
         this._background.drawRect(0, 0, this.width, HEIGHT_TRACK-1);
     }
