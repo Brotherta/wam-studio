@@ -70,7 +70,7 @@ export default class GridView extends Container {
     barWidth = stepWidth * nbSteps;
 
     let displaySteps = true;
-    if (stepWidth < 6) displaySteps = false;
+    if (stepWidth < 10) displaySteps = false;
 
     // number of pixels per bar
     //const barWidth = nbSteps * stepWidth;
@@ -172,7 +172,5 @@ export default class GridView extends Container {
 
   resize() {
       this.updateGrid();
-      //this.grid.scale.x *= ZOOM_LEVEL;
-      //this.grid.scale.y *= 1;
   }
 }

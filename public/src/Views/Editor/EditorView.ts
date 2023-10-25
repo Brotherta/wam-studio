@@ -116,6 +116,8 @@ export default class EditorView extends Application {
         this.playhead = new PlayheadView(this);
         this.loop = new LoopView(this);
         this.grid = new GridView(this);
+        this.grid.eventMode = "dynamic";
+
 
         this.viewport.sortableChildren = true;
         this.stage.sortableChildren = true;

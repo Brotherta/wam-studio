@@ -44,6 +44,11 @@ export default class PlayheadController {
         this._view.track.on("pointerdown", (e) => {
             this.handlePointerDown(e);
         });
+        this._app.editorView.grid.on("pointerdown", (e) => {
+            // to handle cliks on bar numbers, step lines etc.
+            // that prevented the playhead to move
+            this.handlePointerDown(e);
+        });
 
         this._view.handle.on("pointerup", (e) => {
             this.handlePointerUp(e);
