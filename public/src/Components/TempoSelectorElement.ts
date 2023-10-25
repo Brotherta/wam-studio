@@ -150,9 +150,12 @@ export default class TempoSelectorElement extends HTMLElement {
         console.log("new tempo = " + newTempo);
         this.currentTempo = newTempo;
 
-        // fire tempoChanged event
+        // fire tempochanged event
         this.tempoInput?.dispatchEvent(
-          new CustomEvent("tempoChanged", {
+          // event name must be in lowercase otherwise
+          // attributeChangeCallback, for ex in WC will never
+          // be fired !
+          new CustomEvent("tempochanged", {
             detail: {
               tempo: this.currentTempo,
             },

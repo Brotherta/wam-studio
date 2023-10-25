@@ -325,7 +325,7 @@ export default class HostController {
       this._app.editorView.grid.updateTimeSignature(event.detail.nbStepsPerBar, event.detail.nbStepsPerBeat);
     });
 
-    this._view.tempoSelector.addEventListener("tempoChanged", (event: any) => {
+    this._view.tempoSelector.addEventListener("tempochanged", (event: any) => {
       // sent by the tempoSelector Web Component (custom event has its data in event.detail)
       const newTempo = event.detail.tempo;
 
