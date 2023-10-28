@@ -1,4 +1,5 @@
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
+import { RATIO_MILLS_BY_PX } from "../Env";
 
 
 export default class Region {
@@ -16,6 +17,8 @@ export default class Region {
         this.buffer = buffer;
         // in milliseconds
         this.start = start;
+        // in pixels
+        this.pos = this.start * RATIO_MILLS_BY_PX;
 
         // in seconds
         this.duration = buffer.duration;

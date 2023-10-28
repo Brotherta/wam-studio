@@ -46,8 +46,8 @@ export default class RegionsController {
    */
   private _offsetX: number;
 
-  /* Clipboard for regions, used for copy/cut/paste */
-  private _dashboard = [];
+  /* Clipboard for the pasted region, used for copy/cut/paste */
+  private clipBoardRegion: Region;
 
   constructor(app: App) {
     this._app = app;
@@ -194,6 +194,9 @@ export default class RegionsController {
       this.handlePointerDown(regionView);
       this._offsetX = _e.data.global.x - regionView.position.x;
       this._isMovingRegion = true;
+      // select the track that corresponds to the clicked region
+      let track = this._app.tracksController.getTrackById(region.trackId);
+      if (track) this._app.pluginsController.selectTrack(track);
     });
     regionView.on("pointerup", () => {
       this.handlePointerUp();
@@ -320,37 +323,76 @@ export default class RegionsController {
   }
 
   private cutSelectedRegion() {
-    if (
-        !this._selectedRegionView ||
-        !this._selectedRegion ||
-        this._isMovingRegion
-      )
-        return;
-
-    // for the moment, make a clone of the region
-    let waveformCut = this._selectedRegionView.parent as WaveformView;
-    let trackCut = this._app.tracksController.getTrackById(
-        this._selectedRegion.trackId
-      );
-      if (trackCut === undefined) throw new Error("Track not found");
-
-      trackCut.removeRegionById(this._selectedRegion.id);
-      waveformCut.removeRegionView(this._selectedRegionView);
-
-    this._selectedRegionView = undefined;
-    this._selectedRegion = undefined;
-
-    trackCut.modified = true;
-    trackCut.updateBuffer(audioCtx, this._app.host.playhead);
+    this.copySelectedRegion();
+    this.deleteSelectedRegion();
   }
 
   private copySelectedRegion() {
+    if (!this._selectedRegion) return;
 
+    // 1 copy the buffer of the selected region
+    const bufferCpy: OperableAudioBuffer = this._selectedRegion.buffer.clone();
+
+    // make a new region from this buffer, with start at the playhead value
+    // same duration, track will be the current selected track
+    // trackId and region start properties will be updated when pasted
+    const start = this._selectedRegion.start;
+    const trackId = this._selectedRegion.trackId;
+    const region = new Region(trackId, bufferCpy, start, this.getNewId());
+    // put it into the clipBoard
+    this.clipBoardRegion = region;
+    console.log("Region copied in the clipboard !");
   }
 
   private pasteRegion() {
+    if (!this.clipBoardRegion) return;
+    // get the id of the selected track. This where we're going to paste the
+    // region in the clipboard. We're using _selectedRegionView.trackId as the
+    // current selected track might be different from the one we copied the region
+    let track: Track | undefined = this._app.pluginsController.selectedTrack;
+    if (!track) {
+      // There is no selected track, consider that the track we're going to paste
+      // the region in is the same track we pasted the region from
+      track = this._app.tracksController.getTrackById(
+        this.clipBoardRegion.trackId
+      );
+    }
 
+    const trackId = track!.id;
+    const startInMs = (this._app.host.playhead / audioCtx.sampleRate) * 1000;
+    const id = this.clipBoardRegion.id;
+
+    // make a new region from the clipboard region
+    const newRegion = new Region(
+      trackId,
+      this.clipBoardRegion.buffer.clone(),
+      startInMs,
+      id
+    );
+
+    // create a view from the new region
+    let waveformView = this._editorView.getWaveFormViewById(trackId);
+    let regionView = waveformView!.createRegionView(newRegion);
+    waveformView!.addRegionView(regionView);
+
+    this._app.regionsController.bindRegionEvents(newRegion, regionView);
+
+    // Update the selected track
+    track!.modified = true;
+    track!.addRegion(newRegion);
+
+    // move playhead at the end of the newly pasted region
+    // jumps to new pos in pixels
+    const regionWidth = newRegion.duration * 1000 / RATIO_MILLS_BY_PX;
+    // MB : maybe add region width into region model
+    const newX = newRegion.pos + regionWidth;
+    // maybe add new methods in playheadController moveTo(pixelPos) and moveTo(samplePos)
+    this._app.host.playhead += newRegion.duration * audioCtx.sampleRate;
+    this._app.editorView.playhead.moveToFromPlayhead(this._app.host.playhead);
+
+    this._app.tracksController.jumpTo(newX);
   }
+
   /**
    * Move the region in the current waveform. If the users move out of the current waveform, it will also
    * change the region to the new waveform.
@@ -435,6 +477,9 @@ export default class RegionsController {
       newTrack.updateBuffer(audioCtx, this._app.host.playhead);
 
       this._selectedRegion!.trackId = this._selectedRegionView!.trackId;
+
+      // select the new track (this will unselect automatically the previous selected track)
+      this._app.pluginsController.selectTrack(newTrack);
     } else {
       let track = this._app.tracksController.getTrackById(
         this._selectedRegion!.trackId
