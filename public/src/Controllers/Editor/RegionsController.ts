@@ -3,7 +3,7 @@ import EditorView from "../../Views/Editor/EditorView";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import Region from "../../Models/Region";
 import { RATIO_MILLS_BY_PX } from "../../Env";
-import { FederatedPointerEvent } from "pixi.js";
+import { FederatedPointerEvent, FilterState } from "pixi.js";
 import WaveformView from "../../Views/Editor/WaveformView";
 import RegionView from "../../Views/Editor/RegionView";
 import { audioCtx } from "../../index";
@@ -225,6 +225,12 @@ export default class RegionsController {
       ) {
         this.deleteSelectedRegion();
       }
+
+      if(((e.key === "S") || (e.key === "s")) &&
+      this._selectedRegionView !== undefined) {
+        this.splitSelectedRegion();
+      }
+
       // MB: not sure that this is the proper way do handle
       // keyboard shortcuts for copy/cut/paste
       if (e.ctrlKey || e.metaKey) {
@@ -391,6 +397,60 @@ export default class RegionsController {
     this._app.editorView.playhead.moveToFromPlayhead(this._app.host.playhead);
 
     this._app.tracksController.jumpTo(newX);
+  }
+
+  splitSelectedRegion() {
+    if (!this._selectedRegion) return;
+
+    // get the split point (corresponding to the playhead position) in samples
+    const startOfSelectedRegionInMs = this._selectedRegion.start;
+    // same in samples
+    const startOfSelectedRegionInSamples = startOfSelectedRegionInMs/1000 * audioCtx.sampleRate;
+    const splitPoint = this._app.host.playhead - startOfSelectedRegionInSamples;
+
+    // get the buffer from the selected region
+    const buffer: OperableAudioBuffer = this._selectedRegion.buffer;
+    // split it into two buffers. The calls returns two NEW buffers
+    let firstBuffer:OperableAudioBuffer|null, secondBuffer:OperableAudioBuffer|null;
+
+    [firstBuffer, secondBuffer] = buffer.split(splitPoint);
+
+    // Makes two new regions
+
+    // make a new region from the first audio buffer, with start the same as selected region
+    // duration/2, track will be the same track as original region
+    let leftRegionStart = this._selectedRegion.start;
+    let trackId = this._selectedRegion.trackId;
+    const leftRegion = new Region(trackId, firstBuffer!, leftRegionStart, this.getNewId());
+
+    // make another region starting at mid point of the original selected region
+    // start in ms and duration in ms
+    const splitPointInMs = splitPoint *1000 / 44100;
+    let rightRegionStart = this._selectedRegion.start + splitPointInMs;
+    const rightRegion = new Region(trackId, secondBuffer!, rightRegionStart, this.getNewId());
+
+    // delete original region
+    this.deleteSelectedRegion();
+
+    // create new views from the two new regions and add them to the waveformView of the track
+    let waveformView = this._editorView.getWaveFormViewById(trackId);
+
+    // create a view from the left region
+    let leftRegionView = waveformView!.createRegionView(leftRegion);
+    waveformView!.addRegionView(leftRegionView);
+    this._app.regionsController.bindRegionEvents(leftRegion, leftRegionView);
+
+    // create a view from the right region
+    let rightRegionView = waveformView!.createRegionView(rightRegion);
+    waveformView!.addRegionView(rightRegionView);
+    this._app.regionsController.bindRegionEvents(rightRegion, rightRegionView);
+
+    // Update the selected track
+    const track = this._app.tracksController.getTrackById(trackId);
+    track!.modified = true;
+    track!.addRegion(leftRegion);
+    track!.addRegion(rightRegion);
+
   }
 
   /**
