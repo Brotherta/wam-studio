@@ -49,6 +49,9 @@ export default class RegionsController {
   /* Clipboard for the pasted region, used for copy/cut/paste */
   private clipBoardRegion: Region;
 
+  /* for disabling snapping is shift key is pressed and global snapping enabled */
+  private snappingDisabled:boolean = false;
+
   constructor(app: App) {
     this._app = app;
     this._editorView = app.editorView;
@@ -217,6 +220,11 @@ export default class RegionsController {
         this.deselectRegion();
       }
     });
+
+    document.addEventListener("keyup", (e) => {
+        this.snappingDisabled = e.shiftKey;
+    });
+
     // On delete key pressed, delete the selected region.
     document.addEventListener("keydown", (e) => {
       if (
@@ -224,6 +232,11 @@ export default class RegionsController {
         this._selectedRegionView !== undefined
       ) {
         this.deleteSelectedRegion();
+      }
+
+      // for "disabling temporarily the grid snapping if shift is pressed"
+      if(e.shiftKey) {
+        this.snappingDisabled = true;
       }
 
       if(((e.key === "S") || (e.key === "s")) &&
@@ -379,7 +392,7 @@ export default class RegionsController {
     // create a view from the new region
     let waveformView = this._editorView.getWaveFormViewById(trackId);
     let regionView = waveformView!.createRegionView(newRegion);
-    waveformView!.addRegionView(regionView);
+    //waveformView!.addRegionView(regionView);
 
     this._app.regionsController.bindRegionEvents(newRegion, regionView);
 
@@ -437,12 +450,12 @@ export default class RegionsController {
 
     // create a view from the left region
     let leftRegionView = waveformView!.createRegionView(leftRegion);
-    waveformView!.addRegionView(leftRegionView);
+    //waveformView!.addRegionView(leftRegionView);
     this._app.regionsController.bindRegionEvents(leftRegion, leftRegionView);
 
     // create a view from the right region
     let rightRegionView = waveformView!.createRegionView(rightRegion);
-    waveformView!.addRegionView(rightRegionView);
+    //waveformView!.addRegionView(rightRegionView);
     this._app.regionsController.bindRegionEvents(rightRegion, rightRegionView);
 
     // Update the selected track
@@ -450,6 +463,9 @@ export default class RegionsController {
     track!.modified = true;
     track!.addRegion(leftRegion);
     track!.addRegion(rightRegion);
+
+    // select right region
+    rightRegionView.select();
 
   }
 
@@ -470,7 +486,7 @@ export default class RegionsController {
     let newX = x - this._offsetX;
     newX = Math.max(0, Math.min(newX, this._editorView.worldWidth));
 
-    if (this._editorView.snapping) {
+    if ((this._editorView.snapping) && (!this.snappingDisabled)){
       // snapping, using cell-size
       const cellSize = this._editorView.cellSize;
       newX = Math.round(newX / cellSize) * cellSize;

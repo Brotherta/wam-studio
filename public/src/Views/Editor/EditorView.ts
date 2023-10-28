@@ -197,6 +197,8 @@ export default class EditorView extends Application {
             this.playhead.track.position.y = scrollValue;
             this.loop.position.y = scrollValue;
             this.loop.track.position.y = scrollValue;
+
+            this.grid.position.y = scrollValue;
         }
         if (e.detail.type !== "propagate off") {
             this.trackContainer.scrollTop = scrollValue;
