@@ -500,9 +500,9 @@ export default class RegionsController {
     this._selectedRegion = rightRegion;
     this._selectedRegionView = rightRegionView;
 
-    //this.handlePointerDown(leftRegionView);
-    //this.handlePointerUp();
-
+    // update the track buffer, as the regions have been modified
+    track!.modified = true;
+    track?.updateBuffer(audioCtx, this._app.host.playhead);
   }
 
   isPlayheadOnSelectedRegion() {
@@ -570,9 +570,9 @@ export default class RegionsController {
     this._selectedRegionView.position.x = newX;
     // in ms
     this._selectedRegion.pos = newX;
-    console.log("Region Moved, new pos (pixels): " + this._selectedRegion.pos);
+    //console.log("Region Moved, new pos (pixels): " + this._selectedRegion.pos);
     this._selectedRegion.start = newX * RATIO_MILLS_BY_PX;
-    console.log("Region Moved, new start (ms): " + this._selectedRegion.start);
+    //console.log("Region Moved, new start (ms): " + this._selectedRegion.start);
   }
 
   /**
@@ -581,9 +581,6 @@ export default class RegionsController {
    * @private
    */
   private handlePointerUp(): void {
-    console.log("isMovingRegion = " + this._isMovingRegion)
-    console.log("handlePointerUp OffsetX =  " + this._offsetX);
-
     this._isMovingRegion = false;
     if (!this._selectedRegionView && !this._selectedRegion) return;
 

@@ -319,14 +319,16 @@ export default class Track {
       if (start > currentTime) {
         // No buffer until the current time, create an empty buffer and concat it to the buffer.
         const delta = start - currentTime;
-        console.log("delta", delta)
-        if (delta > 0.1) {
+        //console.log("delta", delta)
+        // MB : create new region only if there is a minimal ammount between two consecutive regions
+        // otherwise createBuffer will fail.
+        if (delta > 0.03) { 
           let emptyBuffer = context.createBuffer(
             NUM_CHANNELS,
             ((start - currentTime) * sampleRate) / 1000,
             sampleRate
           );
-          console.log("after createBuffer");
+          //console.log("after createBuffer");
           let emptyOpBuffer = Object.setPrototypeOf(
             emptyBuffer,
             OperableAudioBuffer.prototype
