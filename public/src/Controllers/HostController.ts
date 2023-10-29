@@ -316,6 +316,16 @@ export default class HostController {
       this._app.regionsController.splitSelectedRegion();
     });
 
+    // undo/redo
+    this._view.undoBtn.addEventListener("click", () => {
+      console.log("undo");
+      this._app.undoManager.undo();
+    });
+    this._view.redoBtn.addEventListener("click", () => {
+      console.log("redo");
+      this._app.undoManager.redo();
+    });
+
     this._view.zoomInBtn.addEventListener("click", async () => {
       let playhead = this._app.host.playhead;
       console.log("zoomInBtn.addEventListener !!!!!!!");

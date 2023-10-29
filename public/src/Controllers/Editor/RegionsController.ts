@@ -55,6 +55,13 @@ export default class RegionsController {
   /* for computing delta between two pointermove events */
   private previousMouseXPos: number = 0;
 
+  /* For undo/redo when moving a region */
+  private dragRegionStartX: number = 0;
+  private draggedRegion!: Region;
+  private draggedRegionView!: RegionView;
+  private oldTrackWhenMoving!: Track;
+  private newTrackWhenMoving!: Track;
+
   constructor(app: App) {
     this._app = app;
     this._editorView = app.editorView;
@@ -288,18 +295,22 @@ export default class RegionsController {
    * @private
    */
   private handlePointerDown(regionView: RegionView): void {
-    console.log("HandlePointerDown"); 
     if (this._selectedRegionView !== regionView) {
-      console.log("HandlePointerDown selectedRegionView different from regionView"); 
-
       this.deselectRegion();
       this._selectedRegionView = regionView;
       this._selectedRegionView.select();
       this._selectedRegion = this._app.tracksController
         .getTrackById(regionView.trackId)
         ?.getRegionById(regionView.id);
-    } else {
-      console.log("HandlePointerDown selectedRegionView equals regionView"); 
+    }
+    // will be useful for undo/redo
+    if (this._selectedRegionView) {
+      console.log(
+        "handlePointerDown this.dragRegionStartX = " + this.dragRegionStartX
+      );
+      this.dragRegionStartX = this._selectedRegionView.position.x;
+      this.draggedRegion = this._selectedRegion!;
+      this.draggedRegionView = this._selectedRegionView;
     }
   }
 
@@ -449,7 +460,7 @@ export default class RegionsController {
     // duration/2, track will be the same track as original region
     let leftRegionStart = this._selectedRegion.start;
     let trackId = this._selectedRegion.trackId;
-    
+
     const leftRegion = new Region(
       trackId,
       firstBuffer!,
@@ -497,7 +508,7 @@ export default class RegionsController {
     track!.addRegion(rightRegion);
     //track!.modified = true;
     //track?.updateBuffer(audioCtx, this._app.host.playhead);
-    
+
     // select right region
     rightRegionView.select();
     this._selectedRegion = rightRegion;
@@ -518,8 +529,8 @@ export default class RegionsController {
       (this._selectedRegion.duration * 1000) / RATIO_MILLS_BY_PX;
 
     return (
-      (playHeadPosX >= selectedRegionPosX) &&
-      (playHeadPosX <= (selectedRegionPosX + selectedRegionWidth))
+      playHeadPosX >= selectedRegionPosX &&
+      playHeadPosX <= selectedRegionPosX + selectedRegionWidth
     );
   }
   /**
@@ -532,7 +543,7 @@ export default class RegionsController {
   private handlePointerMove(e: FederatedPointerEvent): void {
     if (!this._selectedRegionView || !this._selectedRegion || !this._offsetX)
       return;
-    
+
     // compute delta since last move. If delta is 0, do nothing
     const delta = e.data.global.x - this.previousMouseXPos;
     this.previousMouseXPos = e.data.global.x;
@@ -614,17 +625,121 @@ export default class RegionsController {
 
       // select the new track (this will unselect automatically the previous selected track)
       this._app.pluginsController.selectTrack(newTrack);
+
+      this.oldTrackWhenMoving = oldTrack;
+      this.newTrackWhenMoving = newTrack;
     } else {
       let track = this._app.tracksController.getTrackById(
         this._selectedRegion!.trackId
       );
       if (track == undefined) throw new Error("Track not found");
-      
+
       track.modified = true;
       track.updateBuffer(audioCtx, this._app.host.playhead);
+      // for undo/redo
+      this.oldTrackWhenMoving = track;
+      this.newTrackWhenMoving = track;
     }
+
+    this.addLastMoveToUndoManager();
   }
 
+  // MB : need to update to take into account the case where a region is moved from
+  // one track to another
+  addLastMoveToUndoManager() {
+    const oldX = this.dragRegionStartX;
+    const newX = this._selectedRegion!.pos;
+    const oldTrack = this.oldTrackWhenMoving;
+    const newTrack = this.newTrackWhenMoving;
+
+    if(oldX === newX && oldTrack === newTrack) return;
+
+    // MB: for undo/redo
+    if (!this._selectedRegion) return;
+
+    // use closure to stack values (copies)
+    ((oldX: number, newX: number, oldTrack: Track, newTrack: Track) => {
+      this._app.undoManager.add({
+        undo: () => {
+          this.moveTo(
+            this.draggedRegion,
+            this.draggedRegionView,
+            oldX,
+            oldTrack,
+            newTrack
+          );
+        },
+        redo: () => {
+          if (this._selectedRegion)
+            this.moveTo(
+              this.draggedRegion,
+              this.draggedRegionView,
+              newX,
+              newTrack,
+              oldTrack
+            );
+        },
+      });
+    })(
+      oldX,
+      newX,
+      oldTrack,
+      newTrack
+    );
+  }
+
+  moveTo(
+    region: Region,
+    regionView: RegionView,
+    x: number,
+    oldTrack: Track,
+    newTrack: Track
+  ) {
+    //console.log("UNDO moveTo x = " + x);
+    if (oldTrack === newTrack) {
+      // moving on the same track
+      this.draggedRegionView.position.x = x;
+      this.draggedRegion.start = x * RATIO_MILLS_BY_PX;
+      regionView.trackId = region.trackId;
+      /*this.draggedRegionView.drawWave(
+            this.draggedRegionView.color,
+            this.draggedRegion
+          );*/
+      this.draggedRegionView.select();
+
+      let track = this._app.tracksController.getTrackById(region!.trackId);
+      if (track == undefined) throw new Error("Track not found");
+
+      track.modified = true;
+      track.updateBuffer(audioCtx, this._app.host.playhead);
+    } else {
+      // Moving from one track to the other
+      //console.log("UNDO moving from one track to the other");
+      this.draggedRegionView.position.x = x;
+      this.draggedRegion.start = x * RATIO_MILLS_BY_PX;
+      this.draggedRegionView.trackId = oldTrack.id;
+      region.trackId = oldTrack.id;
+
+      newTrack.removeRegionById(this.draggedRegion.id);
+      oldTrack.addRegion(this.draggedRegion);
+
+      // remove regionView from new track
+      let newTrackWaveformView = this._editorView.getWaveFormViewById(newTrack.id);
+      newTrackWaveformView!.removeRegionView(this.draggedRegionView);
+
+      // create a view from the new region
+     let oldTrackWaveformView = this._editorView.getWaveFormViewById(oldTrack.id);
+     oldTrackWaveformView!.addRegionView(this.draggedRegionView);
+      this._app.regionsController.bindRegionEvents(this.draggedRegion, regionView);
+
+      oldTrack.modified = true;
+      newTrack.modified = true;
+      oldTrack.updateBuffer(audioCtx, this._app.host.playhead);
+      newTrack.updateBuffer(audioCtx, this._app.host.playhead);
+
+      this.draggedRegionView.select();
+    }
+  }
   /**
    * Updates the current selected region that is moving to a new waveform view.
    * It updates the old and the new waveform.

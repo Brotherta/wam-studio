@@ -15,6 +15,8 @@ export default class HostView {
     muteBtn = document.getElementById("mute-btn") as HTMLDivElement;
     snapBtn = document.getElementById("snap-btn") as HTMLDivElement;
     splitBtn = document.getElementById("split-btn") as HTMLDivElement;
+    undoBtn = document.getElementById("undo-btn") as HTMLDivElement;
+    redoBtn = document.getElementById("redo-btn") as HTMLDivElement;
 
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;

@@ -1,3 +1,7 @@
+// @ts-ignore
+import UndoManager from "undo-manager/lib/undomanager.js";
+
+
 import HostView from "./Views/HostView";
 import HostController from "./Controllers/HostController";
 import TracksController from "./Controllers/TracksController";
@@ -62,6 +66,8 @@ export default class App {
     host: Host;
     loader: Loader;
 
+    undoManager:UndoManager;
+
 
     constructor() {
         this.host = new Host(this);
@@ -96,6 +102,9 @@ export default class App {
         
         this.hostController.addDraggableWindow(this.pluginsView, this.latencyView, this.settingsView, 
             this.projectView, this.aboutView, this.keyboardShortcutsView);
+
+        this.undoManager = new UndoManager();
+
     }
 
     /**
