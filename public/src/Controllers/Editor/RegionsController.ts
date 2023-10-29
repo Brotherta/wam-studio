@@ -651,6 +651,8 @@ export default class RegionsController {
     const newX = this._selectedRegion!.pos;
     const oldTrack = this.oldTrackWhenMoving;
     const newTrack = this.newTrackWhenMoving;
+    const region = this.draggedRegion;
+    const regionView = this.draggedRegionView;
 
     if(oldX === newX && oldTrack === newTrack) return;
 
@@ -658,12 +660,12 @@ export default class RegionsController {
     if (!this._selectedRegion) return;
 
     // use closure to stack values (copies)
-    ((oldX: number, newX: number, oldTrack: Track, newTrack: Track) => {
+    ((region:Region, regionView:RegionView, oldX: number, newX: number, oldTrack: Track, newTrack: Track) => {
       this._app.undoManager.add({
         undo: () => {
           this.moveTo(
-            this.draggedRegion,
-            this.draggedRegionView,
+            region,
+            regionView,
             oldX,
             oldTrack,
             newTrack
@@ -672,8 +674,8 @@ export default class RegionsController {
         redo: () => {
           if (this._selectedRegion)
             this.moveTo(
-              this.draggedRegion,
-              this.draggedRegionView,
+              region,
+              regionView,
               newX,
               newTrack,
               oldTrack
@@ -681,6 +683,8 @@ export default class RegionsController {
         },
       });
     })(
+      region,
+      regionView,
       oldX,
       newX,
       oldTrack,
