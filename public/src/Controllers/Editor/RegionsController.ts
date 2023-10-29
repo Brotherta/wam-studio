@@ -52,6 +52,9 @@ export default class RegionsController {
   /* for disabling snapping is shift key is pressed and global snapping enabled */
   private snappingDisabled: boolean = false;
 
+  /* for computing delta between two pointermove events */
+  private previousMouseXPos: number = 0;
+
   constructor(app: App) {
     this._app = app;
     this._editorView = app.editorView;
@@ -529,6 +532,11 @@ export default class RegionsController {
   private handlePointerMove(e: FederatedPointerEvent): void {
     if (!this._selectedRegionView || !this._selectedRegion || !this._offsetX)
       return;
+    
+    // compute delta since last move. If delta is 0, do nothing
+    const delta = e.data.global.x - this.previousMouseXPos;
+    this.previousMouseXPos = e.data.global.x;
+    if (delta === 0) return;
 
     let x = e.data.global.x;
     let y = e.data.global.y + this._editorView.viewport.top;
