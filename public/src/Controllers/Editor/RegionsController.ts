@@ -285,13 +285,18 @@ export default class RegionsController {
    * @private
    */
   private handlePointerDown(regionView: RegionView): void {
+    console.log("HandlePointerDown"); 
     if (this._selectedRegionView !== regionView) {
+      console.log("HandlePointerDown selectedRegionView different from regionView"); 
+
       this.deselectRegion();
       this._selectedRegionView = regionView;
       this._selectedRegionView.select();
       this._selectedRegion = this._app.tracksController
         .getTrackById(regionView.trackId)
         ?.getRegionById(regionView.id);
+    } else {
+      console.log("HandlePointerDown selectedRegionView equals regionView"); 
     }
   }
 
@@ -441,6 +446,7 @@ export default class RegionsController {
     // duration/2, track will be the same track as original region
     let leftRegionStart = this._selectedRegion.start;
     let trackId = this._selectedRegion.trackId;
+    
     const leftRegion = new Region(
       trackId,
       firstBuffer!,
@@ -491,6 +497,8 @@ export default class RegionsController {
     
     // select right region
     rightRegionView.select();
+    this._selectedRegion = rightRegion;
+    this._selectedRegionView = rightRegionView;
 
     //this.handlePointerDown(leftRegionView);
     //this.handlePointerUp();
@@ -573,6 +581,9 @@ export default class RegionsController {
    * @private
    */
   private handlePointerUp(): void {
+    console.log("isMovingRegion = " + this._isMovingRegion)
+    console.log("handlePointerUp OffsetX =  " + this._offsetX);
+
     this._isMovingRegion = false;
     if (!this._selectedRegionView && !this._selectedRegion) return;
 
@@ -603,6 +614,7 @@ export default class RegionsController {
         this._selectedRegion!.trackId
       );
       if (track == undefined) throw new Error("Track not found");
+      
       track.modified = true;
       track.updateBuffer(audioCtx, this._app.host.playhead);
     }

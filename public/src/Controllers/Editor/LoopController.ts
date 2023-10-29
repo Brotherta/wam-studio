@@ -37,6 +37,9 @@ export default class LoopController {
        We use it here for detecting doubleClick on the loop handle background */
     private lastPointerDown: number = 0;
 
+    /* for disabling snapping is shift key is pressed and global snapping enabled */
+    private snappingDisabled: boolean = false;
+
     constructor(app: App) {
         this._app = app;
         this._view = this._app.editorView.loop;
@@ -50,6 +53,17 @@ export default class LoopController {
     }
 
     private bindEvents(): void {
+        document.addEventListener("keyup", (e) => {
+            this.snappingDisabled = e.shiftKey;
+          });
+      
+          document.addEventListener("keydown", (e) => {
+            // for "disabling temporarily the grid snapping if shift is pressed"
+            if (e.shiftKey) {
+              this.snappingDisabled = true;
+            }
+          });
+
         this._view.rightHandle.on("pointerdown", () => {
             this.handlePointerDown(MovingHandleEnum.RIGHT)
         });
@@ -172,7 +186,14 @@ export default class LoopController {
             pos = this._view.track.width - this._view.rightHandle.x - this._view.rightHandle.width;
         }
 
+        if (this._app.editorView.snapping && !this.snappingDisabled) {
+            // snapping, using cell-size
+            const cellSize = this._app.editorView.cellSize;
+            pos = Math.round(pos / cellSize) * cellSize;
+          }
+
         const leftPos = pos;
+
         const rightPos = this._view.rightHandle.x + pos - this._view.leftHandle.x
         this._view.updateHandlePosition(leftPos, rightPos, false);
     }
@@ -183,6 +204,11 @@ export default class LoopController {
         else if (pos >= this._view.rightHandle.x - this._view.leftHandle.width) {
             pos = this._view.rightHandle.x - this._view.leftHandle.width;
         }
+        if (this._app.editorView.snapping && !this.snappingDisabled) {
+            // snapping, using cell-size
+            const cellSize = this._app.editorView.cellSize;
+            pos = Math.round(pos / cellSize) * cellSize;
+          }
 
         const leftPos = pos;
         const rightPos = this._view.rightHandle.x;
@@ -198,6 +224,12 @@ export default class LoopController {
             pos = this._view.leftHandle.x + this._view.leftHandle.width;
         }
 
+        if (this._app.editorView.snapping && !this.snappingDisabled) {
+            // snapping, using cell-size
+            const cellSize = this._app.editorView.cellSize;
+            pos = Math.round(pos / cellSize) * cellSize;
+          }
+          
         const leftPos = this._view.leftHandle.x;
         const rightPos = pos;
         this._view.updateHandlePosition(leftPos, rightPos, true);
