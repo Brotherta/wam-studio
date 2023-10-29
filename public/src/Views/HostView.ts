@@ -14,6 +14,7 @@ export default class HostView {
     loopBtn = document.getElementById("loop-btn") as HTMLDivElement;
     muteBtn = document.getElementById("mute-btn") as HTMLDivElement;
     snapBtn = document.getElementById("snap-btn") as HTMLDivElement;
+    splitBtn = document.getElementById("split-btn") as HTMLDivElement;
 
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
@@ -49,6 +50,10 @@ export default class HostView {
     aboutBtn = document.getElementById("about-btn") as HTMLDivElement;
     aboutCloseBtn = document.getElementById("about-close-button") as HTMLDivElement;
     aboutWindow = document.getElementById("about-window") as HTMLDivElement;
+
+    keyboardShortcutsBtn = document.getElementById("keyboard-shortcuts-btn") as HTMLDivElement;
+    keyboardShortcutsCloseBtn = document.getElementById("keyboard-shortcuts-close-button") as HTMLDivElement;
+    keyboardShortcutsWindow = document.getElementById("keyboard-shortcuts-window") as HTMLDivElement;
 
     constructor() {
         // add tempo and time signature selectors to the main toolbar

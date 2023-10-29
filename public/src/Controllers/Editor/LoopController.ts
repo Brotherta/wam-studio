@@ -33,6 +33,10 @@ export default class LoopController {
 
     private offsetX: number;
 
+    /* Used to mesure time of consecutive pointerdown events 
+       We use it here for detecting doubleClick on the loop handle background */
+    private lastPointerDown: number = 0;
+
     constructor(app: App) {
         this._app = app;
         this._view = this._app.editorView.loop;
@@ -62,7 +66,6 @@ export default class LoopController {
             this.handleHover(MovingHandleEnum.RIGHT);
         });
 
-
         this._view.leftHandle.on("pointerdown", () => {
             this.handlePointerDown(MovingHandleEnum.LEFT)
         });
@@ -79,13 +82,25 @@ export default class LoopController {
             this.handleHover(MovingHandleEnum.LEFT);
         });
 
+        
         this._view.background.on("pointerdown", (e) => {
             this.offsetX = e.data.global.x - this._view.leftHandle.x;
-            this.handlePointerDown(MovingHandleEnum.BACKGROUND)
+            this.handlePointerDown(MovingHandleEnum.BACKGROUND);
+
+            // Detect double click on the loop handle background
+            // We measure the elapsed time during consecutive pointerdown events
+            const now = Date.now();
+            const lastPointerDown = this.lastPointerDown;
+            if (now - lastPointerDown < 300) {
+                this._app.hostController.loop();
+            }
+            this.lastPointerDown = now;
         });
-        this._view.background.on("pointerup", () => {
+
+        this._view.background.on("pointerup", (e) => {
             this.handlePointerUp();
         });
+       
         this._view.background.on("pointerupoutside", () => {
             this.handlePointerUp();
         });

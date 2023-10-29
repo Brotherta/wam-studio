@@ -14,6 +14,9 @@ export default class LoopView extends Container {
     public background: Graphics;
     public active: boolean;
 
+    private activeColor = 0x5C69C;
+    private inactiveColor = 0x426c8a;
+
     private _window: Graphics;
     private _editor: EditorView;
 
@@ -96,7 +99,7 @@ export default class LoopView extends Container {
      */
     public updateActive(looping: boolean) {
         this.active = looping;
-        const color = this.active ? 0x5C69CC : 0x333b77;
+        const color = this.active ? this.activeColor : this.inactiveColor;
         this.background.tint = color;
         this.leftHandle.tint = color;
         this.rightHandle.tint = color;
@@ -128,7 +131,7 @@ export default class LoopView extends Container {
     }
 
     private drawLeftHandle(): void {
-        const color = this.active ? 0x5C69CC : 0x333b77;
+        const color = this.active ? this.activeColor : this.inactiveColor;
         this.leftHandle = new Graphics();
         this.leftHandle.eventMode = "dynamic";
 
@@ -143,7 +146,7 @@ export default class LoopView extends Container {
     }
 
     private drawRightHandle(): void {
-        const color = this.active ? 0x5C69CC : 0x333b77;
+        const color = this.active ? this.activeColor : this.inactiveColor;
         this.rightHandle = new Graphics();
         this.rightHandle.eventMode = "dynamic";
 
@@ -158,7 +161,7 @@ export default class LoopView extends Container {
     }
 
     private drawBackground(): void {
-        const color = this.active ? 0x5C69CC : 0x333b77;
+        const color = this.active ? this.activeColor : this.inactiveColor;
         this.background = new Graphics();
         this.background.eventMode = "dynamic";
 

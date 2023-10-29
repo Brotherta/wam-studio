@@ -95,6 +95,7 @@ export default class GridView extends Container {
     // number of bars
     let nbBars = Math.floor(width / barWidth);
     // draw bars
+    const lineColor = "#545252"
     for (
       let currentBarNumberXpos = 0;
       currentBarNumberXpos < nbBars;
@@ -102,9 +103,9 @@ export default class GridView extends Container {
     ) {
       if (displaySteps) {
         // draw vertical lines for steps, less visible
-        this.grid.lineStyle(0.5, "#858181", 0.1);
+        this.grid.lineStyle(0.5, lineColor, 0.1);
         for (let y = 0; y < nbSteps; y++) {
-          this.grid.beginFill("#858181", 0.5);
+          this.grid.beginFill(lineColor, 0.5);
           // Grid should be as high as the canvas
           this.grid.drawRect(
             currentBarNumberXpos * barWidth + y * stepWidth,
@@ -121,9 +122,9 @@ export default class GridView extends Container {
       if (displayBarsEvery === 1 || barNumber % displayBarsEvery === 0) {
         //console.log("DRAW BAR NUMBER" + barNumber+1)
         // draw bar separator
-        this.grid.lineStyle(1, "#858181", 0.5);
+        this.grid.lineStyle(1, lineColor, 0.5);
         // draw vertical line for bar separator
-        this.grid.beginFill("#858181", 0.5);
+        this.grid.beginFill(lineColor, 0.5);
         // Grid should be as high as the canvas
         this.grid.drawRect(currentBarNumberXpos * barWidth, 7, 1, height);
 
@@ -131,14 +132,14 @@ export default class GridView extends Container {
         const text = this.addChild(
           new Text(barNumber + 1, {
             fontSize: 10,
-            fill: 0x858181,
+            fill: 0xe3e3e3, //0x858181,
             align: "left",
           })
         );
         text.anchor.set(0.5);
         text.resolution = 1;
         text.x = currentBarNumberXpos * barWidth + 8;
-        text.y = 12;
+        text.y = 17;
 
         this.listOfTextElements.push(text);
       } else {

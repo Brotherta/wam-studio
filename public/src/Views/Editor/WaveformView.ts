@@ -42,7 +42,7 @@ export default class WaveformView extends Container {
         this.eventMode = "dynamic";
         this._editorView.viewport.addChild(this);
 
-        this.zIndex = 99;
+        this.zIndex = -10;
         this.setPos(track);
     }
 

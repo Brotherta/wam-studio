@@ -34,23 +34,27 @@
 				<i class="menu-icon"></i>
 			</a>
 			<div class="dropdown-menu dropright" aria-labelledby="dropdownMenuButton">
-				<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Demo Song</a>
+				<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Demo Project</a>
 				<div id="songs-container" class="dropdown-menu songs" aria-labelledby="dropdownSubMenuButton"></div>
 
 				<div class="dropdown-divider"></div>
 
-				<a class="dropdown-item" id="load-project">Load Project</a>
-				<a class="dropdown-item" id="save-project">Save Project</a>
-				<a class="dropdown-item" id="export-project" >Export Project</a>
+				<a class="dropdown-item" id="load-project">Load project</a>
+				<a class="dropdown-item" id="save-project">Save project</a>
+				<a class="dropdown-item" id="export-project" >Render/Export project</a>
 
 				<div class="dropdown-divider"></div>
 
-				<a class="dropdown-item" id="import-songs" >Import Song</a>
+				<a class="dropdown-item" id="import-songs" >Import audio file</a>
 				<input id="new-track-input" type="file" accept=".mp3, .wav, .ogg" multiple style="display: none">
 
 				<div class="dropdown-divider advanced"></div>
 
-				<a class="dropdown-item" id="latency-btn">Latency Compensation</a>
+				<a class="dropdown-item" id="keyboard-shortcuts-btn">Keyboard shortcuts</a>
+
+				<div class="dropdown-divider advanced"></div>
+
+				<a class="dropdown-item" id="latency-btn">Calibrate latency compensation</a>
 				<a class="dropdown-item" id="settings-btn">Settings</a>
 
 				<div class="dropdown-divider advanced"></div>
@@ -100,6 +104,10 @@
 			<div id="snap-btn" class="menu-item">
 				<span class="mytooltip">Snap grid</span>
 				<i class="snap-icon" style="width: 30px" id="snap-icon"></i>
+			</div>
+			<div id="split-btn" class="menu-item">
+				<span class="mytooltip">Split region</span>
+				<i class="split-icon" style="width: 30px" id="split-icon"></i>
 			</div>
 		</div>
 		<div id="right-controls">
@@ -295,6 +303,24 @@
 			<div class="settings-item">
 				<label for="select-output-device">Output Device</label>
 				<select class="select-input" id="select-output-device"></select>
+			</div>
+		</div>
+	</div>
+
+	<div id="keyboard-shortcuts-window" class="floating-window" hidden>
+		<div id="keyboard-shortcuts-header" class="header-window">
+			<span class="title">Keyboard shortcuts</span>
+			<button id="keyboard-shortcuts-close-button" class="close-button">X</button>
+		</div>
+		<div class="settings-body" style="display:flex; justify-content: center; align-items: center">
+			<div class="settings-small-item-text">
+				<p><b>SPACE</b> - play on/off</p>
+				<p><b>Control or Cmd + C/X/V</b> - copy/cut/paste selected region. 
+					Paste can be done on another selected track.</p>
+				<p><b>DEL or BACKSPACE on a selected region</b> -  deletes the region.</p>
+				<p><b>S or s on a selected waveform region</b> - split region in two separate regions.</p>
+				<p><b>Double click on the loop handle</b> - turn loop mode on/off.</p>
+				<p><b>Shift while dragging region/playhead/loop handle</b> - bypass grid snapping if snapping is on.</p>
 			</div>
 		</div>
 	</div>

@@ -281,6 +281,13 @@ export default class HostController {
    * @private
    */
   private bindEvents(): void {
+    // detect global click on the document and resume the audio context if necessary
+    document.addEventListener("click", () => {
+      if (audioCtx.state === "suspended") {
+        console.log("RESUMING AUDIO CONTEXT")
+        audioCtx.resume();
+      }
+    });
     // TOP BAR CONTROLS
     this._view.playBtn.addEventListener("click", () => {
       this.play();
@@ -303,6 +310,12 @@ export default class HostController {
     this._view.snapBtn.addEventListener("click", () => {
       this.snapOnOff();
     });
+
+    this._view.splitBtn.addEventListener("click", () => {
+      // splits selected region
+      this._app.regionsController.splitSelectedRegion();
+    });
+
     this._view.zoomInBtn.addEventListener("click", async () => {
       let playhead = this._app.host.playhead;
       console.log("zoomInBtn.addEventListener !!!!!!!");
@@ -389,6 +402,7 @@ export default class HostController {
       this._app.settingsController.openSettings();
       this.focus(this._app.settingsView);
     });
+
     this._view.aboutBtn.addEventListener("click", () => {
       this._view.aboutWindow.hidden = false;
       this.focus(this._app.aboutView);
@@ -396,6 +410,15 @@ export default class HostController {
     this._view.aboutCloseBtn.addEventListener("click", () => {
       this._view.aboutWindow.hidden = true;
     });
+
+    this._view.keyboardShortcutsBtn.addEventListener("click", () => {
+      this._view.keyboardShortcutsWindow.hidden = false;
+      this.focus(this._app.keyboardShortcutsView);
+    });
+    this._view.keyboardShortcutsCloseBtn.addEventListener("click", () => {
+      this._view.keyboardShortcutsWindow.hidden = true;
+    });
+
     this._view.latencyBtn.addEventListener("click", () => {
       this._app.latencyView.openWindow();
       this.focus(this._app.latencyView);

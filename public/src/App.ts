@@ -25,6 +25,7 @@ import KeyboardController from "./Controllers/KeyboardController";
 import ExporterController from "./Controllers/ExportController";
 import LoopController from "./Controllers/Editor/LoopController";
 import AboutView from "./Views/AboutView";
+import KeyboardShortcutsView from "./Views/KeyboardShortcutsView";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -56,6 +57,7 @@ export default class App {
     projectView: ProjectView;
     editorView: EditorView;
     aboutView: AboutView;
+    keyboardShortcutsView: KeyboardShortcutsView;
 
     host: Host;
     loader: Loader;
@@ -74,6 +76,7 @@ export default class App {
         this.projectView = new ProjectView();
         this.editorView = new EditorView();
         this.aboutView = new AboutView();
+        this.keyboardShortcutsView = new KeyboardShortcutsView();
 
         this.editorController = new EditorController(this);
         this.waveformController = new WaveformController(this);
@@ -91,7 +94,8 @@ export default class App {
         this.exportController = new ExporterController(this);
         this.loopController = new LoopController(this);
         
-        this.hostController.addDraggableWindow(this.pluginsView, this.latencyView, this.settingsView, this.projectView, this.aboutView);
+        this.hostController.addDraggableWindow(this.pluginsView, this.latencyView, this.settingsView, 
+            this.projectView, this.aboutView, this.keyboardShortcutsView);
     }
 
     /**

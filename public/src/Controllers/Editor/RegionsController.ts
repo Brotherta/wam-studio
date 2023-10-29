@@ -50,7 +50,7 @@ export default class RegionsController {
   private clipBoardRegion: Region;
 
   /* for disabling snapping is shift key is pressed and global snapping enabled */
-  private snappingDisabled:boolean = false;
+  private snappingDisabled: boolean = false;
 
   constructor(app: App) {
     this._app = app;
@@ -214,19 +214,17 @@ export default class RegionsController {
    * @private
    */
   private bindEvents(): void {
-    // On escape key pressed, deselect the selected waveform.
+    document.addEventListener("keyup", (e) => {
+      this.snappingDisabled = e.shiftKey;
+    });
+
     document.addEventListener("keydown", (e) => {
+      // On escape key pressed, deselect the selected waveform.
       if (e.key === "Escape") {
         this.deselectRegion();
       }
-    });
 
-    document.addEventListener("keyup", (e) => {
-        this.snappingDisabled = e.shiftKey;
-    });
-
-    // On delete key pressed, delete the selected region.
-    document.addEventListener("keydown", (e) => {
+      // On delete key pressed, delete the selected region.
       if (
         (e.key === "Delete" || e.key === "Backspace") &&
         this._selectedRegionView !== undefined
@@ -235,37 +233,35 @@ export default class RegionsController {
       }
 
       // for "disabling temporarily the grid snapping if shift is pressed"
-      if(e.shiftKey) {
+      if (e.shiftKey) {
         this.snappingDisabled = true;
       }
 
-      if(((e.key === "S") || (e.key === "s")) &&
-      this._selectedRegionView !== undefined) {
+      // split a region at playhead position
+      if (
+        (e.key === "S" || e.key === "s") &&
+        this._selectedRegionView !== undefined
+      ) {
         this.splitSelectedRegion();
       }
 
       // MB: not sure that this is the proper way do handle
       // keyboard shortcuts for copy/cut/paste
       if (e.ctrlKey || e.metaKey) {
-        console.log("ctrlKey = " + e.ctrlKey + " command = " + e.metaKey);
-        // ctr-c or command-c
         switch (e.key) {
           case "x":
-            console.log("CUT REGION");
             this.cutSelectedRegion();
             break;
           case "c":
-            console.log("COPY REGION");
             this.copySelectedRegion();
             break;
           case "v":
-            console.log("PASTE REGION");
             this.pasteRegion();
             break;
         }
       }
     });
-    // On the pointer move around the PIXI Canvas.
+    // handle moving a region on the PIXI Canvas.
     this._editorView.viewport.on("pointermove", (e) => {
       if (this._isMovingRegion) {
         this.handlePointerMove(e);
@@ -349,7 +345,7 @@ export default class RegionsController {
   private copySelectedRegion() {
     if (!this._selectedRegion) return;
 
-    // 1 copy the buffer of the selected region
+    // Copy the buffer of the selected region
     const bufferCpy: OperableAudioBuffer = this._selectedRegion.buffer.clone();
 
     // make a new region from this buffer, with start at the playhead value
@@ -402,7 +398,7 @@ export default class RegionsController {
 
     // move playhead at the end of the newly pasted region
     // jumps to new pos in pixels
-    const regionWidth = newRegion.duration * 1000 / RATIO_MILLS_BY_PX;
+    const regionWidth = (newRegion.duration * 1000) / RATIO_MILLS_BY_PX;
     // MB : maybe add region width into region model
     const newX = newRegion.pos + regionWidth;
     // maybe add new methods in playheadController moveTo(pixelPos) and moveTo(samplePos)
@@ -412,38 +408,63 @@ export default class RegionsController {
     this._app.tracksController.jumpTo(newX);
   }
 
+  /**
+   *
+   * @returns Splits a region at playhead position, creating two new regions
+   * the second is selected and the playhead does not move.
+   */
   splitSelectedRegion() {
     if (!this._selectedRegion) return;
+
+    // if playhead not "on" the selected region, do nothing
+    if (!this.isPlayheadOnSelectedRegion()) return;
 
     // get the split point (corresponding to the playhead position) in samples
     const startOfSelectedRegionInMs = this._selectedRegion.start;
     // same in samples
-    const startOfSelectedRegionInSamples = startOfSelectedRegionInMs/1000 * audioCtx.sampleRate;
+    const startOfSelectedRegionInSamples =
+      (startOfSelectedRegionInMs / 1000) * audioCtx.sampleRate;
     const splitPoint = this._app.host.playhead - startOfSelectedRegionInSamples;
 
     // get the buffer from the selected region
     const buffer: OperableAudioBuffer = this._selectedRegion.buffer;
     // split it into two buffers. The calls returns two NEW buffers
-    let firstBuffer:OperableAudioBuffer|null, secondBuffer:OperableAudioBuffer|null;
+    let firstBuffer: OperableAudioBuffer | null,
+      secondBuffer: OperableAudioBuffer | null;
 
     [firstBuffer, secondBuffer] = buffer.split(splitPoint);
 
     // Makes two new regions
 
-    // make a new region from the first audio buffer, with start the same as selected region
+    // make a new region from the left part of the audio buffer (according to playhead position),
+    // with start the same as selected region
     // duration/2, track will be the same track as original region
     let leftRegionStart = this._selectedRegion.start;
     let trackId = this._selectedRegion.trackId;
-    const leftRegion = new Region(trackId, firstBuffer!, leftRegionStart, this.getNewId());
+    const leftRegion = new Region(
+      trackId,
+      firstBuffer!,
+      leftRegionStart,
+      this.getNewId()
+    );
 
     // make another region starting at mid point of the original selected region
     // start in ms and duration in ms
-    const splitPointInMs = splitPoint *1000 / 44100;
+    const splitPointInMs = (splitPoint * 1000) / 44100;
     let rightRegionStart = this._selectedRegion.start + splitPointInMs;
-    const rightRegion = new Region(trackId, secondBuffer!, rightRegionStart, this.getNewId());
+    const rightRegion = new Region(
+      trackId,
+      secondBuffer!,
+      rightRegionStart,
+      this.getNewId()
+    );
 
     // delete original region
     this.deleteSelectedRegion();
+    // update track
+    let track = this._app.tracksController.getTrackById(trackId);
+    //track!.modified = true;
+    //track?.updateBuffer(audioCtx, this._app.host.playhead);
 
     // create new views from the two new regions and add them to the waveformView of the track
     let waveformView = this._editorView.getWaveFormViewById(trackId);
@@ -459,16 +480,37 @@ export default class RegionsController {
     this._app.regionsController.bindRegionEvents(rightRegion, rightRegionView);
 
     // Update the selected track
-    const track = this._app.tracksController.getTrackById(trackId);
-    track!.modified = true;
+    track = this._app.tracksController.getTrackById(trackId);
     track!.addRegion(leftRegion);
-    track!.addRegion(rightRegion);
+    //track!.modified = true;
+    //track?.updateBuffer(audioCtx, this._app.host.playhead);
 
+    track!.addRegion(rightRegion);
+    //track!.modified = true;
+    //track?.updateBuffer(audioCtx, this._app.host.playhead);
+    
     // select right region
     rightRegionView.select();
 
+    //this.handlePointerDown(leftRegionView);
+    //this.handlePointerUp();
+
   }
 
+  isPlayheadOnSelectedRegion() {
+    if (!this._selectedRegion) return;
+
+    // check if playhead is on the selected region
+    const playHeadPosX = this._app.editorView.playhead.position.x;
+    const selectedRegionPosX = this._selectedRegionView!.position.x;
+    const selectedRegionWidth =
+      (this._selectedRegion.duration * 1000) / RATIO_MILLS_BY_PX;
+
+    return (
+      (playHeadPosX >= selectedRegionPosX) &&
+      (playHeadPosX <= (selectedRegionPosX + selectedRegionWidth))
+    );
+  }
   /**
    * Move the region in the current waveform. If the users move out of the current waveform, it will also
    * change the region to the new waveform.
@@ -486,7 +528,7 @@ export default class RegionsController {
     let newX = x - this._offsetX;
     newX = Math.max(0, Math.min(newX, this._editorView.worldWidth));
 
-    if ((this._editorView.snapping) && (!this.snappingDisabled)){
+    if (this._editorView.snapping && !this.snappingDisabled) {
       // snapping, using cell-size
       const cellSize = this._editorView.cellSize;
       newX = Math.round(newX / cellSize) * cellSize;

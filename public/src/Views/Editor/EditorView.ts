@@ -187,6 +187,8 @@ export default class EditorView extends Application {
             this.playhead.track.position.y = 0;
             this.loop.position.y = 0;
             this.loop.track.position.y = 0;
+            this.grid.position.y = 0;
+
         }
         else {
             let x = this.viewport.center.x;
