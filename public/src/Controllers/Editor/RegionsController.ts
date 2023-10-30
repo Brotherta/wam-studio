@@ -604,12 +604,15 @@ export default class RegionsController {
     if (!this._selectedRegionView && !this._selectedRegion) return;
 
     if (this._selectedRegionView!.trackId !== this._selectedRegion!.trackId) {
+
       let oldTrack = this._app.tracksController.getTrackById(
         this._selectedRegion!.trackId
       );
+
       let newTrack = this._app.tracksController.getTrackById(
         this._selectedRegionView!.trackId
       );
+
       if (oldTrack == undefined || newTrack == undefined) {
         throw new Error("Track not found");
       }
@@ -710,6 +713,7 @@ export default class RegionsController {
             this.draggedRegion
           );*/
       this.draggedRegionView.select();
+      this._selectedRegion = this.draggedRegion;
 
       let track = this._app.tracksController.getTrackById(region!.trackId);
       if (track == undefined) throw new Error("Track not found");
@@ -721,6 +725,9 @@ export default class RegionsController {
       //console.log("UNDO moving from one track to the other");
       this.draggedRegionView.position.x = x;
       this.draggedRegion.start = x * RATIO_MILLS_BY_PX;
+      this.draggedRegion.trackId = oldTrack.id;
+      this.draggedRegionView.trackId = oldTrack.id;
+
       this.draggedRegionView.trackId = oldTrack.id;
       region.trackId = oldTrack.id;
 
@@ -734,6 +741,8 @@ export default class RegionsController {
       // create a view from the new region
      let oldTrackWaveformView = this._editorView.getWaveFormViewById(oldTrack.id);
      oldTrackWaveformView!.addRegionView(this.draggedRegionView);
+     this.draggedRegionView.drawWave(oldTrackWaveformView!.color, this.draggedRegion);
+     
       this._app.regionsController.bindRegionEvents(this.draggedRegion, regionView);
 
       oldTrack.modified = true;
@@ -742,6 +751,7 @@ export default class RegionsController {
       newTrack.updateBuffer(audioCtx, this._app.host.playhead);
 
       this.draggedRegionView.select();
+      this._selectedRegion = this.draggedRegion;
     }
   }
   /**
