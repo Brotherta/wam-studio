@@ -695,6 +695,63 @@ export default class RegionsController {
     );
   }
 
+  // MB : need to fix that, no use of global variables. Replace this.draggedRegionView by regionView, this._selectedRegion by region
+  // etc.
+  moveTo(
+    region: Region,
+    regionView: RegionView,
+    x: number,
+    oldTrack: Track,
+    newTrack: Track
+  ) {
+    //console.log("UNDO moveTo x = " + x);
+    if (oldTrack === newTrack) {
+      // moving on the same track
+      regionView.position.x = x;
+      region.start = x * RATIO_MILLS_BY_PX;
+      regionView.trackId = region.trackId;
+      
+      regionView.select();
+
+      let track = this._app.tracksController.getTrackById(region!.trackId);
+      if (track == undefined) throw new Error("Track not found");
+
+      track.modified = true;
+      track.updateBuffer(audioCtx, this._app.host.playhead);
+    } else {
+      // Moving from one track to the other
+      //console.log("UNDO moving from one track to the other");
+      regionView.position.x = x;
+      region.start = x * RATIO_MILLS_BY_PX;
+      region.trackId = oldTrack.id;
+      regionView.trackId = oldTrack.id;
+
+      regionView.trackId = oldTrack.id;
+      region.trackId = oldTrack.id;
+
+      newTrack.removeRegionById(region.id);
+      oldTrack.addRegion(region);
+
+      // remove regionView from new track
+      let newTrackWaveformView = this._editorView.getWaveFormViewById(newTrack.id);
+      newTrackWaveformView!.removeRegionView(regionView);
+
+      // create a view from the new region
+     let oldTrackWaveformView = this._editorView.getWaveFormViewById(oldTrack.id);
+     oldTrackWaveformView!.addRegionView(regionView);
+     this.draggedRegionView.drawWave(oldTrackWaveformView!.color, region);
+     
+      this._app.regionsController.bindRegionEvents(region, regionView);
+
+      oldTrack.modified = true;
+      newTrack.modified = true;
+      oldTrack.updateBuffer(audioCtx, this._app.host.playhead);
+      newTrack.updateBuffer(audioCtx, this._app.host.playhead);
+
+      regionView.select();
+    }
+  }
+  /*
   moveTo(
     region: Region,
     regionView: RegionView,
@@ -708,10 +765,7 @@ export default class RegionsController {
       this.draggedRegionView.position.x = x;
       this.draggedRegion.start = x * RATIO_MILLS_BY_PX;
       regionView.trackId = region.trackId;
-      /*this.draggedRegionView.drawWave(
-            this.draggedRegionView.color,
-            this.draggedRegion
-          );*/
+      
       this.draggedRegionView.select();
       this._selectedRegion = this.draggedRegion;
 
@@ -754,6 +808,7 @@ export default class RegionsController {
       this._selectedRegion = this.draggedRegion;
     }
   }
+  */
   /**
    * Updates the current selected region that is moving to a new waveform view.
    * It updates the old and the new waveform.
