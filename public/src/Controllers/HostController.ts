@@ -318,20 +318,23 @@ export default class HostController {
 
     // undo/redo
     this._view.undoBtn.addEventListener("click", () => {
-      console.log("undo");
       this._app.undoManager.undo();
+        this._app.hostView.setUndoButtonState(this._app.undoManager.hasUndo());
+        this._app.hostView.setRedoButtonState(this._app.undoManager.hasRedo());
     });
     this._view.redoBtn.addEventListener("click", () => {
-      console.log("redo");
       this._app.undoManager.redo();
+      
+      this._app.hostView.setUndoButtonState(this._app.undoManager.hasUndo());
+      this._app.hostView.setRedoButtonState(this._app.undoManager.hasRedo());
     });
 
     this._view.zoomInBtn.addEventListener("click", async () => {
       let playhead = this._app.host.playhead;
-      console.log("zoomInBtn.addEventListener !!!!!!!");
-      console.log("beginning of zoomInBtn.addEventListener playhead=" + playhead + 
-      " pos="  + this._app.editorView.playhead.position.x + " ms=" + (playhead / audioCtx.sampleRate) * 1000);
-      console.log("---");
+      //console.log("zoomInBtn.addEventListener !!!!!!!");
+      //console.log("beginning of zoomInBtn.addEventListener playhead=" + playhead + 
+      //" pos="  + this._app.editorView.playhead.position.x + " ms=" + (playhead / audioCtx.sampleRate) * 1000);
+      //console.log("---");
 
       this._app.editorController.zoomIn();
     });
@@ -341,9 +344,9 @@ export default class HostController {
 
     // Tempo and Time Signature selectors
     this._view.timeSignatureSelector.addEventListener("timeSignatureChanged", (event: any) => {
-      console.log("time signature changed to " + event.detail.signature);
-      console.log("nbStepsPerBar=" + event.detail.nbStepsPerBar);
-      console.log("nbStepsPerBeat=" + event.detail.nbStepsPerBeat);
+      //console.log("time signature changed to " + event.detail.signature);
+      //console.log("nbStepsPerBar=" + event.detail.nbStepsPerBar);
+      //console.log("nbStepsPerBeat=" + event.detail.nbStepsPerBeat);
       // update grid
       this._app.editorView.grid.updateTimeSignature(event.detail.nbStepsPerBar, event.detail.nbStepsPerBeat);
     });

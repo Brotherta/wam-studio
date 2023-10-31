@@ -33,6 +33,8 @@ export default class HostView {
     playIcon = document.getElementById("play-icon") as HTMLDivElement;
     muteIcon = document.getElementById("mute-icon") as HTMLDivElement;
     snapIcon = document.getElementById("snap-icon") as HTMLDivElement;
+    undoIcon = document.getElementById("undo-icon") as HTMLDivElement;
+    redoIcon = document.getElementById("redo-icon") as HTMLDivElement;
 
     vuMeterDiv = document.getElementById("vu-meter") as HTMLCanvasElement;
     vuMeterCanvas = document.getElementById("vu-meter-canvas") as HTMLCanvasElement;
@@ -172,6 +174,21 @@ export default class HostView {
             tooltip.innerHTML = "Snap Grid On";
         }
     }
+
+    public setUndoButtonState(undoAvailable: boolean): void {
+        if(undoAvailable) 
+            this.undoIcon.className= "undo-icon";
+        else 
+            this.undoIcon.className ="undo-icon-off";
+    }
+
+    public setRedoButtonState(redoAvailable: boolean): void {
+        if(redoAvailable) 
+            this.redoIcon.className = "redo-icon";
+        else 
+            this.redoIcon.className = "redo-icon-off";
+    }
+
 
     /**
      * Creates a new song item in the songs' container. It is used to display the songs in the dropdown menu.

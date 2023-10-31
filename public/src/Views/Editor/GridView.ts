@@ -146,14 +146,7 @@ export default class GridView extends Container {
         // do not display the bar number
       }
     }
-    /*
-        for (let x = 0; x < width; x += 100) {
-            this.grid.beginFill("red", 1);
-            // Grid should be as high as the canvas
-            this.grid.drawRect(x, 0, 1, height); 
-            //this.grid.drawRect(x, EditorView.LOOP_HEIGHT, 1, height);
-        }
-*/
+
     this.addChild(this.grid);
   }
 

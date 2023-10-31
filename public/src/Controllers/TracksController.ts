@@ -352,7 +352,7 @@ export default class TracksController {
         // wait until the trackElement WebComponent is connected
         // to the DOM before initializing the peak meter
         let id = setInterval(() => {
-            console.log("trackElement.isConnected", trackElement.isConnected);
+            //console.log("trackElement.isConnected", trackElement.isConnected);
             // create the peak meter
             if (trackElement.isConnected) {
                 console.log("trackElement.isConnected", trackElement.isConnected)

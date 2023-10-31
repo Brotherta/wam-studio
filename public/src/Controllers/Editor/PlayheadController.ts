@@ -1,6 +1,7 @@
 import { audioCtx } from "../..";
 import App from "../../App";
 import { RATIO_MILLS_BY_PX } from "../../Env";
+import EditorView from "../../Views/Editor/EditorView";
 import PlayheadView from "../../Views/Editor/PlayheadView";
 import { FederatedPointerEvent } from "pixi.js";
 
@@ -60,7 +61,12 @@ export default class PlayheadController {
     this._app.editorView.grid.on("pointerdown", (e) => {
       // to handle cliks on bar numbers, step lines etc.
       // that prevented the playhead to move
-      this.handlePointerDown(e);
+      // call handlePointerDown only if the click occured on the top line of the grid
+      // otherwise, let the click be handled by the grid clicking on a line in the middle of screen
+      // would move the playhead...
+      //console.log("e.data.global.y = " + e.data.global.y + "PLAYHEAD_HEIGHT = " + EditorView.PLAYHEAD_HEIGHT);
+      if (e.data.global.y < EditorView.PLAYHEAD_HEIGHT+10)
+        this.handlePointerDown(e);
     });
 
     this._view.handle.on("pointerup", (e) => {
