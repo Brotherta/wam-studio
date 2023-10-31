@@ -734,7 +734,7 @@ export default class RegionsController {
       region.start = x * RATIO_MILLS_BY_PX;
       regionView.trackId = region.trackId;
 
-      regionView.select();
+      //regionView.select();
 
       let track = this._app.tracksController.getTrackById(region!.trackId);
       if (track == undefined) throw new Error("Track not found");
@@ -774,7 +774,7 @@ export default class RegionsController {
       oldTrack.updateBuffer(audioCtx, this._app.host.playhead);
       newTrack.updateBuffer(audioCtx, this._app.host.playhead);
 
-      regionView.select();
+      //regionView.select();
     }
   }
 
