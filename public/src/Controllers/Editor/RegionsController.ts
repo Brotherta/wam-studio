@@ -8,6 +8,7 @@ import WaveformView from "../../Views/Editor/WaveformView";
 import RegionView from "../../Views/Editor/RegionView";
 import { audioCtx } from "../../index";
 import Track from "../../Models/Track";
+import { map } from "jquery";
 
 /**
  * Class that control the regions of the editor.
@@ -61,6 +62,14 @@ export default class RegionsController {
   private draggedRegionView!: RegionView;
   private oldTrackWhenMoving!: Track;
   private newTrackWhenMoving!: Track;
+
+  // scroll smoothly viewport left or right
+  scrollingRight: boolean = false;
+  scrollingLeft: boolean = false;
+  incrementScrollSpeed: number = 0;
+  viewportAnimationLoopId: number = 0;
+  selectedRegionEndOutsideViewport: boolean = false;
+  selectedRegionStartOutsideViewport: boolean = false;
 
   constructor(app: App) {
     this._app = app;
@@ -295,6 +304,10 @@ export default class RegionsController {
    * @private
    */
   private handlePointerDown(regionView: RegionView): void {
+    this.viewportAnimationLoopId = requestAnimationFrame(
+      this.viewportAnimationLoop.bind(this)
+    );
+
     if (this._selectedRegionView !== regionView) {
       this.deselectRegion();
       this._selectedRegionView = regionView;
@@ -303,8 +316,12 @@ export default class RegionsController {
         .getTrackById(regionView.trackId)
         ?.getRegionById(regionView.id);
     }
-    // Useful for undo/redo
     if (this._selectedRegionView) {
+      // useful for avoiding scrolling with large regions
+      this.selectedRegionEndOutsideViewport = (this._selectedRegionView.position.x + this._selectedRegionView.width) > this._editorView.viewport.right;
+      this.selectedRegionStartOutsideViewport = this._selectedRegionView.position.x < this._editorView.viewport.left;
+
+      // Useful for undo/redo
       this.dragRegionStartX = this._selectedRegionView.position.x;
       this.draggedRegion = this._selectedRegion!;
       this.draggedRegionView = this._selectedRegionView;
@@ -552,7 +569,12 @@ export default class RegionsController {
     let newX = x - this._offsetX;
     newX = Math.max(0, Math.min(newX, this._editorView.worldWidth));
 
-    if (this._editorView.snapping && !this.snappingDisabled) {
+    if (
+      this._editorView.snapping &&
+      !this.snappingDisabled &&
+      !this.scrollingLeft &&
+      !this.scrollingRight
+    ) {
       // snapping, using cell-size
       const cellSize = this._editorView.cellSize;
       newX = Math.round(newX / cellSize) * cellSize;
@@ -589,14 +611,104 @@ export default class RegionsController {
     //console.log("Region Moved, new pos (pixels): " + this._selectedRegion.pos);
     this._selectedRegion.start = newX * RATIO_MILLS_BY_PX;
     //console.log("Region Moved, new start (ms): " + this._selectedRegion.start);
+
+    // scroll viewport if the right end of the moving  region is close
+    // to the right or left edge of the viewport, or left edge of the region close to left edge of viewxport
+    // (and not 0 or end of viewport)
+    // scroll smoothly the viewport if the region is dragged to the right or left
+    // when a region is dragged to the right or to the left, we start scrolling
+    // when the right end of the region is close to the right edge of the viewport or
+    // when the left end of the region is close to the left edge of the viewport
+    // "close" means at a distance of SCROLL_TRIGGER_ZONE_WIDTH pixels from the edge
+
+    // scroll parameters
+    const SCROLL_TRIGGER_ZONE_WIDTH = 50;
+    const MIN_SCROLL_SPEED = 1;
+    const MAX_SCROLL_SPEED = 10;
+
+
+    const regionEndPos =
+    this._selectedRegion.pos + this._selectedRegionView.width;
+    const regionStartPos = this._selectedRegion.pos;
+    let viewport = this._editorView.viewport;
+    const viewportWidth = viewport.right - viewport.left;
+
+    const distanceToRightEdge = viewportWidth - (regionEndPos - viewport.left);
+    this.scrollingRight = !this.selectedRegionEndOutsideViewport && (regionEndPos - viewport.left) >= (viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH);
+    if(this.scrollingRight) {
+      // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
+      // to the right between 1 and 10
+      this.incrementScrollSpeed = this.map(distanceToRightEdge, SCROLL_TRIGGER_ZONE_WIDTH, -SCROLL_TRIGGER_ZONE_WIDTH, MIN_SCROLL_SPEED, MAX_SCROLL_SPEED);
+    }
+
+    //console.log("distanceToRightEdge = " + distanceToRightEdge);
+    const distanceToLeftEdge = viewport.left - regionStartPos;
+    //console.log("distanceToLeftEdge = " + distanceToLeftEdge);
+
+    this.scrollingLeft = !this.selectedRegionStartOutsideViewport &&(regionStartPos < (viewport.left + SCROLL_TRIGGER_ZONE_WIDTH)) && (viewport.left > 0);
+      if(this.scrollingLeft) {
+        // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
+        // to the right between 1 and 10
+        // MB : need to adjust the mapping function here !
+        this.incrementScrollSpeed = this.map(distanceToLeftEdge, -SCROLL_TRIGGER_ZONE_WIDTH, SCROLL_TRIGGER_ZONE_WIDTH, MIN_SCROLL_SPEED, MAX_SCROLL_SPEED);
+      }
   }
 
+  // maps a value from [istart, istop] into [ostart, ostop]
+ map(value:number, istart:number, istop:number, ostart:number, ostop:number) {
+  return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+}
+  viewportAnimationLoop() {
+    if (!this._selectedRegionView || !this._selectedRegion || !this._offsetX)
+      return;
+
+    let viewScrollSpeed = 0;
+    if (this.scrollingRight) {
+      viewScrollSpeed = this.incrementScrollSpeed;
+      this._offsetX -= viewScrollSpeed;
+    } else if (this.scrollingLeft) {
+      viewScrollSpeed = -this.incrementScrollSpeed;
+      this._offsetX -= viewScrollSpeed;
+    }
+
+    // if needed scroll smoothly the viewport to left or right
+    if (this.scrollingRight || this.scrollingLeft) {
+      let viewport = this._editorView.viewport;
+
+      viewport.left += viewScrollSpeed;
+      // move also region and region view
+      this._selectedRegionView.position.x += viewScrollSpeed;
+      this._selectedRegion.pos += viewScrollSpeed;
+      // adjust region start
+      this._selectedRegion.start = this._selectedRegion.pos * RATIO_MILLS_BY_PX;
+
+      // adjust horizontal scrollbar so that it corresponds to the current viewport position
+      // scrollbar pos depends on the left position of the viewport.
+      const horizontalScrollbar = this._editorView.horizontalScrollbar;
+      horizontalScrollbar.moveTo(viewport.left);
+
+      // if scrolling left and viewport.left < 0, stop scrolling an put viewport.left to 0
+      if (this.scrollingLeft && viewport.left < 0) {
+        viewport.left = 0;
+        this.scrollingLeft = false;
+      }
+      // if scrolling right and viewport.right > worldWidth, stop scrolling and put viewport.right to worldWidth
+      if (this.scrollingRight && viewport.right > this._editorView.worldWidth) {
+        viewport.right = this._editorView.worldWidth;
+        this.scrollingRight = false;
+      }
+    }
+    requestAnimationFrame(this.viewportAnimationLoop.bind(this));
+  }
   /**
    * If the region was moving, it stops the move and update the track buffer. If the region is in a new tracks,
    * it will modify the old track and the new one.
    * @private
    */
   private handlePointerUp(): void {
+    // stop viewport animation
+    cancelAnimationFrame(this.viewportAnimationLoopId);
+
     this._isMovingRegion = false;
     if (!this._selectedRegionView && !this._selectedRegion) return;
 
@@ -717,7 +829,7 @@ export default class RegionsController {
       },
     });
 
-   this.updateUndoButtons();
+    this.updateUndoButtons();
   }
 
   // undoing/redoing region move
@@ -779,10 +891,10 @@ export default class RegionsController {
   }
 
   // TODO : implement all these for region operations...
-   /* ---- REGION CUT ---------------- */
-   /* ---- REGION DELETE ------------- */
-   /* ---- REGION SELECT (needed ?)--- */
-   /* ---- REGION PASTE -------------- */
-   /* ---- REGION COPY (needed ?) ---- */
-   /* ---- REGION SPLIT -------------- */
+  /* ---- REGION CUT ---------------- */
+  /* ---- REGION DELETE ------------- */
+  /* ---- REGION SELECT (needed ?)--- */
+  /* ---- REGION PASTE -------------- */
+  /* ---- REGION COPY (needed ?) ---- */
+  /* ---- REGION SPLIT -------------- */
 }

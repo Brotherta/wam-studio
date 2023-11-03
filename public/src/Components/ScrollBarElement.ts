@@ -165,6 +165,23 @@ export default class ScrollBarElement extends HTMLElement {
       e.preventDefault();
     });
 
+    track.addEventListener("mousedown", (e) => {
+      if(this.orientation === "horizontal") {
+        // 200 = width of the left track panel
+        let clickPos = e.clientX - 200;
+        //console.log("Click on scrollbar track x = " + clickPos + " handle x pos = " 
+        //+ this.handlePos + " worldSize = " + this.worldSize + " trackSize = " + track.offsetWidth);
+
+        this.customScrollTo(clickPos - this.handlePos);
+      } else {
+        // 60 is the height of the top panel
+        let clickPos = e.clientY -60;
+        //console.log("Click on scrollbar track y = " + clickPos + " handle y pos = " 
+        //+ this.handlePos + " trackSize = " + track.offsetHeight);
+        this.customScrollTo(clickPos - this.handlePos);
+      }
+    });
+
     document.addEventListener("mousemove", (e) => {
       if (!this.isDragging) return;
 

@@ -355,7 +355,7 @@ export default class TracksController {
             //console.log("trackElement.isConnected", trackElement.isConnected);
             // create the peak meter
             if (trackElement.isConnected) {
-                console.log("trackElement.isConnected", trackElement.isConnected)
+                //console.log("trackElement.isConnected", trackElement.isConnected)
                 let peakMeter = new WebAudioPeakMeter(
                     audioCtx, 
                     track.gainNode, 
