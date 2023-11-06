@@ -119,13 +119,15 @@ export default class HostController {
 
     // recenter viewport at center of current viewport width
     // MB FIX
-    const pos = this._app.editorView.editorDiv.clientWidth/2 ;
-    console.log("width = " + this._app.editorView.editorDiv.clientWidth)
-    this._app.editorView.viewport.moveCenter(pos, 
-        this._app.editorView.viewport.center.y);
-        // need to reposition the custom scrollbar too...
-        // adjust horizontal scrollbar
-        this._app.editorView.horizontalScrollbar.moveToBeginning();
+    const pos = this._app.editorView.editorDiv.clientWidth / 2;
+    console.log("width = " + this._app.editorView.editorDiv.clientWidth);
+    this._app.editorView.viewport.moveCenter(
+      pos,
+      this._app.editorView.viewport.center.y
+    );
+    // need to reposition the custom scrollbar too...
+    // adjust horizontal scrollbar
+    this._app.editorView.horizontalScrollbar.moveToBeginning();
   }
 
   /**
@@ -154,12 +156,10 @@ export default class HostController {
   }
 
   public snapOnOff(): void {
-    
     const snapping = !this._app.editorView.snapping;
     this._app.editorView.snapping = snapping;
-    
+
     this._view.updateSnapButton(snapping);
-    
   }
 
   /**
@@ -284,7 +284,7 @@ export default class HostController {
     // detect global click on the document and resume the audio context if necessary
     document.addEventListener("click", () => {
       if (audioCtx.state === "suspended") {
-        console.log("RESUMING AUDIO CONTEXT")
+        console.log("RESUMING AUDIO CONTEXT");
         audioCtx.resume();
       }
     });
@@ -317,25 +317,39 @@ export default class HostController {
     });
 
     // undo/redo
-    this._view.undoBtn.addEventListener("click", () => {
-      this._app.undoManager.undo();
+    // with cdm/ctl-z or cmd-ctrl-shift-z
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      // MB: not sure that this is the proper way do handle
+      // keyboard shortcuts for copy/cut/paste
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case "z":
+            this._app.undoManager.undo();
+            break;
+          case "Z":
+            this._app.undoManager.redo();
+            break;
+        }
         this._app.hostView.setUndoButtonState(this._app.undoManager.hasUndo());
         this._app.hostView.setRedoButtonState(this._app.undoManager.hasRedo());
+      }
+    });
+
+    // with clicks on undo/redo buttons
+    this._view.undoBtn.addEventListener("click", () => {
+      this._app.undoManager.undo();
+      this._app.hostView.setUndoButtonState(this._app.undoManager.hasUndo());
+      this._app.hostView.setRedoButtonState(this._app.undoManager.hasRedo());
     });
     this._view.redoBtn.addEventListener("click", () => {
       this._app.undoManager.redo();
-      
+
       this._app.hostView.setUndoButtonState(this._app.undoManager.hasUndo());
       this._app.hostView.setRedoButtonState(this._app.undoManager.hasRedo());
     });
 
+    // ZOOM BUTTONS
     this._view.zoomInBtn.addEventListener("click", async () => {
-      let playhead = this._app.host.playhead;
-      //console.log("zoomInBtn.addEventListener !!!!!!!");
-      //console.log("beginning of zoomInBtn.addEventListener playhead=" + playhead + 
-      //" pos="  + this._app.editorView.playhead.position.x + " ms=" + (playhead / audioCtx.sampleRate) * 1000);
-      //console.log("---");
-
       this._app.editorController.zoomIn();
     });
     this._view.zoomOutBtn.addEventListener("click", async () => {
@@ -343,30 +357,37 @@ export default class HostController {
     });
 
     // Tempo and Time Signature selectors
-    this._view.timeSignatureSelector.addEventListener("timeSignatureChanged", (event: any) => {
-      //console.log("time signature changed to " + event.detail.signature);
-      //console.log("nbStepsPerBar=" + event.detail.nbStepsPerBar);
-      //console.log("nbStepsPerBeat=" + event.detail.nbStepsPerBeat);
-      // update grid
-      this._app.editorView.grid.updateTimeSignature(event.detail.nbStepsPerBar, event.detail.nbStepsPerBeat);
-    });
+    this._view.timeSignatureSelector.addEventListener(
+      "timeSignatureChanged",
+      (event: any) => {
+        // update grid
+        this._app.editorView.grid.updateTimeSignature(
+          event.detail.nbStepsPerBar,
+          event.detail.nbStepsPerBeat
+        );
+      }
+    );
 
     this._view.tempoSelector.addEventListener("tempochanged", (event: any) => {
       // sent by the tempoSelector Web Component (custom event has its data in event.detail)
       const newTempo = event.detail.tempo;
 
-      if(newTempo < 5 || newTempo > 600) return;
+      if (newTempo < 5 || newTempo > 600) return;
 
       updateTempo(newTempo);
 
       // should update length of waveforms, time display, playhead speed, not the grid...
       // update timer using playhead pos in pixels
-      this._view.updateTimerByPixelsPos(this._app.editorView.playhead.position.x);
+      this._view.updateTimerByPixelsPos(
+        this._app.editorView.playhead.position.x
+      );
 
       // update playhead value (in samples) and post to all track nodes
       //console.log("Tempo changed : playhead before = " + this._app.host.playhead + " pos = " + this._app.editorView.playhead.position.x + " in ms : " + (this._app.host.playhead*1000)/audioCtx.sampleRate);
       // jumps to new playhead value
-      this._app.tracksController.jumpTo(this._app.editorView.playhead.position.x);
+      this._app.tracksController.jumpTo(
+        this._app.editorView.playhead.position.x
+      );
 
       // update position of playhead in editorView
       this._app.editorView.playhead.moveToFromPlayhead(this._app.host.playhead);
@@ -376,7 +397,7 @@ export default class HostController {
       this._app.tracksController.trackList.forEach((track) => {
         // redraw all regions taking into account the new tempo
         // RATIO_MILLS_BY_PX has been updated by updateTemponew(Tempo)
-        
+
         // for all track regions, update their start properties
         for (const region of track.regions) {
           // TEMPO_DELTA (that represents the ration newTempo/oldTempo) has been updated

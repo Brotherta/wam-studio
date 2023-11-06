@@ -612,6 +612,16 @@ export default class RegionsController {
     this._selectedRegion.start = newX * RATIO_MILLS_BY_PX;
     //console.log("Region Moved, new start (ms): " + this._selectedRegion.start);
 
+    this.checkIfScrollingNeeded();
+  }
+
+  /**
+   * Check if scrolling is needed when moving a region.
+   * @private
+   */
+  checkIfScrollingNeeded() {
+    if (!this._selectedRegionView || !this._selectedRegion || !this._offsetX)
+      return;
     // scroll viewport if the right end of the moving  region is close
     // to the right or left edge of the viewport, or left edge of the region close to left edge of viewxport
     // (and not 0 or end of viewport)
@@ -625,7 +635,6 @@ export default class RegionsController {
     const SCROLL_TRIGGER_ZONE_WIDTH = 50;
     const MIN_SCROLL_SPEED = 1;
     const MAX_SCROLL_SPEED = 10;
-
 
     const regionEndPos =
     this._selectedRegion.pos + this._selectedRegionView.width;
@@ -653,6 +662,7 @@ export default class RegionsController {
         this.incrementScrollSpeed = this.map(distanceToLeftEdge, -SCROLL_TRIGGER_ZONE_WIDTH, SCROLL_TRIGGER_ZONE_WIDTH, MIN_SCROLL_SPEED, MAX_SCROLL_SPEED);
       }
   }
+
 
   // maps a value from [istart, istop] into [ostart, ostop]
  map(value:number, istart:number, istop:number, ostart:number, ostop:number) {
@@ -700,6 +710,7 @@ export default class RegionsController {
     }
     requestAnimationFrame(this.viewportAnimationLoop.bind(this));
   }
+  
   /**
    * If the region was moving, it stops the move and update the track buffer. If the region is in a new tracks,
    * it will modify the old track and the new one.

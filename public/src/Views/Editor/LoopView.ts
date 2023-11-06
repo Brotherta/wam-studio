@@ -69,6 +69,15 @@ export default class LoopView extends Container {
         this.drawWindow();
     }
 
+    public shiftHandlePosition(delta: number): void {
+        this.position.x += delta;
+        //this.background.x += delta;
+        //this.rightHandle.x += delta;
+        //this.leftHandle.x += delta;
+
+        this.drawWindow();
+    }
+
     /**
      * Updates the position of the handle and the background. The background is scaled to fit the handle.
      * The background is scaled only if the scale parameter is true.
@@ -98,13 +107,16 @@ export default class LoopView extends Container {
      * @param looping
      */
     public updateActive(looping: boolean) {
+        console.log("updateActive", looping);
         this.active = looping;
         const color = this.active ? this.activeColor : this.inactiveColor;
         this.background.tint = color;
         this.leftHandle.tint = color;
         this.rightHandle.tint = color;
         this.drawWindow();
-    }
+
+        console.log("updateActive this.leftHandle.x", this.leftHandle.position.x + " this.rightHandle.x", this.rightHandle.x)
+;    }
 
     /**
      * Only redraw the children of the track containers.
