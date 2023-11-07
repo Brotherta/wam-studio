@@ -298,6 +298,7 @@ export default class ScrollBarElement extends HTMLElement {
     }
 
     this.dispatchEvent(
+      console.log("SCROLLBAR ELEMENT dispatch event;
       new CustomEvent("change", {
         detail: { value: this.handlePos, type: type },
         bubbles: true, // Allows the event to bubble up through the shadow DOM boundary
