@@ -239,7 +239,7 @@ export default class EditorController {
             //this._app.playheadController.centerViewportAround();
             this._app.tracksController.trackList.forEach(track => {
                 // MB : below seems also unecessary
-                //track.updateBuffer(audioCtx, this._app.host.playhead);
+                track.updateBuffer(audioCtx, this._app.host.playhead);
                 this._view.drawRegions(track);
             });
         }, 1000);
