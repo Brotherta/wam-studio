@@ -233,16 +233,9 @@ export default class LoopController {
         this._view.rightHandle.width;
     }
 
-    if (
-      this._app.editorView.snapping &&
-      !this.snappingDisabled &&
-      !this.scrollingLeft &&
-      !this.scrollingRight
-    ) {
-      // snapping, using cell-size
-      const cellSize = this._app.editorView.cellSize;
-      pos = Math.round(pos / cellSize) * cellSize;
-    }
+      // adjust pos if snapping is enabled and if not scrolling
+      pos = this.adjustPosIfSnapping(pos);
+
 
     const leftPos = pos;
 
@@ -411,6 +404,18 @@ export default class LoopController {
     else if (pos >= this._view.rightHandle.x - this._view.leftHandle.width) {
       pos = this._view.rightHandle.x - this._view.leftHandle.width;
     }
+
+     // adjust pos if snapping is enabled and if not scrolling
+     pos = this.adjustPosIfSnapping(pos);
+
+
+    const leftPos = pos;
+    const rightPos = this._view.rightHandle.x;
+    this._view.updateHandlePosition(leftPos, rightPos, true);
+  }
+
+  /* adjust pos if snapping is enabled and if not scrolling */
+  adjustPosIfSnapping(pos: number, specialRightHandleCase: boolean = false) {
     if (
       this._app.editorView.snapping &&
       !this.snappingDisabled &&
@@ -418,13 +423,17 @@ export default class LoopController {
       !this.scrollingRight
     ) {
       // snapping, using cell-size
-      const cellSize = this._app.editorView.cellSize;
-      pos = Math.round(pos / cellSize) * cellSize;
-    }
+      let cellSize = this._app.editorView.cellSize;
+      // for right handle
 
-    const leftPos = pos;
-    const rightPos = this._view.rightHandle.x;
-    this._view.updateHandlePosition(leftPos, rightPos, true);
+      pos = Math.round(pos / cellSize) * cellSize;
+      // for right handle, we must adjust the right end of the handle to be
+      // aligned on a grid line. Shift left the right handle x pos
+      // with the right handle width.
+      if(specialRightHandleCase) pos -= this._view.rightHandle.width;
+
+    }
+    return pos;
   }
 
   private handleRightHandleMove(e: FederatedPointerEvent): void {
@@ -444,16 +453,11 @@ export default class LoopController {
       pos = this._view.leftHandle.x + this._view.leftHandle.width;
     }
 
-    if (
-      this._app.editorView.snapping &&
-      !this.snappingDisabled &&
-      !this.scrollingLeft &&
-      !this.scrollingRight
-    ) {
-      // snapping, using cell-size
-      const cellSize = this._app.editorView.cellSize;
-      pos = Math.round(pos / cellSize) * cellSize;
-    }
+    // adjust pos if snapping is enabled and if not scrolling
+    // second parameter is for special case of right handle
+    // that needs to be aligned on its end edge, not on its start edge
+    // i.e x pos must be shifted left with the width of the right handle
+    pos = this.adjustPosIfSnapping(pos, true);
 
     const leftPos = this._view.leftHandle.x;
     const rightPos = pos;
