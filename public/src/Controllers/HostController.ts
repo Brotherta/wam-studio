@@ -239,7 +239,7 @@ export default class HostController {
   /**
    * Resumes the timer interval. Used when the user is jumping to a specific beat.
    */
-  public resumeTimerInteravel(): void {
+  public resumeTimerInterval(): void {
     this._timerIntervalPaused = false;
   }
 

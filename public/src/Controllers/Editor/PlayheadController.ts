@@ -74,6 +74,20 @@ export default class PlayheadController {
       if (e.data.global.y < EditorView.PLAYHEAD_HEIGHT + 10)
         this.handlePointerDown(e);
     });
+    this._app.editorView.grid.on("pointerup", (e) => {
+      // to handle cliks on bar numbers, step lines etc.
+      // that prevented the playhead to move
+      // call handlePointerUp only if the click occured on the top line of the grid
+      if (e.data.global.y < EditorView.PLAYHEAD_HEIGHT + 10)
+        this.handlePointerUp(e);
+    });
+    this._app.editorView.grid.on("globalpointermove", (e) => {
+      // to handle cliks on bar numbers, step lines etc.
+      // that prevented the playhead to move
+      // call handlePointerUp only if the click occured on the top line of the grid
+      if (e.data.global.y < EditorView.PLAYHEAD_HEIGHT + 10)
+        this.handlePointerMove(e);
+    });
 
     this._view.handle.on("pointerup", (e) => {
       this.handlePointerUp(e);
@@ -92,31 +106,24 @@ export default class PlayheadController {
     });
 
     this._view.track.on("globalpointermove", (e) => {
-      if (this._movingPlayhead) {
-        document.body.style.cursor = "grabbing";
-        let pos = e.data.global.x + this._app.editorView.viewport.left;
-
-        if (
-          this._app.editorView.snapping &&
-          !this.snappingDisabled &&
-          !this.scrollingLeft &&
-          !this.scrollingRight
-        ) {
-          // snapping, using cell-size
-          const cellSize = this._app.editorView.cellSize;
-          pos = Math.round(pos / cellSize) * cellSize;
-        }
-
-        if (pos < 0) pos = 0;
-        this._view.moveTo(pos);
-        this._app.hostView.updateTimerByPixelsPos(pos);
-        // MB !
-        this._app.host.playhead =
-          (pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000;
-        //console.log("global pointermove playhead = " + this._app.host.playhead + " pos = " + pos)
-        this.checkIfScrollingNeeded(pos);
-      }
+      this.handlePointerMove(e);
     });
+  }
+
+
+  /* adjust pos if snapping is enabled and if not scrolling */
+  adjustPosIfSnapping(pos: number) {
+    if (
+      this._app.editorView.snapping &&
+      !this.snappingDisabled &&
+      !this.scrollingLeft &&
+      !this.scrollingRight
+    ) {
+      // snapping, using cell-size
+      const cellSize = this._app.editorView.cellSize;
+      pos = Math.round(pos / cellSize) * cellSize;
+    }
+    return pos;
   }
 
   /**
@@ -234,6 +241,25 @@ export default class PlayheadController {
     requestAnimationFrame(this.viewportAnimationLoop.bind(this));
   }
 
+  private handlePointerMove(e: FederatedPointerEvent) {
+    if (this._movingPlayhead) {
+      document.body.style.cursor = "grabbing";
+      let pos = e.data.global.x + this._app.editorView.viewport.left;
+
+      // adjust pos if grid snapping is enabled and if not scrolling
+      pos = this.adjustPosIfSnapping(pos);
+      
+      if (pos < 0) pos = 0;
+      this._view.moveTo(pos);
+      this._app.hostView.updateTimerByPixelsPos(pos);
+      // MB !
+      this._app.host.playhead =
+        (pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000;
+      //console.log("global pointermove playhead = " + this._app.host.playhead + " pos = " + pos)
+      this.checkIfScrollingNeeded(pos);
+    }
+  }
+  
   /**
    * Handler for the pointer down event. It declares the start of the move.
    *
@@ -245,9 +271,16 @@ export default class PlayheadController {
     );
 
     let pos = e.data.global.x + this._app.editorView.viewport.left;
+    // adjust pos if grid snapping is enabled and if not scrolling
+    pos = this.adjustPosIfSnapping(pos);
+
     this._app.hostController.pauseTimerInterval();
     this._movingPlayhead = true;
     this._view.moveTo(pos);
+
+     // update timer display
+     this._app.hostView.updateTimer(this._app.host.playhead)
+
   }
 
   /**
@@ -264,10 +297,12 @@ export default class PlayheadController {
     if (pos < 0) pos = 0;
     this._app.tracksController.jumpTo(pos);
     this._movingPlayhead = false;
-    this._app.hostController.resumeTimerInteravel();
+    this._app.hostController.resumeTimerInterval();
     if (this._app.host.playing) {
       this._app.automationController.applyAllAutomations();
     }
+
+   
 
     // MB : for debugging viewport centering
     //this._app.editorView.viewport.moveCenter(this._view.x, this._app.editorView.viewport.center.y);
