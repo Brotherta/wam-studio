@@ -203,6 +203,7 @@ export default class EditorController {
     private async updateZoom(): Promise<void> {
         let offsetPlayhead = this._view.playhead.position.x;
         //console.log("playhad pos before zoom = " + offsetPlayhead)
+
         this._view.resizeCanvas();
         this._view.playhead.moveToFromPlayhead(this._app.host.playhead);
          const playhead = this._app.host.playhead;
@@ -232,9 +233,10 @@ export default class EditorController {
         //this._view.playhead.resize();
         //this._app.playheadController.centerViewportAround();
 
+
         this._timeout = setTimeout(() => {
             //console.log("Dans le timeout")
-
+            //this._app.playheadController.centerViewportAround();
             this._app.tracksController.trackList.forEach(track => {
                 // MB : below seems also unecessary
                 //track.updateBuffer(audioCtx, this._app.host.playhead);

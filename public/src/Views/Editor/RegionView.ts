@@ -60,12 +60,7 @@ export default class RegionView extends Container {
      * @param region - The region that will contain the buffer to draw.
      */
     public initializeRegionView(color: string, region: Region): void {
-        //console.log("----")
-        //console.log("initializeRegionView start = " + region.start);
-        //console.log("initializeRegionView ratio = " + RATIO_MILLS_BY_PX);
         region.pos = region.start / RATIO_MILLS_BY_PX;
-        //console.log("initializeRegionView pos = " + region.pos);
-        //console.log("----")
         this.position.x = region.pos;
         this.drawWave(color, region);
         this.drawBackground();
