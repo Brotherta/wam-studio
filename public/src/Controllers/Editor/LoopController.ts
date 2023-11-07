@@ -158,15 +158,26 @@ export default class LoopController {
   private handlePointerUp(): void {
     // stop viewport animation
     cancelAnimationFrame(this.viewportAnimationLoopId);
+    this.scrollingLeft = false;
+    this.scrollingRight = false;
 
     // update left and right handle positions, background position
+    
     console.log("UP Position x = " + this._view.handle.position.x);
-    this._view.handle.position.x = 0;
+    // this._view.handle.position.x = de combien on a scrollé
+    //this._view.leftHandle.x += this._view.handle.position.x;
+    //this._view.rightHandle.x += this._view.handle.position.x;
+    //this._view.background.x += this._view.handle.position.x;
+    //this._view.handle.position.x = 0;
+
+    /*
     this._view.updateHandlePosition(
       this._view.leftHandle.x + this._view.handle.position.x + this._app.editorView.viewport.left,
       this._view.rightHandle.x +   this._view.handle.position.x + this._app.editorView.viewport.left,
       true
     );
+    */
+
 
     this._movingHandle = false;
     this._MOVING_HANDLE = MovingHandleEnum.NONE;
@@ -197,7 +208,6 @@ export default class LoopController {
     switch (this._MOVING_HANDLE) {
       case MovingHandleEnum.BACKGROUND:
         this.handleBackgroundMove(e);
-        this.checkIfScrollingNeeded();
         break;
       case MovingHandleEnum.LEFT:
         this.handleLeftHandleMove(e);
@@ -208,6 +218,7 @@ export default class LoopController {
       case MovingHandleEnum.NONE:
         break;
     }
+    this.checkIfScrollingNeeded();
   }
 
   private handleBackgroundMove(e: FederatedPointerEvent): void {
@@ -256,7 +267,7 @@ export default class LoopController {
    * @private
    */
   checkIfScrollingNeeded() {
-    //console.log("checkIfScrollingNeeded");
+    console.log("checkIfScrollingNeeded");
     // scroll viewport if the right end of the moving  loop controller is close
     // to the right or left edge of the viewport, or left edge of the loop controller close to left edge of viewxport
     // (and not 0 or end of viewport)
@@ -274,8 +285,7 @@ export default class LoopController {
     // pos of extreme right of the right handle
     const rightHandleEndPos =
       this._view.rightHandle.x +
-      this._view.rightHandle.width +
-      this._editor.viewport.left;
+      this._view.rightHandle.width;
 
     console.log("right handle end pos = " + rightHandleEndPos);
 
@@ -306,7 +316,7 @@ export default class LoopController {
 
     // pos of extreme left of the left handle
     const leftHandleStartPos =
-      this._view.leftHandle.x + this._editor.viewport.left;
+      this._view.leftHandle.x;
 
     const distanceToLeftEdge = viewport.left - leftHandleStartPos;
     //console.log("distanceToLeftEdge = " + distanceToLeftEdge);
@@ -345,33 +355,35 @@ export default class LoopController {
 
     if (this.scrollingRight) {
       viewScrollSpeed = this.incrementScrollSpeed;
-      //this.offsetX -= viewScrollSpeed;
+      this.offsetX -= viewScrollSpeed;
     } else if (this.scrollingLeft) {
       viewScrollSpeed = -this.incrementScrollSpeed;
-      //this.offsetX -= viewScrollSpeed;
+      this.offsetX -= viewScrollSpeed;
     }
 
     // if needed scroll smoothly the viewport to left or right
     if (this.scrollingRight || this.scrollingLeft) {
       let viewport = this._app.editorView.viewport;
 
+      // scroll the viewport
       viewport.left += viewScrollSpeed;
 
       // move also controller background and handles (left/right)
-      //this._view.leftHandle.x += viewScrollSpeed;
-      //this._view.rightHandle.x += viewScrollSpeed;
-      //this._view.background.x += viewScrollSpeed;
+      this._view.leftHandle.x += viewScrollSpeed;
+      this._view.rightHandle.x += viewScrollSpeed;
+     //this._view.background.x += viewScrollSpeed;
       //this._view.position.x += viewScrollSpeed;
       //this.moveBackground(viewScrollSpeed);
-      this._view.handle.position.x += viewScrollSpeed;
+      //this._view.handle.position.x += viewScrollSpeed;
+      //console.log("handle pos x = "   + this._view.handle.position.x)
       //this.moveBackground(this._view.background.x + viewScrollSpeed);
       //this._view.shiftHandlePosition(viewScrollSpeed);
 
-      /*this._view.updateHandlePosition(
+      this._view.updateHandlePosition(
         this._view.leftHandle.x,
         this._view.rightHandle.x,
         true
-      );*/
+      );
 
       // adjust horizontal scrollbar so that it corresponds to the current viewport position
       // scrollbar pos depends on the left position of the viewport.
