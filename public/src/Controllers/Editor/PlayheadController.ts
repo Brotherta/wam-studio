@@ -292,6 +292,8 @@ export default class PlayheadController {
   private handlePointerUp(e: FederatedPointerEvent) {
     // stop viewport animation
     cancelAnimationFrame(this.viewportAnimationLoopId);
+    this.scrollingLeft = false;
+    this.scrollingRight = false;
 
     let pos = e.data.global.x + this._app.editorView.viewport.left;
     if (pos < 0) pos = 0;
@@ -302,7 +304,6 @@ export default class PlayheadController {
       this._app.automationController.applyAllAutomations();
     }
 
-   
 
     // MB : for debugging viewport centering
     //this._app.editorView.viewport.moveCenter(this._view.x, this._app.editorView.viewport.center.y);

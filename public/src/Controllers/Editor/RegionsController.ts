@@ -719,6 +719,8 @@ export default class RegionsController {
   private handlePointerUp(): void {
     // stop viewport animation
     cancelAnimationFrame(this.viewportAnimationLoopId);
+    this.scrollingLeft = false;
+    this.scrollingRight = false;
 
     this._isMovingRegion = false;
     if (!this._selectedRegionView && !this._selectedRegion) return;
