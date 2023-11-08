@@ -119,7 +119,9 @@ const getProcessor = (moduleId: string) => {
                     const loop = !!(i < parameters.loop.length ? parameters.loop[i] : parameters.loop[0]);
                     if (!playing) continue; // Not playing
                     const audioLength: number = this.audio[0].length;
-                    if (this.playhead >= audioLength || (loop && this.playhead > this.loopEnd)) { // Play was finished
+                   
+                    //if (this.playhead >= audioLength || (loop && this.playhead > this.loopEnd)) { // Play was finished
+                    if (loop && this.playhead > this.loopEnd) { // Play was finished
                         if (loop) this.playhead = this.loopStart; // Loop just enabled, reset playhead
                         else continue; // EOF without loop
                     }
