@@ -39,7 +39,7 @@ export default class ExporterController {
         let buffers = [];
 
         // Check if there's content to export.
-        let maxDuration = this._app.regionsController.getMaxDurationRegions();
+        let maxDuration = this._app.regionsController.getMaxDurationRegions(); // in seconds
         if (maxDuration == 0) {
             alert("You can't export nothing...");
             return;
