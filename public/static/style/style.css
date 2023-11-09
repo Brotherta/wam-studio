@@ -152,7 +152,7 @@ body {
 }
 
 #header-main-track {
-    min-width: 161px;
+    min-width: 200px;
     border-right: 1px solid black;
     display: flex;
     flex-direction: row;
@@ -169,7 +169,7 @@ body {
 
 
 #main-track {
-    min-width: 161px;
+    min-width: 200px;
     background: rgb(23, 23, 26);
     border: 1px solid black;
     margin-top: 1px;
@@ -178,6 +178,7 @@ body {
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: flex-start;
+    align-items: center;
 }
 
 #vu-meter {
@@ -336,7 +337,7 @@ track-element {
     align-items: center;
     flex-direction: column;
     flex-wrap: nowrap;
-    width: 143px;
+    width: 190px;
     min-height: 80px;
     margin: 8px;
     background: transparent;
