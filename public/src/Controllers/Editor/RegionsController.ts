@@ -63,6 +63,13 @@ export default class RegionsController {
   private oldTrackWhenMoving!: Track;
   private newTrackWhenMoving!: Track;
 
+  /* For undo/redo when cutting a region */
+  private regionStack: {
+    region: Region;
+    regionView: RegionView;
+    track: Track;
+  }[] = [];
+
   // scroll smoothly viewport left or right
   scrollingRight: boolean = false;
   scrollingLeft: boolean = false;
@@ -322,8 +329,11 @@ export default class RegionsController {
     }
     if (this._selectedRegionView) {
       // useful for avoiding scrolling with large regions
-      this.selectedRegionEndOutsideViewport = (this._selectedRegionView.position.x + this._selectedRegionView.width) > this._editorView.viewport.right;
-      this.selectedRegionStartOutsideViewport = this._selectedRegionView.position.x < this._editorView.viewport.left;
+      this.selectedRegionEndOutsideViewport =
+        this._selectedRegionView.position.x + this._selectedRegionView.width >
+        this._editorView.viewport.right;
+      this.selectedRegionStartOutsideViewport =
+        this._selectedRegionView.position.x < this._editorView.viewport.left;
 
       // Useful for undo/redo
       this.dragRegionStartX = this._selectedRegionView.position.x;
@@ -358,11 +368,20 @@ export default class RegionsController {
     )
       return;
 
+      
+
     let waveform = this._selectedRegionView.parent as WaveformView;
     let track = this._app.tracksController.getTrackById(
       this._selectedRegion.trackId
     );
     if (track === undefined) throw new Error("Track not found");
+
+    // for undo/redo
+    this.addLastDeleteToUndoManager(
+      this._selectedRegion!,
+      this._selectedRegionView!,
+      track
+    );
 
     track.removeRegionById(this._selectedRegion.id);
     waveform.removeRegionView(this._selectedRegionView);
@@ -372,9 +391,21 @@ export default class RegionsController {
 
     track.modified = true;
     track.updateBuffer(audioCtx, this._app.host.playhead);
+
+   
   }
 
   private cutSelectedRegion() {
+    if (!this._selectedRegionView || !this._selectedRegion) return;
+
+    // for undo/redo
+    this.addLastCutToUndoManager(
+      this._selectedRegion!,
+      this._selectedRegionView!,
+      this._app.tracksController.getTrackById(this._selectedRegion!.trackId)!
+    );
+
+    // do the cut
     this.copySelectedRegion();
     this.deleteSelectedRegion();
   }
@@ -443,6 +474,9 @@ export default class RegionsController {
     this._app.editorView.playhead.moveToFromPlayhead(this._app.host.playhead);
 
     this._app.tracksController.jumpTo(newX);
+
+    // for undo/redo
+    this.addLastPasteToUndoManager(newRegion, regionView, track!);
   }
 
   /**
@@ -641,37 +675,59 @@ export default class RegionsController {
     const MAX_SCROLL_SPEED = 10;
 
     const regionEndPos =
-    this._selectedRegion.pos + this._selectedRegionView.width;
+      this._selectedRegion.pos + this._selectedRegionView.width;
     const regionStartPos = this._selectedRegion.pos;
     let viewport = this._editorView.viewport;
     const viewportWidth = viewport.right - viewport.left;
 
     const distanceToRightEdge = viewportWidth - (regionEndPos - viewport.left);
-    this.scrollingRight = !this.selectedRegionEndOutsideViewport && (regionEndPos - viewport.left) >= (viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH);
-    if(this.scrollingRight) {
+    this.scrollingRight =
+      !this.selectedRegionEndOutsideViewport &&
+      regionEndPos - viewport.left >= viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH;
+    if (this.scrollingRight) {
       // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
       // to the right between 1 and 10
-      this.incrementScrollSpeed = this.map(distanceToRightEdge, SCROLL_TRIGGER_ZONE_WIDTH, -SCROLL_TRIGGER_ZONE_WIDTH, MIN_SCROLL_SPEED, MAX_SCROLL_SPEED);
+      this.incrementScrollSpeed = this.map(
+        distanceToRightEdge,
+        SCROLL_TRIGGER_ZONE_WIDTH,
+        -SCROLL_TRIGGER_ZONE_WIDTH,
+        MIN_SCROLL_SPEED,
+        MAX_SCROLL_SPEED
+      );
     }
 
     //console.log("distanceToRightEdge = " + distanceToRightEdge);
     const distanceToLeftEdge = viewport.left - regionStartPos;
     //console.log("distanceToLeftEdge = " + distanceToLeftEdge);
 
-    this.scrollingLeft = !this.selectedRegionStartOutsideViewport &&(regionStartPos < (viewport.left + SCROLL_TRIGGER_ZONE_WIDTH)) && (viewport.left > 0);
-      if(this.scrollingLeft) {
-        // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
-        // to the right between 1 and 10
-        // MB : need to adjust the mapping function here !
-        this.incrementScrollSpeed = this.map(distanceToLeftEdge, -SCROLL_TRIGGER_ZONE_WIDTH, SCROLL_TRIGGER_ZONE_WIDTH, MIN_SCROLL_SPEED, MAX_SCROLL_SPEED);
-      }
+    this.scrollingLeft =
+      !this.selectedRegionStartOutsideViewport &&
+      regionStartPos < viewport.left + SCROLL_TRIGGER_ZONE_WIDTH &&
+      viewport.left > 0;
+    if (this.scrollingLeft) {
+      // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
+      // to the right between 1 and 10
+      // MB : need to adjust the mapping function here !
+      this.incrementScrollSpeed = this.map(
+        distanceToLeftEdge,
+        -SCROLL_TRIGGER_ZONE_WIDTH,
+        SCROLL_TRIGGER_ZONE_WIDTH,
+        MIN_SCROLL_SPEED,
+        MAX_SCROLL_SPEED
+      );
+    }
   }
 
-
   // maps a value from [istart, istop] into [ostart, ostop]
- map(value:number, istart:number, istop:number, ostart:number, ostop:number) {
-  return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
-}
+  map(
+    value: number,
+    istart: number,
+    istop: number,
+    ostart: number,
+    ostop: number
+  ) {
+    return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+  }
   viewportAnimationLoop() {
     if (!this._selectedRegionView || !this._selectedRegion || !this._offsetX)
       return;
@@ -714,7 +770,7 @@ export default class RegionsController {
     }
     requestAnimationFrame(this.viewportAnimationLoop.bind(this));
   }
-  
+
   /**
    * If the region was moving, it stops the move and update the track buffer. If the region is in a new tracks,
    * it will modify the old track and the new one.
@@ -909,9 +965,115 @@ export default class RegionsController {
 
   // TODO : implement all these for region operations...
   /* ---- REGION CUT ---------------- */
+  addLastCutToUndoManager(
+    region: Region,
+    regionView: RegionView,
+    track: Track
+  ) {
+    // add to the undo/redo stack
+
+    this.regionStack.push({
+      region: region,
+      regionView: regionView,
+      track: track,
+    });
+
+    this._app.undoManager.add({
+      undo: () => {
+        this.undoCutRegion();
+      },
+      redo: () => {
+        this.redoCutRegion(region, regionView, track);
+      },
+    });
+  }
+
+  undoCutRegion() {
+    // let's get the last region that was cut
+    let last = this.regionStack.pop();
+
+    if (!last) return;
+
+    let region = last!.region;
+    let regionView = last!.regionView;
+    let track = last!.track;
+    const trackId = track!.id;
+
+    // add regionView to track waveform
+    let waveformView = this._editorView.getWaveFormViewById(trackId);
+    waveformView!.addRegionView(regionView);
+
+    // certainly unecessary... ?
+    //this._app.regionsController.bindRegionEvents(region, regionView);
+
+    // Update the selected track, add the region to the track
+    track!.modified = true;
+    track!.addRegion(region);
+
+    // the region that has been restored is not selected, otherwise doing ctrl-z multiple
+    // times would add multiple regions that are all selected
+    regionView.deselect();
+  }
+
+  redoCutRegion(region: Region, regionView: RegionView, track: Track) {
+    this.regionStack.push({
+      region: region,
+      regionView: regionView,
+      track: track,
+    });
+
+    // remove regionView from track waveform
+    let waveformView = this._editorView.getWaveFormViewById(track.id);
+    waveformView!.removeRegionView(regionView);
+
+    // remove region from track
+    track.removeRegionById(region.id);
+    track.modified = true;
+    track.updateBuffer(audioCtx, this._app.host.playhead);
+  }
+
   /* ---- REGION DELETE ------------- */
+  addLastDeleteToUndoManager(
+    region: Region,
+    regionView: RegionView,
+    track: Track
+  ) {
+    this.regionStack.push({
+      region: region,
+      regionView: regionView,
+      track: track,
+    });
+
+    this._app.undoManager.add({
+      undo: () => {
+        this.undoCutRegion();
+      },
+      redo: () => {
+        this.redoCutRegion(region, regionView, track);
+      },
+    });
+  }
+
   /* ---- REGION SELECT (needed ?)--- */
   /* ---- REGION PASTE -------------- */
+  addLastPasteToUndoManager(
+    region: Region,
+    regionView: RegionView,
+    track: Track
+  ) {
+    // add to the undo/redo stack
+
+    //this.regionStack.pop();
+
+    this._app.undoManager.add({
+      undo: () => {
+        this.redoCutRegion(region, regionView, track);
+      },
+      redo: () => {
+        this.undoCutRegion();
+      },
+    });
+  }
   /* ---- REGION COPY (needed ?) ---- */
   /* ---- REGION SPLIT -------------- */
 }
