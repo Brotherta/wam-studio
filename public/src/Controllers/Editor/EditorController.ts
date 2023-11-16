@@ -295,43 +295,52 @@ export default class EditorController {
         if ((clientX >= offsetLeft && clientX <= offsetLeft + this._view.width) &&
             (clientY >= offsetTop && clientY <= offsetTop + this._view.height)) {
             
+            
+            const audioFiles = files.filter(file => this.isAccepted(file))
+                .map(file => file.getAsFile() as File);
+            
             const start = (this._app.editorView.viewport.left + (clientX - offsetLeft)) * RATIO_MILLS_BY_PX;
             let acc = 0;
-            for (let item of files) {
-                if (item.kind === "file") {
-                    let file = item.getAsFile() as File;
-                    if (file.type === "audio/mpeg"
-                        || file.type === "audio/ogg" 
-                        || file.type === "audio/wav"
-                        || file.type === "audio/x-wav") {
+            for (let i = 0; i < audioFiles.length; i++) {
+                let file = audioFiles[i];
 
-                        let waveform = this._view.getWaveformAtPos(clientY - offsetTop + acc);
+                let waveform = this._view.getWaveformAtPos(clientY - offsetTop + acc);
 
-                        if (!waveform) {
-                            let track = await this._app.tracksController.newEmptyTrack();
-                            this._app.tracksController.initializeTrack(track);
-                            track.element.progressDone();
-                            waveform = this._view.getWaveFormViewById(track.id);
-                            if (!waveform) {
-                                console.error("Can't fin a waveform with the given track id " + track.id);
-                                return;
-                            }
-                        }
-                        let track = this._app.tracksController.getTrackById(waveform.trackId) as Track;
-
-                        let audioArrayBuffer = await file.arrayBuffer();
-                        let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
-                        let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-                        
-                        this._app.regionsController.createRegion(track, operableAudioBuffer, start, waveform)
-                        acc += HEIGHT_TRACK;
-                    }
-                    else {
-                        console.warn("the file provided is not an audio file");
+                if (!waveform) {
+                    let track = await this._app.tracksController.newEmptyTrack();
+                    this._app.tracksController.initializeTrack(track);
+                    track.element.progressDone();
+                    waveform = this._view.getWaveFormViewById(track.id);
+                    if (!waveform) {
+                        console.error("Can't fin a waveform with the given track id " + track.id);
+                        return;
                     }
                 }
+                let track = this._app.tracksController.getTrackById(waveform.trackId) as Track;
+
+                let audioArrayBuffer = await file.arrayBuffer();
+                let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
+                let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                
+                this._app.regionsController.createRegion(track, operableAudioBuffer, start, waveform)
+                acc += HEIGHT_TRACK;
             }
         }
         
+    }
+
+    private isAccepted(file: DataTransferItem) {
+        if (file.kind === "file" &&
+                    (file.type === "audio/mpeg"
+                    || file.type === "audio/ogg" 
+                    || file.type === "audio/wav"
+                    || file.type === "audio/x-wav")) {
+                    return true;
+        }
+        else {
+            console.warn("the file provided is not an audio file");
+            return false;
+
+        }
     }
 }
