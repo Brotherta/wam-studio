@@ -181,6 +181,12 @@ export default class EditorController {
         this._view.verticalScrollbar.addEventListener("change", (e: ScrollEvent) => {
             this._view.handleVerticalScroll(e);
         });
+        this._view.canvasContainer.addEventListener('dragover', (e: DragEvent) => {
+            e.preventDefault();
+        });
+        window.addEventListener('dragover', (e: DragEvent) => {
+            e.preventDefault();
+        });
         this._view.canvasContainer.addEventListener('drop', (e: DragEvent) => {
             e.preventDefault();
             if (e.dataTransfer?.items) {
