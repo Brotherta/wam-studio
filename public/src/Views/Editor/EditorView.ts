@@ -237,6 +237,15 @@ export default class EditorView extends Application {
         this.resizeCanvas();
     }
 
+    public getWaveformAtPos(y: number): WaveformView | undefined {
+        let globalY = this.viewport.top + y;
+        return this.waveforms.find(w => globalY >= w.position.y && globalY <= w.position.y + HEIGHT_TRACK)
+    }
+
+    public getWaveformById(trackId: number) : WaveformView | undefined {
+        return this.waveforms.find(w => w.trackId === trackId);
+    }
+
     /**
      * Resize the canvas when the window is resized. It will resize the playhead, the viewport, the PIXI.Renderer,
      * the canvas and the automation div.

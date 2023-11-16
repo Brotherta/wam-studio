@@ -1,7 +1,9 @@
 import App from "../../App";
 import EditorView from "../../Views/Editor/EditorView";
-import { RATIO_MILLS_BY_PX, ZOOM_LEVEL, decrementZoomLevel, incrementZoomLevel } from "../../Env";
+import { HEIGHT_TRACK, RATIO_MILLS_BY_PX, ZOOM_LEVEL, decrementZoomLevel, incrementZoomLevel } from "../../Env";
 import { audioCtx } from "../../index";
+import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
+import Track from "../../Models/Track";
 
 /**
  * Interface of the custom event of the ScrollBarElement.
@@ -179,6 +181,15 @@ export default class EditorController {
         this._view.verticalScrollbar.addEventListener("change", (e: ScrollEvent) => {
             this._view.handleVerticalScroll(e);
         });
+        this._view.canvasContainer.addEventListener('drop', (e: DragEvent) => {
+            e.preventDefault();
+            if (e.dataTransfer?.items) {
+                this.importDraggedFiles([...e.dataTransfer.items], e.clientX, e.clientY);
+            }
+        })
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+        })
     }
 
     /**
@@ -262,5 +273,59 @@ export default class EditorController {
             }
         }
         return nearestLevel;
+    }
+
+    /**
+     * Import files that has been dragged on the page.
+     * 
+     * @param file - Files that must be dragged
+     * @param clientX - x pos of the drop
+     * @param clientY - y pos of the drop
+     */
+    private async importDraggedFiles(files: DataTransferItem[], clientX: number, clientY: number) {  
+        let offsetLeft = this._view.canvasContainer.offsetLeft // offset x of the canvas
+        let offsetTop = this._view.canvasContainer.offsetTop // offset y of the canvas
+    
+        if ((clientX >= offsetLeft && clientX <= offsetLeft + this._view.width) &&
+            (clientY >= offsetTop && clientY <= offsetTop + this._view.height)) {
+            
+            const start = (this._app.editorView.viewport.left + (clientX - offsetLeft)) * RATIO_MILLS_BY_PX;
+            let acc = 0;
+            for (let item of files) {
+                if (item.kind === "file") {
+                    let file = item.getAsFile() as File;
+                    if (file.type === "audio/mpeg"
+                        || file.type === "audio/ogg" 
+                        || file.type === "audio/wav"
+                        || file.type === "audio/x-wav") {
+
+                        let waveform = this._view.getWaveformAtPos(clientY - offsetTop + acc);
+
+                        if (!waveform) {
+                            let track = await this._app.tracksController.newEmptyTrack();
+                            this._app.tracksController.initializeTrack(track);
+                            track.element.progressDone();
+                            waveform = this._view.getWaveFormViewById(track.id);
+                            if (!waveform) {
+                                console.error("Can't fin a waveform with the given track id " + track.id);
+                                return;
+                            }
+                        }
+                        let track = this._app.tracksController.getTrackById(waveform.trackId) as Track;
+
+                        let audioArrayBuffer = await file.arrayBuffer();
+                        let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
+                        let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                        
+                        this._app.regionsController.createRegion(track, operableAudioBuffer, start, waveform)
+                        acc += HEIGHT_TRACK;
+                    }
+                    else {
+                        console.warn("the file provided is not an audio file");
+                    }
+                }
+            }
+        }
+        
     }
 }
