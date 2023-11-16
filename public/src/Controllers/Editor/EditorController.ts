@@ -255,9 +255,11 @@ export default class EditorController {
             //console.log("Dans le timeout")
             // if playhead pos is more viewport width/2, center the viewport around the playhead, 
             // recenter the viewport 
+            console.log("playhead pos = " + this._view.playhead.position.x + " width/2=" + this._view.width/2);
             if(this._view.playhead.position.x > this._view.width/2)
                 this._app.playheadController.centerViewportAround();
             
+
 
             this._app.tracksController.trackList.forEach(track => {
                 // MB : below seems also unecessary
