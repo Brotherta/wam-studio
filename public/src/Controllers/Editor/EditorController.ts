@@ -253,7 +253,12 @@ export default class EditorController {
 
         this._timeout = setTimeout(() => {
             //console.log("Dans le timeout")
-            this._app.playheadController.centerViewportAround();
+            // if playhead pos is more viewport width/2, center the viewport around the playhead, 
+            // recenter the viewport 
+            if(this._view.playhead.position.x > this._view.width/2)
+                this._app.playheadController.centerViewportAround();
+            
+
             this._app.tracksController.trackList.forEach(track => {
                 // MB : below seems also unecessary
                 track.updateBuffer(audioCtx, this._app.host.playhead);
