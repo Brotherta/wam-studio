@@ -49,6 +49,7 @@ export default class ExporterController {
 
         // Process and export individual tracks.
         for (let track of this._app.tracksController.trackList) {
+            track.updateBuffer(audioCtx, 0);
             let buffer = await this.processTrack(track, maxDuration, initializeWamHost);
             if (buffer) buffers.push(buffer);
             if (tracksIds.includes(track.id)) {
