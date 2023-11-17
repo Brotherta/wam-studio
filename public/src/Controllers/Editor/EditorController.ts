@@ -311,11 +311,14 @@ export default class EditorController {
             for (let i = 0; i < audioFiles.length; i++) {
                 let file = audioFiles[i];
 
+
                 let waveform = this._view.getWaveformAtPos(clientY - offsetTop + acc);
 
                 if (!waveform) {
                     let track = await this._app.tracksController.newEmptyTrack();
                     this._app.tracksController.initializeTrack(track);
+                    track.element.setName(file.name);
+                    
                     track.element.progressDone();
                     waveform = this._view.getWaveFormViewById(track.id);
                     if (!waveform) {
@@ -324,6 +327,7 @@ export default class EditorController {
                     }
                 }
                 let track = this._app.tracksController.getTrackById(waveform.trackId) as Track;
+                
 
                 let audioArrayBuffer = await file.arrayBuffer();
                 let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);

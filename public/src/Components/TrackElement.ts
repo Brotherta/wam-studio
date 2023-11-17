@@ -349,6 +349,8 @@ export default class TrackElement extends HTMLElement {
         }
     }
 
+    
+
     defineTrackElementListeners() {
         this.trackNameInput.value = this.name;
 
@@ -476,6 +478,7 @@ export default class TrackElement extends HTMLElement {
     }
 
     setName(arg0: string) {
+        this.name = arg0;
         this.trackNameInput.value = arg0;
     }
 
