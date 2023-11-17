@@ -249,6 +249,9 @@ export default class RegionsController {
     });
 
     document.addEventListener("keydown", (e) => {
+      // If the user is typing in an input, we don't want to trigger the keyboard shortcuts
+      if(e.target != document.body) return;
+
       // On escape key pressed, deselect the selected waveform.
       if (e.key === "Escape") {
         this.deselectRegion();
@@ -522,7 +525,7 @@ export default class RegionsController {
 
     // make another region starting at mid point of the original selected region
     // start in ms and duration in ms
-    const splitPointInMs = (splitPoint * 1000) / 44100;
+    const splitPointInMs = (splitPoint * 1000) / audioCtx.sampleRate;
     let rightRegionStart = this._selectedRegion.start + splitPointInMs;
     const rightRegion = new Region(
       trackId,

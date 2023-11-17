@@ -22,6 +22,9 @@ export default class KeyboardController {
      */
     private bindEvents() {
         window.addEventListener("keypress", (e) => {
+            // If the user is typing in an input, we don't want to trigger the keyboard shortcuts
+            if(e.target != document.body) return;
+
             switch (e.key) {
                 case " ": // Space bar pressed : play/pause
                     this._app.hostController.play();

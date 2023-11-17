@@ -122,6 +122,9 @@ export default class PlayheadController {
       // snapping, using cell-size
       const cellSize = this._app.editorView.cellSize;
       pos = Math.round(pos / cellSize) * cellSize;
+      // adjust playhead value according to pos
+      this._app.host.playhead =
+        (pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000;
     }
     return pos;
   }
