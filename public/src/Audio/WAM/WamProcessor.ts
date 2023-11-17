@@ -128,7 +128,7 @@ const getProcessor = (moduleId: string) => {
 
           // we need to test this in case we are looping and the current track is shorter than the loop end
           // we only copy input samples that exist
-          if (this.playhead < audioLength) {
+          if (this.playhead <= audioLength) {
             const channelCount = Math.min(this.audio.length, output.length);
             for (let channel = 0; channel < channelCount; channel++) {
               output[channel][i] = this.audio[channel][this.playhead];
