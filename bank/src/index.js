@@ -29,6 +29,7 @@ app.use(pluginsRoutes);
 app.use("/", express.static(path.join(__dirname, "../PedalBoard")));
 app.use("/plugins", express.static(path.join(__dirname, "../plugins")));
 app.use("/songs", express.static(path.join(__dirname, "../songs")));
+app.use("/loops", express.static(path.join(__dirname, "../loops")));
 
 
 app.listen(config.port, () => {
