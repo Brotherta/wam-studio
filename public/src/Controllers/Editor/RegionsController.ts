@@ -779,6 +779,8 @@ export default class RegionsController {
 
       viewport.left += viewScrollSpeed;
       // move also region and region view
+      if(this._selectedRegionView.position.x + viewScrollSpeed < 0) return;
+      
       this._selectedRegionView.position.x += viewScrollSpeed;
       this._selectedRegion.pos += viewScrollSpeed;
       // adjust region start

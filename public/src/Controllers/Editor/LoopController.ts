@@ -162,7 +162,7 @@ export default class LoopController {
     this.scrollingRight = false;
 
     // update left and right handle positions, background position
-    
+
     console.log("UP Position x = " + this._view.handle.position.x);
     // this._view.handle.position.x = de combien on a scrollé
     //this._view.leftHandle.x += this._view.handle.position.x;
@@ -177,7 +177,6 @@ export default class LoopController {
       true
     );
     */
-
 
     this._movingHandle = false;
     this._MOVING_HANDLE = MovingHandleEnum.NONE;
@@ -218,7 +217,7 @@ export default class LoopController {
       case MovingHandleEnum.NONE:
         break;
     }
-    this.checkIfScrollingNeeded();
+    this.checkIfScrollingNeeded(e.data.global.x);
   }
 
   private handleBackgroundMove(e: FederatedPointerEvent): void {
@@ -244,9 +243,8 @@ export default class LoopController {
         this._view.rightHandle.width;
     }
 
-      // adjust pos if snapping is enabled and if not scrolling
-      pos = this.adjustPosIfSnapping(pos);
-
+    // adjust pos if snapping is enabled and if not scrolling
+    pos = this.adjustPosIfSnapping(pos);
 
     const leftPos = pos;
 
@@ -266,7 +264,7 @@ export default class LoopController {
    * Check if scrolling is needed when moving the loop controller.
    * @private
    */
-  checkIfScrollingNeeded() {
+  checkIfScrollingNeeded(mousePosX: number) {
     console.log("checkIfScrollingNeeded");
     // scroll viewport if the right end of the moving  loop controller is close
     // to the right or left edge of the viewport, or left edge of the loop controller close to left edge of viewxport
@@ -284,8 +282,7 @@ export default class LoopController {
 
     // pos of extreme right of the right handle
     const rightHandleEndPos =
-      this._view.rightHandle.x +
-      this._view.rightHandle.width;
+      this._view.rightHandle.x + this._view.rightHandle.width;
 
     console.log("right handle end pos = " + rightHandleEndPos);
 
@@ -302,6 +299,11 @@ export default class LoopController {
       rightHandleEndPos - viewport.left >=
         viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH;
 
+    /*
+        this.scrollingRight =
+        mousePosX >= (viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH);
+*/
+
     if (this.scrollingRight) {
       // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
       // to the right between 1 and 10
@@ -315,8 +317,7 @@ export default class LoopController {
     }
 
     // pos of extreme left of the left handle
-    const leftHandleStartPos =
-      this._view.leftHandle.x;
+    const leftHandleStartPos = this._view.leftHandle.x;
 
     const distanceToLeftEdge = viewport.left - leftHandleStartPos;
     //console.log("distanceToLeftEdge = " + distanceToLeftEdge);
@@ -371,7 +372,7 @@ export default class LoopController {
       // move also controller background and handles (left/right)
       this._view.leftHandle.x += viewScrollSpeed;
       this._view.rightHandle.x += viewScrollSpeed;
-     //this._view.background.x += viewScrollSpeed;
+      //this._view.background.x += viewScrollSpeed;
       //this._view.position.x += viewScrollSpeed;
       //this.moveBackground(viewScrollSpeed);
       //this._view.handle.position.x += viewScrollSpeed;
@@ -417,9 +418,8 @@ export default class LoopController {
       pos = this._view.rightHandle.x - this._view.leftHandle.width;
     }
 
-     // adjust pos if snapping is enabled and if not scrolling
-     pos = this.adjustPosIfSnapping(pos);
-
+    // adjust pos if snapping is enabled and if not scrolling
+    pos = this.adjustPosIfSnapping(pos);
 
     const leftPos = pos;
     const rightPos = this._view.rightHandle.x;
@@ -442,8 +442,7 @@ export default class LoopController {
       // for right handle, we must adjust the right end of the handle to be
       // aligned on a grid line. Shift left the right handle x pos
       // with the right handle width.
-      if(specialRightHandleCase) pos -= this._view.rightHandle.width;
-
+      if (specialRightHandleCase) pos -= this._view.rightHandle.width;
     }
     return pos;
   }
