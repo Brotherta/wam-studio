@@ -83,10 +83,14 @@ export default class PlayheadView extends Container {
          if (pixelPos >= this._editor.viewport.center.x && pixelPos < this._editor.viewport.center.x + 25) {
               this._editor.viewport.moveCenter(pixelPos, this._editor.viewport.center.y);
          } else {
-            // if the payhead is after center +5, and goes after the right border, center the viewport
+            // if the playhead is after center +5, and goes after the right border, center the viewport
             if (pixelPos > this._editor.viewport.center.x + 5 && pixelPos > this._editor.viewport.right) {
                 this._editor.viewport.moveCenter(pixelPos, this._editor.viewport.center.y);
-            } 
+            } else if((pixelPos < this._editor.viewport.left) && (pixelPos > this._editor.width/2)){
+                this._editor.viewport.moveCenter(pixelPos, this._editor.viewport.center.y);
+            } else if (pixelPos < this._editor.viewport.left) {
+                this._editor.viewport.moveCenter(this._editor.width/2, this._editor.viewport.center.y);
+            }
          }
          // adjust horizontal scrollbar so that it corresponds to the current viewport position
          // scrollbar pos depends on the left position of the viewport.

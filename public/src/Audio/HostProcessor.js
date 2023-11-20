@@ -65,7 +65,7 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             if (!playing) continue; // Not playing
             const audioLength = this.audio[0].length;
 
-            if (this.playhead >= audioLength || (loop && this.playhead > this.loopEnd)) { // Play was finished
+            if (this.playhead >= audioLength || (loop && this.playhead >= this.loopEnd)) { // Play was finished
                 if (loop) this.playhead = this.loopStart; // Loop just enabled, reset playhead
                 else continue; // EOF without loop
             }
