@@ -22,8 +22,14 @@ export default class PlayheadController {
    */
   private _movingPlayhead: boolean;
 
+  /**
+   * Check if the pointer is down in the playhead track.
+   */
+  private _pointerIsDown: boolean = false;
+
   /* for disabling snapping is shift key is pressed and global snapping enabled */
   private snappingDisabled: boolean = false;
+
 
   /* for scrolling the viewport when moving the playhead */
   private scrollingLeft: boolean = false;
@@ -58,7 +64,7 @@ export default class PlayheadController {
     this._view.track.on("pointerup", (e) => {
       this.handlePointerUp(e);
     });
-    this._view.track.on("pointerupoutside", (e) => {
+    this._view.track.on("pointerupoutside", (e) => {      
       this.handlePointerUp(e);
     });
     this._view.track.on("pointerdown", (e) => {
@@ -269,6 +275,7 @@ export default class PlayheadController {
    * @param e - Event fired by PIXI.JS that contains all the information needed to handle the event
    */
   private handlePointerDown(e: FederatedPointerEvent) {
+    this._pointerIsDown = true;
     this.viewportAnimationLoopId = requestAnimationFrame(
       this.viewportAnimationLoop.bind(this)
     );
@@ -276,14 +283,13 @@ export default class PlayheadController {
     let pos = e.data.global.x + this._app.editorView.viewport.left;
     // adjust pos if grid snapping is enabled and if not scrolling
     pos = this.adjustPosIfSnapping(pos);
-
+  
     this._app.hostController.pauseTimerInterval();
     this._movingPlayhead = true;
     this._view.moveTo(pos);
 
      // update timer display
      this._app.hostView.updateTimer(this._app.host.playhead)
-
   }
 
   /**
@@ -293,18 +299,27 @@ export default class PlayheadController {
    * @param e - Event fired by PIXI.JS that contains all the information needed to handle the event
    */
   private handlePointerUp(e: FederatedPointerEvent) {
-    // stop viewport animation
-    cancelAnimationFrame(this.viewportAnimationLoopId);
-    this.scrollingLeft = false;
-    this.scrollingRight = false;
+    if (this._pointerIsDown) {
 
-    let pos = e.data.global.x + this._app.editorView.viewport.left;
-    if (pos < 0) pos = 0;
-    this._app.tracksController.jumpTo(pos);
-    this._movingPlayhead = false;
-    this._app.hostController.resumeTimerInterval();
-    if (this._app.host.playing) {
-      this._app.automationController.applyAllAutomations();
+      // stop viewport animation
+      cancelAnimationFrame(this.viewportAnimationLoopId);
+      this.scrollingLeft = false;
+      this.scrollingRight = false;
+  
+      let pos = e.data.global.x + this._app.editorView.viewport.left;
+      if (pos < 0){
+        pos = 0;
+        console.log("pos", pos);
+      }
+      
+  
+      this._app.tracksController.jumpTo(pos);
+      this._movingPlayhead = false;
+      this._app.hostController.resumeTimerInterval();
+      if (this._app.host.playing) {
+        this._app.automationController.applyAllAutomations();
+      }
+      this._pointerIsDown = false;
     }
 
 

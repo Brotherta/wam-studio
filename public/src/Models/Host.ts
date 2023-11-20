@@ -5,7 +5,7 @@ import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import Track from "./Track";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "./Plugin";
-import {BACKEND_URL} from "../Env";
+import {BACKEND_URL, MAX_DURATION_SEC} from "../Env";
 
 /**
  * Host class that contains the master track.
@@ -85,7 +85,7 @@ export default class Host extends Track {
         const [hostGroupId] = await initializeWamHost(audioCtx);
         this.hostGroupId = hostGroupId;
 
-        let audio = audioCtx.createBuffer(2, 3600 * audioCtx.sampleRate, audioCtx.sampleRate)
+        let audio = audioCtx.createBuffer(2, MAX_DURATION_SEC * audioCtx.sampleRate, audioCtx.sampleRate)
         const operableAudioBuffer = Object.setPrototypeOf(audio, OperableAudioBuffer.prototype) as OperableAudioBuffer;
         
         this.hostNode = new AudioPlayerNode(audioCtx, 2);
