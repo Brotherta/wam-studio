@@ -203,7 +203,7 @@ export default class RegionsController {
     for (let track of this._app.tracksController.trackList) {
       for (let region of track.regions) {
         console.log(region);
-        
+
         let end = region.start / 1000 + region.duration;
         if (end > maxTime) {
           maxTime = end;
@@ -211,7 +211,7 @@ export default class RegionsController {
       }
     }
     console.log(maxTime);
-    
+
     return maxTime;
   }
 
@@ -250,7 +250,7 @@ export default class RegionsController {
 
     document.addEventListener("keydown", (e) => {
       // If the user is typing in an input, we don't want to trigger the keyboard shortcuts
-      if(e.target != document.body) return;
+      if (e.target != document.body) return;
 
       // On escape key pressed, deselect the selected waveform.
       if (e.key === "Escape") {
@@ -371,8 +371,6 @@ export default class RegionsController {
     )
       return;
 
-      
-
     let waveform = this._selectedRegionView.parent as WaveformView;
     let track = this._app.tracksController.getTrackById(
       this._selectedRegion.trackId
@@ -394,8 +392,6 @@ export default class RegionsController {
 
     track.modified = true;
     track.updateBuffer(audioCtx, this._app.host.playhead);
-
-   
   }
 
   private cutSelectedRegion() {
@@ -610,6 +606,15 @@ export default class RegionsController {
     let newX = x - this._offsetX;
     newX = Math.max(0, Math.min(newX, this._editorView.worldWidth));
 
+    // If reaching end of world, do nothing
+    const regionEndPos =
+      newX + this._selectedRegionView.width;
+
+    if ((regionEndPos >= this._editorView.worldWidth)  || newX <= 0){
+      return;
+    }
+
+    // check if snapping is needed
     if (
       this._editorView.snapping &&
       !this.snappingDisabled &&
@@ -653,14 +658,15 @@ export default class RegionsController {
     this._selectedRegion.start = newX * RATIO_MILLS_BY_PX;
     //console.log("Region Moved, new start (ms): " + this._selectedRegion.start);
 
-    this.checkIfScrollingNeeded();
+    this.checkIfScrollingNeeded(e.data.global.x);
   }
 
   /**
    * Check if scrolling is needed when moving a region.
    * @private
    */
-  checkIfScrollingNeeded() {
+  checkIfScrollingNeeded(mousePosX: number) {
+    console.log("mousePosX = " + mousePosX);
     if (!this._selectedRegionView || !this._selectedRegion || !this._offsetX)
       return;
     // scroll viewport if the right end of the moving  region is close
@@ -679,15 +685,24 @@ export default class RegionsController {
 
     const regionEndPos =
       this._selectedRegion.pos + this._selectedRegionView.width;
+
+    //if (regionEndPos >= this._editorView.viewport.right) return;
+
     const regionStartPos = this._selectedRegion.pos;
     let viewport = this._editorView.viewport;
     const viewportWidth = viewport.right - viewport.left;
 
     const distanceToRightEdge = viewportWidth - (regionEndPos - viewport.left);
+
+    /*
     this.scrollingRight =
       !this.selectedRegionEndOutsideViewport &&
       regionEndPos - viewport.left >= viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH;
-    if (this.scrollingRight) {
+*/
+      this.scrollingRight =
+      mousePosX >= (viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH);
+
+    if (this.scrollingRight && regionEndPos <= this._editorView.worldWidth) {
       // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
       // to the right between 1 and 10
       this.incrementScrollSpeed = this.map(
@@ -703,10 +718,14 @@ export default class RegionsController {
     const distanceToLeftEdge = viewport.left - regionStartPos;
     //console.log("distanceToLeftEdge = " + distanceToLeftEdge);
 
-    this.scrollingLeft =
+    /*this.scrollingLeft =
       !this.selectedRegionStartOutsideViewport &&
       regionStartPos < viewport.left + SCROLL_TRIGGER_ZONE_WIDTH &&
       viewport.left > 0;
+      */
+
+      this.scrollingLeft = (mousePosX <= SCROLL_TRIGGER_ZONE_WIDTH && regionStartPos > 0);
+
     if (this.scrollingLeft) {
       // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
       // to the right between 1 and 10
