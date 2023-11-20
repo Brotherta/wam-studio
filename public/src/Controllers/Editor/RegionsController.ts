@@ -442,6 +442,16 @@ export default class RegionsController {
 
     const trackId = track!.id;
     const startInMs = (this._app.host.playhead / audioCtx.sampleRate) * 1000;
+
+    // if startInMs + region width > worldWidth do nothing
+    // (region will be outside viewport)
+    const rWidth = (this.clipBoardRegion.duration * 1000) / RATIO_MILLS_BY_PX;
+    // pos of playhead in pixels
+    const playheadPos = this._app.editorView.playhead.position.x;
+
+    const regionEndPos =  playheadPos + rWidth;
+    if (regionEndPos >= this._editorView.worldWidth) return;
+
     const id = this.clipBoardRegion.id;
 
     // make a new region from the clipboard region
