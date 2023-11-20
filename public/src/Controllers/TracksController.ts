@@ -158,7 +158,7 @@ export default class TracksController {
      * @param pos - The position in px
      */
     public jumpTo(pos: number): void {
-        this._app.host.playhead = (pos * RATIO_MILLS_BY_PX) /1000 * audioCtx.sampleRate
+        this._app.host.playhead = Math.floor((pos * RATIO_MILLS_BY_PX) /1000 * audioCtx.sampleRate)
         this.trackList.forEach((track) => {
             track.node!.port.postMessage({playhead: this._app.host.playhead+1})
         });

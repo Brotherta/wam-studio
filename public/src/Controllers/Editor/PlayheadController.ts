@@ -124,7 +124,7 @@ export default class PlayheadController {
       pos = Math.round(pos / cellSize) * cellSize;
       // adjust playhead value according to pos
       this._app.host.playhead =
-        (pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000;
+        Math.floor((pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000);
     }
     return pos;
   }
@@ -218,9 +218,9 @@ export default class PlayheadController {
       this._view.position.x += viewScrollSpeed;
 
       // update also the playhead value (in samples)
-      this._app.host.playhead =
+      this._app.host.playhead = Math.floor(
         (this._view.position.x * RATIO_MILLS_BY_PX * audioCtx.sampleRate) /
-        1000;
+        1000);
 
       // adjust horizontal scrollbar so that it corresponds to the current viewport position
       // scrollbar pos depends on the left position of the viewport.
@@ -256,8 +256,8 @@ export default class PlayheadController {
       this._view.moveTo(pos);
       this._app.hostView.updateTimerByPixelsPos(pos);
       // MB !
-      this._app.host.playhead =
-        (pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000;
+      this._app.host.playhead = Math.floor(
+        (pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000);
       //console.log("global pointermove playhead = " + this._app.host.playhead + " pos = " + pos)
       this.checkIfScrollingNeeded(pos);
     }

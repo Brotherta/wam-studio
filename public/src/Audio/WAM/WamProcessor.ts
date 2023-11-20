@@ -118,7 +118,8 @@ const getProcessor = (moduleId: string) => {
           const audioLength: number = this.audio[0].length;
 
           //if (this.playhead >= audioLength || (loop && this.playhead > this.loopEnd)) { // Play was finished
-          if (loop && this.playhead >= this.loopEnd) {
+          if (loop && this.playhead === this.loopEnd) {
+            
             // Play was finished
             if (loop)
               this.playhead =
