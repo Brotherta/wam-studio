@@ -510,6 +510,11 @@ export default class TrackElement extends HTMLElement {
         this.isArmed = false;
     }
 
+    setArm(arm:boolean) {
+        if(arm) this.arm()
+        else this.unArm();
+    }
+
     monitorOn() {
         this.monitoringBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
         this.isMonitoring = true;
@@ -518,6 +523,11 @@ export default class TrackElement extends HTMLElement {
     monitorOff() {
         this.monitoringBtn.style.filter = "none";
         this.isMonitoring = false;
+    }
+
+    setMonitoring(monitoring:boolean) {
+        if(monitoring) this.monitorOn()
+        else this.monitorOff();
     }
 
     setMono() {
@@ -534,16 +544,45 @@ export default class TrackElement extends HTMLElement {
         this.rightBtn.hidden = true;
     }
 
+    setMode(stereoMode:boolean) {
+        if(stereoMode) this.setStereo();
+        else this.setMono();
+    }
+
     clickMerge() {
         this.mergeBtn.classList.toggle("active");
+    }
+
+    setMerge(merge:boolean) {
+        if(merge) {
+            this.mergeBtn.classList.add("active");
+        } else {
+            this.mergeBtn.classList.remove("active");
+        }
     }
 
     clickLeft() {
         this.leftBtn.classList.toggle("active");
     }
 
+    setLeft(left:boolean) {
+        if(left) {
+            this.leftBtn.classList.add("active");
+        } else {
+            this.leftBtn.classList.remove("active");
+        }
+    }
+
     clickRight() {
         this.rightBtn.classList.toggle("active");
+    }
+
+    setRight(right:boolean) {
+        if(right) {
+            this.rightBtn.classList.add("active");
+        } else {
+            this.rightBtn.classList.remove("active");
+        }
     }
 
     get closeBtn() {

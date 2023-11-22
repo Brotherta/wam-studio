@@ -221,6 +221,12 @@ export default class EditorView extends Application {
         return wave;
     }
 
+    public addWaveformView(waveformView: WaveformView) {
+        this.waveforms.push(waveformView);
+        this.resizeCanvas();
+        this.grid.resize();
+    }
+
     /**
      * Remove the waveform from the canvas for the given track and update the position of the other waveforms.
      * @param track - The track that contain the waveform to delete.
@@ -236,6 +242,7 @@ export default class EditorView extends Application {
         }
         this.resizeCanvas();
     }
+
 
     public getWaveformAtPos(y: number): WaveformView | undefined {
         let globalY = this.viewport.top + y;
