@@ -468,6 +468,11 @@ export default class TrackElement extends HTMLElement {
         this.isMuted = false;
     }
 
+    setMute(mute:boolean) {
+        if(mute) this.mute()
+        else this.unmute();
+    }
+
     solo() {
         this.soloBtn.style.color = "lightgreen";
         this.isSolo = true;
@@ -475,6 +480,11 @@ export default class TrackElement extends HTMLElement {
     unsolo() {
         this.soloBtn.style.color = "lightgrey";
         this.isSolo = false;
+    }
+
+    setSolo(solo:boolean) {
+        if(solo) this.solo()
+        else this.unsolo();
     }
 
     setName(arg0: string) {

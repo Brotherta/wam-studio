@@ -130,7 +130,7 @@ export default class PlayheadController {
       pos = Math.round(pos / cellSize) * cellSize;
       // adjust playhead value according to pos
       this._app.host.playhead =
-        Math.floor((pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000);
+        Math.round((pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000);
     }
     return pos;
   }
@@ -224,7 +224,7 @@ export default class PlayheadController {
       this._view.position.x += viewScrollSpeed;
 
       // update also the playhead value (in samples)
-      this._app.host.playhead = Math.floor(
+      this._app.host.playhead = Math.round(
         (this._view.position.x * RATIO_MILLS_BY_PX * audioCtx.sampleRate) /
         1000);
 
@@ -261,9 +261,7 @@ export default class PlayheadController {
       if (pos < 0) pos = 0;
       this._view.moveTo(pos);
       this._app.hostView.updateTimerByPixelsPos(pos);
-      // MB !
-      this._app.host.playhead = Math.floor(
-        (pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000);
+      
       //console.log("global pointermove playhead = " + this._app.host.playhead + " pos = " + pos)
       this.checkIfScrollingNeeded(pos);
     }

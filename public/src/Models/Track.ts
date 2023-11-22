@@ -153,7 +153,7 @@ export default class Track {
     this.regions = [];
     this.url = "";
 
-    // Defalut Controls
+    // Default Controls
     this.volume = 0.5;
     this.oldVolume = 0.5;
     this.muted = false;
@@ -210,6 +210,8 @@ export default class Track {
   public setVolume(value: number): void {
     this.volume = value;
     this.gainNode.gain.value = this.volume;
+
+    
   }
 
   /**
@@ -240,6 +242,10 @@ export default class Track {
    */
   public setBalance(value: number): void {
     this.pannerNode.pan.value = value;
+  }
+
+  public getBalance():number {
+    return this.pannerNode.pan.value;
   }
 
   /**

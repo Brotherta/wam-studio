@@ -262,7 +262,7 @@ export default class RegionsController {
         (e.key === "Delete" || e.key === "Backspace") &&
         this._selectedRegionView !== undefined
       ) {
-        this.deleteSelectedRegion();
+        this.deleteSelectedRegion(true);
       }
 
       // for "disabling temporarily the grid snapping if shift is pressed"
@@ -363,7 +363,7 @@ export default class RegionsController {
    *
    * @private
    */
-  private deleteSelectedRegion(): void {
+  private deleteSelectedRegion(undoable:boolean): void {
     if (
       !this._selectedRegionView ||
       !this._selectedRegion ||
@@ -377,12 +377,14 @@ export default class RegionsController {
     );
     if (track === undefined) throw new Error("Track not found");
 
-    // for undo/redo
-    this.addLastDeleteToUndoManager(
-      this._selectedRegion!,
-      this._selectedRegionView!,
-      track
-    );
+    if (undoable) {
+      // for undo/redo
+      this.addLastDeleteToUndoManager(
+        this._selectedRegion!,
+        this._selectedRegionView!,
+        track
+      );
+    }
 
     track.removeRegionById(this._selectedRegion.id);
     waveform.removeRegionView(this._selectedRegionView);
@@ -406,7 +408,7 @@ export default class RegionsController {
 
     // do the cut
     this.copySelectedRegion();
-    this.deleteSelectedRegion();
+    this.deleteSelectedRegion(true);
   }
 
   private copySelectedRegion() {
@@ -449,7 +451,7 @@ export default class RegionsController {
     // pos of playhead in pixels
     const playheadPos = this._app.editorView.playhead.position.x;
 
-    const regionEndPos =  playheadPos + rWidth;
+    const regionEndPos = playheadPos + rWidth;
     if (regionEndPos >= this._editorView.worldWidth) return;
 
     const id = this.clipBoardRegion.id;
@@ -499,12 +501,17 @@ export default class RegionsController {
     // if playhead not "on" the selected region, do nothing
     if (!this.isPlayheadOnSelectedRegion()) return;
 
-    // get the split point (corresponding to the playhead position) in samples
-    const startOfSelectedRegionInMs = this._selectedRegion.start;
-    // same in samples
-    const startOfSelectedRegionInSamples =
-      (startOfSelectedRegionInMs / 1000) * audioCtx.sampleRate;
-    const splitPoint = this._app.host.playhead - startOfSelectedRegionInSamples;
+    // Store orignal region and original region view
+    let originalRegion = this._selectedRegion;
+    let originalRegionView = this._selectedRegionView;
+
+    // select nb pixels from start of region to playhead
+    const playHeadPosX = this._app.editorView.playhead.position.x;
+    const startOfRegionX = this._selectedRegionView?.position.x;
+    const nbPixels = playHeadPosX - startOfRegionX!;
+
+    // convert it in samples
+    const splitPoint = Math.round((nbPixels * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000);
 
     // get the buffer from the selected region
     const buffer: OperableAudioBuffer = this._selectedRegion.buffer;
@@ -541,7 +548,7 @@ export default class RegionsController {
     );
 
     // delete original region
-    this.deleteSelectedRegion();
+    this.deleteSelectedRegion(false);
     // update track
     let track = this._app.tracksController.getTrackById(trackId);
     //track!.modified = true;
@@ -578,6 +585,20 @@ export default class RegionsController {
     // update the track buffer, as the regions have been modified
     track!.modified = true;
     track?.updateBuffer(audioCtx, this._app.host.playhead);
+
+    // for undo/redo
+    
+    
+    this.addSplitToUndoManager(
+      originalRegion,
+      originalRegionView!,
+      leftRegion,
+      leftRegionView,
+      rightRegion,
+      rightRegionView,
+      track!,
+    );
+    
   }
 
   isPlayheadOnSelectedRegion() {
@@ -617,10 +638,9 @@ export default class RegionsController {
     newX = Math.max(0, Math.min(newX, this._editorView.worldWidth));
 
     // If reaching end of world, do nothing
-    const regionEndPos =
-      newX + this._selectedRegionView.width;
+    const regionEndPos = newX + this._selectedRegionView.width;
 
-    if ((regionEndPos >= this._editorView.worldWidth)  || newX <= 0){
+    if (regionEndPos >= this._editorView.worldWidth || newX <= 0) {
       return;
     }
 
@@ -709,8 +729,8 @@ export default class RegionsController {
       !this.selectedRegionEndOutsideViewport &&
       regionEndPos - viewport.left >= viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH;
 */
-      this.scrollingRight =
-      mousePosX >= (viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH);
+    this.scrollingRight =
+      mousePosX >= viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH;
 
     if (this.scrollingRight && regionEndPos <= this._editorView.worldWidth) {
       // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
@@ -734,7 +754,8 @@ export default class RegionsController {
       viewport.left > 0;
       */
 
-      this.scrollingLeft = (mousePosX <= SCROLL_TRIGGER_ZONE_WIDTH && regionStartPos > 0);
+    this.scrollingLeft =
+      mousePosX <= SCROLL_TRIGGER_ZONE_WIDTH && regionStartPos > 0;
 
     if (this.scrollingLeft) {
       // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
@@ -779,8 +800,8 @@ export default class RegionsController {
 
       viewport.left += viewScrollSpeed;
       // move also region and region view
-      if(this._selectedRegionView.position.x + viewScrollSpeed < 0) return;
-      
+      if (this._selectedRegionView.position.x + viewScrollSpeed < 0) return;
+
       this._selectedRegionView.position.x += viewScrollSpeed;
       this._selectedRegion.pos += viewScrollSpeed;
       // adjust region start
@@ -1020,6 +1041,7 @@ export default class RegionsController {
         this.redoCutRegion(region, regionView, track);
       },
     });
+    this.updateUndoButtons();
   }
 
   undoCutRegion() {
@@ -1086,6 +1108,7 @@ export default class RegionsController {
         this.redoCutRegion(region, regionView, track);
       },
     });
+    this.updateUndoButtons();
   }
 
   /* ---- REGION SELECT (needed ?)--- */
@@ -1107,7 +1130,108 @@ export default class RegionsController {
         this.undoCutRegion();
       },
     });
+    this.updateUndoButtons();
   }
   /* ---- REGION COPY (needed ?) ---- */
   /* ---- REGION SPLIT -------------- */
+  addSplitToUndoManager(
+    originalRegion:Region,
+    originalRegionView:RegionView,
+    regionleft: Region,
+    regionleftView: RegionView,
+    regionright: Region,
+    regionrightView: RegionView,
+    track: Track
+  ) {
+   
+    this._app.undoManager.add({
+      undo: () => {
+        this.undoSplitRegion(originalRegion,
+          originalRegionView,
+          regionleft,
+          regionleftView,
+          regionright,
+          regionrightView,
+          track);
+      },
+      redo: () => {
+        this.redoSplitRegion(originalRegion,
+          originalRegionView,
+          regionleft,
+          regionleftView,
+          regionright,
+          regionrightView,
+          track);
+      },
+    });
+    this.updateUndoButtons();
+  }
+
+  undoSplitRegion(originalRegion:Region,
+    originalRegionView:RegionView,
+    regionleft: Region,
+    regionleftView: RegionView,
+    regionright: Region,
+    regionrightView: RegionView,
+    track: Track) {
+    
+    const trackId = track!.id;
+
+    // let's remove the left and right regions + region views and put back the previous region
+    // regions
+    // remove regions from track
+    track.removeRegionById(regionleft.id);
+    track.removeRegionById(regionright.id);
+    
+    // remove region views
+    let waveformView = this._editorView.getWaveFormViewById(trackId);
+    waveformView!.removeRegionView(regionrightView);
+    waveformView!.removeRegionView(regionleftView);
+
+    // put back old region
+    //let newRegionView = waveformView!.createRegionView(regionleft);
+    waveformView!.addRegionView(originalRegionView);
+
+    // bind events to the new region view
+    this._app.regionsController.bindRegionEvents(originalRegion, originalRegionView);
+
+    // Update the selected track, add the region to the track
+    track!.modified = true;
+    track!.addRegion(originalRegion);
+    track.updateBuffer(audioCtx, this._app.host.playhead);
+    originalRegionView.deselect();
+  }
+
+  redoSplitRegion(originalRegion:Region,
+    originalRegionView:RegionView,
+    regionleft: Region,
+    regionleftView: RegionView,
+    regionright: Region,
+    regionrightView: RegionView,
+    track: Track) {
+
+    // remove the original region and region view, and add the left and right regions/regionViews
+    const trackId = track!.id;
+
+    // let's remove the left and right regions + region views and put back the previous region
+    // regions
+    // remove region from track
+    track.removeRegionById(originalRegion.id);
+    // remove region views
+    let waveformView = this._editorView.getWaveFormViewById(trackId);
+    waveformView!.removeRegionView(originalRegionView);
+
+    // add left and right regions to the track
+    waveformView!.addRegionView(regionleftView);
+    waveformView!.addRegionView(regionrightView);
+    // bind events to the new region view * CHECK IF THIS IS NECESSARY */
+    this._app.regionsController.bindRegionEvents(regionleft, regionleftView);
+    this._app.regionsController.bindRegionEvents(regionright, regionrightView);
+
+    // add left and right region to track
+    track!.modified = true;
+    track!.addRegion(regionleft);
+    track!.addRegion(regionright);
+    track.updateBuffer(audioCtx, this._app.host.playhead);
+  }
 }
