@@ -271,8 +271,7 @@ export default class TracksController {
           this.removeTrack(oldTrack);
         },
       });
-
-      //
+      this.updateUndoButtons();
     });
 
     // SOLO TRACK
