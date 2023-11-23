@@ -167,16 +167,27 @@ export default class TracksController {
     }
   }
 
-  public async newTrackFromDeletedTrack(deletedTrack:Track) {
+  public async newTrackFromDeletedTrack(deletedTrack: Track) {
     let wamInstance = await WamEventDestination.createInstance(
-        this._app.host.hostGroupId,
-        audioCtx
-      );
-      let node = wamInstance.audioNode as WamAudioWorkletNode;
-      let track = this.createTrack(node);
-      track.setAudioBuffer(deletedTrack.audioBuffer!);
-      track.element.name = deletedTrack.element.name;
-      return track;
+      this._app.host.hostGroupId,
+      audioCtx
+    );
+    let node = wamInstance.audioNode as WamAudioWorkletNode;
+    let track = this.createTrack(node);
+    //track.setAudioBuffer(deletedTrack.audioBuffer!);
+    track.element = deletedTrack.element;
+    track.color = deletedTrack.color;
+    track.mute = deletedTrack.mute;
+    track.solo = deletedTrack.solo;
+    track.merge = deletedTrack.merge;
+    track.left = deletedTrack.left;
+    track.right = deletedTrack.right;
+    track.stereo = deletedTrack.stereo;
+    track.armed = deletedTrack.armed;
+    track.monitored = deletedTrack.monitored;
+    track.setVolume(deletedTrack.volume);
+    track.setBalance(deletedTrack.getBalance());
+    return track;
   }
   /**
    * Jumps audio to the given position in px.
@@ -241,28 +252,27 @@ export default class TracksController {
 
     // REMOVE TRACK
     track.element.closeBtn.addEventListener("click", () => {
-        // for undo/redo
-        // make a copy of the track
-        let oldTrack = track;
-        let oldWaveform = this._app.editorView.getWaveformById(oldTrack.id);
-        let oldTrackElement = track.element.cloneNode(true) as TrackElement;
+      // for undo/redo
+      // make a copy of the track
+      let oldTrack = track;
+      let oldWaveform = this._app.editorView.getWaveformById(oldTrack.id);
+      let oldTrackElement = track.element;
 
       // Remove the track when the close button is clicked.
       this.removeTrack(track);
 
-      /*
-        // for undo/redo
-        this._app.undoManager.add({
-            undo: () => {
-                this.undoTrackRemove(oldTrack, oldTrackElement, oldWaveform);
-            },
-            redo: () => {
-                // remove the track again
-                this.removeTrack(oldTrack);
-            },
-            });
-            */
-           //
+      // for undo/redo
+      this._app.undoManager.add({
+        undo: () => {
+          this.undoTrackRemove(oldTrack, oldTrackElement, oldWaveform);
+        },
+        redo: () => {
+          // remove the track again
+          this.removeTrack(oldTrack);
+        },
+      });
+
+      //
     });
 
     // SOLO TRACK
@@ -771,31 +781,48 @@ export default class TracksController {
     this._app.pluginsController.fxButtonClicked(track);
   }
 
-  undoSelect(track:Track, trackToSelect: Track | undefined) {
-    if(trackToSelect) {
+  undoSelect(track: Track, trackToSelect: Track | undefined) {
+    if (trackToSelect) {
       this._app.pluginsController.selectTrack(trackToSelect);
     }
   }
 
-  async undoTrackRemove(oldTrack: Track, element:TrackElement, oldTrackWaveform: WaveformView | undefined) {
-    // create a new track using oldTrack node
-    let track = await this.newTrackFromDeletedTrack(oldTrack);
-    this._app.tracksController.initializeTrack(track);
-    track.element.progressDone();
+  async undoTrackRemove(
+    oldTrack: Track,
+    element: TrackElement,
+    oldTrackWaveform: WaveformView | undefined
+  ) {
+    
+    // restore track element with old track element state
+    this._app.tracksController.newEmptyTrack().then((track) => {
+        this.initializeTrack(track);
+        let elementState = element.getState();
+        track.element.setState(elementState);
+        // to show the hidden buttons...
+        track.element.progressDone();
+      });
+      
+    // Create new track with old track state
+    let newTrack = await this._app.tracksController.newTrackFromDeletedTrack(oldTrack);
+    // add regions from old track to new track
+    // add regions to waveform
 
-    // add the track back
-    this.trackList.push(track);
-    // add track header element to the view
+    let waveformView = this._app.editorView.getWaveFormViewById(newTrack.id);
+      oldTrack.regions.forEach(region => {
+        newTrack.regions.push(region);
+        waveformView!.createRegionView(region);
+      })
+    
+    newTrack.modified = true;
+    newTrack.updateBuffer(audioCtx, this._app.host.playhead);
 
-    this._app.pluginsController.selectTrack(track);
-
-
-    // add waveform to the editor view
-    this._app.editorView.addWaveformView(oldTrackWaveform!);
-
-    // re render track
-    track.modified = true;
-    track.updateBuffer(audioCtx, this._app.host.playhead);
-
+    return;
+    oldTrack.deleted = false;
+    this.bindTrackEvents(oldTrack);
+    this._app.recorderController.clickMode(oldTrack);
+    this._app.pluginsController.selectTrack(oldTrack);
+    // update buffers
+    oldTrack.modified = true;
+    //oldTrack.updateBuffer()
   }
 }

@@ -323,11 +323,63 @@ export default class TrackElement extends HTMLElement {
     isMonitoring: boolean = false;
     isLoading: boolean = false;
     vuMeterDiv: HTMLDivElement;
+    stereo: boolean = true;
+    left: boolean = true;
+    right: boolean = false;
+    merge: boolean = true;
 
     constructor() {
         super();
         this.attachShadow({mode: "open"});
         this.name = "";
+    }
+
+    getState() {
+        return {
+            name: this.trackNameInput.value,
+            volume: this.volumeSlider.value,
+            balance : this.balanceSlider.value,
+            isSolo: this.isSolo,
+            isMuted: this.isMuted,
+            isArmed: this.isArmed,
+            isMonitoring: this.isMonitoring,
+            isLoading: this.isLoading,
+            stereo : this.modeBtn.innerText === "stereo",
+            left : this.leftBtn.classList.contains("active"),
+            right : this.rightBtn.classList.contains("active"),
+            merge : this.mergeBtn.classList.contains("active"),
+            color : this.color.style.background
+        }
+    }
+
+    setState(state:any) {
+        this.name = state.name;
+        this.volumeSlider.value = state.volume;
+        this.balanceSlider.value = state.balance;
+        this.isArmed = state.isArmed;
+        this.isSolo = state.isSolo;
+        this.isMuted = state.isMuted;
+        this.isMonitoring = state.isMonitoring;
+        this.isArmed = state.isArmed;
+        this.stereo = state.stereo;
+        this.left = state.left;
+        this.right = state.right;
+        this.merge = state.merge;
+        this.color.style.background = state.color;
+        this.update();
+    }
+
+    // update element GUI from current properties values
+    update() {
+        this.trackNameInput.value = this.name;
+        this.setArm(this.isArmed);
+        this.setSolo(this.isSolo);
+        this.setMute(this.isMuted);
+        this.setMonitoring(this.isMonitoring);
+        this.setMode(this.stereo);
+        this.setLeft(this.left);
+        this.setRight(this.right);
+        this.setMerge(this.merge);
     }
 
     connectedCallback() {

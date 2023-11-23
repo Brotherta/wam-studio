@@ -2,6 +2,7 @@ import App from "../../App";
 import EditorView from "../../Views/Editor/EditorView";
 import Track from "../../Models/Track";
 import WaveformView from "../../Views/Editor/WaveformView";
+import Region from "../../Models/Region";
 
 /**
  * Class that control the waveforms of the editor.
@@ -31,6 +32,16 @@ export default class WaveformController {
         if (track.audioBuffer !== undefined) {
             this._app.regionsController.createRegion(track, track.audioBuffer, 0, waveformView);
         }
+    }
+
+    public recreateRegionsAndRegionViews(track: Track, regions: Region[]): WaveformView {
+        let waveformView = this._editorView.createWaveformView(track);
+        // for all regions in the oldTrack, create a region view in the waveform of newTrack
+        for (let region of regions) {
+            this._app.regionsController.createRegion(track, region.buffer, region.start, waveformView);
+        }
+        // return the waveformView
+        return waveformView;
     }
 
     /**
