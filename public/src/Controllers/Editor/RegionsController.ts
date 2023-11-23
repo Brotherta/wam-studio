@@ -220,9 +220,8 @@ export default class RegionsController {
    *
    * @param region - The data object of the region.
    * @param regionView - The view representing the region.
-   * @private
    */
-  private bindRegionEvents(region: Region, regionView: RegionView): void {
+   bindRegionEvents(region: Region, regionView: RegionView): void {
     regionView.on("pointerdown", (_e) => {
       this.handlePointerDown(regionView);
       this._offsetX = _e.data.global.x - regionView.position.x;

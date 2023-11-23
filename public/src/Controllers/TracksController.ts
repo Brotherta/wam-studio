@@ -257,6 +257,7 @@ export default class TracksController {
       let oldTrack = track;
       let oldWaveform = this._app.editorView.getWaveformById(oldTrack.id);
       let oldTrackElement = track.element;
+      let oldPlugin = track.plugin;
 
       // Remove the track when the close button is clicked.
       this.removeTrack(track);
@@ -264,7 +265,7 @@ export default class TracksController {
       // for undo/redo
       this._app.undoManager.add({
         undo: () => {
-          this.undoTrackRemove(oldTrack, oldTrackElement, oldWaveform);
+          this.undoTrackRemove(oldTrack, oldTrackElement, oldWaveform, oldPlugin);
         },
         redo: () => {
           // remove the track again
@@ -789,7 +790,8 @@ export default class TracksController {
   async undoTrackRemove(
     oldTrack: Track,
     element: TrackElement,
-    oldTrackWaveform: WaveformView | undefined
+    oldTrackWaveform: WaveformView | undefined,
+    oldPlugin: Plugin
   ) {
     
     // restore track element with old track element state
@@ -799,22 +801,37 @@ export default class TracksController {
         track.element.setState(elementState);
         // to show the hidden buttons...
         track.element.progressDone();
+
+        track.color = oldTrack.color;
+        // get regionView of track
+        let waveformView = this._app.editorView.getWaveformById(track.id);
+        if(waveformView) waveformView.color = oldTrack.color;
+    
+        // restore waveformView with old waveformView state
+        
+        oldTrack.regions.forEach(region => {
+            region.trackId = track.id;
+            track.regions.push(region);
+            const regionView = waveformView!.createRegionView(region);
+            this._app.regionsController.bindRegionEvents(region, regionView);
+
+          });
+
+          // restore plugin controller  with old plugin controller state
+          // connect oldPlugin to the track and audio graph
+          // TODO
+
+          track.plugin = oldPlugin;
+          track.plugin.initialized = true;
+          // reconnect it to the track
+          this._app.pluginsController.connectPedalBoard(track);
+
+          this._app.pluginsController.selectTrack(track);
+
+          track.modified = true;
+          track.updateBuffer(audioCtx, this._app.host.playhead);
       });
       
-    // Create new track with old track state
-    let newTrack = await this._app.tracksController.newTrackFromDeletedTrack(oldTrack);
-    // add regions from old track to new track
-    // add regions to waveform
-
-    let waveformView = this._app.editorView.getWaveFormViewById(newTrack.id);
-      oldTrack.regions.forEach(region => {
-        newTrack.regions.push(region);
-        waveformView!.createRegionView(region);
-      })
-    
-    newTrack.modified = true;
-    newTrack.updateBuffer(audioCtx, this._app.host.playhead);
-
     return;
     oldTrack.deleted = false;
     this.bindTrackEvents(oldTrack);
