@@ -1,0 +1,11 @@
+{
+    "name": "Comb Filter",
+    "vendor": "Wimmics",
+    "description": "Feed-Back Comb Filter (integer delay)",
+    "version": "1.0.0",
+    "apiVersion": "1.0.0",
+    "thumbnail": "default.png",
+    "keywords": ["filter"],
+    "isInstrument": false,
+    "website": ""
+}

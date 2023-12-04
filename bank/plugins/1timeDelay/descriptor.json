@@ -1,0 +1,11 @@
+{
+    "name": "1 time delay",
+    "vendor": "Wimmics/Michel Buffa",
+    "description": "A 1 time delay plugin (!)",
+    "version": "1.0.0",
+    "apiVersion": "1.0.0",
+    "thumbnail": "default.png",
+    "keywords": ["Delay"],
+    "isInstrument": false,
+    "website": ""
+}
