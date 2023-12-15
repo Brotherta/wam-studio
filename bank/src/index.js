@@ -7,14 +7,19 @@ const utils = require('./utils');
 const projectsRoutes = require('./routes/projects.routes');
 const authRoutes = require('./routes/auth.routes');
 const pluginsRoutes = require('./routes/plugins.routes');
+const audioloopsroute = require('./routes/audioloops.routes');
+
 const path = require("path");
 
 const app = express();
 app.use(express.json());
 app.use(cors(config.corsOptions));
 app.use(cookieParser());
-app.use((req, res, next) => {
-    res.header("Cross-Origin-Resource-Policy", "cross-origin");
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE");
+
     next();
 });
 
@@ -25,6 +30,7 @@ utils.createFiles();
 app.use(projectsRoutes);
 app.use(authRoutes);
 app.use(pluginsRoutes);
+app.use(audioloopsroute);
 
 app.use("/", express.static(path.join(__dirname, "../PedalBoard")));
 app.use("/plugins", express.static(path.join(__dirname, "../plugins")));
