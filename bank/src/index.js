@@ -32,8 +32,8 @@ app.use(authRoutes);
 app.use(pluginsRoutes);
 app.use(audioloopsroute);
 
-app.use("/", express.static(path.join(__dirname, "../PedalBoard")));
-app.use("/plugins", express.static(path.join(__dirname, "../plugins")));
+app.use("/", cors(), express.static(path.join(__dirname, "../PedalBoard")));
+app.use("/plugins", cors(), express.static(path.join(__dirname, "../plugins")));
 app.use("/songs", express.static(path.join(__dirname, "../songs")));
 app.use("/loops", express.static(path.join(__dirname, "../loops")));
 
