@@ -262,6 +262,7 @@ export default class TracksController {
       // Remove the track when the close button is clicked.
       this.removeTrack(track);
 
+      /*
       // for undo/redo
       this._app.undoManager.add({
         undo: () => {
@@ -273,6 +274,8 @@ export default class TracksController {
         },
       });
       this.updateUndoButtons();
+
+      */
     });
 
     // SOLO TRACK
