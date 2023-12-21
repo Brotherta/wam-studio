@@ -13,7 +13,7 @@ const path = require("path");
 
 const app = express();
 app.use(express.json());
-app.use(cors(config.corsOptions));
+app.use(cors());
 app.use(cookieParser());
 
 
@@ -26,8 +26,8 @@ app.use(authRoutes);
 app.use(pluginsRoutes);
 app.use(audioloopsroute);
 
-app.use("/", cors(), express.static(path.join(__dirname, "../PedalBoard")));
-app.use("/plugins", cors(), express.static(path.join(__dirname, "../plugins")));
+app.use("/", express.static(path.join(__dirname, "../PedalBoard")));
+app.use("/plugins", express.static(path.join(__dirname, "../plugins")));
 app.use("/songs", express.static(path.join(__dirname, "../songs")));
 app.use("/loops", express.static(path.join(__dirname, "../loops")));
 
