@@ -13,7 +13,7 @@ const path = require("path");
 
 const app = express();
 app.use(express.json());
-// app.use(cors());
+app.use(cors(config.corsOptions));
 app.use(cookieParser());
 // Custom middleware to set Cross-Origin-Resource-Policy header
 app.use((req, res, next) => {
