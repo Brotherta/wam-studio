@@ -15,7 +15,12 @@ const app = express();
 app.use(express.json());
 // app.use(cors());
 app.use(cookieParser());
-
+// Custom middleware to set Cross-Origin-Resource-Policy header
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+});
+  
 
 utils.checkEnvVars();
 utils.createDirectories();
