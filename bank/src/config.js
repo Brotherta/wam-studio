@@ -6,7 +6,7 @@ const ENV = process.env.NODE_ENV || 'development';
 
 const CORS_OPTIONS = {
     development: {
-        origin: 'http://localhost:5002',
+        origin: '*',
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]
