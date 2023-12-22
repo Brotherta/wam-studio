@@ -6,14 +6,13 @@ const ENV = process.env.NODE_ENV || 'development';
 
 const CORS_OPTIONS = {
     development: {
-        origin: 'http://localhost:5002',
+        origin: '*',
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]
     },
     production: {
-        //origin: ['https://wam-studio.i3s.univ-cotedazur.fr', 'https://wam-openstudio.vidalmazuy.fr'],
-        origin:true,
+        origin: '*',
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]
