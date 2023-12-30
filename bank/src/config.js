@@ -2,9 +2,6 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const ENV = process.env.NODE_ENV || 'development';
-
-
 const CORS_OPTIONS = {
     all: {
         origin: '*',
@@ -13,7 +10,11 @@ const CORS_OPTIONS = {
         allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]
     },
     verified: {
-        origin: ['http://localhost:5002', 'https://wam-studio.vidalmazuy.fr'],
+        origin: [
+            'http://localhost:5002',
+            'https://wam-studio.vidalmazuy.fr',
+            'https://wam-studio.i3s.univ-cotedazur.fr/'
+        ],
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]
