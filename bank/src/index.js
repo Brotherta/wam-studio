@@ -11,9 +11,12 @@ const audioloopsroute = require('./routes/audioloops.routes');
 
 const path = require("path");
 
+const CORS_ALL = config.corsOptions.all;
+const CORS_VERIFIED = config.corsOptions.verified;
+
 const app = express();
 app.use(express.json());
-app.use(cors(config.corsOptions));
+// app.use(cors(config.corsOptions));
 app.use(cookieParser());
 // Custom middleware to set Cross-Origin-Resource-Policy header
 app.use((req, res, next) => {
@@ -26,15 +29,15 @@ utils.checkEnvVars();
 utils.createDirectories();
 utils.createFiles();
 
-app.use(projectsRoutes);
-app.use(authRoutes);
-app.use(pluginsRoutes);
-app.use(audioloopsroute);
+app.use(cors(CORS_VERIFIED), projectsRoutes);
+app.use(cors(CORS_VERIFIED), authRoutes);
+app.use(cors(CORS_ALL), pluginsRoutes);
+app.use(cors(CORS_ALL), audioloopsroute);
 
-app.use("/", express.static(path.join(__dirname, "../PedalBoard")));
-app.use("/plugins", express.static(path.join(__dirname, "../plugins")));
-app.use("/songs", express.static(path.join(__dirname, "../songs")));
-app.use("/loops", express.static(path.join(__dirname, "../loops")));
+app.use("/", cors(CORS_ALL), express.static(path.join(__dirname, "../PedalBoard")));
+app.use("/plugins", cors(CORS_ALL), express.static(path.join(__dirname, "../plugins")));
+app.use("/songs", cors(CORS_ALL), express.static(path.join(__dirname, "../songs")));
+app.use("/loops", cors(CORS_ALL), express.static(path.join(__dirname, "../loops")));
 
 
 app.listen(config.port, () => {

@@ -2,17 +2,19 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const ENV = process.env.NODE_ENV || 'development';
-
 const CORS_OPTIONS = {
-    development: {
+    all: {
         origin: '*',
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]
     },
-    production: {
-        origin: '*',
+    verified: {
+        origin: [
+            'http://localhost:5002',
+            'https://wam-studio.vidalmazuy.fr',
+            'https://wam-studio.i3s.univ-cotedazur.fr/'
+        ],
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"]
@@ -25,5 +27,5 @@ module.exports = {
     jwtSecret: process.env.JWT_SECRET,
     HTTPS: process.env.HTTPS === "true",
     port: process.env.PORT || 6002,
-    corsOptions: CORS_OPTIONS[ENV],
+    corsOptions: CORS_OPTIONS,
 };
