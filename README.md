@@ -19,4 +19,47 @@ If you use our resource, please cite the following articles:
   year={2023}
 }
 ```
+# Running guide
 
+## Running the Application Locally
+
+### Frontend
+1. Navigate to the `public` folder.
+2. Install dependencies by running `npm install`.
+3. Create a `.env` file in the root directory of the `public` folder.
+4. Configure the following variables in the `.env` file:
+   - `PORT`: The port number that the frontend server will run on. For example, `5002`.
+   - `HTTPS`: Set this to `true` if you want to enable HTTPS. If `true`, you must create a certificate and set the `SSL_CRT_FILE` and `SSL_KEY_FILE` variables.
+   - `BACKEND_URL`: The URL of the backend server. For example, `http://localhost:6002`.
+   - `BANK_PLUGIN_URL`: The URL of the bank plugin. For example, `http://localhost:6002`.
+5. Start the frontend server by running `npm start`.
+
+### Back-end (Bank Plugin)
+1. Navigate to the `bank` folder.
+2. Install dependencies by running `npm install`.
+3. Create a `.env.local` file in the root directory of the `bank` folder.
+4. Configure the following variables in the `.env.local` file:
+   - `PORT`: The port number that the bank plugin server will run on. For example, `6002`.
+   - `STORAGE_DIR`: The directory where the bank plugin will store data. For example, `storage`.
+   - `ADMIN_PASSWORD`: The password for the admin user.
+   - `JWT_SECRET`: The secret for JSON Web Tokens (JWT).
+   - `NODE_ENV`: The environment that the bank plugin is running in. For example, `development`.
+5. Start the bank plugin server by running `npm start`.
+
+## Running the Application with Docker
+1. Install Docker on your machine if you haven't already.
+2. Clone the project repository to your local machine.
+3. Navigate to the root directory of the project.
+4. Start the application with Docker by running `docker-compose up`.
+5. Docker will read the `docker-compose.yml` file to build and run the containers.
+6. Configure the following variables in the `docker-compose.yml` file:
+   - `HTTPS`: Set this to `false` to disable HTTPS. If `true`, you must create a certificate and set the `SSL_CRT_FILE` and `SSL_KEY_FILE`
+   - `BACKEND_URL`: The URL of the backend server. For example, `http://localhost:6002`.
+   - `BANK_PLUGIN_URL`: The URL of the bank plugin. For example, `http://localhost:7002`.
+   - `STORAGE_DIR`: The directory where the backend will store data. For example, `/data/storage` (inside the volume).
+   - `ADMIN_PASSWORD`: The password for the admin user.
+   - `JWT_SECRET`: The secret for JSON Web Tokens (JWT).
+
+Note : The server and the plugin bank can be hosted elsewhere, in that case do not forget to provide the URLs in the public `.env` or in the `docker-compose.yml`.
+
+That's it! The application should now be running. You can access the frontend by going to `http://localhost:5002` in your web browser.
