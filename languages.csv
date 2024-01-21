@@ -1,0 +1,27 @@
+key,en,ja
+loading, loading,こんにちは
+restart, restart,こんにちは
+play, play,こんにちは
+mute, mute,こんにちは
+emptyProject, empty project,こんにちは
+preset, preset,こんにちは
+default, default,こんにちは
+tracks, tracks,こんにちは
+masterTrack, master track,こんにちは
+plugins, plugins,こんにちは
+selectSong, select song,こんにちは
+bass, bass,こんにちは
+drums, drums,こんにちは
+guitar, guitar,こんにちは
+vocals, vocals,こんにちは
+solo, solo,こんにちは
+volume, volume,こんにちは
+presets, presets,こんにちは
+selectAPreset, select a preset,こんにちは
+default, default,こんにちは
+saveProject, save project,こんにちは
+userName, user name,こんにちは
+projectName, project name,こんにちは
+ProjectSaved, Project saved,こんにちは
+saveProjectOverwrite, Project "hi" last edited : 2024-01-21T04:36:19.940Z already exists. Do you want to override it?,こんにちは
+switchMode, switch mode,こんにちは
