@@ -70,7 +70,15 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             this.port.postMessage({playhead: this.playhead});
             this.playheadCount = 0;
         }
-        this.calculateMax(inputs[0][0])
+
+        // if stereo, average the two channels
+        if (inputs[0].length === 2) {
+            // average the two channels
+            const stereoAvg = inputs[0][0].map((v, i) => (v + inputs[0][1][i]) / 2);
+            this.calculateMax(stereoAvg);
+        } else {
+            this.calculateMax(inputs[0][1])
+        }
         return true;
     }
 
@@ -88,7 +96,6 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             this.blockCount++;
         }
         else {
-            this.max = 0;
             this.blockCount++;
         }
         if (this.blockCount >= COUNT_BLOCK) {
@@ -96,7 +103,6 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             this.max = 0;
             this.blockCount = 0;
         }
-
     }
 }
 

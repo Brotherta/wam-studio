@@ -54,13 +54,13 @@ export default class BindsController {
         slider.id = "volume";
         slider.setNameLabel("Volume");
         slider.slider.min = "0";
-        slider.slider.max = "4";
-        slider.slider.value = "2";
-        slider.valueLabel.innerHTML = "2";
+        slider.slider.max = "100";
+        slider.slider.value = "50";
+        slider.valueLabel.innerHTML = "50";
         // set color to white
         slider.style.backgroundColor = "#646464";
         slider.slider.oninput = async () => {
-            let value = parseInt(slider.slider.value) / 4;
+            let value = parseInt(slider.slider.value) / 100;
             track.setVolume(value);
         }
     }
@@ -149,9 +149,13 @@ export default class BindsController {
         slider.id = "slider-"+name;
         slider.setNameLabel(name!);
         slider.slider.value = bind.currentValue;
+        slider.slider.min = "0";
+        slider.slider.max = "4";
         slider.valueLabel.innerHTML = bind.currentValue;
         slider.slider.oninput = async () => {
-            await this.updateBindValue(track, bind, slider.slider.value);
+            // scale value from 0-100
+            let value = parseInt(slider.slider.value) * 25;
+            await this.updateBindValue(track, bind, value.toString());
             this.app.projectController.saved = false;
         }
 
