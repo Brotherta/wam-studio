@@ -50,7 +50,7 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
         if (!this.audio || !this.audio.length > 0) return true;
 
         // Initializing the buffer with the given outputs and the audio length.
-        const bufferSize = outputs[0][0].length;
+        const bufferSize = inputs[0][0].length; // tzfeng, changed from outputs[0][0].length 2/2/2024
         const audioLength = this.audio[0].length;
 
         for (let i = 0; i < bufferSize; i++) {
