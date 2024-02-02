@@ -4,6 +4,11 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const TsI18nWebpackPlugin = require('ts-i18n-webpack-plugin');
+var languages = {
+    "en": require("./static/languages/en.json"),
+    "de": require("./static/languages/ja.json")
+};
 
 module.exports = (env, argv) => {
     return ({
@@ -92,6 +97,12 @@ module.exports = (env, argv) => {
 
             new Dotenv({
                 path: './.env',
+            }),
+
+            new TsI18nWebpackPlugin({
+                inputDirectory: 'static/languages',
+                outputDirectory: 'dist',
+                defaultLanguage: 'en',
             })
         ]
     });
