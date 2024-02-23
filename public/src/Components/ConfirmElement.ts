@@ -80,6 +80,8 @@ export default class ConfirmElement extends HTMLElement {
     }
 
     setMessage(message: string) {
+        // tzfeng: clear the message before appending a new one
+        (this.shadowRoot?.querySelector(".message") as HTMLDivElement).innerHTML = "";
         this.shadowRoot?.querySelector(".message")?.append(message);
     }
 }
