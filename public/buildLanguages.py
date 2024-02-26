@@ -1,20 +1,26 @@
 # Take in a language file and build a json file for the language
 # CSV file format:
 # key,en,ja
+# key1,english1,japanese1
 #
-# output:
-# en.json
-# - key: en_value
-# ja.json
-# - key: ja_value
+# Output Structure:
+# src/locales/
+# - en/
+#   - translation.json
+# - ja/
+#   - translation.json
+# --------------------
+# translation.json format:
+# {
+#     "key": "translated value",
+# }
 
 import csv
 import json
-import sys
 
 def main():
     filename = "languages.csv"
-    dest = "./public/static/languages/"
+    dest = "./src/locales/"
     languages = ["en", "ja"]
 
     # Read in the csv file
@@ -25,13 +31,15 @@ def main():
         # Build the json files
         for lang in languages:
             # Create the json file if it doesn't exist
-            jsonFile = open(dest + lang + ".json", "w+")
+            # dest/lang/translation.json
+            jsonFile = open(dest + "/" + lang + "/translation.json", "w")
             # Create the json object
             jsonObj = {}
             # Read in the csv file
             for row in reader:
-                # Add the key and value to the json object
-                jsonObj[row[0]] = row[languages.index(lang) + 1]
+                if (row != [] and row[0] != ""):
+                    # Add the key and value to the json object
+                    jsonObj[row[0]] = row[languages.index(lang) + 1]
             # Write the json object to the json file
             json.dump(jsonObj, jsonFile, indent=4)
             # Reset the csv file

@@ -1,0 +1,52 @@
+key,en,ja
+loading,loading,こんにちは
+restart,Restart,こんにちは
+play,Play,こんにちは
+mute,Mute,こんにちは
+emptyProject,"Empty Project",こんにちは
+preset,preset,こんにちは
+default,Default,こんにちは
+
+tracks,tracks,こんにちは
+masterTrack,"master track",こんにちは
+plugins,plugins,こんにちは
+
+selectSong,"Select Song",こんにちは
+lead_vocal,"Lead Vocal",こんにちは
+guitar,Guitar,こんにちは
+acoustic_guitar,"Acoustic Guitar",こんにちは
+electric_guitar,"Electric Guitar",こんにちは
+piano,"Piano",こんにちは
+strings,"Strings",こんにちは
+synth,"Synth",こんにちは
+bass,"Bass",こんにちは
+brass,"Brass",こんにちは
+soundEffects,"Sound Effects",こんにちは
+drums,Drums,こんにちは
+kicks,"Kicks",こんにちは
+snares,"Snares",こんにちは
+other,"Other",こんにちは
+
+vocals,vocals,こんにちは
+solo,solo,こんにちは
+volume,volume,こんにちは
+presets,Presets,こんにちは
+selectAPreset,"select a preset",こんにちは
+folk,"Folk",こんにちは
+EDM,"EDM",こんにちは
+hipHop,"Hip Hop",こんにちは
+pop,"Pop",こんにちは
+rock,"Rock",こんにちは
+
+saveProject,"Save Project",こんにちは
+userName,"User Name",こんにちは
+projectName,"Project name",こんにちは
+pleaseFillInAllFields,"Please fill in all fields",こんにちは
+ProjectSaved,"Project Saved!",こんにちは
+ifYouOpenANewProject,"If you open a new project you will lose all your unsaved changes. Do you want to continue?",こんにちは
+saveProjectOverwrite,"Project {title}, last edited: {date}, already exists. Do you want to override it?",こんにちは
+default,Default,こんにちは
+confirm,Confirm,こんにちは
+cancel,Cancel,こんにちは
+
+switchMode,"Switch Mode",こんにちは

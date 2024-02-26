@@ -17,6 +17,8 @@ import BindsController from "./Controllers/BindsController";
 import BindsView from "./Views/BindsView";
 import ExporterController from "./Controllers/ExporterController";
 
+import i18next from "./i18n";
+
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
  */
@@ -70,3 +72,6 @@ export default class App {
         await this.host.initWAM()
     }
 }
+
+console.log(i18next.t('guitar'));
+console.log(i18next.t('guitar', { lng: 'ja' }));

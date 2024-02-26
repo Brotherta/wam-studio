@@ -57,10 +57,12 @@ customElements.define(
 );
 
 const audioCtx = new AudioContext();
+(window as any).audioCtx = audioCtx;
 
-window.addEventListener('beforeunload', (e) => {
-    e.returnValue = 'test';
-});
+// TODO tzfeng - commented out because it's annoying
+// window.addEventListener('beforeunload', (e) => {
+//     e.returnValue = 'test';
+// });
 
 const app = new App();
 (async () => {
