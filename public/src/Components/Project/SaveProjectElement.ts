@@ -1,3 +1,5 @@
+import i18n, { translateHTMLElements } from "../../i18n";
+
 const template: HTMLTemplateElement = document.createElement("template");
 
 template.innerHTML = /*html*/`
@@ -52,12 +54,12 @@ button {
 
 <div class="main">
     <div class="form-element">
-        <label for="user">User Name</label>
+        <label for="user" data-i18n="userName">User Name</label>
         <input id="user-input" type="text" placeholder="Username..." name="user">
     </div>
     
     <div class="form-element">
-        <label for="project">Project Name</label>
+        <label for="project" data-i18n="projectName">Project Name</label>
         <input id="project-input" type="text" placeholder="Project Name..." name="project">
     </div>
     
@@ -66,11 +68,11 @@ button {
     </div>
     
     <div class="confirm-div" id="confirm" style="display: none" >
-        <button id="yes" type="button">Yes</button>
-        <button id="no" type="button">No</button>
+        <button id="yes" type="button" data-i18n="confirm">Yes</button>
+        <button id="no" type="button" data-i18n="cancel">No</button>
     </div>
     
-    <button id="save-project" type="button">Save Project</button>
+    <button id="save-project" type="button" data-i18n="saveProject">Save Project</button>
 </div>    
 `
 
@@ -84,7 +86,12 @@ export default class SaveProjectElement extends HTMLElement {
 
     connectedCallback() {
         if (!this.initialized) {
-            this.shadowRoot?.appendChild(template.content.cloneNode(true));
+            const translateHTML = template.content.cloneNode(true) as HTMLElement;
+            translateHTMLElements(translateHTML);
+            // create a document fragment to hold the template content
+            this.shadowRoot?.appendChild(translateHTML);
+            this.shadowRoot?.getElementById("user-input")?.setAttribute("placeholder", i18n.t("userName")+"...");
+            this.shadowRoot?.getElementById("project-input")?.setAttribute("placeholder", i18n.t("projectName")+"...");
 
             this.no.addEventListener("click", () => {
                 this.confirm.style.display = "none";

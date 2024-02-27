@@ -1,52 +1,55 @@
-key,en,ja
-loading,Loading,こんにちは
-restart,Restart,こんにちは
-play,Play,こんにちは
-mute,Mute,こんにちは
-emptyProject,"Empty Project",こんにちは
-preset,Preset,こんにちは
-default,Default,こんにちは
+key,en,jp
+loading,Loading,読み込み中
+restart,Restart,再起動
+play,Play,再生
+pause,Pause,一時停止
+mute,Mute,ミュート
+unmute,Unmute,ミュート解除
+emptyProject,Empty Project,空のプロジェクト
+preset,Preset,プリセット
+default,Default,デフォルト
 
-tracks,TRACKS,こんにちは
-masterTrack,"MASTER TRACK",こんにちは
-plugins,PLUGINS,こんにちは
+tracks,TRACKS,トラック
+masterTrack,MASTER TRACK,マスタートラック
+plugins,PLUGINS,プラグイン
 
-selectSong,"Select Song",こんにちは
-lead_vocal,"Lead Vocal",こんにちは
-guitar,Guitar,こんにちは
-acoustic_guitar,"Acoustic Guitar",こんにちは
-electric_guitar,"Electric Guitar",こんにちは
-piano,"Piano",こんにちは
-strings,"Strings",こんにちは
-synth,"Synth",こんにちは
-bass,"Bass",こんにちは
-brass,"Brass",こんにちは
-soundEffects,"Sound Effects",こんにちは
-drums,Drums,こんにちは
-kicks,"Kicks",こんにちは
-snares,"Snares",こんにちは
-other,"Other",こんにちは
+selectSong,Select Song,曲を選択
+lead_vocal,Lead Vocal,リードボーカル
+guitar,Guitar,ギター
+acoustic_guitar,Acoustic Guitar,アコースティックギター
+electric_guitar,Electric Guitar,エレクトリックギター
+piano,Piano,ピアノ
+strings,Strings,ストリングス
+synth,Synth,シンセ
+bass,Bass,ベース
+brass,Brass,ブラス
+soundEffects,Sound Effects,サウンドエフェクト
+drums,Drums,ドラム
+kicks,Kicks,キック
+snares,Snares,スネア
+other,Other,その他
 
-vocals,vocals,こんにちは
-solo,solo,こんにちは
-volume,volume,こんにちは
-presets,Presets,こんにちは
-selectAPreset,"select a preset",こんにちは
-folk,"Folk",こんにちは
-EDM,"EDM",こんにちは
-hipHop,"Hip Hop",こんにちは
-pop,"Pop",こんにちは
-rock,"Rock",こんにちは
+vocals,Vocals,ボーカル
+solo,solo,ソロ
+volume,Volume,音量
+presets,Presets,プリセット
+selectAPreset,Select a preset,プリセットを選択
+Folk,Folk,フォーク
+EDM,EDM,エレクトロニック・ダンス・ミュージック
+HipHop,Hip Hop,ヒップホップ
+Pop,Pop,ポップ
+Rock,Rock,ロック
+Funk,Funk,ファンク
 
-saveProject,"Save Project",こんにちは
-userName,"User Name",こんにちは
-projectName,"Project name",こんにちは
-pleaseFillInAllFields,"Please fill in all fields",こんにちは
-ProjectSaved,"Project Saved!",こんにちは
-ifYouOpenANewProject,"If you open a new project you will lose all your unsaved changes. Do you want to continue?",こんにちは
-saveProjectOverwrite,"Project {title}, last edited: {date}, already exists. Do you want to override it?",こんにちは
-default,Default,こんにちは
-confirm,Confirm,こんにちは
-cancel,Cancel,こんにちは
+saveProject,Save Project,プロジェクトを保存
+userName,User Name,ユーザー名
+projectName,Project name,プロジェクト名
+pleaseFillInAllFields,Please fill in all fields,すべての欄を埋めてください
+ProjectSaved,Project Saved!,プロジェクトが保存されました！
+ifYouOpenANewProject,If you open a new project you will lose all your unsaved changes. Do you want to continue?,新しいプロジェクトを開くと、保存されていない変更が全て失われます。続けますか？
+saveProjectOverwrite,"Project {project}, last edited: {date}, already exists. Do you want to override it?","プロジェクト {project}, 最終編集日: {date}, は既に存在します。上書きしますか？"
+default,Default,デフォルト
+confirm,Confirm,確認
+cancel,Cancel,キャンセル
 
-switchMode,"Switch Mode",こんにちは
+switchMode,Switch Mode,モードを切り替え

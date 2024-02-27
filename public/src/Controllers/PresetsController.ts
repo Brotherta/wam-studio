@@ -8,7 +8,7 @@ import {WamParameterInfoMap} from "@webaudiomodules/api";
 import {BACKEND_URL} from "../Env";
 import Bind from "../Models/Bind";
 import Parameter from "../Models/Parameter";
-import i18next from "i18next";
+import i18n from "../i18n";
 
 export default class PresetsController {
 
@@ -27,7 +27,7 @@ export default class PresetsController {
 
     getPresets() {
         for (let tag of Object.values(SongTagEnum)) {
-            let defaultPreset = new Preset(i18next.t("default"));
+            let defaultPreset = new Preset(i18n.t("default"));
             let presets = [defaultPreset];
             this.presets.set(tag, presets);
         }
@@ -42,7 +42,7 @@ export default class PresetsController {
                     let tag = item.tag;
                     let presets = item.presets;
                     for (let preset of presets) {
-                        let newPreset = new Preset(preset.name);
+                        let newPreset = new Preset(i18n.t(preset.name));
                         newPreset.pluginState = preset.pluginState;
 
                         let binds = [];
@@ -62,7 +62,7 @@ export default class PresetsController {
                         this.addPreset(newPreset, tag);
                     }
                 }
-                this.presetsSet.add(i18next.t("default"));
+                this.presetsSet.add(i18n.t("default"));
             }
         });
     }
@@ -84,7 +84,7 @@ export default class PresetsController {
 
             let presetsObject = [];
             for (let preset of presets) {
-                if (preset.name == "Default") {
+                if (preset.name == "default") {
                     continue;
                 }
 
@@ -170,7 +170,7 @@ export default class PresetsController {
         // @ts-ignore
         track.plugin.instance!.id = 0;
 
-        if (preset.name !== "Default") {
+        if (preset.name !== i18n.t("default")) {
             await track.plugin.setStateAsync(preset.pluginState);
             let paramInfo = await track.plugin.instance?._audioNode.getParameterInfo();
 
@@ -322,6 +322,7 @@ export default class PresetsController {
 
             let a = document.createElement("a");
             a.innerText = presetString;
+            console.log("add preset", presetString);
             a.classList.add("dropdown-item");
 
             a.addEventListener("click", async () => {

@@ -1,5 +1,6 @@
 import App from "../App";
 import {BACKEND_URL} from "../Env";
+import i18n from "../i18n";
 
 
 export default class ProjectController {
@@ -180,7 +181,7 @@ export default class ProjectController {
         let user = this.app.projectView.saveElement.user.value;
         let project = this.app.projectView.saveElement.project.value;
         if (user === "" || project === "") {
-            this.app.projectView.saveElement.showError("Please fill in all fields");
+            this.app.projectView.saveElement.showError(i18n.t("pleaseFillInAllFields"));
             return;
         }
         this.projectUser = user;
@@ -207,7 +208,9 @@ export default class ProjectController {
         }
         else if (response.status === 400) {
             let json = await response.json();
-            let message = `Project "${project}", last edited : ${json.date}, already exists, do you want to override it?`;
+            let message = i18n.t("saveProjectOverwrite");
+            message.replace("{project}", project);
+            message.replace("{date}", json.date);
             await this.saveProjectConfirm(user, project, jsonProject, message);
         }
     }

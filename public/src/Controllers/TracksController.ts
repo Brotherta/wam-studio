@@ -10,6 +10,7 @@ import {SongTagEnum} from "../Utils/SongTagEnum";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "../Models/Plugin";
 import {RATIO_MILLS_BY_PX} from "../Utils/Utils";
+import i18n from "../i18n";
 
 /**
  * Controller for the track view. This controller is responsible for adding and removing tracks from the track view.
@@ -38,7 +39,9 @@ export default class TracksController {
         let track = this.createTrack(node);
         if (song) {
             track.url = song.url;
-            track.element.name = song.name;
+            // track.element.name = song.name;
+            // Changed for internationalization
+            track.element.name = i18n.t(song.tag);
             track.tag = song.tag;
             if (splitChannel) {
                 track.splitting = true;

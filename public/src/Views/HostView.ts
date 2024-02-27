@@ -1,6 +1,7 @@
 /**
  * Class responsible for the host view. It displays the host controls and the host track.
  */
+import i18n from "../i18n";
 import {audioCtx} from "../index";
 
 export default class HostView {
@@ -72,11 +73,11 @@ export default class HostView {
         if (playing) {
             imgPause.removeAttribute("hidden");
             imgPlay.setAttribute("hidden", "hidden");
-            tooltip.innerHTML = "Pause";
+            tooltip.innerHTML = i18n.t("pause");
         } else {
             imgPlay.removeAttribute("hidden");
             imgPause.setAttribute("hidden", "hidden");
-            tooltip.innerHTML = "Play";
+            tooltip.innerHTML = i18n.t("play");
         }
     }
 
@@ -92,11 +93,11 @@ export default class HostView {
         if (muted) {
             imgMute.removeAttribute("hidden");
             imgUnmute.setAttribute("hidden", "hidden");
-            tooltip.innerHTML = "Unmute";
+            tooltip.innerHTML = i18n.t("unmute");
         } else {
             imgUnmute.removeAttribute("hidden");
             imgMute.setAttribute("hidden", "hidden");
-            tooltip.innerHTML = "Mute";
+            tooltip.innerHTML = i18n.t("mute");
         }
     }
 

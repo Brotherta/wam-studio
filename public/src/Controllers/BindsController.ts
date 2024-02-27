@@ -9,6 +9,7 @@ import Bind from "../Models/Bind";
 import BindSliderElement from "../Components/Binds/BindSliderElement";
 import ParameterElement from "../Components/Binds/ParameterElement";
 import {getMinMax, normalizeValue, verifyString} from "../Utils/Normalizer";
+import i18n from "../i18n";
 
 
 export default class BindsController {
@@ -52,7 +53,7 @@ export default class BindsController {
         track.volumeSlider = slider;
         track.bindControl.trackBindElement.addBindSliderElement(slider);
         slider.id = "volume";
-        slider.setNameLabel("Volume");
+        slider.setNameLabel(i18n.t("volume"));
         slider.slider.min = "0";
         slider.slider.max = "100";
         slider.slider.value = "50";
@@ -147,7 +148,7 @@ export default class BindsController {
         let slider = document.createElement("bind-slider-element") as BindSliderElement;
         bindControl.trackBindElement.addBindSliderElement(slider);
         slider.id = "slider-"+name;
-        slider.setNameLabel(name!);
+        slider.setNameLabel(i18n.t(name!)); console.log("create bind", name)
         slider.slider.value = bind.currentValue;
         slider.slider.min = "0";
         slider.slider.max = "4";
@@ -376,13 +377,13 @@ export default class BindsController {
      * @private
      */
     private async deleteParameter(track: Track, bind: Bind, parameterElement: ParameterElement) {
-        console.log("before delete", bind.parameters);
+        // console.log("before delete", bind.parameters);
         if (parameterElement.parameter !== undefined) {
             bind.parameters.splice(bind.parameters.indexOf(parameterElement.parameter!), 1);
         }
         parameterElement.parameter = undefined;
         track.bindControl.advElement.removeParameterElement(parameterElement);
-        console.log("after delete", bind.parameters)
+        // console.log("after delete", bind.parameters)
     }
 
     /**

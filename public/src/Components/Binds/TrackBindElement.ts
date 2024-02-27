@@ -1,5 +1,7 @@
 import BindSliderElement from "./BindSliderElement";
 import Preset from "../../Models/Preset";
+import i18n from "../../i18n";
+import { translateHTMLElements, translateHTMLString } from "../../i18n";
 
 const template: HTMLTemplateElement = document.createElement("template");
 
@@ -76,11 +78,11 @@ bind-slider-element {
     
     </div>
     <div id="presets-control">
-        <div class="special-control-value" style="padding: 10px">
+        <div class="special-control-value" style="padding: 10px" data-i18n="presets">
             Presets
         </div>
         <select id="presets-select">
-            <option value="Default" selected>Default</option>
+            <option value="Default" selected data-i18n="default">Default</option>
         </select>
     </div>
 </div>
@@ -98,7 +100,7 @@ export default class TrackBindElement extends HTMLElement {
 
     connectedCallback() {
         if (this.shadowRoot !== null && !this.initialized) {
-            this.shadowRoot.innerHTML = template.innerHTML;
+            this.shadowRoot.innerHTML = translateHTMLString(template.innerHTML);
             this.initialized = true;
         }
     }
@@ -127,8 +129,8 @@ export default class TrackBindElement extends HTMLElement {
 
         this.presetsSelect.innerHTML = "";
         let firstOption = document.createElement("option");
-        firstOption.value = "none";
-        firstOption.innerText = "Select a preset";
+        firstOption.value = i18n.t("none");
+        firstOption.innerText = i18n.t("selectAPreset");
         firstOption.disabled = true;
         this.presetsSelect.appendChild(firstOption);
 
@@ -139,7 +141,7 @@ export default class TrackBindElement extends HTMLElement {
         for (let preset of presets) {
             let option = document.createElement("option");
             option.value = preset.name;
-            option.innerText = preset.name;
+            option.innerText = i18n.t(preset.name);
             this.presetsSelect.appendChild(option);
             if (selected === preset.name) {
                 option.selected = true;

@@ -25,18 +25,23 @@ if (lang) {
 }   
 
 // Translate all html elements with data-i18n attribute
-document.querySelector('[data-i18n="loading"]')!.textContent = i18next.t('loading');
-document.querySelector('[data-i18n="masterTrack"]')!.textContent = i18next.t('masterTrack');
-document.querySelector('[data-i18n="plugins"]')!.textContent = i18next.t('plugins');
-document.querySelector('[data-i18n="selectSong"]')!.textContent = i18next.t('selectSong');
-document.querySelector('[data-i18n="saveProject"]')!.textContent = i18next.t('saveProject');
-document.querySelector('[data-i18n="switchMode"]')!.textContent = i18next.t('switchMode');
-document.querySelector('[data-i18n="restart"]')!.textContent = i18next.t('restart');
-document.querySelector('[data-i18n="play"]')!.textContent = i18next.t('play');
-document.querySelector('[data-i18n="mute"]')!.textContent = i18next.t('mute');
-document.querySelector('[data-i18n="emptyProject"]')!.textContent = i18next.t('emptyProject');
-document.querySelector('[data-i18n="preset"]')!.textContent = i18next.t('preset');
-document.querySelector('[data-i18n="default"]')!.textContent = i18next.t('default');
-document.querySelector('[data-i18n="tracks"]')!.textContent = i18next.t('tracks');
+export function translateHTMLElements(element: HTMLElement) {
+    const elements = element.querySelectorAll('[data-i18n]');
+    elements.forEach((element) => {
+        const key = element.getAttribute('data-i18n');
+        if (key) {
+            element.textContent = i18next.t(key);
+        }
+    });
+}
+translateHTMLElements(document.body)
+
+// Translate html string function
+export function translateHTMLString(html: string): string {
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    translateHTMLElements(div);
+    return div.innerHTML;
+}
 
 export default i18next;
