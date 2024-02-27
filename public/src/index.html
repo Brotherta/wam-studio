@@ -16,7 +16,7 @@
 <body>
 	<div class="loading-overlay">
 		<div class="loading-wheel"></div>
-		<div class="loading-text">Loading</div>
+		<div class="loading-text" data-i18n="loading">Loading</div>
 	</div>
 	<div class="app">
 		<div class="controls-bar" id="controls-bar">
@@ -26,13 +26,13 @@
 				</a>
 				<div class="dropdown-menu dropright" aria-labelledby="dropdownMenuButton">
 
-					<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Song</a>
+					<a class="dropdown-item dropdown-toggle"  type="button" id="dropdownSubMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="selectSong">Select Song</a>
 					<div id="songs-container" class="dropdown-menu songs" aria-labelledby="dropdownSubMenuButton"></div>
 
 					<div class="dropdown-divider"></div>
 
 					<a class="dropdown-item advanced" id="load-project">Load Project</a>
-					<a class="dropdown-item" id="save-project">Save Project</a>
+					<a class="dropdown-item" id="save-project" data-i18n="saveProject">Save Project</a>
 
 					<div class="dropdown-divider"></div>
 
@@ -47,21 +47,21 @@
 
 					<div class="dropdown-divider advanced"></div>
 
-					<a class="dropdown-item" id="switch-mode">Switch mode</a>
+					<a class="dropdown-item" id="switch-mode" data-i18n="switchMode">Switch mode</a>
 
 				</div>
 
 				<div id="back-btn" class="menu-item">
-					<span class="mytooltip">Restart</span>
+					<span class="mytooltip" data-i18n="restart">Restart</span>
 					<img src="/icons/skip-start-fill.svg">
 				</div>
 				<div id="play-btn" class="menu-item">
-					<span class="mytooltip">Play</span>
+					<span class="mytooltip" data-i18n="play">Play</span>
 					<img src="/icons/play-fill.svg" id="play-img">
 					<img src="/icons/pause-fill.svg" id="pause-img" hidden>
 				</div>
 				<div id="mute-btn" class="menu-item">
-					<span class="mytooltip">Mute</span>
+					<span class="mytooltip" data-i18n="mute">Mute</span>
 					<img id="unmute-img" src="icons/volume-up-fill.svg">
 					<img id="mute-img" src="icons/volume-mute-fill.svg" hidden>
 				</div>
@@ -73,17 +73,17 @@
 						00:00:00:00
 					</div>
 				</div>
-				<div id="header-title">
+				<div id="header-title" data-i18n="emptyProject">
 					Empty Project
 				</div>
 			</div>
 			<div class="right-controls">
 				<div id="presets-btn" class="menu-item" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span class="mytooltip">Preset</span>
+					<span class="mytooltip" data-i18n="preset">Preset</span>
 					<i class="presets-icon"></i>
 				</div>
 				<div class="dropdown-menu dropleft" id="presets-dropdown" aria-labelledby="presets-btn">
-					<a class="dropdown-item" id="default-presets">Default</a>
+					<a class="dropdown-item" id="default-presets" data-i18n="default">Default</a>
 				</div>
 			</div>
 
@@ -97,7 +97,7 @@
 						<div class="icon">
 							<img src="icons/file-earmark-music-fill.svg">
 						</div>
-						<div class="text-icon">
+						<div class="text-icon" data-i18n="tracks">
 							TRACKS
 						</div>
 					</div>
@@ -161,7 +161,7 @@
 						<div class="icon">
 							<img src="icons/sliders.svg">
 						</div>
-						<div class="text-icon">
+						<div class="text-icon" data-i18n="masterTrack">
 							MASTER TRACK
 						</div>
 					</div>
@@ -169,7 +169,7 @@
 					<div class="icon">
 						<img src="icons/plugin.svg">
 					</div>
-					<div class="text-icon">
+					<div class="text-icon" data-i18n="plugins">
 						PLUGINS
 					</div>
 

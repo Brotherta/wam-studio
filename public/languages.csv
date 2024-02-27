@@ -1,15 +1,15 @@
 key,en,ja
-loading,loading,こんにちは
+loading,Loading,こんにちは
 restart,Restart,こんにちは
 play,Play,こんにちは
 mute,Mute,こんにちは
 emptyProject,"Empty Project",こんにちは
-preset,preset,こんにちは
+preset,Preset,こんにちは
 default,Default,こんにちは
 
-tracks,tracks,こんにちは
-masterTrack,"master track",こんにちは
-plugins,plugins,こんにちは
+tracks,TRACKS,こんにちは
+masterTrack,"MASTER TRACK",こんにちは
+plugins,PLUGINS,こんにちは
 
 selectSong,"Select Song",こんにちは
 lead_vocal,"Lead Vocal",こんにちは

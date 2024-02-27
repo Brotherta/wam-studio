@@ -8,6 +8,7 @@ import {WamParameterInfoMap} from "@webaudiomodules/api";
 import {BACKEND_URL} from "../Env";
 import Bind from "../Models/Bind";
 import Parameter from "../Models/Parameter";
+import i18next from "i18next";
 
 export default class PresetsController {
 
@@ -26,7 +27,7 @@ export default class PresetsController {
 
     getPresets() {
         for (let tag of Object.values(SongTagEnum)) {
-            let defaultPreset = new Preset("Default");
+            let defaultPreset = new Preset(i18next.t("default"));
             let presets = [defaultPreset];
             this.presets.set(tag, presets);
         }
@@ -61,7 +62,7 @@ export default class PresetsController {
                         this.addPreset(newPreset, tag);
                     }
                 }
-                this.presetsSet.add("Default");
+                this.presetsSet.add(i18next.t("default"));
             }
         });
     }

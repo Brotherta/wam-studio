@@ -16,7 +16,6 @@ import PresetsController from "./Controllers/PresetsController";
 import BindsController from "./Controllers/BindsController";
 import BindsView from "./Views/BindsView";
 import ExporterController from "./Controllers/ExporterController";
-
 import i18next from "./i18n";
 
 /**
@@ -74,4 +73,3 @@ export default class App {
 }
 
 console.log(i18next.t('guitar'));
-console.log(i18next.t('guitar', { lng: 'ja' }));
