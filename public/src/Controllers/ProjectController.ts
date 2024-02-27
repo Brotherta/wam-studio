@@ -209,8 +209,8 @@ export default class ProjectController {
         else if (response.status === 400) {
             let json = await response.json();
             let message = i18n.t("saveProjectOverwrite");
-            message.replace("{project}", project);
-            message.replace("{date}", json.date);
+            message = message.replace("{project}", project);
+            message = message.replace("{date}", json.date);
             await this.saveProjectConfirm(user, project, jsonProject, message);
         }
     }
