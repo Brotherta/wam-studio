@@ -148,7 +148,7 @@ export default class BindsController {
         let slider = document.createElement("bind-slider-element") as BindSliderElement;
         bindControl.trackBindElement.addBindSliderElement(slider);
         slider.id = "slider-"+name;
-        slider.setNameLabel(i18n.t(name!)); console.log("create bind", name)
+        slider.setNameLabel(i18n.t(name!)); 
         slider.slider.value = bind.currentValue;
         slider.slider.min = "0";
         slider.slider.max = "4";

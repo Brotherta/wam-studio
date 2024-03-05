@@ -202,7 +202,7 @@ export default class ProjectController {
         });
         if (response.status === 201) {
             let json = await response.json();
-            this.app.projectView.saveElement.showInfo("Project saved!");
+            this.app.projectView.saveElement.showInfo(i18n.t("projectSaved"));
             this.projectId = json.id;
             this.saved = true;
         }
@@ -233,12 +233,12 @@ export default class ProjectController {
             });
             if (response.status === 201) {
                 let json = await response.json();
-                this.app.projectView.saveElement.showInfo("Project saved!");
+                this.app.projectView.saveElement.showInfo(i18n.t("projectSaved"));
                 this.projectId = json.id;
                 this.saved = true;
             }
             else {
-                this.app.projectView.saveElement.showError("Something went wrong");
+                this.app.projectView.saveElement.showError(i18n.t("somethingWentWrong"));
             }
         });
     }

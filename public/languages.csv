@@ -45,7 +45,8 @@ saveProject,Save Project,プロジェクトを保存
 userName,User Name,ユーザー名
 projectName,Project name,プロジェクト名
 pleaseFillInAllFields,Please fill in all fields,すべての欄を埋めてください
-ProjectSaved,Project Saved!,プロジェクトが保存されました！
+projectSaved,Project Saved!,プロジェクトが保存されました！
+somethingWentWrong,Something went wrong,何か問題が発生しました
 ifYouOpenANewProject,If you open a new project you will lose all your unsaved changes. Do you want to continue?,新しいプロジェクトを開くと、保存されていない変更が全て失われます。続けますか？
 saveProjectOverwrite,"Project {project}, last edited: {date}, already exists. Do you want to override it?","プロジェクト {project}, 最終編集日: {date}, は既に存在します。上書きしますか？"
 default,Default,デフォルト
@@ -53,3 +54,8 @@ confirm,Confirm,確認
 cancel,Cancel,キャンセル
 
 switchMode,Switch Mode,モードを切り替え
+Clarity,Clarity,明瞭さ
+Weight,Weight,重み
+Deepen,Deepen,太さ
+Shine,Shine,輝き
+Tame,Tame,音の丸み

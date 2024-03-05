@@ -41,10 +41,16 @@
     "userName": "User Name",
     "projectName": "Project name",
     "pleaseFillInAllFields": "Please fill in all fields",
-    "ProjectSaved": "Project Saved!",
+    "projectSaved": "Project Saved!",
+    "somethingWentWrong": "Something went wrong",
     "ifYouOpenANewProject": "If you open a new project you will lose all your unsaved changes. Do you want to continue?",
     "saveProjectOverwrite": "Project {project}, last edited: {date}, already exists. Do you want to override it?",
     "confirm": "Confirm",
     "cancel": "Cancel",
-    "switchMode": "Switch Mode"
+    "switchMode": "Switch Mode",
+    "Clarity": "Clarity",
+    "Weight": "Weight",
+    "Deepen": "Deepen",
+    "Shine": "Shine",
+    "Tame": "Tame"
 }

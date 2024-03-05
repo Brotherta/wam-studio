@@ -41,7 +41,12 @@ export default class TracksController {
             track.url = song.url;
             // track.element.name = song.name;
             // Changed for internationalization
-            track.element.name = i18n.t(song.tag);
+            // TODO: Check this edge case
+            if (i18n.language === "ja") {
+                track.element.name = i18n.t(song.tag);
+            } else {
+                track.element.name = song.name;
+            }
             track.tag = song.tag;
             if (splitChannel) {
                 track.splitting = true;

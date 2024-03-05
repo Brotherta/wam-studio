@@ -193,7 +193,7 @@ export default class AdvancedElement extends HTMLElement {
     addBindOption(name: string) {
         const option = document.createElement("option");
         option.value = name;
-        option.innerText = i18n.t(name); console.log("add bind option", name)
+        option.innerText = i18n.t(name); 
         this.bindsSelect.appendChild(option);
     }
 
