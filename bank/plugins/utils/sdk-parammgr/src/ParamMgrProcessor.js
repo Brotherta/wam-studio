@@ -229,8 +229,8 @@ const processor = (moduleId, paramsConfig) => {
 		/**
 		 * Main process
 		 *
-		 * @param {Array<Float32Array>[]} inputs
-		 * @param {Array<Float32Array>[]} outputs
+		 * @param {Float32Array[][]} inputs
+		 * @param {Float32Array[][]} outputs
 		 * @param {Record<string, Float32Array>} parameters
 		 */
 		process(inputs, outputs, parameters) {

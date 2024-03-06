@@ -5,9 +5,7 @@
     "start": "webpack serve --mode=development",
     "build": "run-s clean build-only",
     "build-only": "webpack --mode=production",
-    "clean": "rimraf dist",
-    "build:en": "webpack --env lang=en --mode=production",
-    "build:ja": "webpack --env lang=ja --mode=production"
+    "clean": "rimraf dist"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",

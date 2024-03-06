@@ -92,7 +92,7 @@ module.exports = (env, argv) => {
 
             new Dotenv({
                 path: './.env',
-            }),
+            })
         ]
     });
 }
