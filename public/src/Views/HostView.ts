@@ -2,6 +2,7 @@ import {audioCtx} from "../index";
 import {RATIO_MILLS_BY_PX} from "../Env";
 import TempoSelectorElement from "../Components/TempoSelectorElement";
 import TimeSignatureSelectorElement from "../Components/TimeSignatureSelectorElement";
+import AudioLoopBrowser from "../Components/WamAudioLoopBrowser";
 
 /**
  * Class responsible for the host view. It displays the host controls and the host track.
@@ -23,6 +24,9 @@ export default class HostView {
 
     tempoDiv = document.getElementById("tempo-selector") as HTMLDivElement;
     tempoSelector = new TempoSelectorElement() as HTMLElement;
+
+    audioLoopBrowserDiv = document.getElementById("audio-loop-browser") as HTMLDivElement;
+    audioLoopBrowserElement = new AudioLoopBrowser() as HTMLElement;
 
     timeSignatureDiv = document.getElementById("time-signature-selector") as HTMLDivElement;
     timeSignatureSelector = new TimeSignatureSelectorElement() as HTMLElement;
@@ -63,7 +67,9 @@ export default class HostView {
         // add tempo and time signature selectors to the main toolbar
         this.tempoDiv.appendChild(this.tempoSelector);
         this.timeSignatureDiv.appendChild(this.timeSignatureSelector);
-        
+
+        // audio loop browser
+        this.audioLoopBrowserDiv.appendChild(this.audioLoopBrowserElement);
     }
     
     /**
