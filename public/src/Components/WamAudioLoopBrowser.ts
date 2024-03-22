@@ -17,7 +17,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
     }
     init() {
         this.shadowRoot.innerHTML = `
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
         <div id="mainWrapper">
             <div id="main">
                 <a><h1>Sound Loops <i class="bi bi-arrow-repeat rotating"></i></h1></a>
