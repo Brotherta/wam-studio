@@ -94,6 +94,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
           }
           
           #main {
+            user-select: none;
             background-color: var(--primary-bg-color);
             color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -155,6 +156,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
           }
           
           #folder-container {
+            user-select: none;
             display: flex;
             flex-direction: column;
             margin-bottom: 1rem;
@@ -217,6 +219,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
           .favourite-btn,
           .download-btn,
           .add-btn {
+            font-size: 16px;
             background: none;
             border: none;
             padding: 0.5rem;
@@ -237,6 +240,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
           }
           
           .file-name {
+            user-select: none;
             flex-grow: 1;
             margin-right: 10px;
             overflow: hidden; 
@@ -479,6 +483,11 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             } else if (element.type === "file") {
                 item = document.createElement("div");
                 item.innerHTML = this.createAudioPlayer(element);
+                item.querySelectorAll(".audio-file-item").forEach((audioLoopDiv) => {
+                    console.log("audioLoopDiv");
+                    audioLoopDiv.addEventListener("dragstart", this.dragHandler);
+                });
+
             }
             if (item !== null && container !== null) {
                 container.appendChild(item);
@@ -588,7 +597,9 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             const fileObject = this.findFileObjectByFullPath(fullPath, this.audioData.children);
             if (fileObject) {
                 const audioPlayerHtml = this.createAudioPlayer(fileObject, true, false);
+               
                 favoritesContainer.innerHTML += audioPlayerHtml;
+
             }
         });
 
@@ -661,7 +672,8 @@ export default class WamAudioLoopBrowser extends HTMLElement {
         const fileNameWithoutExtension = element.name.replace(new RegExp(`\.${fileExtension}$`), '');
 
         return `
-            <div class="audio-file-item" data-filename="${element.name}" data-fullpath="${fullPath}">
+            <div draggable=true  class="audio-file-item" data-filename="${element.name}" 
+            data-fullpath="${fullPath}">
                 <button class="play-btn">
                     <i class="bi bi-play-fill"></i>
                 </button>
@@ -678,6 +690,12 @@ export default class WamAudioLoopBrowser extends HTMLElement {
                 </button>
             </div>
         `;
+    }
+
+    dragHandler = (event: any) => {
+        console.log(event.target.dataset.fullpath);
+        // copy to datatransfer
+        event.dataTransfer.setData("audioFileURL", event.target.dataset.fullpath);
     }
 }
 

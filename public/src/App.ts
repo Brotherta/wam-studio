@@ -67,6 +67,7 @@ export default class App {
     loader: Loader;
 
     undoManager:UndoManager;
+    audioLoopBrowser: any;
 
 
     constructor() {

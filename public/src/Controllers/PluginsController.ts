@@ -1,7 +1,7 @@
 import App from "../App";
 import Track from "../Models/Track";
 import Host from "../Models/Host";
-import {audioCtx} from "../index";
+import { audioCtx } from "../index";
 import PluginsView from "../Views/PluginsView";
 
 /**
@@ -199,6 +199,10 @@ export default class PluginsController {
         this._view.mainTrack.addEventListener("click", () => {
             this.selectHost();
         });
+        const soundLoupButton = document.getElementById('soundLoup');
+        soundLoupButton?.addEventListener('click', () => {
+        this.toggleAudioLoopBrowser();
+        });
     }
 
     /**
@@ -277,6 +281,21 @@ export default class PluginsController {
         } else {
             this._view.minimize();
             this._app.editorView.resizeCanvas();
+        }
+    }
+
+    /**
+    * Toggles the visibility of the audio loop browser.
+    * @private
+    */
+    private toggleAudioLoopBrowser(): void {
+        const audioLoopBrowser = document.getElementById('audio-loop-browser');
+        if (audioLoopBrowser) {
+            if (audioLoopBrowser.style.display === 'none') {
+                audioLoopBrowser.style.display = 'flex';
+            } else {
+                audioLoopBrowser.style.display = 'none';
+            }
         }
     }
 

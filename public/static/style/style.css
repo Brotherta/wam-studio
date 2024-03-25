@@ -60,6 +60,7 @@ body {
 #left-container {
     width: 0;
     flex-grow: 1;
+    border-right: 1px solid black;
     display: flex;
     flex-direction: column;
 }
@@ -68,7 +69,10 @@ body {
     display: flex;
     flex-direction: column;
     font-size: 12px;
+    border-right: 1px solid black;
+    max-width: 300px;
     transform: translateZ(0);
+    display: none;
 }
 #ToggleButtons{
     position: relative;
@@ -130,6 +134,7 @@ body {
 #editor {
     width: calc(100% - var(--track-container-width));
     height: 100%;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
@@ -142,7 +147,7 @@ body {
 }
 
 #editor-canvas {
-    flex-grow: 1;
+    flex: 1;
 }
 
 #automation-container {
