@@ -3,6 +3,7 @@ import LoadProjectElement from "../Components/Project/LoadProjectElement";
 import LoginElement from "../Components/Project/LoginElement";
 import ConfirmElement from "../Components/ConfirmElement";
 import ExportProjectElement from "../Components/Project/ExportProjectElement";
+import i18n from "../i18n";
 
 
 export default class ProjectView {
@@ -43,19 +44,19 @@ export default class ProjectView {
     }
 
     mountLoad() {
-        this.title.innerText = "Load Project";
+        this.title.innerText = i18n.t("loadAroject");
         this.mount.innerHTML = "";
         this.mount.appendChild(this.loadElement);
     }
 
     mountSave() {
-        this.title.innerText = "Save Project";
+        this.title.innerText = i18n.t("saveProject");
         this.mount.innerHTML = "";
         this.mount.appendChild(this.saveElement);
     }
 
     mountExport() {
-        this.title.innerText = "Export Project";
+        this.title.innerText = i18n.t("exportProject");
         this.mount.innerHTML = "";
         this.mount.appendChild(this.exportElement);
     }
@@ -67,7 +68,7 @@ export default class ProjectView {
     }
 
     mountConfirm() {
-        this.title.innerText = "Confirm";
+        this.title.innerText = i18n.t("confirm");
         this.mount.innerHTML = "";
         this.mount.appendChild(this.confirmElement);
     }

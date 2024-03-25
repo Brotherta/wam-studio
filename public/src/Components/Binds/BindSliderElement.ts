@@ -1,3 +1,5 @@
+import i18n from "../../i18n";
+
 const template: HTMLTemplateElement = document.createElement("template");
 
 template.innerHTML = /*html*/`
@@ -59,7 +61,7 @@ export default class BindSliderElement extends HTMLElement {
     }
 
     setNameLabel(name: string) {
-        this.nameLabel.innerText = name;
+        this.nameLabel.innerText = i18n.t(name); 
     }
 
     defineSliderListener() {

@@ -1,0 +1,61 @@
+key,en,jp
+loading,Loading,読み込み中
+restart,Restart,再起動
+play,Play,再生
+pause,Pause,一時停止
+mute,Mute,ミュート
+unmute,Unmute,ミュート解除
+emptyProject,Empty Project,空のプロジェクト
+preset,Preset,プリセット
+default,Default,デフォルト
+
+tracks,TRACKS,トラック
+masterTrack,MASTER TRACK,マスタートラック
+plugins,PLUGINS,プラグイン
+
+selectSong,Select Song,曲を選択
+lead_vocal,Lead Vocal,リードボーカル
+guitar,Guitar,ギター
+acoustic_guitar,Acoustic Guitar,アコースティックギター
+electric_guitar,Electric Guitar,エレクトリックギター
+piano,Piano,ピアノ
+strings,Strings,ストリングス
+synth,Synth,シンセ
+bass,Bass,ベース
+brass,Brass,ブラス
+soundEffects,Sound Effects,サウンドエフェクト
+drums,Drums,ドラム
+kicks,Kicks,キック
+snares,Snares,スネア
+other,Other,その他
+
+vocals,Vocals,ボーカル
+solo,solo,ソロ
+volume,Volume,音量
+presets,Presets,プリセット
+selectAPreset,Select a preset,プリセットを選択
+Folk,Folk,フォーク
+EDM,EDM,エレクトロニック・ダンス・ミュージック
+HipHop,Hip Hop,ヒップホップ
+Pop,Pop,ポップ
+Rock,Rock,ロック
+Funk,Funk,ファンク
+
+saveProject,Save Project,プロジェクトを保存
+userName,User Name,ユーザー名
+projectName,Project name,プロジェクト名
+pleaseFillInAllFields,Please fill in all fields,すべての欄を埋めてください
+projectSaved,Project Saved!,プロジェクトが保存されました！
+somethingWentWrong,Something went wrong,何か問題が発生しました
+ifYouOpenANewProject,If you open a new project you will lose all your unsaved changes. Do you want to continue?,新しいプロジェクトを開くと、保存されていない変更が全て失われます。続けますか？
+saveProjectOverwrite,"Project {project}, last edited: {date}, already exists. Do you want to override it?","プロジェクト {project}, 最終編集日: {date}, は既に存在します。上書きしますか？"
+default,Default,デフォルト
+confirm,Confirm,確認
+cancel,Cancel,キャンセル
+
+switchMode,Switch Mode,モードを切り替え
+Clarity,Clarity,明瞭さ
+Weight,Weight,重み
+Deepen,Deepen,太さ
+Shine,Shine,輝き
+Tame,Tame,音の丸み

@@ -1,5 +1,6 @@
 import ParameterElement from "./ParameterElement";
 import Preset from "../../Models/Preset";
+import i18n from "../../i18n";
 
 const template: HTMLTemplateElement = document.createElement("template");
 
@@ -192,7 +193,7 @@ export default class AdvancedElement extends HTMLElement {
     addBindOption(name: string) {
         const option = document.createElement("option");
         option.value = name;
-        option.innerText = name;
+        option.innerText = i18n.t(name); 
         this.bindsSelect.appendChild(option);
     }
 
@@ -209,7 +210,7 @@ export default class AdvancedElement extends HTMLElement {
     addPresetsOption(name: string) {
         const option = document.createElement("option");
         option.value = name;
-        option.innerText = name;
+        option.innerText = i18n.t(name);
         this.presetsSelect.appendChild(option);
     }
 
@@ -228,8 +229,8 @@ export default class AdvancedElement extends HTMLElement {
 
         this.presetsSelect.innerHTML = "";
         let firstOption = document.createElement("option");
-        firstOption.value = "none";
-        firstOption.innerText = "Select a preset";
+        firstOption.value = i18n.t("none");
+        firstOption.innerText = i18n.t("selectAPreset");
         firstOption.disabled = true;
         this.presetsSelect.appendChild(firstOption);
 
@@ -240,7 +241,7 @@ export default class AdvancedElement extends HTMLElement {
         for (let preset of presets) {
             let option = document.createElement("option");
             option.value = preset.name;
-            option.innerText = preset.name;
+            option.innerText = i18n.t(preset.name);
             this.presetsSelect.appendChild(option);
             if (selected === preset.name) {
                 option.selected = true;

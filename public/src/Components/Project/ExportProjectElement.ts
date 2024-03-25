@@ -48,13 +48,13 @@ p {
 </style>
 
 <div id="main">
-    <p id="title">Export Project</p>
+    <p id="title" data-i18n="exportProject">Export Project</p>
     <div class="form-element">
-        <label for="name">Project Name</label>
+        <label for="name" data-i18n="projectName">Project Name</label>
         <input id="name-input" type="text" placeholder="Project Name..." name="name">
     </div>
     <div class="form-element">
-        <label for="master">Master Track</label>
+        <label for="master" data-i18n="masterTrack">Master Track</label>
         <input type="checkbox" id="master-input" name="master" checked>
     </div>
     <div id="tracks-container">

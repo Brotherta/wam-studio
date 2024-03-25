@@ -4,6 +4,7 @@ import {audioCtx} from "../index";
 import {SONGS_FILE_URL} from "../Env";
 import {MAX_DURATION_SEC} from "../Utils/Utils";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
+import i18n from "../i18n";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -159,7 +160,7 @@ export default class HostController {
             el.onclick = async () => {
                 if (!this.app.projectController.saved) {
                     this.app.projectController.openConfirm(
-                        "If you open a new project, you will lose all your unsaved changes. Do you want to continue ?",
+                        i18n.t("ifYouOpenANewProject"),
                         async () => {
                             await this.app.tracksController.openSong(song, name);
                             this.app.projectController.saved = false;

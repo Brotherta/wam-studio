@@ -250,7 +250,7 @@ const processor = (moduleId, paramsConfig) => {
 					const [tMin, tMax] = targetRange;
 					let out;
 					if (minValue !== tMin || maxValue !== tMax
-							|| minValue !== sMin || maxValue !== sMax) { // need to calculate with mapping
+						|| minValue !== sMin || maxValue !== sMax) { // need to calculate with mapping
 						out = raw.map((v) => {
 							const mappedValue = mapValue(v, minValue, maxValue, sMin, sMax, tMin, tMax);
 							return mappedValue - intrinsicValue;
@@ -260,8 +260,14 @@ const processor = (moduleId, paramsConfig) => {
 					} else { // No need to modify
 						out = raw;
 					}
-					if (out.length === 1) outputs[j + outputOffset][0].fill(out[0]);
-					else outputs[j + outputOffset][0].set(out);
+					// tzfeng added null check
+					if (outputs[j + outputOffset][0]) {
+						if (out.length === 1) {
+							outputs[j + outputOffset][0].fill(out[0]);
+						} else {
+							outputs[j + outputOffset][0].set(out);
+						}
+					}
 					this.$internalParamsBuffer[j] = out[0];
 				});
 			});

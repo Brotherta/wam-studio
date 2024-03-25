@@ -1,3 +1,5 @@
+import { translateHTMLElements } from "../i18n";
+
 const template: HTMLTemplateElement = document.createElement("template");
 
 template.innerHTML = /*html*/`
@@ -49,8 +51,8 @@ button {
     </div>
     
     <div class="form-element">
-        <button id="confirm">Confirm</button>
-        <button id="cancel">Cancel</button>
+        <button id="confirm" data-i18n="confirm">Confirm</button>
+        <button id="cancel" data-i18n="cancel">Cancel</button>
     </div>
 </div>    
 `
@@ -66,7 +68,9 @@ export default class ConfirmElement extends HTMLElement {
 
     connectedCallback() {
         if (!this.initialized) {
-            this.shadowRoot?.appendChild(template.content.cloneNode(true));
+            const translatedHTML = template.content.cloneNode(true) as HTMLElement;
+            translateHTMLElements(translatedHTML);
+            this.shadowRoot?.appendChild(translatedHTML);
             this.initialized = true;
         }
     }
@@ -80,6 +84,8 @@ export default class ConfirmElement extends HTMLElement {
     }
 
     setMessage(message: string) {
+        // tzfeng: clear the message before appending a new one
+        (this.shadowRoot?.querySelector(".message") as HTMLDivElement).innerHTML = "";
         this.shadowRoot?.querySelector(".message")?.append(message);
     }
 }

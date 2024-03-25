@@ -50,7 +50,7 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
         if (!this.audio || !this.audio.length > 0) return true;
 
         // Initializing the buffer with the given outputs and the audio length.
-        const bufferSize = outputs[0][0].length;
+        const bufferSize = inputs[0][0].length; // tzfeng, changed from outputs[0][0].length 2/2/2024
         const audioLength = this.audio[0].length;
 
         for (let i = 0; i < bufferSize; i++) {
@@ -70,7 +70,15 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             this.port.postMessage({playhead: this.playhead});
             this.playheadCount = 0;
         }
-        this.calculateMax(inputs[0][0])
+
+        // if stereo, average the two channels
+        if (inputs[0].length === 2) {
+            // average the two channels
+            const stereoAvg = inputs[0][0].map((v, i) => (v + inputs[0][1][i]) / 2);
+            this.calculateMax(stereoAvg);
+        } else {
+            this.calculateMax(inputs[0][0])
+        }
         return true;
     }
 
@@ -96,7 +104,6 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             this.max = 0;
             this.blockCount = 0;
         }
-
     }
 }
 

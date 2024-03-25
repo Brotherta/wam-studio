@@ -1,3 +1,5 @@
+import i18n from "../i18n";
+
 const template: HTMLTemplateElement = document.createElement("template");
 
 template.innerHTML = /*html*/`
@@ -57,7 +59,7 @@ export default class DialogElement extends HTMLElement {
         this.shadowRoot?.appendChild(template.content.cloneNode(true));
         this.loadProjectButton.addEventListener("click", () => {
             if (this.user.value === "" || this.project.value === "") {
-                this.showError("Please fill in all fields");
+                this.showError(i18n.t("pleaseFillInAllFields"));
                 return;
             }
         });

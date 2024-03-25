@@ -15,8 +15,10 @@
     "express": "^4.18.2",
     "helmet": "^7.0.0",
     "http-proxy": "^1.18.1",
-    "jszip": "^3.10.1",
     "http-proxy-middleware": "^2.0.6",
+    "i18next": "^23.10.0",
+    "i18next-http-backend": "^2.5.0",
+    "jszip": "^3.10.1",
     "pixi.js": "^7.2.4"
   },
   "devDependencies": {
@@ -34,7 +36,7 @@
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "ts-loader": "^9.2.8",
-    "typescript": "^4.6.3",
+    "typescript": "^5.3.3",
     "val-loader": "^5.0.1",
     "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2",

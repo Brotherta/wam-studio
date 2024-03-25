@@ -1,3 +1,5 @@
+import { translateHTMLString } from "../i18n";
+
 const template: HTMLTemplateElement = document.createElement("template");
 
 template.innerHTML = /*html*/`
@@ -249,8 +251,8 @@ template.innerHTML = /*html*/`
         </div>
     </div>
     <div class="track-controls">
-        <div id="mute-btn" class="mute-icon" hidden>Mute</div>
-        <div id="solo-btn" class="solo-icon">Solo</div>
+        <div id="mute-btn" class="mute-icon" hidden data-i18n="Mute">Mute</div>
+        <div id="solo-btn" class="solo-icon" data-i18n="solo">Solo</div>
         <div id="instrument-icon" class="other"></div>
         <div id="arm" class="control" hidden>
             <img src="icons/mic-fill.svg">
@@ -284,7 +286,7 @@ export default class TrackElement extends HTMLElement {
 
     connectedCallback() {
         if (this.shadowRoot !== null && !this.initialized) {
-            this.shadowRoot.innerHTML = template.innerHTML;
+            this.shadowRoot.innerHTML = translateHTMLString(template.innerHTML);
             this.initialized = true;
             this.defineTrackNameListener();
             this.shadowRoot.querySelectorAll(".track-volume, .track-balance, .track-controls").forEach((element) => {

@@ -42,7 +42,7 @@ export default class Loader {
                 let preset = track.bindControl.advElement.presetsSelect.value;
 
                 tracks.push({
-                    "name": track.element.name,
+                    "name": track.element.name, // TODO: saving track name in japanese? or save in english?
                     "id": track.id,
                     "url": track.url ? track.url : null,
                     "tag": track.tag,
