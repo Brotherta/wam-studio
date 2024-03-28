@@ -291,12 +291,10 @@ export default class PluginsController {
     private toggleAudioLoopBrowser(): void {
         const audioLoopBrowser = document.getElementById('audio-loop-browser');
         if (audioLoopBrowser) {
-            if (audioLoopBrowser.style.display === 'none') {
-                audioLoopBrowser.style.display = 'flex';
-            } else {
-                audioLoopBrowser.style.display = 'none';
-            }
+            audioLoopBrowser.style.display = audioLoopBrowser.style.display === 'none' ? 'flex' : 'none';
+            // Forcer un reflow
+            const reflow = audioLoopBrowser.offsetHeight;
         }
-    }
-
+    }    
+    
 }

@@ -199,7 +199,7 @@ export default class EditorController {
                 console.log("audio file url : " + audioFileURL);
                 this.importDraggedAudioLoop(audioFileURL, e.clientX, e.clientY);
             } else {
-                // check is dragged data is one or several files (drag'n'drop from desktop)
+                // check if dragged data is one or several files (drag'n'drop from desktop)
                 if (e.dataTransfer?.items) {
 
                     this.importDraggedFiles([...e.dataTransfer.items], e.clientX, e.clientY);
@@ -323,6 +323,7 @@ export default class EditorController {
 
             const start = (this._app.editorView.viewport.left + (clientX - offsetLeft)) * RATIO_MILLS_BY_PX;
             let acc = 0;
+            this.showLoadingIcon(true);
             for (let i = 0; i < audioFiles.length; i++) {
                 let file = audioFiles[i];
 
@@ -350,10 +351,41 @@ export default class EditorController {
 
                 this._app.regionsController.createRegion(track, operableAudioBuffer, start, waveform)
                 acc += HEIGHT_TRACK;
+                this.showLoadingIcon(false);
             }
         }
 
     }
+
+    private showLoadingIcon(show: boolean): void {
+        let loadingIcon = document.querySelector('#loading-icon') as HTMLElement; 
+        if (show) {
+            if (!loadingIcon) {
+                loadingIcon = document.createElement('div') as HTMLElement;
+                loadingIcon.id = 'loading-icon';
+                loadingIcon.style.position = 'fixed'; 
+                loadingIcon.style.top = '0';
+                loadingIcon.style.left = '0';
+                loadingIcon.style.width = '100vw';
+                loadingIcon.style.height = '100vh';
+                loadingIcon.style.display = 'flex';
+                loadingIcon.style.alignItems = 'center';
+                loadingIcon.style.justifyContent = 'center';
+                loadingIcon.style.zIndex = '9999'; 
+                loadingIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
+                loadingIcon.innerHTML = `
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                `;
+                document.body.appendChild(loadingIcon);
+            }
+        } else {
+            if (loadingIcon) loadingIcon.remove();
+        }
+    }
+    
+    
 
     private async importDraggedAudioLoop(url: string, clientX: number, clientY: number) {
         let offsetLeft = this._view.canvasContainer.offsetLeft // offset x of the canvas
@@ -362,12 +394,11 @@ export default class EditorController {
         if ((clientX >= offsetLeft && clientX <= offsetLeft + this._view.width) &&
             (clientY >= offsetTop && clientY <= offsetTop + this._view.height)) {
 
-
             const start = (this._app.editorView.viewport.left + (clientX - offsetLeft)) * RATIO_MILLS_BY_PX;
-
+            this.showLoadingIcon(true);
             // we have only one url
 
-            // Check is the drop is on an existing track or if we need to create a new on
+            // Check if the drop is on an existing track or if we need to create a new on
             let waveform = this._view.getWaveformAtPos(clientY - offsetTop);
 
             if (!waveform) {
@@ -393,7 +424,8 @@ export default class EditorController {
             // create an operable audio buffer
             let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
 
-            this._app.regionsController.createRegion(track, operableAudioBuffer, start, waveform)
+            this._app.regionsController.createRegion(track, operableAudioBuffer, start, waveform);
+            this.showLoadingIcon(false);
         }
     }
 
