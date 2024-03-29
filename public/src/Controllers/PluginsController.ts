@@ -199,10 +199,6 @@ export default class PluginsController {
         this._view.mainTrack.addEventListener("click", () => {
             this.selectHost();
         });
-        const soundLoupButton = document.getElementById('soundLoup');
-        soundLoupButton?.addEventListener('click', () => {
-        this.toggleAudioLoopBrowser();
-        });
     }
 
     /**
@@ -283,18 +279,5 @@ export default class PluginsController {
             this._app.editorView.resizeCanvas();
         }
     }
-
-    /**
-    * Toggles the visibility of the audio loop browser.
-    * @private
-    */
-    private toggleAudioLoopBrowser(): void {
-        const audioLoopBrowser = document.getElementById('audio-loop-browser');
-        if (audioLoopBrowser) {
-            audioLoopBrowser.style.display = audioLoopBrowser.style.display === 'none' ? 'flex' : 'none';
-            // Forcer un reflow
-            const reflow = audioLoopBrowser.offsetHeight;
-        }
-    }    
     
 }

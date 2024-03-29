@@ -3,9 +3,7 @@ import DraggableWindow from "../Utils/DraggableWindow";
 
 
 export default class PluginsView extends DraggableWindow {
-
     maxMinBtn = document.getElementById("min-max-btn") as HTMLDivElement;
-    audioLoop = document.getElementById("sound-loop") as HTMLAudioElement;
     rack = document.getElementById("plugin-editor") as HTMLDivElement;
     newPlugin = document.getElementById("add-plugins") as HTMLDivElement;
     mount = document.getElementById("mount") as HTMLDivElement;

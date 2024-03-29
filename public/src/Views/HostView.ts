@@ -8,7 +8,7 @@ import AudioLoopBrowser from "../Components/WamAudioLoopBrowser";
  * Class responsible for the host view. It displays the host controls and the host track.
  */
 export default class HostView {
-
+    audioLoop = document.getElementById("sound-loop") as HTMLAudioElement;
     playBtn = document.getElementById("play-btn") as HTMLDivElement;
     backBtn = document.getElementById("back-btn") as HTMLDivElement;
     recordBtn = document.getElementById("record-btn") as HTMLDivElement;
