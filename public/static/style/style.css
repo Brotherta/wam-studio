@@ -64,14 +64,7 @@ body {
     display: flex;
     flex-direction: column;
 }
-#audio-loop-browser{
-    position: relative;
-    font-size: 12px;
-    width: 300px;
-    height: 100%;
-    transform: translateZ(0);
-    display: none;
-}
+
 #ToggleButtons{
     position: relative;
     display: flex;
@@ -85,15 +78,15 @@ body {
 }
 
 #track-editor {
-    height: 100%;
-    width: 100%;
     display: flex;
     flex-direction: row;
-    overflow: hidden;
+    height: 100%;
+    width: 100%;
     border-bottom: 1px solid black;
 }
 
 #track-container {
+    flex: 0 0 var(--track-container-width);
     min-width: var(--track-container-width);
     display: flex;
     flex-direction: column;
@@ -131,10 +124,18 @@ body {
 }
 
 #editor {
-    width: calc(100% - var(--track-container-width));
-    height: 100%;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
+}
+
+#audio-loop-browser{
+    width: 300px;
+    display: none;
+    position: relative;
+    font-size: 12px;
+    height: 100%;
+    transform: translateZ(0);
 }
 
 #editor-content {
@@ -146,10 +147,7 @@ body {
 }
 
 #editor-canvas {
-    position: relative;
-    overflow: hidden;
-    flex: 1;
-    height: 100%;
+    flex-grow: 1;
 }
 
 #automation-container {

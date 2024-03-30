@@ -485,22 +485,20 @@ export default class HostController {
       trackDiv.scrollTop = automationDiv.scrollTop;
     });
 
-    const soundLoupButton = document.getElementById('soundLoup');
-        soundLoupButton?.addEventListener('click', () => {
-        this.toggleAudioLoopBrowser();
-    });
+    
+    const toggleAudioLoopBrowserButton = document.getElementById('soundLoupBtn');
+    toggleAudioLoopBrowserButton?.addEventListener('click', function() {
+    const audioLoopBrowser = document.getElementById('audio-loop-browser') as HTMLDivElement;
+    if (audioLoopBrowser.style.display === 'none') {
+        audioLoopBrowser.style.display = 'flex';
+    } else {
+        audioLoopBrowser.style.display = 'none';
+    }
+});
+
   }
 
-  /**
-    * Toggles the visibility of the audio loop browser.
-    * @private
-    */
-  private toggleAudioLoopBrowser(): void {
-    const audioLoopBrowser = document.getElementById('audio-loop-browser');
-    if (audioLoopBrowser) {
-        audioLoopBrowser.style.display = audioLoopBrowser.style.display === 'none' ? 'flex' : 'none';
-    }
-  }    
+      
 
   /**
    * Initializes the demo songs. It creates a new song item for each demo song present in the json file.
