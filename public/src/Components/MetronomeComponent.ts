@@ -151,6 +151,8 @@ export default class MetronomeComponent extends HTMLElement {
         this.resolution = newResolution;
         if (this.isPlaying) {
             this.updateInterval();
+        }else{
+            return;
         }
     }
 
