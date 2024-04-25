@@ -93,6 +93,8 @@ export default class HostController {
       // Start the metronome if it's enabled
       if (this._app.host.metronomeOn){
         (this._view.MetronomeElement as MetronomeComponent).startMetronome();
+      }else{
+        (this._view.MetronomeElement as MetronomeComponent).pauseMetronome();
       }
 
     } else {
@@ -176,7 +178,9 @@ export default class HostController {
 
     // Start or stop the metronome based on both metronome state and whether playback is active
     if (metronomeOn && this._app.host.playing) {
-      (this._view.MetronomeElement as MetronomeComponent).PlayPauseMetro();
+      (this._view.MetronomeElement as MetronomeComponent).startMetronome();
+    }else{
+      (this._view.MetronomeElement as MetronomeComponent).pauseMetronome();
     }
 
     // Update the icon to reflect the new state.

@@ -103,19 +103,6 @@ export default class MetronomeComponent extends HTMLElement {
             this.updateTimeSignature(newNumerator, newDenominator);
         });
 
-
-
-        // // when the user clicks the play button, the metronome will start
-        // this.playBtn.addEventListener('click', () => {
-        //     this.togglePlay();
-        // });
-
-        // // when the user clicks the record button, the metronome will start
-        // this.recordBtn.addEventListener('click', () => {
-        //     this.togglePlay();
-        // });
-
-
         this.metroBtnArrow.addEventListener('click', () => {
             console.log('clicked');
             const metronomeContainer = this.shadowRoot?.querySelector('.metronome-container') as HTMLDivElement;
@@ -132,8 +119,6 @@ export default class MetronomeComponent extends HTMLElement {
         precountSelect?.addEventListener('change', () => this.setPrecount(parseInt(precountSelect.value)));
 
     }
-
-    
 
     //stop the metronome
     public stopMetronome(): void {
@@ -179,16 +164,16 @@ export default class MetronomeComponent extends HTMLElement {
         this.metronomeInterval = window.setInterval(() => this.playClick(), interval);
     }
 
-    public PlayPauseMetro(): void {
-        this.isPlaying = !this.isPlaying;
-        if (this.isPlaying) {
-            if (!this.metronomeInterval) {  // Start the metronome if not already running
-                this.updateInterval();
-            }
-        } else {
-            this.pauseMetronome();  // Pause the metronome, but do not reset
-        }
-    }
+    // public PlayPauseMetro(): void {
+    //     this.isPlaying = !this.isPlaying;
+    //     if (this.isPlaying) {
+    //         if (!this.metronomeInterval) {  // Start the metronome if not already running
+    //             this.updateInterval();
+    //         }
+    //     } else {
+    //         this.pauseMetronome();  // Pause the metronome, but do not reset
+    //     }
+    // }
     
 
     public startMetronome(): void {
