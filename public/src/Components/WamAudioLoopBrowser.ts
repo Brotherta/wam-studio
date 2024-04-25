@@ -6,8 +6,8 @@ export default class WamAudioLoopBrowser extends HTMLElement {
     constructor() {
         super();
         this.audioData = null;
-        this.URL_SERVER = "https://wam-bank.i3s.univ-cotedazur.fr";
-        // this.URL_SERVER = "http://localhost:6002";
+        // this.URL_SERVER = "https://wam-bank.i3s.univ-cotedazur.fr";
+        this.URL_SERVER = "http://localhost:6002";
         this.attachShadow({ mode: "open" });
     }
 
@@ -69,7 +69,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
                     <div id="favorites-container" style="display: none;">
                         <!-- Les morceaux favoris apparaîtront ici -->
                     </div>
-                    
+
                     <div id="folder-container"></div>
                     <div id="files-container"></div>
 
@@ -85,14 +85,14 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             --accent-color: #505dca; /* Couleur d'accent */
             --hover-bg-color: #505dca; /* Couleur de fond au survol */
           }
-          
+
           #mainWrapper {
             width: 300px;
             height: 100vh;
             max-height: 100vh;
             font-size: 12px;
           }
-          
+
           #main {
             user-select: none;
             background-color: var(--primary-bg-color);
@@ -113,23 +113,23 @@ export default class WamAudioLoopBrowser extends HTMLElement {
         #library-list::-webkit-scrollbar {
             width: 12px;
         }
-        
+
         ::-webkit-scrollbar-track {
             background-color: transparent;
         }
-        
+
         ::-webkit-scrollbar-thumb {
             -webkit-border-radius: 10px;
             border-radius: 10px;
-            background: #777; 
+            background: #777;
         }
-          
+
           h1 {
             color: var(--accent-color);
             text-align: center;
             margin:0;
           }
-          
+
           #search-container {
             display: flex;
             padding-left: 0.5rem;
@@ -137,13 +137,13 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             position: relative;
             margin-bottom: 1rem;
           }
-          
+
           #search-icon {
             color: var(--accent-color);
             position: absolute;
             left: 1rem;
           }
-          
+
           #search-input {
             flex-grow: 1;
             padding: 0.5rem 2rem;
@@ -154,14 +154,14 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             background-color: var(--secondary-bg-color);
             color: var(--text-color);
           }
-          
+
           #folder-container {
             user-select: none;
             display: flex;
             flex-direction: column;
             margin-bottom: 1rem;
           }
-          
+
           .folder-btn {
             background-color: var(--secondary-bg-color);
             color: var(--text-color);
@@ -173,48 +173,48 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             transition: background-color 0.2s;
             text-align: left;
           }
-          
+
           .folder-btn:hover {
             background-color: var(--hover-bg-color);
           }
-          
+
           #files-container {
             display: flex;
             overflow: hidden;
             flex-direction: column;
             gap: 0.5rem;
           }
-          
+
           .folder > .nested {
-            display: none; 
-            margin-left: 0.5rem; 
+            display: none;
+            margin-left: 0.5rem;
           }
-          
+
           .folder > .nested.show {
             display: block;
           }
           .folder-title {
             cursor: pointer;
           }
-          
+
             .folder-icon {
             margin-left: 0.5rem;
             font-size: 18px;
             }
-          
+
           .audio-file-item {
             background-color: var(--secondary-bg-color);
             flex-grow: 1;
-            white-space: nowrap; 
+            white-space: nowrap;
             text-overflow: ellipsis;
             border-radius: 5px;
             padding: 0.1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 0.5rem; 
+            margin-bottom: 0.5rem;
           }
-          
+
           .play-btn,
           .favourite-btn,
           .download-btn,
@@ -227,27 +227,27 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             cursor: pointer;
             transition: transform 0.2s;
           }
-          
+
           .play-btn:hover,
           .favourite-btn:hover,
           .download-btn:hover,
           .add-btn:hover {
             transform: scale(1.1);
           }
-          
+
           .bi-heart-fill {
             color: red;
           }
-          
+
           .file-name {
             user-select: none;
             flex-grow: 1;
             margin-right: 10px;
-            overflow: hidden; 
-            white-space: nowrap; 
-            text-overflow: ellipsis; 
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
           }
-          
+
           #filter-container {
             display: flex;
             flex-wrap: wrap;
@@ -258,7 +258,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             border-radius: 10px;
             margin-bottom: 1rem;
           }
-          
+
           select, input[type="number"],option[name="key-mode"] {
             padding: 0.5rem;
             border-radius: 5px;
@@ -266,16 +266,16 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             background-color: var(--primary-bg-color);
             color: var(--text-color);
           }
-          
+
           select:focus, input[type="number"]:focus {
             outline: none;
             border-color: var(--accent-color);
           }
-          
+
           label {
             color: var(--text-color);
           }
-          
+
           button {
             padding: 0.5rem 1rem;
             border: none;
@@ -285,46 +285,47 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             cursor: pointer;
             transition: background-color 0.2s;
           }
-          
+
           button:hover {
             background-color: darken(var(--accent-color), 60%);
           }
-          
+
           #key-filter {
             display: flex;
             align-items: center;
-            gap: 1rem; 
+            gap: 1rem;
           }
-          
+
           #key-mode-filter {
             display: flex;
             align-items: center;
             gap: 0.5rem; /
           }
-          
+
           #reset-filters-btn:hover{
             background-color: red;
           }
-          
+
           #favorites-container .audio-file-item {
             margin-bottom: 0.5rem;
           }
-          
+
           #favorites-container {
-            display: none; 
+            display: none;
             margin-bottom: 1rem;
           }
-          
-          
-          
+
+
+
         </style>
-        
+
     `;
 
         fetch(this.URL_SERVER + "/api/audioloops")
             .then((response) => response.json())
             .then((data) => {
                 this.audioData = data;
+
                 const folderContainer = this.shadowRoot.getElementById('folder-container') as HTMLElement;
                 this.generateStructure(this.audioData, folderContainer);
 
@@ -497,7 +498,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
     resetFoldersAndFilesDisplay() {
         const folderContainer = this.shadowRoot.getElementById('folder-container') as HTMLElement;
         const filesContainer = this.shadowRoot.getElementById('files-container') as HTMLElement;
-        
+
         folderContainer.innerHTML = '';
         filesContainer.innerHTML = '';
         this.generateStructure(this.audioData,folderContainer);
@@ -539,7 +540,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
                     const fileMatches = this.filterFile(item, selectedKey, selectedMode, bpm);
                     if (fileMatches) {
                         const fileItem = this.createAudioPlayer(item, false, true);
-                        htmlContent += fileItem; 
+                        htmlContent += fileItem;
                     }
                 }
             });
@@ -597,7 +598,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             const fileObject = this.findFileObjectByFullPath(fullPath, this.audioData.children);
             if (fileObject) {
                 const audioPlayerHtml = this.createAudioPlayer(fileObject, true, false);
-               
+
                 favoritesContainer.innerHTML += audioPlayerHtml;
 
             }
@@ -672,7 +673,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
         const fileNameWithoutExtension = element.name.replace(new RegExp(`\.${fileExtension}$`), '');
 
         return `
-            <div draggable=true  class="audio-file-item" data-filename="${element.name}" 
+            <div draggable=true  class="audio-file-item" data-filename="${element.name}"
             data-fullpath="${fullPath}">
                 <button class="play-btn">
                     <i class="bi bi-play-fill"></i>

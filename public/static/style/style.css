@@ -5,6 +5,22 @@
     --track-container-width: 200px;
 }
 
+.metro-btn-arrow {
+    background: none;
+    border: none;
+    position: relative;
+    top: 13px;
+    width: 12px;
+    margin: 0 3px 0 -12px;
+    padding: 3px 0;
+    font-size: 16px;
+    transform: scaleY(0.6);
+}
+.metro-btn-arrow:hover {
+    cursor: pointer;
+    color: lightgrey;
+}
+
 html, body {
     overflow: hidden;
     height: 100%;
@@ -78,10 +94,11 @@ body {
 }
 
 #track-editor {
-    display: flex;
-    flex-direction: row;
     height: 100%;
     width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
     border-bottom: 1px solid black;
 }
 

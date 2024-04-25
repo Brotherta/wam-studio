@@ -50,6 +50,9 @@ export default class Host extends Track {
      * Volume of the host for the mute and unmute.
      */
     private muteBeforeMute: number;
+  metronome: any;
+  metronomeOn: any;
+  MetronomeElement: any;
     
     constructor(app: App) {
         super(-1, new TrackElement(), undefined);
