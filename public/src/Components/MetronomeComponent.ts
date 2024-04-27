@@ -1,3 +1,5 @@
+import {BACKEND_URL} from "../Env";
+
 export default class MetronomeComponent extends HTMLElement {
     private isPlaying: boolean = false;
     private bpm: number = 120;
@@ -23,7 +25,7 @@ export default class MetronomeComponent extends HTMLElement {
     constructor(tempoSelector: HTMLElement, timeSignatureSelector: HTMLElement) {
         super();
         this.audioContext = new window.AudioContext();
-        this.URL_SERVER = "http://localhost:6002";
+        this.URL_SERVER = BACKEND_URL;
         this.click1 = new Audio(`${this.URL_SERVER}/AudioMetro/metroBig.wav`);
         this.click2 = new Audio(`${this.URL_SERVER}/AudioMetro/metroSmall.wav`);
         this.initDOMElements();
@@ -163,6 +165,7 @@ export default class MetronomeComponent extends HTMLElement {
     private updateInterval(): void {
         clearInterval(this.metronomeInterval);
         const interval = (60 / this.bpm) * 1000 * (this.noteValue / this.resolution);
+        this.playClick();
         this.metronomeInterval = window.setInterval(() => this.playClick(), interval);
     }
 
@@ -191,6 +194,7 @@ export default class MetronomeComponent extends HTMLElement {
     }
 
     private playClick(): void {
+        console.log('playing click, currentBeat:', this.currentBeat, 'currentMeasure:', this.currentMeasure)
         const audioToPlay = (this.currentBeat % this.beatsPerMeasure === 0) ? this.click1 : this.click2;
         audioToPlay.currentTime = 0;
         audioToPlay.play();

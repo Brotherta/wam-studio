@@ -6,8 +6,8 @@ export default class WamAudioLoopBrowser extends HTMLElement {
     constructor() {
         super();
         this.audioData = null;
-        // this.URL_SERVER = "https://wam-bank.i3s.univ-cotedazur.fr";
-        this.URL_SERVER = "http://localhost:6002";
+         this.URL_SERVER = "https://wam-bank.i3s.univ-cotedazur.fr";
+        //this.URL_SERVER = "http://localhost:6002";
         this.attachShadow({ mode: "open" });
     }
 
@@ -412,7 +412,16 @@ export default class WamAudioLoopBrowser extends HTMLElement {
         }
 
         this.attachPlayButtonEventListeners();
+        this.attachDragListeners();
     }
+
+    attachDragListeners() {
+        this.shadowRoot.querySelectorAll(".audio-file-item").forEach((audioLoopDiv) => {
+            console.log("audioLoopDiv");
+            audioLoopDiv.addEventListener("dragstart", this.dragHandler);
+        });
+    }
+
     attachPlayButtonEventListeners(): void {
         const playButtons = this.shadowRoot.querySelectorAll('.play-btn');
 
