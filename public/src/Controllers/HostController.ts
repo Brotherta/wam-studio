@@ -7,6 +7,7 @@ import VuMeter from "../Components/VuMeterElement";
 import DraggableWindow from "../Utils/DraggableWindow";
 import WebAudioPeakMeter from "../Audio/Utils/PeakMeter";
 import PlayheadView from "../Views/Editor/PlayheadView";
+import MetronomeComponent from "../Components/MetronomeComponent";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -58,6 +59,9 @@ export default class HostController {
     this.initializeVuMeter();
     this.bindEvents();
     this.bindNodeListeners();
+    this._app.host.metronomeOn = false;  // Metronome is off by default
+    console.log("Initial Metronome State: " + (this._app.host.metronomeOn ? "On" : "Off"));
+    this._view.updateMetronomeBtn(false);
   }
 
   /**
@@ -68,7 +72,7 @@ export default class HostController {
   public play(stop: boolean = false): void {
     const playing = !this._app.host.playing;
     this._app.host.playing = playing;
-    console.log("Playing: " + playing);
+    console.log("Playing: " + playing + ", Metronome: " + (this._app.host.metronomeOn ? "On" : "Off"));
     if (playing) {
       // disable zoom buttons when playing (this confuses the player in this version)
       this._view.zoomInBtn.classList.remove("zoom-enabled");
@@ -85,6 +89,14 @@ export default class HostController {
       });
       this._app.host.hostNode?.play();
       this.launchTimerInterval();
+
+      // Start the metronome if it's enabled
+      if (this._app.host.metronomeOn){
+        (this._view.MetronomeElement as MetronomeComponent).startMetronome();
+      }else{
+        (this._view.MetronomeElement as MetronomeComponent).pauseMetronome();
+      }
+
     } else {
       // enable zoom buttons when playing is stopped
       this._view.zoomInBtn.classList.remove("zoom-disabled");
@@ -92,7 +104,6 @@ export default class HostController {
       this._view.zoomInBtn.classList.add("zoom-enabled");
       this._view.zoomOutBtn.classList.add("zoom-enabled");
       //console.log("Stopping zoom-enabled");
-
       this._app.tracksController.trackList.forEach((track) => {
         if (track.plugin.initialized) {
           track.plugin.instance!._audioNode.clearEvents();
@@ -105,6 +116,8 @@ export default class HostController {
       }
       this._app.host.hostNode?.pause();
       if (this._timerInterval) clearInterval(this._timerInterval);
+      // Always stop the metronome when playback is stopped
+      (this._view.MetronomeElement as MetronomeComponent).pauseMetronome();
     }
     this._view.updatePlayButton(playing, stop);
   }
@@ -153,6 +166,27 @@ export default class HostController {
     else this._app.host.unmute();
     this._view.updateMuteButton(muted);
   }
+  
+
+  public toggleMetronome(): void {
+    const metronomeOn = !this._app.host.metronomeOn;
+    console.log("Metronome Toggled: " + (metronomeOn ? "On" : "Off"));
+    this._app.host.metronomeOn = metronomeOn;
+
+    // Log the state change
+    console.log(`Metronome ${metronomeOn ? "started" : "stopped"}`);
+
+    // Start or stop the metronome based on both metronome state and whether playback is active
+    if (metronomeOn && this._app.host.playing) {
+      (this._view.MetronomeElement as MetronomeComponent).startMetronome();
+    }else{
+      (this._view.MetronomeElement as MetronomeComponent).pauseMetronome();
+    }
+
+    // Update the icon to reflect the new state.
+    this._view.updateMetronomeBtn(metronomeOn);
+}
+
 
   public snapOnOff(): void {
     const snapping = !this._app.editorView.snapping;
@@ -305,6 +339,9 @@ export default class HostController {
     });
     this._view.muteBtn.addEventListener("click", () => {
       this.mute();
+    });
+    this._view.metroBtn.addEventListener("click", () => {
+      this.toggleMetronome();
     });
     this._view.snapBtn.addEventListener("click", () => {
       this.snapOnOff();

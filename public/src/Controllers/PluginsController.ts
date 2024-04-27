@@ -1,7 +1,7 @@
 import App from "../App";
 import Track from "../Models/Track";
 import Host from "../Models/Host";
-import {audioCtx} from "../index";
+import { audioCtx } from "../index";
 import PluginsView from "../Views/PluginsView";
 
 /**
@@ -279,5 +279,5 @@ export default class PluginsController {
             this._app.editorView.resizeCanvas();
         }
     }
-
+    
 }

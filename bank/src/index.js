@@ -38,6 +38,7 @@ app.use("/", cors(CORS_ALL), express.static(path.join(__dirname, "../PedalBoard"
 app.use("/plugins", cors(CORS_ALL), express.static(path.join(__dirname, "../plugins")));
 app.use("/songs", cors(CORS_ALL), express.static(path.join(__dirname, "../songs")));
 app.use("/loops", cors(CORS_ALL), express.static(path.join(__dirname, "../loops")));
+app.use("/AudioMetro", cors(CORS_ALL), express.static(path.join(__dirname, "../AudioMetro")));
 
 
 app.listen(config.port, () => {

@@ -219,10 +219,10 @@ export default class RecorderController {
         this.app.host.recording = recording;
         if (recording) {
             let armed = this.app.tracksController.trackList.find((e) => e.armed);
-            if (armed === undefined) {
-                alert("No track armed");
-                return;
-            }
+            // if (armed === undefined) {
+            //     alert("No track armed");
+            //     return;
+            // }
             if (!this.app.host.playing) {
                 this.app.hostController.play(true);
             }

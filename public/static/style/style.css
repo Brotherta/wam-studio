@@ -5,6 +5,22 @@
     --track-container-width: 200px;
 }
 
+.metro-btn-arrow {
+    background: none;
+    border: none;
+    position: relative;
+    top: 13px;
+    width: 12px;
+    margin: 0 3px 0 -12px;
+    padding: 3px 0;
+    font-size: 16px;
+    transform: scaleY(0.6);
+}
+.metro-btn-arrow:hover {
+    cursor: pointer;
+    color: lightgrey;
+}
+
 html, body {
     overflow: hidden;
     height: 100%;
@@ -51,11 +67,30 @@ body {
 }
 
 #app {
-    height: 100%;
-    width: 100%;
+    display: flex;
+    flex-grow: 1;
+    height: 0;
+    margin-bottom: 0;
+    position: relative;
+}
+#left-container {
+    width: 0;
+    flex-grow: 1;
+    border-right: 1px solid black;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+}
+
+#ToggleButtons{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: right;
+    width: 52px;
+    padding: 6px 6px 32px;
+    background-color: rgb(41, 42, 45);
+    border-left: 1px solid black;
 }
 
 #track-editor {
@@ -68,6 +103,7 @@ body {
 }
 
 #track-container {
+    flex: 0 0 var(--track-container-width);
     min-width: var(--track-container-width);
     display: flex;
     flex-direction: column;
@@ -105,14 +141,23 @@ body {
 }
 
 #editor {
-    width: calc(100% - var(--track-container-width));
-    height: 100%;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
+#audio-loop-browser{
+    width: 300px;
+    display: none;
+    position: relative;
+    font-size: 12px;
+    height: 100%;
+    transform: translateZ(0);
+}
+
 #editor-content {
     width: 100%;
+    height: 100%;
     flex-grow: 1;
     display: flex;
     flex-direction: row;
@@ -133,18 +178,19 @@ body {
 }
 
 #plugin-editor {
+
     height: 25px;
+    transform: translateZ(0);
     border: 1px solid black;
     background: rgb(23, 23, 26);
 }
 
 #plugin-container-header {
-    position: absolute;
     min-height: 25px;
-    width: 100%;
     border-bottom: 1px solid rgb(0, 0, 0);
     background-color: var(--head-color);
     display: flex;
+    flex-shrink: 0;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;

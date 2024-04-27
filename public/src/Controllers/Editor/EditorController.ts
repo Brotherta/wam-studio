@@ -86,18 +86,18 @@ export default class EditorController {
         } else { // Button pressed - Find nearest step and adjust to that step
             this._currentLevel = this.getNearestZoomLevel();
             let level = this._currentLevel;
-            
+
             this._currentLevel = Math.max(this._currentLevel - 1, 0);
             //console.log("_currentLevel", this._currentLevel)
 
-            if(this._currentLevel === 0) {
+            if (this._currentLevel === 0) {
                 // level is at max zoom value
                 this._app.hostView.zoomInBtn.classList.remove("zoom-enabled");
                 this._app.hostView.zoomInBtn.classList.add("zoom-disabled");
             }
 
-            if (level === this._currentLevel)return;
-            
+            if (level === this._currentLevel) return;
+
             ratio = this.getZoomRatioByLevel(this._currentLevel);
             //console.log(ratio)
         }
@@ -105,7 +105,7 @@ export default class EditorController {
         incrementZoomLevel();
         this.updateZoom();
 
-       //this._view.stage.scale.x *= ZOOM_LEVEL;
+        //this._view.stage.scale.x *= ZOOM_LEVEL;
 
     }
 
@@ -115,7 +115,7 @@ export default class EditorController {
      * @param value the of the zoom in pixel
      */
     public zoomOut(value?: number): void {
-    
+
 
         // for the moment, do not allow zoom in/out while playing
         if (this._app.host.playing) return;
@@ -136,13 +136,13 @@ export default class EditorController {
             this._currentLevel = Math.min(this.ZOOM_STEPS - 1, this._currentLevel + 1);
             //console.log("_currentLevel", this._currentLevel)
 
-            if(this._currentLevel === this.ZOOM_STEPS - 1) {
+            if (this._currentLevel === this.ZOOM_STEPS - 1) {
                 this._app.hostView.zoomOutBtn.classList.remove("zoom-enabled");
                 this._app.hostView.zoomOutBtn.classList.add("zoom-disabled");
             }
 
             if (level === this._currentLevel) return;
-            
+
             ratio = this.getZoomRatioByLevel(this._currentLevel);
         }
         //updateRatioMillsByPx(ratio);
@@ -169,7 +169,7 @@ export default class EditorController {
             if (isMac && e.metaKey || !isMac && e.ctrlKey) {
                 const zoomIn = e.deltaY > 0;
                 if (zoomIn) this._app.editorController.zoomIn(e.deltaY);
-                else this._app.editorController.zoomOut(e.deltaY*-1);
+                else this._app.editorController.zoomOut(e.deltaY * -1);
             }
             else {
                 this._view.handleWheel(e);
@@ -188,10 +188,25 @@ export default class EditorController {
             e.preventDefault();
         });
         this._view.canvasContainer.addEventListener('drop', (e: DragEvent) => {
+            console.log("drag called !!!!")
             e.preventDefault();
-            if (e.dataTransfer?.items) {
-                this.importDraggedFiles([...e.dataTransfer.items], e.clientX, e.clientY);
+
+
+            if (e.dataTransfer?.getData("audioFileURL")) {
+                // LEt's fetch the audio file and create a new region (drag'n'drop from audio loop browser)
+                console.log("DRAGEGD FILE FROM AUDIO LOOP BROWSER")
+                let audioFileURL = e.dataTransfer?.getData("audioFileURL");
+                console.log("audio file url : " + audioFileURL);
+                this.importDraggedAudioLoop(audioFileURL, e.clientX, e.clientY);
+            } else {
+                // check if dragged data is one or several files (drag'n'drop from desktop)
+                if (e.dataTransfer?.items) {
+
+                    this.importDraggedFiles([...e.dataTransfer.items], e.clientX, e.clientY);
+                }
             }
+
+
         })
         window.addEventListener('drop', (e) => {
             e.preventDefault();
@@ -223,20 +238,20 @@ export default class EditorController {
 
         this._view.resizeCanvas();
         this._view.playhead.moveToFromPlayhead(this._app.host.playhead);
-         const playhead = this._app.host.playhead;
-         /*
-        console.log("after zoom playhead=" + playhead + 
-                " pos="  + this._view.playhead.position.x + " ms=" + (playhead / audioCtx.sampleRate) * 1000);
-        */
+        const playhead = this._app.host.playhead;
+        /*
+       console.log("after zoom playhead=" + playhead + 
+               " pos="  + this._view.playhead.position.x + " ms=" + (playhead / audioCtx.sampleRate) * 1000);
+       */
         this._view.loop.updatePositionFromTime(this._app.host.loopStart, this._app.host.loopEnd);
         this._app.automationController.updateBPFWidth();
 
         // let's scroll the viewport + recompute size and pos of the horizontal scrollbar
         let scrollValue = this._view.playhead.position.x - offsetPlayhead;
         this._view.horizontalScrollbar.customScrollTo(scrollValue);
-        
-        this._view.spanZoomLevel.innerHTML = ("x"+ZOOM_LEVEL.toFixed(2));
-        
+
+        this._view.spanZoomLevel.innerHTML = ("x" + ZOOM_LEVEL.toFixed(2));
+
         this._app.tracksController.trackList.forEach(track => {
             // MB : this seems unecessary
             //track.updateBuffer(audioCtx, this._app.host.playhead);
@@ -255,10 +270,10 @@ export default class EditorController {
             //console.log("Dans le timeout")
             // if playhead pos is more viewport width/2, center the viewport around the playhead, 
             // recenter the viewport 
-            console.log("playhead pos = " + this._view.playhead.position.x + " width/2=" + this._view.width/2);
-            if(this._view.playhead.position.x > this._view.width/2)
+            console.log("playhead pos = " + this._view.playhead.position.x + " width/2=" + this._view.width / 2);
+            if (this._view.playhead.position.x > this._view.width / 2)
                 this._app.playheadController.centerViewportAround();
-            
+
 
 
             this._app.tracksController.trackList.forEach(track => {
@@ -295,19 +310,20 @@ export default class EditorController {
      * @param clientX - x pos of the drop
      * @param clientY - y pos of the drop
      */
-    private async importDraggedFiles(files: DataTransferItem[], clientX: number, clientY: number) {  
+    private async importDraggedFiles(files: DataTransferItem[], clientX: number, clientY: number) {
         let offsetLeft = this._view.canvasContainer.offsetLeft // offset x of the canvas
         let offsetTop = this._view.canvasContainer.offsetTop // offset y of the canvas
-    
+
         if ((clientX >= offsetLeft && clientX <= offsetLeft + this._view.width) &&
             (clientY >= offsetTop && clientY <= offsetTop + this._view.height)) {
-            
-            
+
+
             const audioFiles = files.filter(file => this.isAccepted(file))
                 .map(file => file.getAsFile() as File);
-            
+
             const start = (this._app.editorView.viewport.left + (clientX - offsetLeft)) * RATIO_MILLS_BY_PX;
             let acc = 0;
+            this.showLoadingIcon(true);
             for (let i = 0; i < audioFiles.length; i++) {
                 let file = audioFiles[i];
 
@@ -318,7 +334,7 @@ export default class EditorController {
                     let track = await this._app.tracksController.newEmptyTrack();
                     this._app.tracksController.initializeTrack(track);
                     track.element.setName(file.name);
-                    
+
                     track.element.progressDone();
                     waveform = this._view.getWaveFormViewById(track.id);
                     if (!waveform) {
@@ -327,26 +343,101 @@ export default class EditorController {
                     }
                 }
                 let track = this._app.tracksController.getTrackById(waveform.trackId) as Track;
-                
+
 
                 let audioArrayBuffer = await file.arrayBuffer();
                 let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
                 let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-                
+
                 this._app.regionsController.createRegion(track, operableAudioBuffer, start, waveform)
                 acc += HEIGHT_TRACK;
+                this.showLoadingIcon(false);
             }
         }
-        
+
     }
+
+    private showLoadingIcon(show: boolean): void {
+        let loadingIcon = document.querySelector('#loading-icon') as HTMLElement; 
+        if (show) {
+            if (!loadingIcon) {
+                loadingIcon = document.createElement('div') as HTMLElement;
+                loadingIcon.id = 'loading-icon';
+                loadingIcon.style.position = 'fixed'; 
+                loadingIcon.style.top = '0';
+                loadingIcon.style.left = '0';
+                loadingIcon.style.width = '100vw';
+                loadingIcon.style.height = '100vh';
+                loadingIcon.style.display = 'flex';
+                loadingIcon.style.alignItems = 'center';
+                loadingIcon.style.justifyContent = 'center';
+                loadingIcon.style.zIndex = '9999'; 
+                loadingIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
+                loadingIcon.innerHTML = `
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                `;
+                document.body.appendChild(loadingIcon);
+            }
+        } else {
+            if (loadingIcon) loadingIcon.remove();
+        }
+    }
+    
+    
+
+    private async importDraggedAudioLoop(url: string, clientX: number, clientY: number) {
+        let offsetLeft = this._view.canvasContainer.offsetLeft // offset x of the canvas
+        let offsetTop = this._view.canvasContainer.offsetTop // offset y of the canvas
+
+        if ((clientX >= offsetLeft && clientX <= offsetLeft + this._view.width) &&
+            (clientY >= offsetTop && clientY <= offsetTop + this._view.height)) {
+
+            const start = (this._app.editorView.viewport.left + (clientX - offsetLeft)) * RATIO_MILLS_BY_PX;
+            this.showLoadingIcon(true);
+            // we have only one url
+
+            // Check if the drop is on an existing track or if we need to create a new on
+            let waveform = this._view.getWaveformAtPos(clientY - offsetTop);
+
+            if (!waveform) {
+                let track = await this._app.tracksController.newEmptyTrack();
+                this._app.tracksController.initializeTrack(track);
+                track.element.setName("NEW TRACK");
+
+                track.element.progressDone();
+                waveform = this._view.getWaveFormViewById(track.id);
+                if (!waveform) {
+                    console.error("Can't fin a waveform with the given track id " + track.id);
+                    return;
+                }
+            }
+            let track = this._app.tracksController.getTrackById(waveform.trackId) as Track;
+
+            // get the audio file from the url
+            let file = await fetch(url);
+            // decode as array buffer
+            let audioArrayBuffer = await file.arrayBuffer();
+            // decode as audio buffer
+            let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
+            // create an operable audio buffer
+            let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+
+            this._app.regionsController.createRegion(track, operableAudioBuffer, start, waveform);
+            this.showLoadingIcon(false);
+        }
+    }
+
+
 
     private isAccepted(file: DataTransferItem) {
         if (file.kind === "file" &&
-                    (file.type === "audio/mpeg"
-                    || file.type === "audio/ogg" 
-                    || file.type === "audio/wav"
-                    || file.type === "audio/x-wav")) {
-                    return true;
+            (file.type === "audio/mpeg"
+                || file.type === "audio/ogg"
+                || file.type === "audio/wav"
+                || file.type === "audio/x-wav")) {
+            return true;
         }
         else {
             console.warn("the file provided is not an audio file");

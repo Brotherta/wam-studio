@@ -2,12 +2,14 @@ import {audioCtx} from "../index";
 import {RATIO_MILLS_BY_PX} from "../Env";
 import TempoSelectorElement from "../Components/TempoSelectorElement";
 import TimeSignatureSelectorElement from "../Components/TimeSignatureSelectorElement";
+import AudioLoopBrowser from "../Components/WamAudioLoopBrowser";
+import Metronome from "../Components/MetronomeComponent";
+import MetronomeComponent from "../Components/MetronomeComponent";
 
 /**
  * Class responsible for the host view. It displays the host controls and the host track.
  */
 export default class HostView {
-
     playBtn = document.getElementById("play-btn") as HTMLDivElement;
     backBtn = document.getElementById("back-btn") as HTMLDivElement;
     recordBtn = document.getElementById("record-btn") as HTMLDivElement;
@@ -17,6 +19,8 @@ export default class HostView {
     splitBtn = document.getElementById("split-btn") as HTMLDivElement;
     undoBtn = document.getElementById("undo-btn") as HTMLDivElement;
     redoBtn = document.getElementById("redo-btn") as HTMLDivElement;
+    metroBtn = document.getElementById("metro-btn") as HTMLDivElement;
+    soundLoopBtn = document.getElementById("soundLoupBtn") as HTMLElement;
 
     volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
@@ -24,8 +28,14 @@ export default class HostView {
     tempoDiv = document.getElementById("tempo-selector") as HTMLDivElement;
     tempoSelector = new TempoSelectorElement() as HTMLElement;
 
+    audioLoopBrowserDiv = document.getElementById("audio-loop-browser") as HTMLDivElement;
+    audioLoopBrowserElement = new AudioLoopBrowser() as HTMLElement;
+
     timeSignatureDiv = document.getElementById("time-signature-selector") as HTMLDivElement;
     timeSignatureSelector = new TimeSignatureSelectorElement() as HTMLElement;
+
+    MetronomeDiv = document.getElementById("metronome") as HTMLDivElement;
+    MetronomeElement = new Metronome(this.tempoSelector,this.timeSignatureSelector) as HTMLElement;
 
     zoomInBtn = document.getElementById("zoom-in-btn") as HTMLDivElement;
     zoomOutBtn = document.getElementById("zoom-out-btn") as HTMLDivElement;
@@ -35,6 +45,7 @@ export default class HostView {
     snapIcon = document.getElementById("snap-icon") as HTMLDivElement;
     undoIcon = document.getElementById("undo-icon") as HTMLDivElement;
     redoIcon = document.getElementById("redo-icon") as HTMLDivElement;
+    metronomeIcon = document.getElementById("metro-icon") as HTMLDivElement;
 
     vuMeterDiv = document.getElementById("vu-meter") as HTMLCanvasElement;
     vuMeterCanvas = document.getElementById("vu-meter-canvas") as HTMLCanvasElement;
@@ -63,9 +74,28 @@ export default class HostView {
         // add tempo and time signature selectors to the main toolbar
         this.tempoDiv.appendChild(this.tempoSelector);
         this.timeSignatureDiv.appendChild(this.timeSignatureSelector);
-        
+
+        // audio loop browser
+        this.audioLoopBrowserDiv.appendChild(this.audioLoopBrowserElement);
+        this.MetronomeDiv.appendChild(this.MetronomeElement);
+
     }
+    toggleAudioLoopBrowser = this.soundLoopBtn.addEventListener("click", () => {
+        this.audioLoopBrowserDiv.style.display = this.audioLoopBrowserDiv.style.display === "none" ? "flex" : "none";
+    });
     
+    
+    public updateMetronomeBtn(metronomeOn: boolean) {
+        let tooltip = this.metroBtn.firstElementChild as HTMLSpanElement;
+        if(metronomeOn){
+            this.metroBtn.style.backgroundColor = "black";
+            tooltip.textContent = "Metronome On";
+        }else{
+            this.metroBtn.style.backgroundColor = "";
+            tooltip.textContent = "Metronome Off";
+        }
+    }
+        
     /**
      * Updates the timer of the host view.
      *
