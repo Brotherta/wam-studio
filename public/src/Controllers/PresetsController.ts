@@ -162,7 +162,6 @@ export default class PresetsController {
         let presetName = bindControl.advElement.presetsSelect.value;
         let preset = this.presets.get(track.tag)?.find(p => p.name == presetName);
         if (!preset) return;
-
         await this.app.bindsController.deleteAllBinds(track);
 
         // @ts-ignore

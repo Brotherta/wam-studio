@@ -62,18 +62,21 @@ export default class PluginsController {
         });
 
         this.app.pluginsView.showPlugin.addEventListener("click", () => {
+            this.app.pluginsView.movePluginToWindow(this.selectedTrack);
             this.app.pluginsView.showHidePlugin();
             this.app.pluginsView.hideShowPlugin();
             this.app.pluginsView.showFloatingWindow();
         });
 
         this.app.pluginsView.hidePlugin.addEventListener("click", () => {
+            this.app.pluginsView.movePluginToLoadingZone(this.selectedTrack);
             this.app.pluginsView.showShowPlugin();
             this.app.pluginsView.hideHidePlugin();
             this.app.pluginsView.hideFloatingWindow();
         });
 
         this.app.pluginsView.closeWindowButton.addEventListener("click", () => {
+            this.app.pluginsView.movePluginToLoadingZone(this.selectedTrack);
             this.app.pluginsView.showShowPlugin();
             this.app.pluginsView.hideHidePlugin();
             this.app.pluginsView.hideFloatingWindow();
@@ -134,7 +137,7 @@ export default class PluginsController {
                     document.getElementById("loading-zone")!.appendChild(track.plugin.dom);
                 }
             }
-            this.app.pluginsView.showPlugins(this.selectedTrack);
+            this.app.pluginsView.movePluginToWindow(this.selectedTrack);
             if (this.app.pluginsView.floating.hidden) {
                 this.hideAllControllers();
                 this.app.pluginsView.showShowPlugin();

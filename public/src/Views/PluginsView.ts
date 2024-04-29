@@ -15,6 +15,7 @@ export default class PluginsView {
     closeWindowButton = document.getElementById("closeButtonResizeWindow") as HTMLDivElement;
     mainTrack = document.getElementById("main-track") as HTMLDivElement;
     pluginsDiv = document.getElementById("plugins") as HTMLDivElement;
+    loadingZone = document.getElementById("loading-zone") as HTMLDivElement;
 
     maxHeight: number;
     minHeight: number;
@@ -86,9 +87,16 @@ export default class PluginsView {
      * Remove the plugin's view from the DOM and mount the current track's plugin's view.
      * @param track
      */
-    showPlugins(track: Track) {
-        // this.deletePluginView()
-        this.mount.appendChild(track.plugin.dom);
+    movePluginToWindow(track: Track | undefined) {
+        if (track) {
+            this.mount.appendChild(track.plugin.dom);
+        }
+    }
+
+    movePluginToLoadingZone(track: Track | undefined) {
+        if (track) {
+            this.loadingZone.appendChild(track.plugin.dom)
+        }
     }
 
     /**
