@@ -99,6 +99,7 @@ export default class Loader {
             track.setVolume(trackJson.volume);
             track.setBalance(trackJson.pan);
             track.volumeSlider.slider.value = (trackJson.volume*100).toString();
+            track.volumeSlider.valueLabel.innerText = (trackJson.volume*100).toString();
             track.element.balanceSlider.value = trackJson.pan;
 
             if (trackJson.presetName) {

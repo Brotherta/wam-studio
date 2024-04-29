@@ -58,6 +58,7 @@ export default class BindsController {
         slider.slider.max = "100";
         slider.slider.value = "50";
         slider.valueLabel.innerHTML = "50";
+        track.setVolume(0.5); // set default volume to 0.5 (50%)
         // set color to white
         slider.style.backgroundColor = "#646464";
         slider.slider.oninput = async () => {
@@ -142,7 +143,14 @@ export default class BindsController {
         }
 
         let bind = new Bind(name!);
-        bind.currentValue = value ? value : "50";
+        // bind.currentValue = value ? value : "50"; // old impl
+        if (value) {
+            // convert 1-100 to 0-4
+            bind.currentValue = (parseInt(value) / 25).toString();
+        } else {
+            bind.currentValue = "2"; // default value
+        }
+ 
         bindControl.binds.push(bind);
 
         let slider = document.createElement("bind-slider-element") as BindSliderElement;
@@ -156,7 +164,7 @@ export default class BindsController {
         slider.slider.oninput = async () => {
             // scale value from 0-100
             let value = parseInt(slider.slider.value) * 25;
-            await this.updateBindValue(track, bind, value.toString());
+            await this.updateBindValue(track, bind, value.toString()); // save 1-100 value
             this.app.projectController.saved = false;
         }
 
