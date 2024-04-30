@@ -1,6 +1,7 @@
 import App from "../App";
 import Track from "../Models/Track";
 import Parameter from "../Models/Parameter";
+import i18n from "../i18n";
 
 export default class Loader {
     app: App;
@@ -93,7 +94,12 @@ export default class Loader {
             await track.plugin.setStateAsync(trackJson.plugin);
 
             track.element.name = trackJson.name;
-            track.element.trackNameInput.value = trackJson.name;
+            // Change displayed language to japanese if it's set to japanese
+            if (i18n.language === "ja") {
+                track.element.trackNameInput.value = i18n.t(trackJson.tag);
+            } else {
+                track.element.trackNameInput.value = trackJson.name;
+            }
             if (trackJson.muted) track.element.mute();
             if (trackJson.soloed) track.element.solo();
             track.setVolume(trackJson.volume);

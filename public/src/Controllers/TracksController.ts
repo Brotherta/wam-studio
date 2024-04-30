@@ -39,14 +39,7 @@ export default class TracksController {
         let track = this.createTrack(node);
         if (song) {
             track.url = song.url;
-            // track.element.name = song.name;
-            // Changed for internationalization
-            // TODO: Check this edge case
-            if (i18n.language === "ja") {
-                track.element.name = i18n.t(song.tag);
-            } else {
-                track.element.name = song.name;
-            }
+            track.element.name = song.name;
             track.tag = song.tag;
             if (splitChannel) {
                 track.splitting = true;
@@ -334,6 +327,13 @@ export default class TracksController {
             }
 
             await this.app.tracksController.initTrackComponents(track);
+            // Display the track name in the correct language
+            // TODO: Check this edge case
+            if (i18n.language === "ja") {
+                track.element.trackNameInput.value = i18n.t(trackSong.tag);
+            } else {
+                track.element.trackNameInput.value = trackSong.name;
+            }
         }
         for (let track of this.trackList) {
             if (splitting) {

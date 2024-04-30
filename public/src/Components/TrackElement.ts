@@ -301,6 +301,13 @@ export default class TrackElement extends HTMLElement {
     defineTrackNameListener() {
         this.trackNameInput.value = this.name;
 
+        // @tzfeng 5/29/2024
+        // Hacky way to prevent the user from editing the track name 
+        // only advanced users can edit the track name
+        if (localStorage.getItem("advancedMode") === "false") {
+            this.trackNameInput.readOnly = true;
+        }
+
         this.trackNameInput.addEventListener("keyup", (ev: KeyboardEvent) => {
             if (ev.code === "Enter" && ev.target !== null) {
                 ev.preventDefault;
