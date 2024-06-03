@@ -3,7 +3,7 @@ import {Viewport} from "pixi-viewport";
 import ScrollBarElement from "../../Components/ScrollBarElement";
 import WaveformView from "./WaveformView";
 import PlayheadView from "./PlayheadView";
-import Track from "../../Models/Track";
+import SampleTrack from "../../Models/Track/SampleTrack";
 import {
     HEIGHT_NEW_TRACK,
     HEIGHT_TRACK,
@@ -13,6 +13,7 @@ import {
 import {ScrollEvent} from "../../Controllers/Editor/EditorController";
 import LoopView from "./LoopView";
 import GridView from "./GridView";
+import TrackOf, { Track } from "../../Models/Track/Track.js";
 
 /**
  * Class that Override PIXI.Application. Represents the main editor and handle all events about the editor.
@@ -212,7 +213,7 @@ export default class EditorView extends Application {
      * Add a waveform into the canvas fot the given track and update the position of the other waveforms.
      * @param track - The track where the new waveform will be created.
      */
-    public createWaveformView(track: Track): WaveformView {
+    public createWaveformView(track: SampleTrack): WaveformView {
         let wave = new WaveformView(this, track);
         this.waveforms.push(wave);
         this.resizeCanvas();
@@ -231,7 +232,7 @@ export default class EditorView extends Application {
      * Remove the waveform from the canvas for the given track and update the position of the other waveforms.
      * @param track - The track that contain the waveform to delete.
      */
-    public removeWaveForm(track: Track): void {
+    public removeWaveForm(track: SampleTrack): void {
         let wave = this.waveforms.find(wave => wave.trackId === track.id);
         let index = this.waveforms.indexOf(wave!);
 
@@ -291,14 +292,14 @@ export default class EditorView extends Application {
      * Change the color of the waveform for the given track.
      * @param track - The track where the Waveform must be redrawn.
      */
-    public changeWaveFormColor(track: Track): void {
+    public changeWaveFormColor(track: TrackOf<any>): void {
         let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
         if (waveFormView !== undefined) {
             waveFormView.color = track.color;
             waveFormView.regionViews.forEach(regionView => {
                 let region = track.getRegionById(regionView.id);
                 if (region !== undefined) {
-                    regionView.drawWave(track.color, region);
+                    regionView.redraw(track.color, region);
                 }
             });
         }

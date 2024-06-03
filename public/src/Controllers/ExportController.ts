@@ -2,7 +2,7 @@ import App from "../App";
 import {audioCtx} from "../index";
 import Plugin from "../Models/Plugin";
 import JSZip from "jszip";
-import Track from "../Models/Track";
+import SampleTrack from "../Models/Track/SampleTrack";
 import AudioNode from "../Audio/AudioNode";
 import AutomationController from "./AutomationController";
 import {bufferToWave, combineBuffers, downloadBlob} from "../Audio/Utils/audioBufferToWave";
@@ -48,8 +48,8 @@ export default class ExporterController {
         const { default: initializeWamHost } = await import("@webaudiomodules/sdk/src/initializeWamHost");
 
         // Process and export individual tracks.
-        for (let track of this._app.tracksController.trackList) {
-            track.updateBuffer(audioCtx, 0);
+        for (let track of this._app.tracksController.sampleTracks) {
+            track.update(audioCtx, 0);
             let buffer = await this.processTrack(track, maxDuration, initializeWamHost);
             if (buffer) buffers.push(buffer);
             if (tracksIds.includes(track.id)) {
@@ -72,7 +72,7 @@ export default class ExporterController {
      *
      * @returns The audio buffer of the track.
      */
-    private async processTrack(track: Track, maxDuration: number, initializeWamHost: any): Promise<AudioBuffer> {
+    private async processTrack(track: SampleTrack, maxDuration: number, initializeWamHost: any): Promise<AudioBuffer> {
         console.log("Exporting track " + track.id);
 
         // Create offline audio context.
@@ -126,7 +126,7 @@ export default class ExporterController {
 
         // Create master gain and source nodes.
         const masterGainNode = offlineCtx.createGain();
-        masterGainNode.gain.value = this._app.host.gainNode.gain.value;
+        masterGainNode.gain.value = this._app.host.volume;
 
         let masterSourceNode = offlineCtx.createBufferSource();
         masterSourceNode.buffer = masterBuffer;
@@ -165,25 +165,25 @@ export default class ExporterController {
      * @param hostGroupId - Host group ID.
      * @private
      */
-    private async rebuildTrackGraph(offlineCtx: OfflineAudioContext, track: Track, hostGroupId: string) {
-        let gainNode = offlineCtx.createGain();
-        let pannerNode = offlineCtx.createStereoPanner();
-        let sourceNode = offlineCtx.createBufferSource();
-        let plugin = new Plugin(this._app);
+    private async rebuildTrackGraph(offlineCtx: OfflineAudioContext, track: SampleTrack, hostGroupId: string) {
+        let gainNode = offlineCtx.createGain()
+        let pannerNode = offlineCtx.createStereoPanner()
+        let sourceNode = offlineCtx.createBufferSource()
+        let plugin = new Plugin(this._app)
 
-        sourceNode.buffer = track.audioBuffer as AudioBuffer;
-        gainNode.gain.value = track.gainNode.gain.value;
-        pannerNode.pan.value = track.pannerNode.pan.value;
+        sourceNode.buffer = track.audioBuffer as AudioBuffer
+        gainNode.gain.value = track.volume
+        pannerNode.pan.value = track.balance
 
         if (track.plugin.initialized) {
             await plugin.initPlugin(this._app.host.pluginWAM, audioCtx, offlineCtx, hostGroupId)
-            document.getElementById("loading-zone")!.appendChild(plugin.dom);
-            let state = await track.plugin.instance!._audioNode.getState();
+            document.getElementById("loading-zone")!.appendChild(plugin.dom)
+            let state = await track.plugin.instance!._audioNode.getState()
             if (state.current.length > 0) {
-                await plugin.setStateAsync(state);
+                await plugin.setStateAsync(state)
             }
         }
-        return {gainNode, pannerNode, sourceNode, plugin};
+        return {gainNode, pannerNode, sourceNode, plugin}
     }
 
     /**
@@ -195,7 +195,7 @@ export default class ExporterController {
      * @param offlineAudioContext - Offline audio context to render the track.
      * @private
      */
-    private applyAutomation(track:Track, plugin: Plugin, offlineAudioContext: OfflineAudioContext) {
+    private applyAutomation(track:SampleTrack, plugin: Plugin, offlineAudioContext: OfflineAudioContext) {
         plugin.instance?._audioNode.clearEvents();
         let automation = track.automation;
         let events = [];

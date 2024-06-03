@@ -140,7 +140,7 @@ export default class SettingsController {
                 autoGainControl: false
             }
         }
-        for (let track of this._app.tracksController.trackList) {
+        for (let track of this._app.tracksController.sampleTracks) {
             if (track.micRecNode) {
                 let stream = await navigator.mediaDevices.getUserMedia(this.constraints);
                 track.micRecNode.disconnect();

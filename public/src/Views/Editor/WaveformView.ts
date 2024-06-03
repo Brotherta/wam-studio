@@ -1,10 +1,12 @@
 import {Container} from "pixi.js";
 import EditorView from "./EditorView";
-import RegionView from "./RegionView";
-import Track from "../../Models/Track";
+import RegionView from "./Region/RegionView";
+import SampleTrack from "../../Models/Track/SampleTrack";
 import {HEIGHT_TRACK} from "../../Env";
-import Region from "../../Models/Region";
+import RegionOf, { Region } from "../../Models/Region/Region";
 import TrackElement from "../../Components/TrackElement";
+import SampleRegion from "../../Models/Region/SampleRegion";
+import SampleRegionView from "./Region/SampleRegionView";
 
 /**
  * Class that extends PIXI.Container.
@@ -15,7 +17,7 @@ export default class WaveformView extends Container {
     /**
      * Array of RegionView that contains the regions of the track.
      */
-    public regionViews: RegionView[];
+    public regionViews: RegionView<any>[];
     /**
      * The unique ID of the track.
      */
@@ -30,7 +32,7 @@ export default class WaveformView extends Container {
      */
     private _editorView: EditorView;
 
-    constructor(editor: EditorView, track: Track) {
+    constructor(editor: EditorView, track: SampleTrack) {
         super();
         this._editorView = editor;
         this.trackId = track.id;
@@ -47,19 +49,16 @@ export default class WaveformView extends Container {
     }
 
     /**
-     * Creates a new RegionView and adds it to the array of RegionView.
+     * Adds a RegionView to the array of RegionView.
      * It will initialize the RegionView with the color and the region.
      *
      * @param region - The region that will contain the buffer to draw.
-     * @returns The RegionView created.
+     * @param regionView - The RegionView to add.
      */
-    public createRegionView(region: Region): RegionView {
-        let regionView = new RegionView(this._editorView, this.trackId, region);
+    public addRegionView(region: Region, regionView: RegionView<any>): void {
         this.regionViews.push(regionView);
         this.addChild(regionView);
-
         regionView.initializeRegionView(this.color, region);
-        return regionView;
     }
 
     /**
@@ -67,20 +66,10 @@ export default class WaveformView extends Container {
      *
      * @param regionView - The RegionView to remove.
      */
-    public removeRegionView(regionView: RegionView): void {
+    public removeRegionView(regionView: RegionView<any>): void {
         let index = this.regionViews.indexOf(regionView);
         this.regionViews.splice(index, 1);
         this.removeChild(regionView);
-    }
-
-    /**
-     * Adds the RegionView to the array of RegionView and to the PIXI.Container.
-     *
-     * @param regionView - The RegionView to add.
-     */
-    public addRegionView(regionView: RegionView): void {
-        this.regionViews.push(regionView);
-        this.addChild(regionView);
     }
 
     /**
@@ -89,7 +78,7 @@ export default class WaveformView extends Container {
      * @param regionId - The unique ID of the region.
      * @returns The RegionView that has the given regionId.
      */
-    public getRegionViewById(regionId: number): RegionView | undefined {
+    public getRegionViewById(regionId: number): RegionView<any> | undefined {
         return this.regionViews.find(regionView => regionView.id === regionId);
     }
 
@@ -99,7 +88,7 @@ export default class WaveformView extends Container {
      * @param track - The track to set the position.
      * @private
      */
-    private setPos(track: Track): void {
+    private setPos(track: SampleTrack): void {
         let trackContainer = document.getElementById("track-container") as HTMLDivElement;
         let pos = Array.from(trackContainer.children).filter(e => e instanceof TrackElement).indexOf(track.element);
 

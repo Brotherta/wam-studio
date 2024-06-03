@@ -1,8 +1,9 @@
 import App from "../../App";
 import EditorView from "../../Views/Editor/EditorView";
-import Track from "../../Models/Track";
+import SampleTrack from "../../Models/Track/SampleTrack";
 import WaveformView from "../../Views/Editor/WaveformView";
-import Region from "../../Models/Region";
+import RegionOf from "../../Models/Region/Region";
+import SampleRegion from "../../Models/Region/SampleRegion";
 
 /**
  * Class that control the waveforms of the editor.
@@ -27,18 +28,19 @@ export default class WaveformController {
      * Add the according waveform to the track in the canvas. It also resizes the canvas.
      * @param track
      */
-    public initializeWaveform(track: Track): void {
+    public initializeWaveform(track: SampleTrack): void {
         let waveformView = this._editorView.createWaveformView(track);
-        if (track.audioBuffer !== undefined) {
-            this._app.regionsController.createRegion(track, track.audioBuffer, 0, waveformView);
+        const audioBuffer=track.audioBuffer
+        if (audioBuffer !== undefined) {
+            if(track instanceof SampleTrack)this._app.regionsController.createRegion( track, id=>new SampleRegion(track.id,audioBuffer,0,id), waveformView);
         }
     }
 
-    public recreateRegionsAndRegionViews(track: Track, regions: Region[]): WaveformView {
+    public recreateRegionsAndRegionViews(track: SampleTrack, regions: SampleRegion[]): WaveformView {
         let waveformView = this._editorView.createWaveformView(track);
         // for all regions in the oldTrack, create a region view in the waveform of newTrack
         for (let region of regions) {
-            this._app.regionsController.createRegion(track, region.buffer, region.start, waveformView);
+            this._app.regionsController.createRegion(track, id=>region.clone(id), waveformView);
         }
         // return the waveformView
         return waveformView;
@@ -48,7 +50,7 @@ export default class WaveformController {
      * Remove the according waveform from the track in the canvas. It also resizes the canvas.
      * @param track - The track that will be removed.
      */
-    public removeWaveformOfTrack(track: Track): void {
+    public removeWaveformOfTrack(track: SampleTrack): void {
         this._editorView.removeWaveForm(track);
     }
 

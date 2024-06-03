@@ -3,8 +3,10 @@ import {bufferToWave} from "../Audio/Utils/audioBufferToWave";
 import APP_VERSION from "../version";
 import {audioCtx} from "../index";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import Track from "../Models/Track";
+import SampleTrack from "../Models/Track/SampleTrack";
 import { BACKEND_URL } from "../Env";
+import SampleRegion from "../Models/Region/SampleRegion";
+import { start } from "@popperjs/core/index";
 
 
 export default class Loader {
@@ -23,7 +25,7 @@ export default class Loader {
             pluginHostState = await this._app.host.plugin.instance!._audioNode.getState();
         }
 
-        for (let track of this._app.tracksController.trackList) {
+        for (let track of this._app.tracksController.sampleTracks) {
             let hasPlugin = track.plugin.initialized;
             let pluginState = null;
 
@@ -68,7 +70,7 @@ export default class Loader {
                 "muted": track.muted,
                 "soloed": track.solo,
                 "volume": track.volume,
-                "pan": track.pannerNode.pan.value,
+                "pan": track.balance,
                 "plugins": hasPlugin ? pluginState : null,
                 "regions": regions,
                 "automations": automations
@@ -111,7 +113,7 @@ export default class Loader {
         this._app.tracksController.clearAllTracks();
         this._app.host.playhead = 0;
         this._app.tracksController.trackIdCount = 1;
-        this._app.host.setVolume(project.host.volume);
+        this._app.host.volume=project.host.volume;
 
         if (project.host.plugin !== null) {
             await this._app.host.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
@@ -121,10 +123,10 @@ export default class Loader {
         }
 
         for (const trackJson of tracksJson) {
-            let track = await this._app.tracksController.newEmptyTrack();
+            let track = await this._app.tracksController.createEmptySampleTrack();
             track.id = trackJson.id;
 
-            this._app.tracksController.initializeTrack(track);
+            this._app.tracksController.addTrack(this._app.tracksController.sampleTracks, track);
 
             track.element.name = trackJson.name;
             track.element.trackNameInput.value = trackJson.name;
@@ -138,8 +140,8 @@ export default class Loader {
                 track.element.solo();
             }
 
-            track.setBalance(trackJson.pan);
-            track.setVolume(trackJson.volume);
+            track.balance=trackJson.pan;
+            track.volume=trackJson.volume;
             track.element.volumeSlider.value = (trackJson.volume*100).toString();
             track.element.balanceSlider.value = trackJson.pan;
             this._app.tracksView.setColor(track, trackJson.color);
@@ -171,7 +173,7 @@ export default class Loader {
         }
     }
 
-    loadTrackRegions(track: Track, regions: any, projectId: string) {
+    loadTrackRegions(track: SampleTrack, regions: any, projectId: string) {
         let loadedRegions = 0;
         let totalSize = new Map();
         let totalLoaded = 0;
@@ -214,7 +216,7 @@ export default class Loader {
                     }
 
                     let opAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
-                    this._app.regionsController.createRegion(track, opAudioBuffer, region.start);
+                    this._app.regionsController.createRegion(track, id=>new SampleRegion(track.id,opAudioBuffer,region.start,id));
 
                     // All regions have been loaded, call progressDone
                     if (loadedRegions === regions.length) {
@@ -233,7 +235,8 @@ export default class Loader {
         }
     }
 
-    loadTrackUrl(track: Track) {
+    loadTrackUrl(track: SampleTrack) {
+        console.log("Load Track" +track.url)
         if (!track.url) return;
 
         let xhr = new XMLHttpRequest();
@@ -264,7 +267,7 @@ export default class Loader {
                         }
                         let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
                         operableAudioBuffer = operableAudioBuffer.makeStereo();
-                        this._app.regionsController.createRegion(track, operableAudioBuffer, 0);
+                        this._app.regionsController.createRegion(track, id=>new SampleRegion(track.id,operableAudioBuffer,0,id));
                         track.element.progressDone();
                     });
             } else {

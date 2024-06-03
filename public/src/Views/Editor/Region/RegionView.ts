@@ -1,18 +1,20 @@
-import EditorView from "./EditorView";
+import EditorView from "../EditorView";
 import {Container, Graphics} from "pixi.js";
-import Region from "../../Models/Region";
-import {HEIGHT_TRACK, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, RATIO_MILLS_BY_PX, TEMPO_RATIO} from "../../Env";
+import RegionOf from "../../../Models/Region/Region";
+import {HEIGHT_TRACK, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, RATIO_MILLS_BY_PX, TEMPO_RATIO} from "../../../Env";
+import SampleRegion from "../../../Models/Region/SampleRegion";
 
 /**
  * Class that extends PIXI.Container.
  * It will contain the PIXI.Graphics that represents the waveform of the current region.
  */
-export default class RegionView extends Container {
+export default abstract class RegionView<REGION extends RegionOf<REGION>> extends Container {
 
     /**
      * The unique ID of the track that contains the region.
      */
     public trackId: number;
+
     /**
      * The unique ID of the region.
      */
@@ -22,20 +24,23 @@ export default class RegionView extends Container {
      * The main editor of the application.
      */
     private _editorView: EditorView;
+
     /**
      * The PIXI.Graphics that represent the waveform.
      */
     private _wave: Graphics;
+
     /**
      * The background of the region, borders included.
      */
     private _background: Graphics;
+    
     /**
      * Boolean to know if the region is selected or not. Use to draw the current border of the background.
      */
     private _selected: boolean;
 
-    constructor(editor: EditorView, trackId: number, region: Region) {
+    constructor(editor: EditorView, trackId: number, region: REGION) {
         super();
         this.eventMode = "dynamic";
 
@@ -59,55 +64,19 @@ export default class RegionView extends Container {
      * @param color - The color in HEX format (#FF00FF).
      * @param region - The region that will contain the buffer to draw.
      */
-    public initializeRegionView(color: string, region: Region): void {
-        region.pos = region.start / RATIO_MILLS_BY_PX;
+    public initializeRegionView(color: string, region: REGION): void {
         this.position.x = region.pos;
-        this.drawWave(color, region);
+        this.drawContent(this._wave, color, region);
         this.drawBackground();
     }
-  
 
-    /**
-     * Draws the waveform of the track.
-     *
-     * @param color - The color in HEX format (#FF00FF).
-     * @param region - The region that will contain the buffer to draw.
-     */
-    public drawWave(color: string, region: Region): void {
-        let range = (region.duration * 1000 / RATIO_MILLS_BY_PX)  ;
-        this.scale.x = 1;
+    protected abstract drawContent(target: Graphics, color: string, region: REGION): void
 
-        let colorHex = +("0x" + color.slice(1));
-        this._wave.clear();
-        // use some color transparency as regions can overlap
-        this._wave.beginFill(colorHex, 0.8);
-
-        let amp = (HEIGHT_TRACK-1) / 2;
-        for (let channel = 0; channel < region.buffer.numberOfChannels; channel++) {
-            let data = region.buffer.getChannelData(channel);
-            let step = Math.round(data.length / range);
-
-            for (let i = 0; i < range; i++) {
-                let min = 1.0;
-                let max = -1.0;
-                for (let j = 0; j < step; j++) {
-                    let dataum = data[i * step + j];
-                    if (dataum < min) min = dataum;
-                    if (dataum > max) max = dataum;
-                }
-                const rectWidth = 1;
-                let rectHeight = Math.max(1, (max-min) * amp);
-
-                // MB: we need to clip the rectangle so that if does not go over track dimensions
-                if(rectHeight < HEIGHT_TRACK) {
-                    this._wave.drawRect(i, (1+min) * amp, rectWidth, rectHeight);
-                } else {
-                    rectHeight = HEIGHT_TRACK;
-                    this._wave.drawRect(i, 0 * amp, rectWidth, rectHeight);
-                }
-            }
-        }
+    public redraw(color: string, region: REGION){
+        this.drawContent(this._wave, color, region);
     }
+
+
 
     /**
      * Draws the background of the region to be selected. (White border)

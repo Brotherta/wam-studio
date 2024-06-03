@@ -3,7 +3,8 @@ import EditorView from "../../Views/Editor/EditorView";
 import { HEIGHT_TRACK, RATIO_MILLS_BY_PX, ZOOM_LEVEL, decrementZoomLevel, incrementZoomLevel } from "../../Env";
 import { audioCtx } from "../../index";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
-import Track from "../../Models/Track";
+import SampleTrack from "../../Models/Track/SampleTrack";
+import SampleRegion from "../../Models/Region/SampleRegion";
 
 /**
  * Interface of the custom event of the ScrollBarElement.
@@ -252,7 +253,7 @@ export default class EditorController {
 
         this._view.spanZoomLevel.innerHTML = ("x" + ZOOM_LEVEL.toFixed(2));
 
-        this._app.tracksController.trackList.forEach(track => {
+        this._app.tracksController.tracks.forEach(track => {
             // MB : this seems unecessary
             //track.updateBuffer(audioCtx, this._app.host.playhead);
             this._view.stretchRegions(track);
@@ -276,9 +277,9 @@ export default class EditorController {
 
 
 
-            this._app.tracksController.trackList.forEach(track => {
+            this._app.tracksController.tracks.forEach(track => {
                 // MB : below seems also unecessary
-                track.updateBuffer(audioCtx, this._app.host.playhead);
+                track.update(audioCtx, this._app.host.playhead);
                 this._view.drawRegions(track);
             });
         }, 1000);
@@ -331,8 +332,8 @@ export default class EditorController {
                 let waveform = this._view.getWaveformAtPos(clientY - offsetTop + acc);
 
                 if (!waveform) {
-                    let track = await this._app.tracksController.newEmptyTrack();
-                    this._app.tracksController.initializeTrack(track);
+                    let track = await this._app.tracksController.createEmptySampleTrack();
+                    this._app.tracksController.addTrack(this._app.tracksController.sampleTracks,track);
                     track.element.setName(file.name);
 
                     track.element.progressDone();
@@ -342,14 +343,14 @@ export default class EditorController {
                         return;
                     }
                 }
-                let track = this._app.tracksController.getTrackById(waveform.trackId) as Track;
+                let track = this._app.tracksController.getTrackById(waveform.trackId) as SampleTrack;
 
 
                 let audioArrayBuffer = await file.arrayBuffer();
                 let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
                 let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
 
-                this._app.regionsController.createRegion(track, operableAudioBuffer, start, waveform)
+                this._app.regionsController.createRegion(track, id=>new SampleRegion(track.id,operableAudioBuffer,start,id), waveform)
                 acc += HEIGHT_TRACK;
                 this.showLoadingIcon(false);
             }
@@ -402,8 +403,8 @@ export default class EditorController {
             let waveform = this._view.getWaveformAtPos(clientY - offsetTop);
 
             if (!waveform) {
-                let track = await this._app.tracksController.newEmptyTrack();
-                this._app.tracksController.initializeTrack(track);
+                let track = await this._app.tracksController.createEmptySampleTrack();
+                this._app.tracksController.addTrack(this._app.tracksController.sampleTracks, track);
                 track.element.setName("NEW TRACK");
 
                 track.element.progressDone();
@@ -413,7 +414,7 @@ export default class EditorController {
                     return;
                 }
             }
-            let track = this._app.tracksController.getTrackById(waveform.trackId) as Track;
+            let track = this._app.tracksController.getTrackById(waveform.trackId) as SampleTrack;
 
             // get the audio file from the url
             let file = await fetch(url);
@@ -424,7 +425,7 @@ export default class EditorController {
             // create an operable audio buffer
             let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
 
-            this._app.regionsController.createRegion(track, operableAudioBuffer, start, waveform);
+            this._app.regionsController.createRegion(track, id=>new SampleRegion(track.id,operableAudioBuffer,start,id), waveform);
             this.showLoadingIcon(false);
         }
     }

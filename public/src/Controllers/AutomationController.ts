@@ -1,8 +1,9 @@
 import App from "../App";
-import Track from "../Models/Track";
+import SampleTrack from "../Models/Track/SampleTrack";
 import {audioCtx} from "../index";
 import AutomationView from "../Views/AutomationView";
 import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Env";
+import TrackOf from "../Models/Track/Track.js";
 
 
 /**
@@ -33,7 +34,7 @@ export default class AutomationController {
      * Applies all automations to the track and opens the automation menu.
      * @param track - The track to apply the automations.
      */
-    public async openAutomationMenu(track: Track): Promise<void> {
+    public async openAutomationMenu(track: TrackOf<any>): Promise<void> {
         this._view.clearMenu();
         await this.updateAutomations(track);
         this._view.openAutomationMenu(track);
@@ -45,7 +46,7 @@ export default class AutomationController {
      *
      * @param track - The track to update the automations.
      */
-     public async updateAutomations(track: Track): Promise<void> {
+     public async updateAutomations(track: TrackOf<any>): Promise<void> {
         let plugin = track.plugin;
         if (plugin.initialized) {
             let params = await plugin.instance?._audioNode.getParameterInfo();
@@ -102,7 +103,7 @@ export default class AutomationController {
             }
         });
         this._app.pluginsView.removePlugin.addEventListener("click", () => {
-            let track = this._app.pluginsController.selectedTrack;
+            let track = this._app.tracksController.selectedTrack;
             if (track != undefined) {
                 track.automation.removeAutomation();
                 track.automation.updateAutomation([]);
@@ -118,14 +119,14 @@ export default class AutomationController {
      * It takes in account the playhead position and the time of the host.
      */
     public applyAllAutomations(): void {
-        let tracks = this._app.tracksController.trackList;
-        let playhead = this._app.host.playhead;
-        let time = (playhead / audioCtx.sampleRate) * 1000;
+        const tracks = this._app.tracksController.tracks;
+        const playhead = this._app.host.playhead;
+        const time = (playhead / audioCtx.sampleRate) * 1000;
 
         for (let track of tracks) {
             track.plugin.instance?._audioNode.clearEvents();
-            let automation = track.automation;
-            let events = [];
+            const automation = track.automation;
+            const events = [];
             for (let bpf of automation.bpfList) {
                 let point = bpf.lastPoint;
                 if (point == null) {
@@ -155,7 +156,7 @@ export default class AutomationController {
     public updateBPFWidth(): void {
         const newWidth = (MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX;
 
-        for (const track of this._app.tracksController.trackList) {
+        for (const track of this._app.tracksController.tracks) {
             this._view.updateBPFWidth(track.id, newWidth);
         }
     }
@@ -171,9 +172,9 @@ export default class AutomationController {
      * @static
      */
     public static getStartingPoint(totalDuration: number, currentTime: number, totalPoint: number): number {
-        let point = (totalPoint * currentTime) / totalDuration;
-        let integPoint = Math.floor(point);
-        let frac = point - integPoint;
+        const point = (totalPoint * currentTime) / totalDuration;
+        const integPoint = Math.floor(point);
+        const frac = point - integPoint;
         if (frac < 0.5) return integPoint;
         else return integPoint+1;
     }

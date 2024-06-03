@@ -4,7 +4,7 @@ import UndoManager from "undo-manager/lib/undomanager.js";
 
 import HostView from "./Views/HostView";
 import HostController from "./Controllers/HostController";
-import TracksController from "./Controllers/TracksController";
+import TracksController from "./Controllers/Editor/Track/TracksController";
 
 import TracksView from "./Views/TracksView";
 import Host from "./Models/Host";
@@ -22,7 +22,7 @@ import ProjectController from "./Controllers/ProjectController";
 import ProjectView from "./Views/ProjectView";
 import EditorController from "./Controllers/Editor/EditorController";
 import WaveformController from "./Controllers/Editor/WaveformController";
-import RegionsController from "./Controllers/Editor/RegionsController";
+import SampleRegionController from "./Controllers/Editor/Region/SampleRegionController";
 import PlayheadController from "./Controllers/Editor/PlayheadController";
 import EditorView from "./Views/Editor/EditorView";
 import KeyboardController from "./Controllers/KeyboardController";
@@ -46,7 +46,7 @@ export default class App {
     projectController: ProjectController;
     editorController: EditorController;
     waveformController: WaveformController;
-    regionsController: RegionsController;
+    regionsController: SampleRegionController;
     playheadController: PlayheadController
     keyboardController: KeyboardController;
     exportController: ExporterController;
@@ -86,7 +86,7 @@ export default class App {
 
         this.editorController = new EditorController(this);
         this.waveformController = new WaveformController(this);
-        this.regionsController = new RegionsController(this);
+        this.regionsController = new SampleRegionController(this);
         this.playheadController = new PlayheadController(this);
         this.hostController = new HostController(this);
         this.tracksController = new TracksController(this);

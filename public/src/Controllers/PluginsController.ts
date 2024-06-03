@@ -1,8 +1,9 @@
 import App from "../App";
-import Track from "../Models/Track";
+import SampleTrack from "../Models/Track/SampleTrack";
 import Host from "../Models/Host";
 import { audioCtx } from "../index";
 import PluginsView from "../Views/PluginsView";
+import TrackOf from "../Models/Track/Track.js";
 
 /**
  * Controller for the plugins view. This controller is responsible for selecting and removing plugins.
@@ -14,15 +15,11 @@ export default class PluginsController {
      * App instance.
      */
     private _app: App;
+    
     /**
      * Plugins view.
      */
     private _view: PluginsView;
-
-    /**
-     * Selected track. It is undefined if the host is selected.
-     */
-    public selectedTrack: Track | undefined;
 
     constructor(app: App) {
         this._app = app;
@@ -36,6 +33,9 @@ export default class PluginsController {
         this._view.maximized = true;
         this.updateRackSize();
     }
+
+    private get selectedTrack(){ return this._app.tracksController.selectedTrack }
+    private set selectedTrack(value: TrackOf<any>|undefined){ this._app.tracksController.selectedTrack=value }
 
     /**
      * Adds a new pedalboard to the selected track.
@@ -53,7 +53,7 @@ export default class PluginsController {
      * Remove the plugins of the given track.
      * @param track
      */
-    public removePedalBoard(track: Track): void {
+    public removePedalBoard(track: TrackOf<any>): void {
         track.plugin.instance?._audioNode.clearEvents();
         this._app.pluginsController.disconnectPedalBoard(track);
         track.plugin.unloadPlugin();
@@ -67,9 +67,11 @@ export default class PluginsController {
      * Connects the plugin to the track. If the track is the host, it connects the plugin to the host gain node.
      * @param track - The track to connect.
      */
-    public connectPedalBoard(track: Track): void {
-        if (track.id === -1) {
+    public connectPedalBoard(track: TrackOf<any>): void {
+        track.connectPlugin(track.plugin.instance!._audioNode)
+        /*if (track.id === -1) {
             let host = track as Host;
+            host.connectOutput(audioCtx.destination)
             host.gainNode.disconnect(audioCtx.destination);
             host.gainNode
                 .connect(host.plugin.instance!._audioNode)
@@ -84,7 +86,7 @@ export default class PluginsController {
                 track.mergerNode.disconnect(track.pannerNode);
                 track.mergerNode.connect(track.plugin.instance?._audioNode!);
             }
-        }
+        }*/
     }
 
     /**
@@ -92,8 +94,9 @@ export default class PluginsController {
      *
      * @param track - The track where the plugin is connected.
      */
-    public disconnectPedalBoard(track: Track): void {
-        if (track.plugin.initialized && track.id === -1) {
+    public disconnectPedalBoard(track: TrackOf<any>): void {
+        track.connectPlugin(undefined)
+        /*if (track.plugin.initialized && track.id === -1) {
             let host = track as Host;
             host.gainNode.disconnect(host.plugin.instance!._audioNode);
             host.gainNode.connect(audioCtx.destination);
@@ -105,16 +108,16 @@ export default class PluginsController {
                 track.mergerNode.disconnect(track.plugin.instance?._audioNode!);
                 track.mergerNode.connect(track.pannerNode);
             }
-        }
+        }*/
     }
 
 
     /**
-     * Selects the clicked track and show the plugins of the track.
+     * Selects a track and show the plugins of the track.
      *
-     * @param track - The track that was clicked.
+     * @param track The track to select
      */
-    public selectTrack(track: Track): void {
+    public selectTrack(track: TrackOf<any>): void {
         if (this.selectedTrack === undefined) {
             this.selectedTrack = track;
             this.selectedTrack.element.select();
@@ -152,7 +155,7 @@ export default class PluginsController {
      *
      * @param track - The track that was clicked.
      */
-    public fxButtonClicked(track: Track): void {
+    public fxButtonClicked(track: TrackOf<any>): void {
         this.selectTrack(track);
         if (track.plugin.initialized) {
             if (this._view.windowOpened) {
@@ -213,7 +216,7 @@ export default class PluginsController {
             this._view.showNew();
         }
         else { // Track selected and plugin initialized
-            this._app.tracksController.trackList.forEach(track => { // Hide all plugins to the loading zone
+            this._app.tracksController.tracks.forEach(track => { // Hide all plugins to the loading zone
                 this._view.movePluginLoadingZone(track);
             })
             this._view.movePluginLoadingZone(this._app.host); // Hide the host plugin to the loading zone

@@ -82,10 +82,10 @@ export default class HostController {
       //console.log("Playing zoom-disabled");
 
       this._app.automationController.applyAllAutomations();
-      this._app.tracksController.trackList.forEach((track) => {
+      this._app.tracksController.tracks.forEach((track) => {
         if (track.modified)
-          track.updateBuffer(audioCtx, this._app.host.playhead);
-        track.node?.play();
+          track.update(audioCtx, this._app.host.playhead)
+        track.play()
       });
       this._app.host.hostNode?.play();
       this.launchTimerInterval();
@@ -99,27 +99,27 @@ export default class HostController {
 
     } else {
       // enable zoom buttons when playing is stopped
-      this._view.zoomInBtn.classList.remove("zoom-disabled");
-      this._view.zoomOutBtn.classList.remove("zoom-disabled");
-      this._view.zoomInBtn.classList.add("zoom-enabled");
-      this._view.zoomOutBtn.classList.add("zoom-enabled");
+      this._view.zoomInBtn.classList.remove("zoom-disabled")
+      this._view.zoomOutBtn.classList.remove("zoom-disabled")
+      this._view.zoomInBtn.classList.add("zoom-enabled")
+      this._view.zoomOutBtn.classList.add("zoom-enabled")
       //console.log("Stopping zoom-enabled");
-      this._app.tracksController.trackList.forEach((track) => {
+      this._app.tracksController.tracks.forEach((track) => {
         if (track.plugin.initialized) {
-          track.plugin.instance!._audioNode.clearEvents();
+          track.plugin.instance!._audioNode.clearEvents()
         }
-        track.node?.pause();
+        track.pause()
       });
       if (this._app.host.recording) {
-        this._app.recorderController.stopRecordingAllTracks();
+        this._app.recorderController.stopRecordingAllTracks()
         this._view.updateRecordButton(false);
       }
-      this._app.host.hostNode?.pause();
+      this._app.host.hostNode?.pause()
       if (this._timerInterval) clearInterval(this._timerInterval);
       // Always stop the metronome when playback is stopped
-      (this._view.MetronomeElement as MetronomeComponent).pauseMetronome();
+      (this._view.MetronomeElement as MetronomeComponent).pauseMetronome()
     }
-    this._view.updatePlayButton(playing, stop);
+    this._view.updatePlayButton(playing, stop)
   }
 
   /**
@@ -148,8 +148,8 @@ export default class HostController {
   public loop(): void {
     const looping = !this._app.host.looping;
     this._app.host.looping = looping;
-    this._app.tracksController.trackList.forEach((track) => {
-      track.node?.loop(looping);
+    this._app.tracksController.tracks.forEach((track) => {
+      track.loop(looping)
     });
     this._app.host.hostNode?.loop(looping);
     this._view.updateLoopButton(looping);
@@ -199,8 +199,8 @@ export default class HostController {
    * Handles the volume slider. It updates the volume of the master track.
    */
   public updateVolume(): void {
-    let value = parseInt(this._view.volumeSlider.value) / 100;
-    this._app.host.setVolume(value);
+    let value = parseInt(this._view.volumeSlider.value) / 100
+    this._app.host.volume=value
   }
 
   /**
@@ -211,7 +211,7 @@ export default class HostController {
    */
   public updateLoopValue(leftTime: number, rightTime: number): void {
     this._app.host.updateLoopTime(leftTime, rightTime);
-    this._app.tracksController.trackList.forEach((track) => {
+    this._app.tracksController.tracks.forEach((track) => {
       track.updateLoopTime(leftTime, rightTime);
     });
   }
@@ -228,9 +228,9 @@ export default class HostController {
       for (let i = 0; i < target.files.length; i++) {
         let file = target.files[i];
         if (file !== undefined) {
-          this._app.tracksController.newTrackWithFile(file).then((track) => {
+          this._app.tracksController.createTrackWithFile(file).then((track) => {
             if (track !== undefined) {
-              this._app.tracksController.initializeTrack(track);
+              this._app.tracksController.addTrack(this._app.tracksController.sampleTracks,track);
               track.element.progressDone();
             }
           });
@@ -280,8 +280,8 @@ export default class HostController {
    * Stops all the tracks.
    */
   public stopAllTracks(): void {
-    this._app.tracksController.trackList.forEach(async (track) => {
-      track.node?.pause();
+    this._app.tracksController.tracks.forEach(async (track) => {
+      track.pause();
     });
   }
 
@@ -430,7 +430,7 @@ export default class HostController {
       //console.log("Tempo changed : playhead AFTER= " + this._app.host.playhead + " pos = " + this._app.editorView.playhead.position.x  + " in ms : " + (this._app.host.playhead*1000)/audioCtx.sampleRate);
 
       // redraw all tracks according to new tempo
-      this._app.tracksController.trackList.forEach((track) => {
+      this._app.tracksController.tracks.forEach((track) => {
         // redraw all regions taking into account the new tempo
         // RATIO_MILLS_BY_PX has been updated by updateTemponew(Tempo)
 
@@ -445,7 +445,7 @@ export default class HostController {
 
         // MB : is this necessary ? Apparently yes as start of regions changed.
         // TODO : check if this is really necessary.
-        track.updateBuffer(audioCtx, this._app.host.playhead);
+        track.update(audioCtx, this._app.host.playhead);
 
         this._app.editorView.drawRegions(track);
       });
@@ -535,11 +535,11 @@ export default class HostController {
         this._app.tracksController.clearAllTracks();
         for (let trackSong of song.songs) {
           const url = SONGS_FILE_URL + trackSong;
-          let track = await this._app.tracksController.newEmptyTrack(url);
+          let track = await this._app.tracksController.createEmptySampleTrack(url);
           track.url = url;
-          this._app.tracksController.initializeTrack(track);
+          this._app.tracksController.addTrack(this._app.tracksController.sampleTracks, track);
         }
-        for (let track of this._app.tracksController.trackList) {
+        for (let track of this._app.tracksController.sampleTracks) {
           this._app.loader.loadTrackUrl(track);
         }
       };
@@ -577,7 +577,7 @@ export default class HostController {
       if (this._view.vuMeterDiv.isConnected) {
         let peakMeter = new WebAudioPeakMeter(
           audioCtx,
-          this._app.host.gainNode, // MB: Check, here we should use the node at the end of the chain i.e main output
+          this._app.host.outputNode, // MB: Check, here we should use the node at the end of the chain i.e main output
           this._view.vuMeterDiv,
           {
             borderSize: 2,

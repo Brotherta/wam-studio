@@ -119,7 +119,7 @@ export default class ProjectController {
             });
         }
         exportElement.setTitle("export project");
-        exportElement.update(this._app.tracksController.trackList);
+        exportElement.update([...this._app.tracksController.sampleTracks]);
     }
 
     /**

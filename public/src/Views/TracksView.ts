@@ -1,5 +1,6 @@
 import TrackElement from "../Components/TrackElement";
-import Track from "../Models/Track";
+import SampleTrack from "../Models/Track/SampleTrack";
+import TrackOf from "../Models/Track/Track.js";
 
 /**
  * Class that is responsible for the view of the tracks.
@@ -30,7 +31,7 @@ export default class TracksView {
      * Changes the color of a track.
      * @param track - The track to change the color.
      */
-    public changeColor(track: Track): void {
+    public changeColor(track: TrackOf<any>): void {
         let newColor = this.getRandomColor();
         track.color = newColor;
         track.element.color.style.background = newColor;
@@ -41,7 +42,7 @@ export default class TracksView {
      * @param track - The track to change the color.
      * @param color - The new color.
      */
-    public setColor(track: Track, color: string): void {
+    public setColor(track: TrackOf<any>, color: string): void {
         track.color = color;
         track.element.color.style.background = color;
     }

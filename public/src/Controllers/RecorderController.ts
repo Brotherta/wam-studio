@@ -1,8 +1,9 @@
 import App from "../App";
-import Track from "../Models/Track";
+import SampleTrack from "../Models/Track/SampleTrack";
 import {URLFromFiles} from "../Audio/Utils/UrlFiles";
 import {audioCtx} from "../index";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
+import SampleRegion from "../Models/Region/SampleRegion";
 
 
 export default class RecorderController {
@@ -18,7 +19,7 @@ export default class RecorderController {
      *
      * @param track - The track to set up recording for.
      */
-    async setupRecording(track: Track) {
+    async setupRecording(track: SampleTrack) {
         track.node?.port.postMessage({
             "arm": true
         });
@@ -41,7 +42,7 @@ export default class RecorderController {
      *
      * @param track - The track to set up the Web Worker for.
      */
-    async setupWorker(track: Track) {
+    async setupWorker(track: SampleTrack) {
         let url1 = new URL('../Audio/Utils/wav-writer.js', import.meta.url);
         let url2 = new URL('../Audio/Utils/Ringbuffer/index.js', import.meta.url);
         await URLFromFiles([url1, url2]).then((e) => {
@@ -60,13 +61,9 @@ export default class RecorderController {
      *
      * @param track - The track to start monitoring.
      */
-    startMonitoring(track: Track) {
+    startMonitoring(track: SampleTrack) {
         if (track.armed) {
-            if (track.plugin.initialized) {
-                track.mergerNode.connect(track.plugin.instance?._audioNode!);
-            } else {
-                track.mergerNode.connect(track.pannerNode);
-            }
+            track.monitored = true
         }
     }
 
@@ -75,20 +72,15 @@ export default class RecorderController {
      *
      * @param track - The track to stop monitoring.
      */
-    stopMonitoring(track: Track) {
-        if (track.plugin.initialized) {
-            track.mergerNode.disconnect(track.plugin.instance?._audioNode!);
-        }
-        else {
-            track.mergerNode.disconnect(track.pannerNode);
-        }
+    stopMonitoring(track: SampleTrack) {
+        track.monitored = false
     }
 
     /**
      * Stops recording all armed tracks.
      */
     stopRecordingAllTracks() {
-        for (let track of this.app.tracksController.trackList) {
+        for (let track of this.app.tracksController.sampleTracks) {
             if (track.armed) {
                 this.stopRecording(track);
             }
@@ -102,7 +94,7 @@ export default class RecorderController {
      * @param track - The track to start recording on.
      * @param playhead - The current playhead position.
      */
-    startRecording(track: Track, playhead: number) {
+    startRecording(track: SampleTrack, playhead: number) {
         this.app.host.recording = true;
         track.mergerNode.connect(track.node!);
 
@@ -137,7 +129,7 @@ export default class RecorderController {
                             right[i / 2] = pcm[i + 1];
                         }
 
-                        this.app.regionsController.updateTemporaryRegion(region, track, audioBuffer)
+                        this.app.regionsController.updateTemporaryRegion(region, track, new SampleRegion(0,audioBuffer,0,region.id));
                     }
                     break;
                 }
@@ -160,7 +152,7 @@ export default class RecorderController {
                             right[i / 2] = pcm[i + 1];
                         }
 
-                        this.app.regionsController.renderTemporaryRegion(region, track, audioBuffer);
+                        this.app.regionsController.renderTemporaryRegion(region, track, new SampleRegion(0,audioBuffer,0,region.id));
                         track.modified = true;
                     }
                 }
@@ -173,7 +165,7 @@ export default class RecorderController {
      *
      * @param track
      */
-    stopRecording(track: Track) {
+    stopRecording(track: SampleTrack) {
         this.app.host.recording = false;
         track.worker?.postMessage({
             command: "stopAndSendAsBuffer"
@@ -189,7 +181,7 @@ export default class RecorderController {
      *
      * @param track - The track to toggle the armed status of.
      */
-    async clickArm(track: Track) {
+    async clickArm(track: SampleTrack) {
         track.armed = !track.armed;
 
         if (track.armed) {
@@ -218,7 +210,7 @@ export default class RecorderController {
         const recording = !this.app.host.recording;
         this.app.host.recording = recording;
         if (recording) {
-            let armed = this.app.tracksController.trackList.find((e) => e.armed);
+            let armed = this.app.tracksController.sampleTracks._tracks.find((e) => e.armed);
             // if (armed === undefined) {
             //     alert("No track armed");
             //     return;
@@ -226,7 +218,7 @@ export default class RecorderController {
             if (!this.app.host.playing) {
                 this.app.hostController.play(true);
             }
-            for (let track of this.app.tracksController.trackList) {
+            for (let track of this.app.tracksController.sampleTracks) {
                 if (track.armed) {
                     this.startRecording(track, this.app.host.playhead);
                 }
@@ -244,7 +236,7 @@ export default class RecorderController {
      *
      * @param track - The track to toggle the monitoring status of.
      */
-    clickMonitoring(track: Track) {
+    clickMonitoring(track: SampleTrack) {
         track.monitored = !track.monitored
         if (track.monitored) {
             track.element.monitorOn();
@@ -261,7 +253,7 @@ export default class RecorderController {
      *
      * @param track - The track to toggle the mode of.
      */
-    clickMode(track: Track) {
+    clickMode(track: SampleTrack) {
         track.stereo = !track.stereo;
         if (track.stereo) {
             track.element.setStereo();
@@ -301,7 +293,7 @@ export default class RecorderController {
      *
      * @param track - The track to toggle the left channel of.
      */
-    clickLeft(track: Track) {
+    clickLeft(track: SampleTrack) {
         track.element.clickLeft();
         track.left = !track.left;
         if (track.left) {
@@ -321,7 +313,7 @@ export default class RecorderController {
      *
      * @param track - The track to toggle the right channel of.
      */
-    clickRight(track: Track) {
+    clickRight(track: SampleTrack) {
         track.element.clickRight();
         track.right = !track.right;
         if (track.right) {
@@ -341,7 +333,7 @@ export default class RecorderController {
      *
      * @param track - The track to toggle merging for.
      */
-    clickMerge(track: Track) {
+    clickMerge(track: SampleTrack) {
         track.element.clickMerge();
         track.merge = !track.merge;
         if (track.merge) {

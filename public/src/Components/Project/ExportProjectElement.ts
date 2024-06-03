@@ -1,4 +1,4 @@
-import Track from "../../Models/Track";
+import SampleTrack from "../../Models/Track/SampleTrack";
 
 const template = document.createElement('template');
 
@@ -98,7 +98,7 @@ export default class ExportProjectElement extends HTMLElement {
      * By default, all the tracks are selected.
      * @param tracks The list of tracks to export
      */
-    update(tracks: Track[]) {
+    update(tracks: SampleTrack[]) {
         if (this.tracksContainer.children.length > 0) {
             this.tracksContainer.innerHTML = "";
         }

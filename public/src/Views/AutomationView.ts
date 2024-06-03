@@ -1,7 +1,8 @@
-import Track from "../Models/Track";
+import SampleTrack from "../Models/Track/SampleTrack";
 import BPF from "../Components/BPF";
 import LoopView from "./Editor/LoopView";
 import EditorView from "./Editor/EditorView";
+import TrackOf from "../Models/Track/Track.js";
 
 /**
  * Class for the automation view. This class is responsible for displaying the automation menu and the automation bpf.
@@ -16,7 +17,7 @@ export default class AutomationView {
      * Opens the automation menu next to the track.
      * @param track - The track to which the automation menu is associated.
      */
-    public openAutomationMenu(track: Track): void {
+    public openAutomationMenu(track: TrackOf<any>): void {
         let trackElement = track.element;
         let bd = trackElement.getBoundingClientRect();
         this.automationMenu.style.transform = `translate(${bd.left + bd.width - 15}px, ${bd.top+15}px)`;

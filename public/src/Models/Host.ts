@@ -2,7 +2,7 @@ import {app, audioCtx} from "..";
 import App from "../App";
 import AudioPlayerNode from "../Audio/AudioNode";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import Track from "./Track";
+import SampleTrack from "./Track/SampleTrack";
 import TrackElement from "../Components/TrackElement";
 import Plugin from "./Plugin";
 import {BACKEND_URL, MAX_DURATION_SEC} from "../Env";
@@ -11,7 +11,7 @@ import {BACKEND_URL, MAX_DURATION_SEC} from "../Env";
  * Host class that contains the master track.
  * It is used to control the global volume and the playhead.
  */
-export default class Host extends Track {
+export default class Host extends SampleTrack {
 
     /**
      * Id of the host group.
@@ -67,10 +67,9 @@ export default class Host extends Track {
         this.recording = false;
         this.looping = false;
 
-        this.setVolume(1);
+        this.volume=1;
         this.plugin = new Plugin(app);
-        this.gainNode = audioCtx.createGain()
-        this.gainNode.connect(audioCtx.destination);
+        this.outputNode.connect(audioCtx.destination)
     }
 
     /**
@@ -93,7 +92,7 @@ export default class Host extends Track {
         
         this.hostNode = new AudioPlayerNode(audioCtx, 2);
         this.hostNode.setAudio(operableAudioBuffer.toArray());
-        this.gainNode.connect(this.hostNode);
+        this.outputNode.connect(this.hostNode);
     }
 
     /**
