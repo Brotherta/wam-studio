@@ -1,7 +1,7 @@
+import { Container, Graphics } from "pixi.js";
+import { RATIO_MILLS_BY_PX } from "../../Env";
+import { audioCtx } from "../../index";
 import EditorView from "./EditorView";
-import {Container, Graphics} from "pixi.js";
-import {audioCtx} from "../../index";
-import {RATIO_MILLS_BY_PX} from "../../Env";
 
 /**
  * Class that represent the playhed. It's a PIXI.JS Container that will contain the track, the handle and the line of
@@ -95,7 +95,6 @@ export default class PlayheadView extends Container {
          // adjust horizontal scrollbar so that it corresponds to the current viewport position
          // scrollbar pos depends on the left position of the viewport.
          this._editor.horizontalScrollbar.moveTo(this._editor.viewport.left);
-
     }
 
     public centerViewportAround() {
