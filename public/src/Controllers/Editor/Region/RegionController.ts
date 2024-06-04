@@ -358,14 +358,14 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
     console.assert(track !== undefined)
     const waveform=this._editorView.getWaveFormViewById(track.id)!
     console.assert(waveform !== undefined)
-    const view=waveform.getRegionViewById(region.id)! as VIEW
-    console.assert(view !== undefined)
 
     this.doIt(undoable,
       ()=>{
         track.removeRegionById(region.id)
         region.trackId=-1
         track.modified=true
+        const view=waveform.getRegionViewById(region.id)! as VIEW
+        console.assert(view !== undefined)
         waveform.removeRegionView(view)
         if(this._selectedRegion?.region===region)this.selectRegion(null)
       },
@@ -525,7 +525,7 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
     let track=this._tracks().getById(rightRegion.trackId)!
 
     // Find the previous region
-    let leftRegion = null
+    let leftRegion: REGION|null = null
     let leftRegionEnd = -1
     for(const candidate of track.regions){
       if(candidate.end<=rightRegion.start && candidate.end>leftRegionEnd){
@@ -533,10 +533,7 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
         leftRegionEnd=candidate.end
       }
     }
-    console.log(leftRegion)
     if(!leftRegion)return
-    let leftRegionView=this._editorView.getWaveFormViewById(track.id)?.getRegionViewById(leftRegion.id)! as VIEW
-    console.assert(leftRegionView!==undefined)
 
     // Create a padding region
     const padding_length=rightRegion.start-leftRegion.end
@@ -544,16 +541,26 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
     if(padding_length>1)padding=this._dummyRegion(track,leftRegion.end,this.getNewId(),padding_length)
     else padding=null
 
-    // Merge the two regions
-    if(padding)leftRegion.mergeWith(padding)
-    leftRegion.mergeWith(rightRegion)
+    // Merge the tree regions into a new region
+    const newRegion=leftRegion.clone(this.getNewId())
+    if(padding)newRegion.mergeWith(padding)
+      newRegion.mergeWith(rightRegion)
 
-    leftRegionView.initializeRegionView(track.color, leftRegion)
-    this._tracks().getById(track.id)!.modified=true
+    this.doIt(true,
+      ()=>{
+        const view=this.addRegion(track,newRegion)
+        if(this._selectedRegion?.region===rightRegion)this.selectRegion(view)
+        this.removeRegion(leftRegion!)
+        this.removeRegion(rightRegion)
+      },
+      ()=>{
+        this.addRegion(track,leftRegion!)
+        const view=this.addRegion(track,rightRegion)
+        if(this._selectedRegion?.region===newRegion)this.selectRegion(view)
+        this.removeRegion(newRegion)
+      }
+    )
 
-    if(this._selectedRegion?.region===rightRegion)this.selectRegion(leftRegionView)
-
-    this.removeRegion(rightRegion)
   }
 
   isPlayheadOnSelectedRegion() {
