@@ -68,9 +68,9 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
 
   protected abstract _regionViewFactory(region: REGION, waveform: WaveformView): VIEW
 
-  protected abstract _dummyRegion(track: Track<REGION>, start: number, id: number): REGION
+  protected abstract _dummyRegion(track: Track<REGION>, start: number, id: number, duration?: number): REGION
 
-  protected abstract _tracks(): TrackList<REGION,any>
+  protected abstract _tracks(): TrackList<REGION,Track<REGION>>
 
   /**
    * Adds a region to the track and the corresponding view in the waveform.
@@ -109,7 +109,7 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
    * @param start - The time in milliseconds where the region should start.
    */
   public createTemporaryRegion(track: Track<REGION>, start: number): REGION {
-    const region=this._dummyRegion(track,start,this.getNewId())
+    const region=this._dummyRegion(track,start,this.getNewId(),)
     this.addRegion(track,region)
 
     //let waveformView = this._editorView.getWaveFormViewById(track.id)!
@@ -166,7 +166,7 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
     const regionView = waveformView.getRegionViewById(region.id)!;
     region.mergeWith(added)
     regionView.initializeRegionView(track.color, region)
-    this._tracks().getById(track.id)!.update(audioCtx, this._app.host.playhead);
+    this._tracks().getById(track.id)!.modified=true
   }
 
   /**
@@ -339,13 +339,15 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
    * @param region - The region to select or null to just unselect the current one.
    * @private
    */
-  private selectRegion(region: VIEW|null){
+  private selectRegion(view: VIEW|null){
     if (this._selectedRegion !== undefined) {
       this._selectedRegion.view.deselect();
       this._selectedRegion = undefined;
     }
-    if (region) {
-      this._selectedRegion = {view:region, region:this._tracks().getById(region.trackId) ?.getRegionById(region.id)!};
+    if (view) {
+      const region=this._tracks().getById(view.trackId) ?.getRegionById(view.id)!
+      console.assert(region!==undefined)
+      this._selectedRegion = {view, region};
       this._selectedRegion.view.select();
     }
   }
@@ -396,7 +398,7 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
 
     this.doIt(undoable,
       ()=>{
-        this.regionClipboard={region: region.clone(this.getNewId()), track: track}
+        this.regionClipboard={region: region.clone(this.getNewId()), track: track!}
       },
       ()=>{
         this.regionClipboard=oldClipboard
@@ -445,7 +447,7 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
 
     // Paste destination in milliseconds and pixel
     const startinPx = this._app.editorView.playhead.position.x
-    const startInMs = (this._app.host.playhead / audioCtx.sampleRate) * 1000;
+    const startInMs = this._app.host.playhead * 1000 / audioCtx.sampleRate;
 
     // Check if pasted region will be outside the world. If so, do nothing.
     if(startinPx + this.regionClipboard.region.width > this._editorView.worldWidth)return
@@ -511,6 +513,49 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
     
   }
 
+  /**
+   *
+   * @returns Merge the selected region with the previous one if it exists, otherwise do nothing.
+   * 
+   */
+  mergeSelectedRegion() {
+    if (!this._selectedRegion) return;
+
+    let rightRegion = this._selectedRegion.region;
+    let track=this._tracks().getById(rightRegion.trackId)!
+
+    // Find the previous region
+    let leftRegion = null
+    let leftRegionEnd = -1
+    for(const candidate of track.regions){
+      if(candidate.end<=rightRegion.start && candidate.end>leftRegionEnd){
+        leftRegion=candidate
+        leftRegionEnd=candidate.end
+      }
+    }
+    console.log(leftRegion)
+    if(!leftRegion)return
+    let leftRegionView=this._editorView.getWaveFormViewById(track.id)?.getRegionViewById(leftRegion.id)! as VIEW
+    console.assert(leftRegionView!==undefined)
+
+    // Create a padding region
+    const padding_length=rightRegion.start-leftRegion.end
+    let padding
+    if(padding_length>1)padding=this._dummyRegion(track,leftRegion.end,this.getNewId(),padding_length)
+    else padding=null
+
+    // Merge the two regions
+    if(padding)leftRegion.mergeWith(padding)
+    leftRegion.mergeWith(rightRegion)
+
+    leftRegionView.initializeRegionView(track.color, leftRegion)
+    this._tracks().getById(track.id)!.modified=true
+
+    if(this._selectedRegion?.region===rightRegion)this.selectRegion(leftRegionView)
+
+    this.removeRegion(rightRegion)
+  }
+
   isPlayheadOnSelectedRegion() {
     if (!this._selectedRegion) return;
 
@@ -545,6 +590,7 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
 
     let newX = x - this._offsetX;
     newX = Math.max(0, Math.min(newX, this._editorView.worldWidth));
+    console.log(newX)
 
     // If reaching end of world, do nothing
     const regionEndPos = newX + this._selectedRegion.view.width;

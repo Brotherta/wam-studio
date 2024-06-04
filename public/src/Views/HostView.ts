@@ -1,10 +1,9 @@
-import {audioCtx} from "../index";
-import {RATIO_MILLS_BY_PX} from "../Env";
+import Metronome from "../Components/MetronomeComponent";
 import TempoSelectorElement from "../Components/TempoSelectorElement";
 import TimeSignatureSelectorElement from "../Components/TimeSignatureSelectorElement";
 import AudioLoopBrowser from "../Components/WamAudioLoopBrowser";
-import Metronome from "../Components/MetronomeComponent";
-import MetronomeComponent from "../Components/MetronomeComponent";
+import { RATIO_MILLS_BY_PX } from "../Env";
+import { audioCtx } from "../index";
 
 /**
  * Class responsible for the host view. It displays the host controls and the host track.
@@ -17,6 +16,7 @@ export default class HostView {
     muteBtn = document.getElementById("mute-btn") as HTMLDivElement;
     snapBtn = document.getElementById("snap-btn") as HTMLDivElement;
     splitBtn = document.getElementById("split-btn") as HTMLDivElement;
+    mergeBtn = document.getElementById("merge-btn") as HTMLDivElement;
     undoBtn = document.getElementById("undo-btn") as HTMLDivElement;
     redoBtn = document.getElementById("redo-btn") as HTMLDivElement;
     metroBtn = document.getElementById("metro-btn") as HTMLDivElement;

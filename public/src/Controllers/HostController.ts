@@ -1,13 +1,12 @@
-import HostView from "../Views/HostView";
-import App from "../App";
 import songs from "../../static/songs.json";
-import { audioCtx } from "../index";
-import { updateTempo, TEMPO_DELTA, SONGS_FILE_URL } from "../Env";
-import VuMeter from "../Components/VuMeterElement";
-import DraggableWindow from "../Utils/DraggableWindow";
+import App from "../App";
 import WebAudioPeakMeter from "../Audio/Utils/PeakMeter";
-import PlayheadView from "../Views/Editor/PlayheadView";
 import MetronomeComponent from "../Components/MetronomeComponent";
+import VuMeter from "../Components/VuMeterElement";
+import { SONGS_FILE_URL, TEMPO_DELTA, updateTempo } from "../Env";
+import DraggableWindow from "../Utils/DraggableWindow";
+import HostView from "../Views/HostView";
+import { audioCtx } from "../index";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -348,8 +347,11 @@ export default class HostController {
     });
 
     this._view.splitBtn.addEventListener("click", () => {
-      // splits selected region
       this._app.regionsController.splitSelectedRegion();
+    });
+
+    this._view.mergeBtn.addEventListener("click", () => {
+      this._app.regionsController.mergeSelectedRegion();
     });
 
     // undo/redo

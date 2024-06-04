@@ -2,7 +2,6 @@ import App from "../../../App.js";
 import OperableAudioBuffer from "../../../Audio/OperableAudioBuffer";
 import SampleRegion from "../../../Models/Region/SampleRegion";
 import SampleTrack from "../../../Models/Track/SampleTrack.js";
-import TrackOf from "../../../Models/Track/Track.js";
 import SampleRegionView from "../../../Views/Editor/Region/SampleRegionView";
 import WaveformView from "../../../Views/Editor/WaveformView.js";
 import { audioCtx } from "../../../index";
@@ -23,8 +22,8 @@ export default class SampleRegionController extends RegionController<SampleRegio
     return new SampleRegionView(this._editorView, region.trackId, region)
   }
 
-  protected override _dummyRegion(track: SampleTrack, start: number, id: number): SampleRegion{
-    let buffer = new OperableAudioBuffer({ length:128, sampleRate:audioCtx.sampleRate, numberOfChannels:2});
+  protected override _dummyRegion(track: SampleTrack, start: number, id: number, duration?: number): SampleRegion{
+    let buffer = new OperableAudioBuffer({ length: duration ? duration*audioCtx.sampleRate/1000 : 128, sampleRate:audioCtx.sampleRate, numberOfChannels:2});
     return new SampleRegion(track.id,buffer,start,id)
   }
   
