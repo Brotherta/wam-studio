@@ -50,7 +50,7 @@ export default class MIDIRegion extends RegionOf<MIDIRegion>{
     /** @inheritdoc */
     override split(cut:number, id1:number, id2:number): [MIDIRegion, MIDIRegion] {
         const [first,second]=this.buffer.split(cut * audioCtx.sampleRate / 1000)
-        return [new MIDIRegion(this.trackId, first!, this.start, id1), new SampleRegion(this.trackId, second!, this.start+cut, id2)]
+        return [new MIDIRegion(this.trackId, first!, this.start, id1), new MIDIRegion(this.trackId, second!, this.start+cut, id2)]
     }
 
     /** @inheritdoc */

@@ -1,8 +1,7 @@
-import EditorView from "../EditorView";
-import {Container, Graphics} from "pixi.js";
-import RegionOf from "../../../Models/Region/Region";
-import {HEIGHT_TRACK, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, RATIO_MILLS_BY_PX, TEMPO_RATIO} from "../../../Env";
+import { Graphics } from "pixi.js";
+import { HEIGHT_TRACK } from "../../../Env";
 import SampleRegion from "../../../Models/Region/SampleRegion";
+import EditorView from "../EditorView";
 import RegionView from "./RegionView";
 
 /**
@@ -24,7 +23,7 @@ export default class SampleRegionView extends RegionView<SampleRegion> {
      * @param region - The region that will contain the buffer to draw.
      */
     override drawContent(target: Graphics, color: string, region: SampleRegion){
-        let range = (region.duration * 1000 / RATIO_MILLS_BY_PX)  ;
+        let range = region.width;
         this.scale.x = 1;
 
         let colorHex = +("0x" + color.slice(1));

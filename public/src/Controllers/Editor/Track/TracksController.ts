@@ -1,19 +1,19 @@
-import SampleTrack from "../../../Models/Track/SampleTrack";
-import TracksView from "../../../Views/TracksView";
-import WaveformView from "../../../Views/Editor/WaveformView";
 import App from "../../../App";
-import { audioCtx } from "../../../index";
-import WamEventDestination from "../../../Audio/WAM/WamEventDestination";
-import WamAudioWorkletNode from "../../../Audio/WAM/WamAudioWorkletNode";
 import OperableAudioBuffer from "../../../Audio/OperableAudioBuffer";
+import WamAudioWorkletNode from "../../../Audio/WAM/WamAudioWorkletNode";
+import WamEventDestination from "../../../Audio/WAM/WamEventDestination";
 import TrackElement from "../../../Components/TrackElement";
+import { RATIO_MILLS_BY_PX } from "../../../Env";
 import Plugin from "../../../Models/Plugin";
-import { BACKEND_URL, RATIO_MILLS_BY_PX } from "../../../Env";
+import SampleTrack from "../../../Models/Track/SampleTrack";
+import WaveformView from "../../../Views/Editor/WaveformView";
+import TracksView from "../../../Views/TracksView";
+import { audioCtx } from "../../../index";
 
 import WebAudioPeakMeter from "../../../Audio/Utils/PeakMeter";
 import RegionOf from "../../../Models/Region/Region.js";
-import TrackOf from "../../../Models/Track/Track.js";
 import SampleRegion from "../../../Models/Region/SampleRegion";
+import TrackOf from "../../../Models/Track/Track.js";
 import FriendlyIterable from "../../../Utils/FriendlyIterable";
 
 export class TrackList<REGION extends RegionOf<REGION>, TRACK extends TrackOf<REGION>> {
@@ -284,9 +284,7 @@ export default class TracksController{
    * @param pos - The position in px
    */
   public jumpTo(pos: number): void {
-    this._app.host.playhead = Math.floor(
-      ((pos * RATIO_MILLS_BY_PX) / 1000) * audioCtx.sampleRate
-    );
+    this._app.host.playhead = Math.floor(pos * RATIO_MILLS_BY_PX / 1000 * audioCtx.sampleRate)
 
     for(const track of this.tracks) if(track instanceof SampleTrack) track.node!.port.postMessage({ playhead: this._app.host.playhead + 1 })
 

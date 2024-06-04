@@ -20,8 +20,11 @@ export default abstract class RegionOf<THIS extends RegionOf<THIS>> {
         this.id = regionId;
     }
 
-    /** In milliseconds */
+    /** Region duration in milliseconds */
     abstract get duration(): number
+
+    /**  Region end in milliseconds */
+    public get end(){ return this.start+this.duration }
 
     /**
      * Split the region into two region 
@@ -41,11 +44,14 @@ export default abstract class RegionOf<THIS extends RegionOf<THIS>> {
         return clone
     }
 
+    /** Region start in PX */
     get pos(){ return this.start / RATIO_MILLS_BY_PX }
 
+    /** Region width in PX */
     get width(){ return this.duration / RATIO_MILLS_BY_PX }
 
-    get end(){ return this.pos + this.width}
+    /** Region end in PX */
+    get endpos(){ return this.pos + this.width}
 
     /**
      * Save the region in a Blob.

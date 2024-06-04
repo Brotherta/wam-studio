@@ -14,7 +14,7 @@ export default class SampleRegion extends RegionOf<SampleRegion>{
     }
     
 
-    override get duration(): number { return this.buffer.duration; }
+    override get duration(): number { return this.buffer.duration*1000 }
 
     /** @inheritdoc */
     override split(cut:number, id1:number, id2:number): [SampleRegion, SampleRegion] {

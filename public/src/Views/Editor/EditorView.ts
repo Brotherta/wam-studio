@@ -1,19 +1,19 @@
-import {Application, Sprite, Texture} from "pixi.js";
-import {Viewport} from "pixi-viewport";
+import { Viewport } from "pixi-viewport";
+import { Application } from "pixi.js";
 import ScrollBarElement from "../../Components/ScrollBarElement";
-import WaveformView from "./WaveformView";
-import PlayheadView from "./PlayheadView";
-import SampleTrack from "../../Models/Track/SampleTrack";
+import { ScrollEvent } from "../../Controllers/Editor/EditorController";
 import {
     HEIGHT_NEW_TRACK,
     HEIGHT_TRACK,
     MAX_DURATION_SEC,
     RATIO_MILLS_BY_PX,
 } from "../../Env";
-import {ScrollEvent} from "../../Controllers/Editor/EditorController";
-import LoopView from "./LoopView";
-import GridView from "./GridView";
+import SampleTrack from "../../Models/Track/SampleTrack";
 import TrackOf, { Track } from "../../Models/Track/Track.js";
+import GridView from "./GridView";
+import LoopView from "./LoopView";
+import PlayheadView from "./PlayheadView";
+import WaveformView from "./WaveformView";
 
 /**
  * Class that Override PIXI.Application. Represents the main editor and handle all events about the editor.
@@ -337,7 +337,7 @@ export default class EditorView extends Application {
                 //if (!track.audioBuffer) return;
                 let region = track.getRegionById(regionView.id);
                 if (region) {
-                    regionView.stretch(region.duration, region.start);
+                    regionView.stretch(region.duration/1000, region.start);
                     //console.log("STRECHED REGION !")
                 }
             }

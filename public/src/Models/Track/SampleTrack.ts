@@ -1,13 +1,11 @@
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
+import { RingBuffer } from "../../Audio/Utils/Ringbuffer";
 import WamAudioWorkletNode from "../../Audio/WAM/WamAudioWorkletNode.js";
 import TrackElement from "../../Components/TrackElement.js";
 import { NUM_CHANNELS } from "../../Env";
 import { audioCtx } from "../../index";
 import SampleRegion from "../Region/SampleRegion";
 import TrackOf from "./Track";
-import WamEventDestination from "../../Audio/WAM/WamEventDestination.js";
-import Host from "../Host.js";
-import { RingBuffer } from "../../Audio/Utils/Ringbuffer";
 
 export default class SampleTrack extends TrackOf<SampleRegion> {
 
@@ -114,7 +112,7 @@ export default class SampleTrack extends TrackOf<SampleRegion> {
       // For each region in the track buffer regions list, concat the buffer
       let region = this.regions[i];
       let start = region.start; // in milliseconds
-      let duration = region.duration * 1000; // in milliseconds
+      let duration = region.duration; // in milliseconds
 
       if (start > currentTime) {
         // No buffer until the current time, create an empty buffer and concat it to the buffer.
