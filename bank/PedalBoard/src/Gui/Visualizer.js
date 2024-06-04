@@ -57,7 +57,7 @@ export default class Visualizer {
       w,
       1,
       this.scene,
-      undefined,
+      false,
       undefined,
       undefined,
       undefined,
@@ -74,9 +74,9 @@ export default class Visualizer {
       // Parameters
       uniform vec2 screenSize;
 
-      vec4 firstColor = vec4(1.0,0.0,0.0,1.0); //red
-      vec4 middleColor = vec4(0.0,1.0,0.0,1.0); // green
-      vec4 endColor = vec4(0.0,0.0,1.0,1.0); // blue
+      const vec4 firstColor = vec4(1.0,0.0,0.0,1.0); //red
+      const vec4 middleColor = vec4(0.0,1.0,0.0,1.0); // green
+      const vec4 endColor = vec4(0.0,0.0,1.0,1.0); // blue
 
       float getIntensity(vec2 xy, float size, float width, float dimension){
         float wave_y = texture2D(textureSampler, vec2(xy.x/dimension, 0.5)).r;
@@ -128,11 +128,10 @@ export default class Visualizer {
   }
 
   createScene() {
-    this.scene = new BABYLON.Scene(this.engine);
-    this.scene.clearColor = new BABYLON.Color3.Black();
-
-    var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), this.scene);
-    light.intensity = 0.7;
+    const scene = this.scene = new BABYLON.Scene(this.engine);
+    scene.autoClear = false; 
+    scene.autoClearDepthAndStencil = false; 
+  
 
     this.camera = new BABYLON.ArcRotateCamera(
       "Camera",
