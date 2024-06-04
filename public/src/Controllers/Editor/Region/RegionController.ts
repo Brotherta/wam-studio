@@ -4,6 +4,7 @@ import { RATIO_MILLS_BY_PX } from "../../../Env";
 import { RegionOf } from "../../../Models/Region/Region";
 import SampleTrack from "../../../Models/Track/SampleTrack.js";
 import Track from "../../../Models/Track/Track.js";
+import { isKeyPressed, registerOnKeyDown, registerOnKeyUp } from "../../../Utils/keys";
 import EditorView from "../../../Views/Editor/EditorView.js";
 import RegionView from "../../../Views/Editor/Region/RegionView";
 import WaveformView from "../../../Views/Editor/WaveformView.js";
@@ -240,54 +241,41 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
    * @private
    */
   private bindEvents(): void {
-    document.addEventListener("keyup", (e) => {
-      this.snappingDisabled = e.shiftKey;
+    registerOnKeyUp( key => {
+      if(key=="Shift") this.snappingDisabled=false
     });
 
-    document.addEventListener("keydown", (e) => {
-      // If the user is typing in an input, we don't want to trigger the keyboard shortcuts
-      if (e.target != document.body) return;
+    registerOnKeyDown(key => {
+      switch(key){
+        case "Escape":
+          this.selectRegion(null);
+          break;
 
-      // On escape key pressed, deselect the selected waveform.
-      if (e.key === "Escape") {
-        this.selectRegion(null);
-      }
+        case "Delete":
+        case "Backspace":
+          this.deleteSelectedRegion(true);
+          break;
 
-      // On delete key pressed, delete the selected region.
-      if (
-        (e.key === "Delete" || e.key === "Backspace") &&
-        this._selectedRegion !== undefined
-      ) {
-        this.deleteSelectedRegion(true);
-      }
+        case "Shift":
+          this.snappingDisabled=true;
+          break;
+        
+        case "S":
+        case "s":
+          this.splitSelectedRegion();
+          break;
 
-      // for "disabling temporarily the grid snapping if shift is pressed"
-      if (e.shiftKey) {
-        this.snappingDisabled = true;
-      }
+        case "x":
+          if(isKeyPressed("Control"))this.cutSelectedRegion();
+          break;
 
-      // split a region at playhead position
-      if (
-        (e.key === "S" || e.key === "s") &&
-        this._selectedRegion !== undefined
-      ) {
-        this.splitSelectedRegion();
-      }
+        case "c":
+          if(isKeyPressed("Control"))this.copySelectedRegion();
+          break;
 
-      // MB: not sure that this is the proper way do handle
-      // keyboard shortcuts for copy/cut/paste
-      if (e.ctrlKey || e.metaKey) {
-        switch (e.key) {
-          case "x":
-            this.cutSelectedRegion();
-            break;
-          case "c":
-            this.copySelectedRegion();
-            break;
-          case "v":
-            this.pasteRegion(true);
-            break;
-        }
+        case "v":
+          if(isKeyPressed("Control"))this.pasteRegion(true);
+          break;
       }
     });
     // handle moving a region on the PIXI Canvas.

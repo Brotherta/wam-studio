@@ -1,9 +1,9 @@
+import { FederatedPointerEvent } from "pixi.js";
 import App from "../../App";
-import LoopView from "../../Views/Editor/LoopView";
-import EditorView from "../../Views/Editor/EditorView";
-import { FederatedPointerEvent, Graphics } from "pixi.js";
 import { RATIO_MILLS_BY_PX } from "../../Env";
-import { right } from "@popperjs/core";
+import { registerOnKeyDown, registerOnKeyUp } from "../../Utils/keys";
+import EditorView from "../../Views/Editor/EditorView";
+import LoopView from "../../Views/Editor/LoopView";
 
 enum MovingHandleEnum {
   LEFT,
@@ -61,15 +61,12 @@ export default class LoopController {
   }
 
   private bindEvents(): void {
-    document.addEventListener("keyup", (e) => {
-      this.snappingDisabled = e.shiftKey;
-    });
+    registerOnKeyUp((key) => {
+      if (key === "Shift") this.snappingDisabled = false
+    })
 
-    document.addEventListener("keydown", (e) => {
-      // for "disabling temporarily the grid snapping if shift is pressed"
-      if (e.shiftKey) {
-        this.snappingDisabled = true;
-      }
+    registerOnKeyDown(key => {
+      if (key === "Shift") this.snappingDisabled = true
     });
 
     this._view.rightHandle.on("pointerdown", () => {

@@ -1,6 +1,7 @@
 import { FederatedPointerEvent } from "pixi.js";
 import App from "../../App";
 import { RATIO_MILLS_BY_PX } from "../../Env";
+import { registerOnKeyDown, registerOnKeyUp } from "../../Utils/keys";
 import EditorView from "../../Views/Editor/EditorView";
 import PlayheadView from "../../Views/Editor/PlayheadView";
 
@@ -49,16 +50,13 @@ export default class PlayheadController {
    * @private
    */
   private bindEvents() {
-    document.addEventListener("keyup", (e) => {
-      this.snappingDisabled = e.shiftKey;
-    });
+    registerOnKeyUp((key) => {
+      if (key === "Shift") this.snappingDisabled = false
+    })
 
-    document.addEventListener("keydown", (e) => {
-      // for "disabling temporarily the grid snapping if shift is pressed"
-      if (e.shiftKey) {
-        this.snappingDisabled = true;
-      }
-    });
+    registerOnKeyDown((key) => {
+      if (key === "Shift") this.snappingDisabled = true
+    })
 
     this._view.track.on("pointerup", (e) => {
       this.handlePointerUp(e);
@@ -257,7 +255,6 @@ export default class PlayheadController {
   }
 
   private handlePointerMove(e: FederatedPointerEvent) {
-    console.log("pointer move")
     if (this._movingPlayhead) {
       document.body.style.cursor = "grabbing";
       let pos = e.data.global.x + this._app.editorView.viewport.left;
