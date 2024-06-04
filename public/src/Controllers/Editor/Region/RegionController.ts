@@ -128,7 +128,7 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
    */
   public moveRegion(region: REGION, newTrack: Track<REGION>, newX?: number){
     // Move the region along its track
-    if(newX){
+    if(newX!==undefined){
       region.start=newX * RATIO_MILLS_BY_PX
       const view=this._editorView.getWaveFormViewById(newTrack.id)!.getRegionViewById(region.id)
       if(view)view.position.x = newX;
