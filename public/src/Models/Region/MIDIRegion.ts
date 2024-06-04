@@ -1,7 +1,7 @@
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import { bufferToWave } from "../../Audio/Utils/audioBufferToWave";
 import { audioCtx } from "../../index";
-import RegionOf from "./Region";
+import { RegionOf } from "./Region";
 
 /**
  * A note on a MIDI track.

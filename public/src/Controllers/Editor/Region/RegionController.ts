@@ -1,7 +1,7 @@
 import { FederatedPointerEvent } from "pixi.js";
 import App from "../../../App.js";
 import { RATIO_MILLS_BY_PX } from "../../../Env";
-import RegionOf from "../../../Models/Region/Region";
+import { RegionOf } from "../../../Models/Region/Region";
 import SampleTrack from "../../../Models/Track/SampleTrack.js";
 import Track from "../../../Models/Track/Track.js";
 import EditorView from "../../../Views/Editor/EditorView.js";

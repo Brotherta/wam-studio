@@ -414,22 +414,7 @@ export default class HostController {
 
       updateTempo(newTempo);
 
-      // should update length of waveforms, time display, playhead speed, not the grid...
-      // update timer using playhead pos in pixels
-      this._view.updateTimerByPixelsPos(
-        this._app.editorView.playhead.position.x
-      );
-
-      // update playhead value (in samples) and post to all track nodes
-      //console.log("Tempo changed : playhead before = " + this._app.host.playhead + " pos = " + this._app.editorView.playhead.position.x + " in ms : " + (this._app.host.playhead*1000)/audioCtx.sampleRate);
-      // jumps to new playhead value
-      this._app.tracksController.jumpTo(
-        this._app.editorView.playhead.position.x
-      );
-
-      // update position of playhead in editorView
-      this._app.editorView.playhead.moveToFromPlayhead(this._app.host.playhead);
-      //console.log("Tempo changed : playhead AFTER= " + this._app.host.playhead + " pos = " + this._app.editorView.playhead.position.x  + " in ms : " + (this._app.host.playhead*1000)/audioCtx.sampleRate);
+      this._app.playheadController.moveTo(this._app.host.playhead/audioCtx.sampleRate*1000,false)
 
       // redraw all tracks according to new tempo
       this._app.tracksController.tracks.forEach((track) => {
@@ -442,12 +427,12 @@ export default class HostController {
           // region pos should not change when the tempo changes
           // a region that starts at 2000ms at 120bpm, when tempo changes to 60bpm
           // should now start at 2000/TEMPO_DELTA, in other words 2000/0.5 = 4000ms
-          region.updateStart(region.start / TEMPO_DELTA);
+          region.start=region.start / TEMPO_DELTA
         }
 
         // MB : is this necessary ? Apparently yes as start of regions changed.
         // TODO : check if this is really necessary.
-        track.update(audioCtx, this._app.host.playhead);
+        track.modified=true
 
         this._app.editorView.drawRegions(track);
       });

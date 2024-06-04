@@ -11,7 +11,7 @@ import TracksView from "../../../Views/TracksView";
 import { audioCtx } from "../../../index";
 
 import WebAudioPeakMeter from "../../../Audio/Utils/PeakMeter";
-import RegionOf from "../../../Models/Region/Region.js";
+import { RegionOf } from "../../../Models/Region/Region";
 import SampleRegion from "../../../Models/Region/SampleRegion";
 import TrackOf from "../../../Models/Track/Track.js";
 import FriendlyIterable from "../../../Utils/FriendlyIterable";
@@ -284,7 +284,9 @@ export default class TracksController{
    * @param pos - The position in px
    */
   public jumpTo(pos: number): void {
-    this._app.host.playhead = Math.floor(pos * RATIO_MILLS_BY_PX / 1000 * audioCtx.sampleRate)
+    this._app.host.playhead = Math.floor(
+      ((pos * RATIO_MILLS_BY_PX) / 1000) * audioCtx.sampleRate
+    );
 
     for(const track of this.tracks) if(track instanceof SampleTrack) track.node!.port.postMessage({ playhead: this._app.host.playhead + 1 })
 

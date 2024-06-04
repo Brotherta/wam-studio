@@ -1,9 +1,8 @@
-import { audioCtx } from "../..";
+import { FederatedPointerEvent } from "pixi.js";
 import App from "../../App";
 import { RATIO_MILLS_BY_PX } from "../../Env";
 import EditorView from "../../Views/Editor/EditorView";
 import PlayheadView from "../../Views/Editor/PlayheadView";
-import { FederatedPointerEvent } from "pixi.js";
 
 /**
  * The class that control the events related to the playhead.
@@ -116,23 +115,33 @@ export default class PlayheadController {
     });
   }
 
-
-  /* adjust pos if snapping is enabled and if not scrolling */
-  adjustPosIfSnapping(pos: number) {
-    if (
-      this._app.editorView.snapping &&
-      !this.snappingDisabled &&
-      !this.scrollingLeft &&
-      !this.scrollingRight
-    ) {
-      // snapping, using cell-size
-      const cellSize = this._app.editorView.cellSize;
-      pos = Math.round(pos / cellSize) * cellSize;
-      // adjust playhead value according to pos
-      this._app.host.playhead =
-        Math.round((pos * RATIO_MILLS_BY_PX * audioCtx.sampleRate) / 1000);
+  /** 
+   * Get a snapped position of the playhead from a free position of the playhead.
+   * @param pos - The free position of the playhead in pixels.
+   * */
+  getSnappedPosition(pos: number) {
+    if (this._app.editorView.snapping && !this.snappingDisabled && !this.scrollingLeft && !this.scrollingRight) {
+      const cellSize = this._app.editorView.cellSize
+      return Math.round(pos / cellSize) * cellSize
     }
-    return pos;
+    return pos
+  }
+  /**
+   * Move the playhead to a specific position in milliseconds.
+   * @param pos - The new position of the playhead in milliseconds.
+   * @param doSnap - If true, the playhead will snap according to the grid settings.
+   */
+  moveTo(pos: number, doSnap:boolean=false){
+    let pixelPos= pos / RATIO_MILLS_BY_PX
+
+    if(this._app.editorView.snapping && doSnap && !this.snappingDisabled && !this.scrollingLeft && !this.scrollingRight){
+      pixelPos = this.getSnappedPosition(pixelPos)
+    }
+    if(pixelPos<0)pixelPos=0
+
+    this._app.tracksController.jumpTo(pixelPos)
+    this._view.moveTo(pixelPos)
+    this._app.hostView.updateTimerByPixelsPos(pixelPos);
   }
 
   /**
@@ -215,6 +224,8 @@ export default class PlayheadController {
       viewScrollSpeed = -this.incrementScrollSpeed;
     }
 
+    console.log("viewScrollSpeed = " + viewScrollSpeed)
+
     // if needed scroll smoothly the viewport to left or right
     if (this.scrollingRight || this.scrollingLeft) {
       let viewport = this._app.editorView.viewport;
@@ -222,11 +233,6 @@ export default class PlayheadController {
       viewport.left += viewScrollSpeed;
       // move also playhead pos according to scrolling (in pixels)
       this._view.position.x += viewScrollSpeed;
-
-      // update also the playhead value (in samples)
-      this._app.host.playhead = Math.round(
-        (this._view.position.x * RATIO_MILLS_BY_PX * audioCtx.sampleRate) /
-        1000);
 
       // adjust horizontal scrollbar so that it corresponds to the current viewport position
       // scrollbar pos depends on the left position of the viewport.
@@ -251,18 +257,12 @@ export default class PlayheadController {
   }
 
   private handlePointerMove(e: FederatedPointerEvent) {
+    console.log("pointer move")
     if (this._movingPlayhead) {
       document.body.style.cursor = "grabbing";
       let pos = e.data.global.x + this._app.editorView.viewport.left;
 
-      // adjust pos if grid snapping is enabled and if not scrolling
-      pos = this.adjustPosIfSnapping(pos);
-      
-      if (pos < 0) pos = 0;
-      this._view.moveTo(pos);
-      this._app.hostView.updateTimerByPixelsPos(pos);
-      
-      //console.log("global pointermove playhead = " + this._app.host.playhead + " pos = " + pos)
+      this.moveTo(pos*RATIO_MILLS_BY_PX, true)
       this.checkIfScrollingNeeded(pos);
     }
   }
@@ -274,20 +274,12 @@ export default class PlayheadController {
    */
   private handlePointerDown(e: FederatedPointerEvent) {
     this._pointerIsDown = true;
-    this.viewportAnimationLoopId = requestAnimationFrame(
-      this.viewportAnimationLoop.bind(this)
-    );
 
     let pos = e.data.global.x + this._app.editorView.viewport.left;
     // adjust pos if grid snapping is enabled and if not scrolling
-    pos = this.adjustPosIfSnapping(pos);
-  
     this._app.hostController.pauseTimerInterval();
     this._movingPlayhead = true;
-    this._view.moveTo(pos);
-
-     // update timer display
-     this._app.hostView.updateTimer(this._app.host.playhead)
+    this.moveTo(pos*RATIO_MILLS_BY_PX, true);
   }
 
   /**
@@ -310,8 +302,9 @@ export default class PlayheadController {
         console.log("pos", pos);
       }
       
-  
-      this._app.tracksController.jumpTo(pos);
+      document.body.style.cursor = "grab";
+
+      this.moveTo(pos*RATIO_MILLS_BY_PX, true);
       this._movingPlayhead = false;
       this._app.hostController.resumeTimerInterval();
       if (this._app.host.playing) {

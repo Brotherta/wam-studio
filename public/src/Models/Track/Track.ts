@@ -1,19 +1,14 @@
-import { audioCtx } from "../../index";
-import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import TrackElement from "../../Components/TrackElement.js";
-import Plugin from "../Plugin.js";
+import { audioCtx } from "../../index";
 import Automation from "../Automation";
-import WamAudioWorkletNode from "../../Audio/WAM/WamAudioWorkletNode.js";
-import RegionOf, { Region } from "../Region/Region.js";
-import { NUM_CHANNELS } from "../../Env";
-import { RingBuffer } from "../../Audio/Utils/ringbuf.js";
-import SampleRegion from "../Region/SampleRegion";
+import Plugin from "../Plugin.js";
+import Region from "../Region/Region";
 
 export type TrackRegionType<Type> = Type extends TrackOf<infer X> ? X : never
 
 export type Track=TrackOf<Region>
 
-export default abstract class TrackOf<REGION extends RegionOf<REGION>> {
+export default abstract class TrackOf<REGION extends Region> {
 
   // Output Node
   /** 

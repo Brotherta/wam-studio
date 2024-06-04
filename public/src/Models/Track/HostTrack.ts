@@ -5,7 +5,7 @@ import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import TrackElement from "../../Components/TrackElement";
 import { BACKEND_URL, MAX_DURATION_SEC } from "../../Env";
 import Plugin from "../Plugin";
-import { Region } from "../Region/Region";
+import Region from "../Region/Region";
 import TrackOf from "./Track";
 
 /**

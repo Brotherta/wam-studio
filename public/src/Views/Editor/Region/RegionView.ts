@@ -1,8 +1,7 @@
+import { Container, Graphics } from "pixi.js";
+import { HEIGHT_TRACK, RATIO_MILLS_BY_PX } from "../../../Env";
+import { RegionOf } from "../../../Models/Region/Region";
 import EditorView from "../EditorView";
-import {Container, Graphics} from "pixi.js";
-import RegionOf from "../../../Models/Region/Region";
-import {HEIGHT_TRACK, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, RATIO_MILLS_BY_PX, TEMPO_RATIO} from "../../../Env";
-import SampleRegion from "../../../Models/Region/SampleRegion";
 
 /**
  * Class that extends PIXI.Container.

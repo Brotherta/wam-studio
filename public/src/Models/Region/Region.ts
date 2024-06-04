@@ -1,13 +1,10 @@
 import { RATIO_MILLS_BY_PX } from "../../Env";
 
-export type Region=RegionOf<any>
+export default abstract class Region{
 
-export default abstract class RegionOf<THIS extends RegionOf<THIS>> {
-    // current start position
     start: number; // in milliseconds
     trackId: number;
     id: number;
-
 
     /**
      * @param trackId The unique ID of the track. 
@@ -30,19 +27,12 @@ export default abstract class RegionOf<THIS extends RegionOf<THIS>> {
      * Split the region into two region 
      * @param {number} cut The cut position in milliseconds relative to the region start
      */
-    abstract split(cut:number, id1:number, id2: number): [THIS, THIS]
-
-    /** Merge the region with another one */
-    abstract mergeWith(other: THIS): void
+    abstract split(cut:number, id1:number, id2: number): [Region, Region]
 
     /** Clone the region. @param newid */
-    abstract clone(id: number): THIS
+    abstract clone(id: number): Region
 
-    cloneWith(newid: number, {start}:{start?:number}): THIS{
-        const clone=this.clone(newid)
-        if(start!=null)clone.start=start
-        return clone
-    }
+    abstract cloneWith(newid: number, {start}:{start?:number}): Region
 
     /** Region start in PX */
     get pos(){ return this.start / RATIO_MILLS_BY_PX }
@@ -62,9 +52,20 @@ export default abstract class RegionOf<THIS extends RegionOf<THIS>> {
      * Load the region from a Blob.
      */
     //async static load(blob: Blob, id: number): Promise<Region>{throw new Error("Not implemented")}
+}
 
-    updateStart(newStart: number) {
-        this.start = newStart;
+export abstract class RegionOf<THIS extends RegionOf<THIS>> extends Region {
+
+    abstract override split(cut:number, id1:number, id2: number): [THIS, THIS]
+
+    abstract mergeWith(other: THIS): void
+
+    abstract override clone(id: number): THIS
+
+    override cloneWith(newid: number, {start}:{start?:number}): THIS{
+        const clone=this.clone(newid)
+        if(start!=null)clone.start=start
+        return clone
     }
 
 }

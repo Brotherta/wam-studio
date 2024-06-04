@@ -1,7 +1,7 @@
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import { bufferToWave } from "../../Audio/Utils/audioBufferToWave";
 import { audioCtx } from "../../index";
-import RegionOf from "./Region";
+import { RegionOf } from "./Region";
 
 
 export default class SampleRegion extends RegionOf<SampleRegion>{

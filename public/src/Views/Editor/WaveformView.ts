@@ -1,12 +1,10 @@
-import {Container} from "pixi.js";
+import { Container } from "pixi.js";
+import TrackElement from "../../Components/TrackElement";
+import { HEIGHT_TRACK } from "../../Env";
+import Region from "../../Models/Region/Region";
+import SampleTrack from "../../Models/Track/SampleTrack";
 import EditorView from "./EditorView";
 import RegionView from "./Region/RegionView";
-import SampleTrack from "../../Models/Track/SampleTrack";
-import {HEIGHT_TRACK} from "../../Env";
-import RegionOf, { Region } from "../../Models/Region/Region";
-import TrackElement from "../../Components/TrackElement";
-import SampleRegion from "../../Models/Region/SampleRegion";
-import SampleRegionView from "./Region/SampleRegionView";
 
 /**
  * Class that extends PIXI.Container.
