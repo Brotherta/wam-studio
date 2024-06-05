@@ -352,8 +352,8 @@ export default class EditorController {
 
                 this._app.regionsController.createRegion(track, id=>new SampleRegion(track.id,operableAudioBuffer,start,id), waveform)
                 acc += HEIGHT_TRACK;
-                this.showLoadingIcon(false);
             }
+            this.showLoadingIcon(false);
         }
 
     }
