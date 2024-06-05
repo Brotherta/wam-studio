@@ -1,11 +1,9 @@
 import App from "../App";
-import {audioCtx} from "../index";
+import { bufferToWave, combineBuffers, downloadBlob } from "../Audio/Utils/audioBufferToWave";
 import Plugin from "../Models/Plugin";
-import JSZip from "jszip";
 import SampleTrack from "../Models/Track/SampleTrack";
-import AudioNode from "../Audio/AudioNode";
+import { audioCtx } from "../index";
 import AutomationController from "./AutomationController";
-import {bufferToWave, combineBuffers, downloadBlob} from "../Audio/Utils/audioBufferToWave";
 
 /**
  * Controller class that binds the events of the exporter.

@@ -1,12 +1,11 @@
 import App from "../App";
-import {bufferToWave} from "../Audio/Utils/audioBufferToWave";
-import APP_VERSION from "../version";
-import {audioCtx} from "../index";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
-import SampleTrack from "../Models/Track/SampleTrack";
+import { bufferToWave } from "../Audio/Utils/audioBufferToWave";
 import { BACKEND_URL } from "../Env";
 import SampleRegion from "../Models/Region/SampleRegion";
-import { start } from "@popperjs/core/index";
+import SampleTrack from "../Models/Track/SampleTrack";
+import { audioCtx } from "../index";
+import APP_VERSION from "../version";
 
 
 export default class Loader {
@@ -108,7 +107,6 @@ export default class Loader {
 
         let tracksJson = project.tracks;
 
-        this._app.host.playing = false;
         this._app.hostController.stopAllTracks();
         this._app.tracksController.clearAllTracks();
         this._app.host.playhead = 0;

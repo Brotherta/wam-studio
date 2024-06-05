@@ -69,10 +69,8 @@ export default class HostController {
    * @param stop - Boolean to know if the button is a stop button or not when recording.
    */
   public play(stop: boolean = false): void {
-    const playing = !this._app.host.playing;
-    this._app.host.playing = playing;
-    console.log("Playing: " + playing + ", Metronome: " + (this._app.host.metronomeOn ? "On" : "Off"));
-    if (playing) {
+    const host=this._app.host
+    if (!host.isPlaying) {
       // disable zoom buttons when playing (this confuses the player in this version)
       this._view.zoomInBtn.classList.remove("zoom-enabled");
       this._view.zoomOutBtn.classList.remove("zoom-enabled");
@@ -81,16 +79,12 @@ export default class HostController {
       //console.log("Playing zoom-disabled");
 
       this._app.automationController.applyAllAutomations();
-      this._app.tracksController.tracks.forEach((track) => {
-        if (track.modified)
-          track.update(audioCtx, this._app.host.playhead)
-        track.play()
-      });
-      this._app.host.hostNode?.play();
+      if (host.modified)host.update(audioCtx, this._app.host.playhead)
+      host.play()
       this.launchTimerInterval();
 
       // Start the metronome if it's enabled
-      if (this._app.host.metronomeOn){
+      if (host.metronomeOn){
         (this._view.MetronomeElement as MetronomeComponent).startMetronome();
       }else{
         (this._view.MetronomeElement as MetronomeComponent).pauseMetronome();
@@ -107,18 +101,17 @@ export default class HostController {
         if (track.plugin.initialized) {
           track.plugin.instance!._audioNode.clearEvents()
         }
-        track.pause()
       });
+      host.pause()
       if (this._app.host.recording) {
         this._app.recorderController.stopRecordingAllTracks()
         this._view.updateRecordButton(false);
       }
-      this._app.host.hostNode?.pause()
       if (this._timerInterval) clearInterval(this._timerInterval);
       // Always stop the metronome when playback is stopped
       (this._view.MetronomeElement as MetronomeComponent).pauseMetronome()
     }
-    this._view.updatePlayButton(playing, stop)
+    this._view.updatePlayButton(host.isPlaying, stop)
   }
 
   /**
@@ -145,12 +138,8 @@ export default class HostController {
    * Handles the loop button. It loops the song or not.
    */
   public loop(): void {
-    const looping = !this._app.host.looping;
-    this._app.host.looping = looping;
-    this._app.tracksController.tracks.forEach((track) => {
-      track.loop(looping)
-    });
-    this._app.host.hostNode?.loop(looping);
+    const looping = !this._app.host.doLoop;
+    this._app.host.loop(looping);
     this._view.updateLoopButton(looping);
     this._app.editorView.loop.updateActive(looping);
   }
@@ -176,7 +165,7 @@ export default class HostController {
     console.log(`Metronome ${metronomeOn ? "started" : "stopped"}`);
 
     // Start or stop the metronome based on both metronome state and whether playback is active
-    if (metronomeOn && this._app.host.playing) {
+    if (metronomeOn && this._app.host.isPlaying) {
       (this._view.MetronomeElement as MetronomeComponent).startMetronome();
     }else{
       (this._view.MetronomeElement as MetronomeComponent).pauseMetronome();
@@ -210,9 +199,6 @@ export default class HostController {
    */
   public updateLoopValue(leftTime: number, rightTime: number): void {
     this._app.host.updateLoopTime(leftTime, rightTime);
-    this._app.tracksController.tracks.forEach((track) => {
-      track.updateLoopTime(leftTime, rightTime);
-    });
   }
 
   /**
@@ -279,9 +265,7 @@ export default class HostController {
    * Stops all the tracks.
    */
   public stopAllTracks(): void {
-    this._app.tracksController.tracks.forEach(async (track) => {
-      track.pause();
-    });
+    this._app.host.pause()
   }
 
   /**

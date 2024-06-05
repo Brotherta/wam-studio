@@ -15,75 +15,79 @@ export default abstract class TrackOf<REGION extends Region> {
    * The gain node associated to the track. It is used to control the volume of the track and is the outputNode of the track.
    * pannerNode -> gainNode
    **/
-  private gainNode: GainNode;
+  private gainNode: GainNode
 
   /** 
    * The panner node associated to the track. It is used to control the balance of the track.
    * pannerNode -> gainNode
    **/
-  private pannerNode: StereoPannerNode;
+  private pannerNode: StereoPannerNode
+
+  /**
+   * The plugin node if a plugin is connected to the track.
+   */
+  private pluginNode?: AudioNode
 
   /**
    * The monitored output node. It output the sound of the track only when it is monitored.
    */
-  private monitoredNode: GainNode;
+  private monitoredNode: GainNode
 
   /** The unique id of the track. */
-  public id: number;
+  public id: number
 
   /** The track element associated to the track. */
-  public element: TrackElement;
+  public element: TrackElement
 
   /** The color of the track in HEX format (#FF00FF). It is used to display the waveform. */
-  public color: string;
+  public color: string
 
   /** The plugin associated to the track. */
-  public plugin: Plugin;
+  public plugin: Plugin
 
   /** The automation associated to the track. */
-  public automation: Automation;
+  public automation: Automation
 
   /** The regions associated to the track. */
-  public regions: REGION[];
+  public regions: REGION[]
 
   /**
    * The old volume of the track. It is used to store the volume before muting the track.
    */
-  public _oldVolume: number;
+  public _oldVolume: number
 
   /**
    * The muted state of the track.
    */
-  public muted: boolean;
+  public muted: boolean
 
   /**
    * The solo state of the track.
    */
-  public solo: boolean;
+  public solo: boolean
 
-  /**
-   * The modified state of the track. It is used to know if the buffer of the track has been modified.
-   * If the buffer has been modified, the buffer must be updated in the audio node.
-   * @see updateBuffer
-   */
-  public modified: boolean;
+  private _modified: boolean
+
   /**
    * The armed state of the track. It is used to record the track.
    */
-  public armed: boolean;
+  public armed: boolean
 
   /**
    * The stereo state of the track. It is used to know if the track is stereo or mono.
    */
-  public stereo: boolean;
+  public stereo: boolean
+
   /**
    * The merge state of the track. It is used to know if the track is merged or not.
    */
   public merge: boolean;
+
   /**
    * The left state of the track. It is used to know if the track is left or right when recording.
    */
   public left: boolean;
+  
   /**
    * The right state of the track. It is used to know if the track is left or right when recording.
    */
@@ -144,7 +148,7 @@ export default abstract class TrackOf<REGION extends Region> {
   }
 
   protected postInit(){
-    this.connectPlugin(undefined)
+    this._connectPlugin(this.pannerNode)
   }
 
   /**
@@ -248,9 +252,21 @@ export default abstract class TrackOf<REGION extends Region> {
    * @param node 
    */
   public connectPlugin(node?: AudioNode){
+    // Disconnect the previous plugin node if it exists.
+    if(this.pluginNode){
+      this.pluginNode.disconnect(this.pannerNode)
+      this._disconnectPlugin(this.pluginNode)
+      this.pluginNode=undefined
+    }
+    // Disconnect from panner node
+    else {
+      this._disconnectPlugin(this.pannerNode)
+    }
+
+    // Connect to a plugin node
     if(node){
+      this.pluginNode=node
       this._connectPlugin(node)
-      node.disconnect()
       node.connect(this.pannerNode)
     }
     else{
@@ -271,10 +287,14 @@ export default abstract class TrackOf<REGION extends Region> {
   }
 
   /**
-   * Connect the track direct output to the plugion node input and disconnect the previous one.
-   * @param node 
+   * Connect the track direct output to the plugin node input.
    */
   protected abstract _connectPlugin(node: AudioNode): void;
+
+  /**
+   * Disconnect the track direct output from the plugin node input/output.
+   */
+  protected abstract _disconnectPlugin(node: AudioNode): void;
 
   public get outputNode(): AudioNode {
     return this.gainNode
@@ -289,4 +309,22 @@ export default abstract class TrackOf<REGION extends Region> {
   public abstract pause(): void
 
   public abstract loop(value:boolean): void
+
+  /**
+   * The modified state of the track. It is used to know if the track has been modified and should be updated.
+   */
+  public set modified(value: boolean){
+    this._modified=value
+  }
+  public get modified(): boolean{
+    return this._modified || this._isModified()
+  }
+
+  /**
+   * Override this method to add more conditions to the modified state.
+   * @returns 
+   */
+  protected _isModified():boolean{
+    return false
+  }
 }

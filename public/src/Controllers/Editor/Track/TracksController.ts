@@ -79,8 +79,6 @@ export default class TracksController{
     // Add the track to the list
     list._tracks.push(track)
 
-    track.outputNode.connect(this._app.host.outputNode);
-
     // Create its track element (GUI)
     track.plugin = new Plugin(this._app);
     track.element.trackId = this.trackIdCount++;
@@ -823,7 +821,6 @@ export default class TracksController{
           this._app.pluginsController.selectTrack(track);
 
           track.modified = true;
-          track.update(audioCtx, this._app.host.playhead);
       });
       
     return;

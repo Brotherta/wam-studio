@@ -304,7 +304,7 @@ export default class PlayheadController {
       this.moveTo(pos*RATIO_MILLS_BY_PX, true);
       this._movingPlayhead = false;
       this._app.hostController.resumeTimerInterval();
-      if (this._app.host.playing) {
+      if (this._app.host.isPlaying) {
         this._app.automationController.applyAllAutomations();
       }
       this._pointerIsDown = false;

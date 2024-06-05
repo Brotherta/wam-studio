@@ -192,12 +192,14 @@ export default class SampleTrack extends TrackOf<SampleRegion> {
   }
 
   protected override _connectPlugin(node: AudioNode): void {
-    this.node?.disconnect()
     this.node?.connect(node!)
   }
 
+  protected override _disconnectPlugin(node: AudioNode): void {
+    this.node?.disconnect(node)
+  }
+
   public override play(){
-    //this.outputNode.connect(audioCtx.destination)
     this.node?.play()
   }
 

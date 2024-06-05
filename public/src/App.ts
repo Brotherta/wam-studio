@@ -2,34 +2,34 @@
 import UndoManager from "undo-manager/lib/undomanager.js";
 
 
-import HostView from "./Views/HostView";
-import HostController from "./Controllers/HostController";
 import TracksController from "./Controllers/Editor/Track/TracksController";
+import HostController from "./Controllers/HostController";
+import HostView from "./Views/HostView";
 
-import TracksView from "./Views/TracksView";
-import Host from "./Models/Host";
-import PluginsController from "./Controllers/PluginsController";
-import PluginsView from "./Views/PluginsView";
 import AutomationController from "./Controllers/AutomationController";
-import AutomationView from "./Views/AutomationView";
-import RecorderController from "./Controllers/RecorderController";
-import LatencyController from "./Controllers/LatencyController";
-import LatencyView from "./Views/LatencyView";
-import SettingsController from "./Controllers/SettingsController";
-import SettingsView from "./Views/SettingsView";
-import Loader from "./Loader/Loader";
-import ProjectController from "./Controllers/ProjectController";
-import ProjectView from "./Views/ProjectView";
 import EditorController from "./Controllers/Editor/EditorController";
-import WaveformController from "./Controllers/Editor/WaveformController";
-import SampleRegionController from "./Controllers/Editor/Region/SampleRegionController";
-import PlayheadController from "./Controllers/Editor/PlayheadController";
-import EditorView from "./Views/Editor/EditorView";
-import KeyboardController from "./Controllers/KeyboardController";
-import ExporterController from "./Controllers/ExportController";
 import LoopController from "./Controllers/Editor/LoopController";
+import PlayheadController from "./Controllers/Editor/PlayheadController";
+import SampleRegionController from "./Controllers/Editor/Region/SampleRegionController";
+import WaveformController from "./Controllers/Editor/WaveformController";
+import ExporterController from "./Controllers/ExportController";
+import KeyboardController from "./Controllers/KeyboardController";
+import LatencyController from "./Controllers/LatencyController";
+import PluginsController from "./Controllers/PluginsController";
+import ProjectController from "./Controllers/ProjectController";
+import RecorderController from "./Controllers/RecorderController";
+import SettingsController from "./Controllers/SettingsController";
+import Loader from "./Loader/Loader";
+import HostTrack from "./Models/Track/HostTrack";
 import AboutView from "./Views/AboutView";
+import AutomationView from "./Views/AutomationView";
+import EditorView from "./Views/Editor/EditorView";
 import KeyboardShortcutsView from "./Views/KeyboardShortcutsView";
+import LatencyView from "./Views/LatencyView";
+import PluginsView from "./Views/PluginsView";
+import ProjectView from "./Views/ProjectView";
+import SettingsView from "./Views/SettingsView";
+import TracksView from "./Views/TracksView";
 
 /**
  * Main class for the host. Start all controllers, views and models. All controllers and views are accessible frome this app.
@@ -63,14 +63,13 @@ export default class App {
     aboutView: AboutView;
     keyboardShortcutsView: KeyboardShortcutsView;
 
-    host: Host;
+    host: HostTrack;
     loader: Loader;
 
     undoManager:UndoManager;
     audioLoopBrowser: any;
 
     constructor() {
-        this.host = new Host(this);
         this.loader = new Loader(this);
 
         this.hostView = new HostView();
@@ -88,8 +87,9 @@ export default class App {
         this.waveformController = new WaveformController(this);
         this.regionsController = new SampleRegionController(this);
         this.playheadController = new PlayheadController(this);
-        this.hostController = new HostController(this);
         this.tracksController = new TracksController(this);
+        this.host = new HostTrack(this,this.tracksController.tracks);
+        this.hostController = new HostController(this);
         this.pluginsController = new PluginsController(this);
         this.automationController = new AutomationController(this);
         this.recorderController = new RecorderController(this);

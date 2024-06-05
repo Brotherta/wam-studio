@@ -1,9 +1,7 @@
 import App from "../App";
-import SampleTrack from "../Models/Track/SampleTrack";
-import Host from "../Models/Host";
-import { audioCtx } from "../index";
-import PluginsView from "../Views/PluginsView";
 import TrackOf from "../Models/Track/Track.js";
+import PluginsView from "../Views/PluginsView";
+import { audioCtx } from "../index";
 
 /**
  * Controller for the plugins view. This controller is responsible for selecting and removing plugins.
@@ -69,24 +67,6 @@ export default class PluginsController {
      */
     public connectPedalBoard(track: TrackOf<any>): void {
         track.connectPlugin(track.plugin.instance!._audioNode)
-        /*if (track.id === -1) {
-            let host = track as Host;
-            host.connectOutput(audioCtx.destination)
-            host.gainNode.disconnect(audioCtx.destination);
-            host.gainNode
-                .connect(host.plugin.instance!._audioNode)
-                .connect(audioCtx.destination);
-        }
-        else {
-            track.node!.disconnect(track.pannerNode);
-            track.node!
-                .connect(track.plugin.instance!._audioNode)
-                .connect(track.pannerNode);
-            if (track.monitored) {
-                track.mergerNode.disconnect(track.pannerNode);
-                track.mergerNode.connect(track.plugin.instance?._audioNode!);
-            }
-        }*/
     }
 
     /**
@@ -96,19 +76,6 @@ export default class PluginsController {
      */
     public disconnectPedalBoard(track: TrackOf<any>): void {
         track.connectPlugin(undefined)
-        /*if (track.plugin.initialized && track.id === -1) {
-            let host = track as Host;
-            host.gainNode.disconnect(host.plugin.instance!._audioNode);
-            host.gainNode.connect(audioCtx.destination);
-        }
-        else if (track.plugin.initialized) {
-            track.node!.disconnect(track.plugin.instance!._audioNode);
-            track.node!.connect(track.pannerNode);
-            if (track.monitored) {
-                track.mergerNode.disconnect(track.plugin.instance?._audioNode!);
-                track.mergerNode.connect(track.pannerNode);
-            }
-        }*/
     }
 
 

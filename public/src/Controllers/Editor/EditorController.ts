@@ -1,10 +1,10 @@
 import App from "../../App";
-import EditorView from "../../Views/Editor/EditorView";
-import { HEIGHT_TRACK, RATIO_MILLS_BY_PX, ZOOM_LEVEL, decrementZoomLevel, incrementZoomLevel } from "../../Env";
-import { audioCtx } from "../../index";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
-import SampleTrack from "../../Models/Track/SampleTrack";
+import { HEIGHT_TRACK, RATIO_MILLS_BY_PX, ZOOM_LEVEL, decrementZoomLevel, incrementZoomLevel } from "../../Env";
 import SampleRegion from "../../Models/Region/SampleRegion";
+import SampleTrack from "../../Models/Track/SampleTrack";
+import EditorView from "../../Views/Editor/EditorView";
+import { audioCtx } from "../../index";
 
 /**
  * Interface of the custom event of the ScrollBarElement.
@@ -74,7 +74,7 @@ export default class EditorController {
     public zoomIn(value?: number): void {
 
         // for the moment, do not allow zoom in/out while playing
-        if (this._app.host.playing) return;
+        if (this._app.host.isPlaying) return;
 
         // if zoom button has been pressed, zoom out should be enabled
         this._app.hostView.zoomOutBtn.classList.remove("zoom-disabled");
@@ -119,7 +119,7 @@ export default class EditorController {
 
 
         // for the moment, do not allow zoom in/out while playing
-        if (this._app.host.playing) return;
+        if (this._app.host.isPlaying) return;
 
         // if zoom ouy button has been pressed, zoom in should be enabled
         this._app.hostView.zoomInBtn.classList.remove("zoom-disabled");

@@ -1,5 +1,4 @@
 
-// @ts-nocheck
 const audioWorkletGlobalScope = globalThis;
 
 const { registerProcessor } = audioWorkletGlobalScope;
@@ -34,22 +33,20 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
     blockCount = 0;
     loopStart = 0;
     loopEnd = 0;
+    wasBeforeLoop = false;
 
     
     constructor(options) {
         super(options);
 
         this.port.onmessage = (e) => {
-            if (e.data.audio) {
-                this.audio = e.data.audio;
-            }
-            else if (e.data.playhead) {
+            if (e.data.audio) this.audio = e.data.audio;
+            if (e.data.playhead!==undefined){
+                this.wasBeforeLoop=false;
                 this.playhead = e.data.playhead;
             }
-            else if (e.data.loop) {
-                this.loopStart = e.data.loopStart;
-                this.loopEnd = e.data.loopEnd;
-            }
+            if (e.data.loopStart!==undefined)this.loopStart = e.data.loopStart;
+            if (e.data.loopEnd!==undefined)this.loopEnd = e.data.loopEnd;
         };
     }
 
@@ -65,10 +62,15 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             if (!playing) continue; // Not playing
             const audioLength = this.audio[0].length;
 
-            if (loop && this.playhead === this.loopEnd) {
-                if (loop) this.playhead = this.loopStart; // Loop just enabled, reset playhead
-                else continue; // EOF without loop
+            if (loop) {
+                if(this.playhead<this.loopEnd){
+                    this.wasBeforeLoop=true;
+                }
+                if(this.playhead>this.loopEnd && this.wasBeforeLoop){
+                    this.playhead = this.loopStart;
+                }
             }
+            else this.wasBeforeLoop=false;
 
             this.playhead++;
         }

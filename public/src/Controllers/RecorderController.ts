@@ -1,9 +1,9 @@
 import App from "../App";
-import SampleTrack from "../Models/Track/SampleTrack";
-import {URLFromFiles} from "../Audio/Utils/UrlFiles";
-import {audioCtx} from "../index";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
+import { URLFromFiles } from "../Audio/Utils/UrlFiles";
 import SampleRegion from "../Models/Region/SampleRegion";
+import SampleTrack from "../Models/Track/SampleTrack";
+import { audioCtx } from "../index";
 
 
 export default class RecorderController {
@@ -20,9 +20,7 @@ export default class RecorderController {
      * @param track - The track to set up recording for.
      */
     async setupRecording(track: SampleTrack) {
-        track.node?.port.postMessage({
-            "arm": true
-        });
+        track.node?.port.postMessage({"arm": true});
 
         if (track.micRecNode === undefined) {
             if (this.app.settingsController.constraints === undefined) {
@@ -192,7 +190,7 @@ export default class RecorderController {
         }
         else {
             track.element.unArm();
-            if (this.app.host.playing) {
+            if (this.app.host.isPlaying) {
                 this.stopRecording(track);
             }
             track.worker?.terminate();
@@ -215,7 +213,7 @@ export default class RecorderController {
             //     alert("No track armed");
             //     return;
             // }
-            if (!this.app.host.playing) {
+            if (!this.app.host.isPlaying) {
                 this.app.hostController.play(true);
             }
             for (let track of this.app.tracksController.sampleTracks) {

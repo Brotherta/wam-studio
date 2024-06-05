@@ -46,7 +46,7 @@ export default class WebAudioPeakMeter {
       var c = sourceNode.channelCount;
       this.meterNode = this.ctx.createScriptProcessor(2048, c, c);
       sourceNode.connect(this.meterNode);
-      sourceNode.connect(this.ctx.destination); // needed otherwise no sound
+      //sourceNode.connect(this.ctx.destination); // needed otherwise no sound
       this.meterNode.connect(this.ctx.destination); // nedded otherwise no onaudioprocessing calls
   
       this.createMeter(this.element, this.meterNode, this.options);
