@@ -66,8 +66,8 @@ export default class Loader {
                 "id": track.id,
                 "name": track.element.name,
                 "color": track.color,
-                "muted": track.muted,
-                "soloed": track.solo,
+                "muted": track.isMuted,
+                "soloed": track.isSolo,
                 "volume": track.volume,
                 "pan": track.balance,
                 "plugins": hasPlugin ? pluginState : null,
@@ -81,7 +81,7 @@ export default class Loader {
             "host": {
                 "version": APP_VERSION,
                 "playhead": this._app.host.playhead,
-                "muted": this._app.host.muted,
+                "muted": this._app.host.isMuted,
                 "volume": this._app.host.volume,
                 "trackAcc": this._app.tracksController.trackIdCount,
                 "regionAcc": this._app.regionsController.regionIdCounter,
@@ -129,14 +129,8 @@ export default class Loader {
             track.element.name = trackJson.name;
             track.element.trackNameInput.value = trackJson.name;
 
-            if (trackJson.muted) {
-                track.mute();
-                track.element.mute();
-            }
-            if (trackJson.soloed) {
-                track.solo = true;
-                track.element.solo();
-            }
+            if (trackJson.muted) track.isMuted=true
+            if (trackJson.soloed) track.isSolo=true
 
             track.balance=trackJson.pan;
             track.volume=trackJson.volume;

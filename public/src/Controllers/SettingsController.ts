@@ -1,6 +1,6 @@
 import App from "../App";
 import SettingsView from "../Views/SettingsView";
-import {audioCtx} from "../index";
+import { audioCtx } from "../index";
 
 /**
  * The class that control the events related to the global settings of the host.
@@ -145,7 +145,7 @@ export default class SettingsController {
                 let stream = await navigator.mediaDevices.getUserMedia(this.constraints);
                 track.micRecNode.disconnect();
                 track.micRecNode = audioCtx.createMediaStreamSource(stream);
-                track.micRecNode.connect(track.mergerNode);
+                track.micRecNode.connect(track.recordingInputNode);
             }
         }
     }

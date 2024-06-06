@@ -23,13 +23,13 @@ export default class SampleTrack extends TrackOf<SampleRegion> {
    * to the selected mode (Stereo, merge, left or right).
    * @see mergerNode
    */
-  public splitterNode: ChannelSplitterNode;
+  private splitterNode: ChannelSplitterNode
   /**
    * The merger node associated to the track. It is used to merge the track channels according
    * to the selected mode (Stereo, merge, left or right).
    * @see splitterNode
    */
-  public mergerNode: ChannelMergerNode;
+  private mergerNode: ChannelMergerNode
 
   /**
  * The worker associated to the track. It is used to record the track.
@@ -51,21 +51,27 @@ export default class SampleTrack extends TrackOf<SampleRegion> {
 
   constructor(id: number, element: TrackElement, node?: WamAudioWorkletNode) {
     super(id,element)
-    this.url = "";
+    this.url = ""
 
-    // Nodes creation and connection.
-    this.node = node;
-    this.micRecNode = undefined;
-    this.splitterNode = audioCtx.createChannelSplitter(NUM_CHANNELS);
-    this.mergerNode = audioCtx.createChannelMerger(NUM_CHANNELS);
+    // Recording nodes
+    this.node = node
+    this.micRecNode = undefined
+    this.splitterNode = audioCtx.createChannelSplitter(NUM_CHANNELS)
+    this.mergerNode = audioCtx.createChannelMerger(NUM_CHANNELS)
 
     // Audio Buffers
-    this.audioBuffer = undefined;
-    this.modified = true;
+    this.audioBuffer = undefined
+    this.modified = true
     if (this.node) {
       this.sab = RingBuffer.getStorageForCapacity(audioCtx.sampleRate * 2,Float32Array);
       this.node!.port.postMessage({ sab: this.sab });
     }
+
+    // Initialize the track
+    this.left=true
+    this.right=true
+    this.isMerged=false
+    this.isStereo=true
 
     this.postInit()
   }
@@ -210,4 +216,106 @@ export default class SampleTrack extends TrackOf<SampleRegion> {
   public override loop(value:boolean): void{
     this.node?.loop(value)
   }
+
+
+  /** RECORDING INFORMATIONS */
+  
+  private linkNodes(){
+    try{
+      this.splitterNode.disconnect(this.mergerNode)
+    }catch(e){}
+    
+    if(this.isStereo){
+      if(this.isMerged){
+        this.splitterNode.connect(this.mergerNode,0,0)
+        this.splitterNode.connect(this.mergerNode,1,0)
+        this.splitterNode.connect(this.mergerNode,0,1)
+        this.splitterNode.connect(this.mergerNode,1,1)
+      }
+      else{
+        this.splitterNode.connect(this.mergerNode,0,0)
+        this.splitterNode.connect(this.mergerNode,1,1)
+      }
+    }
+    else{
+      if(this.isMerged){
+        this.splitterNode.connect(this.mergerNode,0,0)
+        this.splitterNode.connect(this.mergerNode,0,1)
+      }
+      else{
+        if(this.left){
+          this.splitterNode.connect(this.mergerNode,0,0)
+          this.splitterNode.connect(this.mergerNode,0,1)
+        }
+        if(this.right){
+          this.splitterNode.connect(this.mergerNode,1,0)
+          this.splitterNode.connect(this.mergerNode,1,1)
+        }
+      
+      }
+    }
+  }
+
+  /**
+   * The stereo state of the track. It is used to know if the track is stereo or mono.
+   */
+  set isStereo(value: boolean){
+    this._stereo=value
+    this.element.setMode(value)
+    this.linkNodes()
+  }
+
+  get isStereo(){ return this._stereo }
+
+  private _stereo: boolean = true
+
+  /**
+   * The merge state of the track. It is used to know if the track is merged or not.
+   */
+  set isMerged(value: boolean){
+    this._merge=value
+    this.element.setMerge(value)
+    this.linkNodes()
+  }
+
+  get isMerged(){ return this._merge }
+
+  private _merge: boolean = true
+
+  /**
+   * The left state of the track. It is used to know if the track is left or right when recording.
+   */
+  set left(value: boolean){
+    this._left=value
+    this.element.setLeft(value)
+    this.linkNodes()
+  }
+
+  get left(){ return this._left }
+
+  private _left: boolean = true
+  
+  /**
+   * The right state of the track. It is used to know if the track is left or right when recording.
+   */
+  set right(value: boolean){
+    this._right=value
+    this.element.setRight(value)
+    this.linkNodes()
+  }
+
+  get right(){ return this._right }
+
+  private _right: boolean = false
+
+  /**
+   * The recording input node of the track. Microphone is connected to this node when recording.
+   */
+  get recordingInputNode(){ return this.splitterNode }
+
+  /**
+   * The recording output node of the track. It is used to record the track. Its output is what
+   * is recorded.
+   */
+  get recordingOutputNode(){ return this.mergerNode }
 }

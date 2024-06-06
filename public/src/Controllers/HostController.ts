@@ -148,11 +148,7 @@ export default class HostController {
    * Handles the mute button. It mutes or unmutes the audio.
    */
   public mute(): void {
-    const muted = !this._app.host.muted;
-    this._app.host.muted = muted;
-    if (muted) this._app.host.mute();
-    else this._app.host.unmute();
-    this._view.updateMuteButton(muted);
+    this._app.host.isMuted=true
   }
   
 

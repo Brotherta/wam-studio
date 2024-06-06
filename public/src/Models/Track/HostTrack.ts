@@ -65,12 +65,10 @@ export default class HostTrack extends TrackOf<Region> {
     constructor(app: App, tracks: Iterable<Track>) {
         super(-1, new TrackElement());
         this.tracks=tracks
-        this.volume = 0.5;
         this.playhead = 0;
         this.latency = 0;
         this.hostGroupId = "";
 
-        this.muted = false;
         this.recording = false;
         this.looping = false;
 

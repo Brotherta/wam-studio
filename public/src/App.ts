@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-nocheck
 import UndoManager from "undo-manager/lib/undomanager.js";
 
 
@@ -104,7 +104,6 @@ export default class App {
             this.projectView, this.aboutView, this.keyboardShortcutsView);
 
         this.undoManager = new UndoManager();
-
     }
 
     /**
@@ -113,5 +112,35 @@ export default class App {
     async initHost() {
         await this.host.initWAM()
         this.hostController.bindNodeListeners();
+    }
+
+    /**
+   * Do something once, and if undoable is true, save the do and undo functions in the undo manager.
+   * todo is called, and if undoable id true, todo and undo are added to the undoManager respectively as redo and undo
+   * @param undoable Is the action saved in the undo manager
+   * @param todo The todo and redo function, called once and then saved as a redo function if undoable is true
+   * @param undo The undo function, it should cancel what do did, it is save in the undo manager if undoable is true
+   */
+    doIt(undoable: boolean, todo: ()=>void, undo: ()=>void){
+        todo()
+        if(undoable){
+            // to disable/enable undo/redo buttons if undo/redo is available
+            const refreshButtons= ()=>{
+                this.hostView.setUndoButtonState(this.undoManager.hasUndo())
+                this.hostView.setRedoButtonState(this.undoManager.hasRedo())
+            }
+
+            this.undoManager.add({
+                undo: ()=>{
+                    undo()
+                    refreshButtons()
+                },
+                redo: ()=>{
+                    todo()
+                    refreshButtons()
+                }
+            })
+            refreshButtons()
+        }
     }
 }

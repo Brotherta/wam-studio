@@ -1,4 +1,3 @@
-import { audioCtx } from "..";
 
 
 const template: HTMLTemplateElement = document.createElement("template");
@@ -320,6 +319,7 @@ export default class TrackElement extends HTMLElement {
     isArmed: boolean = false;
     isSolo: boolean = false;
     isMuted: boolean = false;
+    isSoloMuted: boolean = false;
     isMonitoring: boolean = false;
     isLoading: boolean = false;
     vuMeterDiv: HTMLDivElement;
@@ -341,6 +341,7 @@ export default class TrackElement extends HTMLElement {
             balance : this.balanceSlider.value,
             isSolo: this.isSolo,
             isMuted: this.isMuted,
+            isSoloMuted: this.isSoloMuted,
             isArmed: this.isArmed,
             isMonitoring: this.isMonitoring,
             isLoading: this.isLoading,
@@ -359,6 +360,7 @@ export default class TrackElement extends HTMLElement {
         this.isArmed = state.isArmed;
         this.isSolo = state.isSolo;
         this.isMuted = state.isMuted;
+        this.isSoloMuted = state.isSoloMuted;
         this.isMonitoring = state.isMonitoring;
         this.isArmed = state.isArmed;
         this.stereo = state.stereo;
@@ -375,6 +377,7 @@ export default class TrackElement extends HTMLElement {
         this.setArm(this.isArmed);
         this.setSolo(this.isSolo);
         this.setMute(this.isMuted);
+        this.setSoloMute(this.isSoloMuted);
         this.setMonitoring(this.isMonitoring);
         this.setMode(this.stereo);
         this.setLeft(this.left);
@@ -397,7 +400,7 @@ export default class TrackElement extends HTMLElement {
 
             this.vuMeterDiv = this.shadowRoot.querySelector("#vu-meter-div") as HTMLDivElement;
             //console.log(this.vuMeterDiv);
-
+            this.update()
         }
     }
 
@@ -425,12 +428,12 @@ export default class TrackElement extends HTMLElement {
         });
 
         this.muteBtn.addEventListener("mouseenter", () => {
-            if (!this.isMuted) {
+            if (!this.isMuted && !this.isSoloMuted) {
                 this.muteBtn.style.color = "lightgrey";
             }
         });
         this.muteBtn.addEventListener("mouseleave", () => {
-            if (!this.isMuted) {
+            if (!this.isMuted && !this.isSoloMuted) {
                 this.muteBtn.style.color = "grey";
             }
         });
@@ -510,33 +513,33 @@ export default class TrackElement extends HTMLElement {
         this.isLoading = false;
     }
 
-
-    mute() {
-        this.muteBtn.style.color = "red";
-        this.isMuted = true;
-    }
-    unmute() {
-        this.muteBtn.style.color = "lightgrey"
-        this.isMuted = false;
+    private updateMute(){
+        if(this.isMuted)this.muteBtn.style.color = "red";
+        else if(this.isSoloMuted)this.muteBtn.style.color = "yellow";
+        else this.muteBtn.style.color = "lightgrey";
     }
 
     setMute(mute:boolean) {
-        if(mute) this.mute()
-        else this.unmute();
+        if(!this.muteBtn)return
+        this.isMuted = mute
+        this.updateMute()
     }
 
-    solo() {
-        this.soloBtn.style.color = "lightgreen";
-        this.isSolo = true;
-    }
-    unsolo() {
-        this.soloBtn.style.color = "lightgrey";
-        this.isSolo = false;
+    setSoloMute(solomute:boolean) {
+        if(!this.muteBtn)return
+        this.isSoloMuted = solomute
+        this.updateMute()
     }
 
     setSolo(solo:boolean) {
-        if(solo) this.solo()
-        else this.unsolo();
+        if(!this.soloBtn)return
+        if(solo){
+            this.soloBtn.style.color = "lightgreen";
+        }
+        else{
+            this.soloBtn.style.color = "lightgrey";
+        }
+        this.isSolo = solo;
     }
 
     setName(arg0: string) {
@@ -552,53 +555,42 @@ export default class TrackElement extends HTMLElement {
         this.style.borderColor = "black";
     }
 
-    arm() {
-        this.armBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
-        this.isArmed = true;
-    }
-
-    unArm() {
-        this.armBtn.style.filter = "none";
-        this.isArmed = false;
-    }
-
     setArm(arm:boolean) {
-        if(arm) this.arm()
-        else this.unArm();
-    }
-
-    monitorOn() {
-        this.monitoringBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
-        this.isMonitoring = true;
-    }
-
-    monitorOff() {
-        this.monitoringBtn.style.filter = "none";
-        this.isMonitoring = false;
+        if(!this.armBtn)return
+        if(arm){
+            this.armBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
+        }
+        else{
+            this.armBtn.style.filter = "none";
+        }
+        this.isArmed=arm
     }
 
     setMonitoring(monitoring:boolean) {
-        if(monitoring) this.monitorOn()
-        else this.monitorOff();
-    }
-
-    setMono() {
-        this.modeBtn.innerText = "mono ⇉ stereo";
-        this.mergeBtn.hidden = true;
-        this.leftBtn.hidden = false;
-        this.rightBtn.hidden = false;
-    }
-
-    setStereo() {
-        this.modeBtn.innerText = "stereo";
-        this.mergeBtn.hidden = false;
-        this.leftBtn.hidden = true;
-        this.rightBtn.hidden = true;
+        if(!this.monitoringBtn)return
+        if(monitoring){
+            this.monitoringBtn.style.filter = "invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)";
+        }
+        else{
+            this.monitoringBtn.style.filter = "none";
+        }
+        this.isMonitoring=monitoring
     }
 
     setMode(stereoMode:boolean) {
-        if(stereoMode) this.setStereo();
-        else this.setMono();
+        if(!this.modeBtn)return
+        if(stereoMode){
+            this.modeBtn.innerText = "stereo";
+            this.mergeBtn.hidden = false;
+            this.leftBtn.hidden = true;
+            this.rightBtn.hidden = true;
+        }
+        else{
+            this.modeBtn.innerText = "mono ⇉ stereo";
+            this.mergeBtn.hidden = true;
+            this.leftBtn.hidden = false;
+            this.rightBtn.hidden = false;
+        }
     }
 
     clickMerge() {
@@ -606,6 +598,7 @@ export default class TrackElement extends HTMLElement {
     }
 
     setMerge(merge:boolean) {
+        if(!this.mergeBtn)return
         if(merge) {
             this.mergeBtn.classList.add("active");
         } else {
@@ -618,6 +611,7 @@ export default class TrackElement extends HTMLElement {
     }
 
     setLeft(left:boolean) {
+        if(!this.leftBtn)return
         if(left) {
             this.leftBtn.classList.add("active");
         } else {
@@ -630,6 +624,7 @@ export default class TrackElement extends HTMLElement {
     }
 
     setRight(right:boolean) {
+        if(!this.rightBtn)return
         if(right) {
             this.rightBtn.classList.add("active");
         } else {

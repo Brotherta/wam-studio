@@ -27,11 +27,8 @@ export default class RecorderController {
                 await this.app.settingsController.updateMediaDevices();
             }
             let stream = await navigator.mediaDevices.getUserMedia(this.app.settingsController.constraints);
-            track.micRecNode = new MediaStreamAudioSourceNode(audioCtx, {
-                mediaStream: stream,
-            });
-
-            track.micRecNode.connect(track.splitterNode);
+            track.micRecNode = new MediaStreamAudioSourceNode(audioCtx, {mediaStream: stream,});
+            track.micRecNode.connect(track.recordingInputNode);
         }
     }
 
@@ -60,9 +57,7 @@ export default class RecorderController {
      * @param track - The track to start monitoring.
      */
     startMonitoring(track: SampleTrack) {
-        if (track.armed) {
-            track.monitored = true
-        }
+        if (track.isArmed) track.monitored = true
     }
 
     /**
@@ -79,7 +74,7 @@ export default class RecorderController {
      */
     stopRecordingAllTracks() {
         for (let track of this.app.tracksController.sampleTracks) {
-            if (track.armed) {
+            if (track.isArmed) {
                 this.stopRecording(track);
             }
         }
@@ -94,18 +89,14 @@ export default class RecorderController {
      */
     startRecording(track: SampleTrack, playhead: number) {
         this.app.host.recording = true;
-        track.mergerNode.connect(track.node!);
+        track.recordingOutputNode.connect(track.node!);
 
         let start = (playhead / audioCtx.sampleRate) * 1000;
         let region = this.app.regionsController.createTemporaryRegion(track, start);
 
-        track.worker?.postMessage({
-            command: "startWorker"
-        });
+        track.worker?.postMessage({ command: "startWorker" });
 
-        track.node?.port.postMessage({
-            "startRecording": true,
-        });
+        track.node?.port.postMessage({ "startRecording": true });
 
         track.worker!.onmessage = async (e) => {
             switch (e.data.command) {
@@ -165,13 +156,9 @@ export default class RecorderController {
      */
     stopRecording(track: SampleTrack) {
         this.app.host.recording = false;
-        track.worker?.postMessage({
-            command: "stopAndSendAsBuffer"
-        });
-        track.node?.port.postMessage({
-            "stopRecording": true
-        });
-        track.mergerNode?.disconnect(track.node!);
+        track.worker?.postMessage({ command: "stopAndSendAsBuffer" });
+        track.node?.port.postMessage({ "stopRecording": true });
+        track.recordingOutputNode?.disconnect(track.node!);
     }
 
     /**
@@ -180,19 +167,14 @@ export default class RecorderController {
      * @param track - The track to toggle the armed status of.
      */
     async clickArm(track: SampleTrack) {
-        track.armed = !track.armed;
+        track.isArmed = !track.isArmed;
 
-        if (track.armed) {
-            track.element.arm();
-
+        if (track.isArmed) {
             await this.setupWorker(track);
             await this.setupRecording(track);
         }
         else {
-            track.element.unArm();
-            if (this.app.host.isPlaying) {
-                this.stopRecording(track);
-            }
+            if (this.app.host.isPlaying) this.stopRecording(track);
             track.worker?.terminate();
             track.node?.port.postMessage({"stopRecording": true});
             if (track.monitored) {
@@ -208,7 +190,7 @@ export default class RecorderController {
         const recording = !this.app.host.recording;
         this.app.host.recording = recording;
         if (recording) {
-            let armed = this.app.tracksController.sampleTracks._tracks.find((e) => e.armed);
+            let armed = this.app.tracksController.sampleTracks._tracks.find((e) => e.isArmed);
             // if (armed === undefined) {
             //     alert("No track armed");
             //     return;
@@ -217,7 +199,7 @@ export default class RecorderController {
                 this.app.hostController.play(true);
             }
             for (let track of this.app.tracksController.sampleTracks) {
-                if (track.armed) {
+                if (track.isArmed) {
                     this.startRecording(track, this.app.host.playhead);
                 }
             }
@@ -237,117 +219,10 @@ export default class RecorderController {
     clickMonitoring(track: SampleTrack) {
         track.monitored = !track.monitored
         if (track.monitored) {
-            track.element.monitorOn();
             this.startMonitoring(track);
         }
         else {
-            track.element.monitorOff();
             this.stopMonitoring(track);
-        }
-    }
-
-    /**
-     * Toggles between stereo and mono mode for the given track.
-     *
-     * @param track - The track to toggle the mode of.
-     */
-    clickMode(track: SampleTrack) {
-        track.stereo = !track.stereo;
-        if (track.stereo) {
-            track.element.setStereo();
-            track.splitterNode.disconnect();
-            if (track.merge) {
-                // Connect left and right channels to both output channels
-                track.splitterNode.connect(track.mergerNode, 0, 0);
-                track.splitterNode.connect(track.mergerNode, 0, 1);
-                track.splitterNode.connect(track.mergerNode, 1, 0);
-                track.splitterNode.connect(track.mergerNode, 1, 1);
-            }
-            else {
-                // Connect left and right channels to their respective output channels
-                track.splitterNode.connect(track.mergerNode, 0, 0);
-                track.splitterNode.connect(track.mergerNode, 1, 1);
-            }
-
-        }
-        else {
-            track.element.setMono();
-            track.splitterNode.disconnect();
-            if (track.left) {
-                // Connect left channel to both output channels
-                track.splitterNode.connect(track.mergerNode, 0, 0);
-                track.splitterNode.connect(track.mergerNode, 0, 1);
-            }
-            if (track.right) {
-                // Connect right channel to both output channels
-                track.splitterNode.connect(track.mergerNode, 1, 0);
-                track.splitterNode.connect(track.mergerNode, 1, 1);
-            }
-        }
-    }
-
-    /**
-     * Toggles the left channel in mono mode for the given track.
-     *
-     * @param track - The track to toggle the left channel of.
-     */
-    clickLeft(track: SampleTrack) {
-        track.element.clickLeft();
-        track.left = !track.left;
-        if (track.left) {
-            // Connect left channel to both output channels
-            track.splitterNode.connect(track.mergerNode, 0, 0);
-            track.splitterNode.connect(track.mergerNode, 0, 1);
-        }
-        else {
-            track.splitterNode.disconnect(track.mergerNode, 0, 0);
-            track.splitterNode.disconnect(track.mergerNode, 0, 1);
-        }
-
-    }
-
-    /**
-     * Toggles the right channel in mono mode for the given track.
-     *
-     * @param track - The track to toggle the right channel of.
-     */
-    clickRight(track: SampleTrack) {
-        track.element.clickRight();
-        track.right = !track.right;
-        if (track.right) {
-            // Connect right channel to both output channels
-            track.splitterNode.connect(track.mergerNode, 1, 0);
-            track.splitterNode.connect(track.mergerNode, 1, 1);
-        }
-        else {
-            track.splitterNode.disconnect(track.mergerNode, 1, 0);
-            track.splitterNode.disconnect(track.mergerNode, 1, 1);
-        }
-
-    }
-
-    /**
-     * Toggles the merging of left and right channels for the given track.
-     *
-     * @param track - The track to toggle merging for.
-     */
-    clickMerge(track: SampleTrack) {
-        track.element.clickMerge();
-        track.merge = !track.merge;
-        if (track.merge) {
-            track.splitterNode.disconnect();
-
-            // Connect left and right channels to both output channels
-            track.splitterNode.connect(track.mergerNode, 0, 0);
-            track.splitterNode.connect(track.mergerNode, 0, 1);
-            track.splitterNode.connect(track.mergerNode, 1, 0);
-            track.splitterNode.connect(track.mergerNode, 1, 1);
-        }
-        else {
-            track.splitterNode.disconnect();
-            // Connect left and right channels to their respective output channels
-            track.splitterNode.connect(track.mergerNode, 0, 0);
-            track.splitterNode.connect(track.mergerNode, 1, 1);
         }
     }
 }

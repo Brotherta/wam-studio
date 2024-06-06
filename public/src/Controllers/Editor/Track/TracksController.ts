@@ -111,10 +111,11 @@ export default class TracksController{
     this.bindTrackEvents(track);
     
     if(track instanceof SampleTrack){
-      this._app.recorderController.clickMode(track);
       this._app.waveformController.initializeWaveform(track);
     }
     this._app.automationView.initializeAutomation(track.id);
+
+    if(this.tracks.find(it=>it.isSolo))track.isSoloMuted=true
   }
 
   /**
@@ -264,13 +265,13 @@ export default class TracksController{
     //track.setAudioBuffer(deletedTrack.audioBuffer!);
     track.element = deletedTrack.element;
     track.color = deletedTrack.color;
-    track.mute = deletedTrack.mute;
-    track.solo = deletedTrack.solo;
-    track.merge = deletedTrack.merge;
+    track.isMuted = deletedTrack.isMuted;
+    track.isSolo = deletedTrack.isSolo;
+    track.isMerged = deletedTrack.isMerged;
     track.left = deletedTrack.left;
     track.right = deletedTrack.right;
-    track.stereo = deletedTrack.stereo;
-    track.armed = deletedTrack.armed;
+    track.isStereo = deletedTrack.isStereo;
+    track.isArmed = deletedTrack.isArmed;
     track.monitored = deletedTrack.monitored;
     track.volume=deletedTrack.volume;
     track.balance=deletedTrack.balance;
@@ -325,7 +326,7 @@ export default class TracksController{
 
       let newSelectedTrack = this.selectedTrack;
 
-      this._app.undoManager.add({
+      if(newSelectedTrack!=oldSelectedTrack)this._app.undoManager.add({
         undo: () => this.undoSelect(track, oldSelectedTrack),
         redo: () => this.undoSelect(track, newSelectedTrack),
       });
@@ -347,36 +348,20 @@ export default class TracksController{
 
     // SOLO TRACK
     track.element.soloBtn.addEventListener("click", () => {
-      // Solo the track when the solo button is clicked.
-      let oldSoloStatus = track.solo;
-      this.solo(track);
-      let newSoloStatus = track.solo;
-
-      // for undo/redo
-      this._app.undoManager.add({
-        undo: () => {
-          this.undoSolo(track, oldSoloStatus);
-        },
-        redo: () => {
-          this.undoSolo(track, newSoloStatus);
-        },
-      });
-      this.updateUndoButtons();
+      let initialSolo = track.isSolo;
+      this._app.doIt(true,
+        ()=> this.setSolo(track, !initialSolo),
+        ()=> this.setSolo(track, initialSolo),
+      )
     });
 
     // MUTE TRACK
     track.element.muteBtn.addEventListener("click", () => {
-      // Mute the track when the mute button is clicked.
-      let oldMuteStatus = track.muted;
-      this.mute(track);
-      let newMuteStatus = track.muted;
-
-      // for undo/redo
-      this._app.undoManager.add({
-        undo: () => this.undoMute(track, oldMuteStatus),
-        redo: () => this.undoMute(track, newMuteStatus),
-      });
-      this.updateUndoButtons();
+      let initialMute = track.isMuted
+      this._app.doIt(true,
+        ()=> track.isMuted = !initialMute,
+        ()=> track.isMuted = initialMute,
+      )
     });
 
     // TRACK VOLUME
@@ -397,16 +382,10 @@ export default class TracksController{
       // for undo/redo
       let oldV = this._oldVolume;
 
-      this._app.undoManager.add({
-        undo: () => {
-          this.undoSetVolume(track, oldV);
-        },
-        redo: () => {
-          this.undoSetVolume(track, newVolume);
-        },
-      });
-
-      this.updateUndoButtons();
+      this._app.doIt(true,
+        ()=> track.volume = newVolume,
+        ()=> track.volume = oldV,
+      );
     });
 
     // TRACK BALANCE
@@ -421,24 +400,17 @@ export default class TracksController{
     });
     track.element.balanceSlider.addEventListener("change", (evt) => {
       const newBalance: number = +track.element.balanceSlider.value;
-      // for undo/redo
       let oldB = this._oldBalance;
 
-      this._app.undoManager.add({
-        undo: () => {
-          this.undoSetBalance(track, oldB);
-        },
-        redo: () => {
-          this.undoSetBalance(track, newBalance);
-        },
-      });
-      this.updateUndoButtons();
+      this._app.doIt(true,
+        ()=> track.balance = newBalance,
+        ()=> track.balance = oldB,
+      );
     });
 
     // TRACK COLOR
     track.element.color.addEventListener("click", () => {
       // Change the color of the track when the color button is clicked.
-
       // for undo/redo
       let oldColor = track.color;
       this.changeColor(track);
@@ -459,141 +431,65 @@ export default class TracksController{
     track.element.automationBtn.addEventListener("click", async (e) => {
       // Open the automation menu when the automation button is clicked.
       this.automationMenu(e, track);
-    });
+    })
     
     if(track instanceof SampleTrack){
       // TRACK ARM
       track.element.armBtn.addEventListener("click", () => {
-        // for undo/redo
-        let oldArmStatus: boolean = track.armed;
-
-        // Arm the track when the arm button is clicked.
-        this._app.pluginsController.selectTrack(track);
-        this._app.recorderController.clickArm(track);
-
-        let newArmStatus: boolean = track.armed;
-        this._app.undoManager.add({
-          undo: () => {
-            this._app.recorderController.clickArm(track);
-            this.undoArm(track, oldArmStatus);
-          },
-          redo: () => {
-            this._app.recorderController.clickArm(track);
-            this.undoArm(track, newArmStatus);
-          },
-        });
-      });
+        let initialArm: boolean = track.isArmed;
+        this._app.doIt(true,
+          ()=> this._app.recorderController.clickArm(track),
+          ()=> this._app.recorderController.clickArm(track),
+        );
+      })
 
       // TRACK MONITOR
       track.element.monitoringBtn.addEventListener("click", () => {
-        // for undo/redo
-        let oldMonitoringStatus: boolean = track.monitored;
-
-        // Change the monitoring of the track when the monitoring button is clicked.
-        this._app.pluginsController.selectTrack(track);
-        this._app.recorderController.clickMonitoring(track);
-
-        let newMonitoringStatus: boolean = track.monitored;
-
-        this._app.undoManager.add({
-          undo: () => {
-            this._app.recorderController.clickMonitoring(track);
-            this.undoMonitoring(track, oldMonitoringStatus);
-          },
-          redo: () => {
-            this._app.recorderController.clickMonitoring(track);
-            this.undoMonitoring(track, newMonitoringStatus);
-          },
-        });
-      });
+        this._app.doIt(true,
+          ()=> this._app.recorderController.clickMonitoring(track),
+          ()=> this._app.recorderController.clickMonitoring(track),
+        );
+      })
 
       // TRACK MODE STEREO or (MONO to STEREO)
       track.element.modeBtn.addEventListener("click", () => {
-        // for undo/redo
-        let oldMode: boolean = track.stereo;
-
-        // Change the mode of the track when the mode button is clicked.
-        this._app.pluginsController.selectTrack(track);
-        this._app.recorderController.clickMode(track);
-
-        let newMode = track.stereo;
-
-        this._app.undoManager.add({
-          undo: () => {
-            this._app.recorderController.clickMode(track);
-            this.undoMode(track, oldMode);
-          },
-          redo: () => {
-            this._app.recorderController.clickMode(track);
-            this.undoMode(track, newMode);
-          },
-        });
-      });
+        if(!(track instanceof SampleTrack))return
+        let initialStereo: boolean = track.isStereo
+        this._app.doIt(true,
+          ()=> track.isStereo = !initialStereo,
+          ()=> track.isStereo = initialStereo,
+        )
+      })
 
       // TRACK LEFT INPUT
       track.element.leftBtn.addEventListener("click", () => {
-        // for undo/redo
-        let oldLeftStatus = track.left;
-
-        this._app.pluginsController.selectTrack(track);
-        this._app.recorderController.clickLeft(track);
-        let newLeftStatus = track.left;
-
-        this._app.undoManager.add({
-          undo: () => {
-            this._app.recorderController.clickLeft(track);
-            this.undoLeft(track, oldLeftStatus);
-          },
-          redo: () => {
-            this._app.recorderController.clickLeft(track);
-            this.undoLeft(track, newLeftStatus);
-          },
-        });
-      });
+        if(!(track instanceof SampleTrack))return
+        let initialLeft: boolean = track.left
+        this._app.doIt(true,
+          ()=> track.left = !initialLeft,
+          ()=> track.left = initialLeft,
+        )
+      })
 
       // TRACK RIGHT INPUT
       track.element.rightBtn.addEventListener("click", () => {
-        // for undo/redo
-        let oldRightStatus = track.right;
-
-        this._app.pluginsController.selectTrack(track);
-        this._app.recorderController.clickRight(track);
-
-        let newRightStatus = track.right;
-
-        this._app.undoManager.add({
-          undo: () => {
-            this._app.recorderController.clickRight(track);
-            this.undoRight(track, oldRightStatus);
-          },
-          redo: () => {
-            this._app.recorderController.clickRight(track);
-            this.undoRight(track, newRightStatus);
-          },
-        });
-      });
+        if(!(track instanceof SampleTrack))return
+        let initialRight: boolean = track.right
+        this._app.doIt(true,
+          ()=> track.right = !initialRight,
+          ()=> track.right = initialRight,
+        )
+      })
 
       // TRACK MERGE LEFT/RIGHT
       track.element.mergeBtn.addEventListener("click", () => {
-        // for undo/redo
-        let oldMergeStatus = track.merge;
-
-        this._app.pluginsController.selectTrack(track);
-        this._app.recorderController.clickMerge(track);
-
-        let newMergeStatus = track.merge;
-
-        this._app.undoManager.add({
-          undo: () => {
-            this._app.recorderController.clickMerge(track);
-            this.undoMerge(track, oldMergeStatus);
-          },
-          redo: () => {
-            this._app.recorderController.clickMerge(track);
-            this.undoMerge(track, newMergeStatus);
-          },
-        });
-      });
+        if(!(track instanceof SampleTrack))return
+        let initialMerge: boolean = track.isMerged
+        this._app.doIt(true,
+          ()=> track.isMerged = !initialMerge,
+          ()=> track.isMerged = initialMerge,
+        )
+      })
     }
 
     // TRACK FX/PLUGINS
@@ -634,70 +530,30 @@ export default class TracksController{
    * @private
    */
   private changeColor(track: TrackOf<any>): void {
-    this._app.pluginsController.selectTrack(track);
+    //this._app.pluginsController.selectTrack(track);
     this._view.changeColor(track);
     this._app.editorView.changeWaveFormColor(track);
   }
 
   /**
-   * Handles the mute button of the given track.
-   * @param track - The track to mute.
-   * @private
-   */
-  private mute(track: TrackOf<any>): void {
-    this._app.pluginsController.selectTrack(track);
-    if (track.muted) {
-      track.unmute();
-      track.element.unmute();
-    } else {
-      track.mute();
-      track.element.mute();
-    }
-    track.muted = !track.muted;
-  }
-
-  /**
-   * Handles the solo button of the given track.
+   * Solo or unsolo a track.
    * @param track - The track to solo.
-   * @private
+   * @param soloValue - Do solo the track else unsolo it.
    */
-  private solo(track: TrackOf<any>): void {
-    this._app.pluginsController.selectTrack(track);
-
-    this.setSolo(track, !track.solo);
-  }
-
   private setSolo(track: TrackOf<any>, soloValue: boolean) {
-    track.solo = soloValue;
-
-    if (track.solo) {
-      // Solo the track
-      for(const other of this.tracks) if(other !== track && !other.solo) other.muteSolo();
-      if (track.muted) track.unmute();
-      track.element.solo();
+    // When soloed, mute every non-soloed track
+    if(soloValue){
+      this.tracks.forEach(it=>{
+        if(!it.isSolo)it.isSoloMuted=true
+      })
+      track.isSolo=true
     }
-    else {
-      // Un-solo the track
-      let otherSolo = false; // Check if there is another soloed track
-
-      for(const other of this.tracks) if(other.solo) otherSolo=true
-
-      if (!otherSolo) {
-        // Unmute all tracks if there is no other soloed track
-        for(const other of this.tracks){
-          if (other.muted) {
-            other.muteSolo();
-          } else {
-            other.unmute();
-          }
-        }
-      } 
-      else {
-        // Else only unmute the track.
-        track.muteSolo();
-      }
-
-      track.element.unsolo();
+    // When unsoloed, unmute every solo-muted track if there is no more soloed track
+    if(!soloValue){
+      track.isSolo=false
+      let soloedTrack = this.tracks.find(it=>it.isSolo)
+      if(!soloedTrack)this.tracks.forEach(it=>it.isSoloMuted=false)
+      if(soloedTrack)track.isSoloMuted=true
     }
   }
 
@@ -708,66 +564,10 @@ export default class TracksController{
     this._app.hostView.setRedoButtonState(this._app.undoManager.hasRedo());
   }
 
-  undoSetVolume(track: TrackOf<any>, v: number) {
-    track.element.volumeSlider.value = "" + v * 100;
-    track.volume=v;
-  }
-
-  undoSetBalance(track: TrackOf<any>, b: number) {
-    track.element.balanceSlider.value = "" + b;
-    track.balance=b;
-  }
-
-  undoMute(track: TrackOf<any>, mutedValue: boolean) {
-    this._app.pluginsController.selectTrack(track);
-    if (mutedValue) {
-      track.mute();
-      track.element.mute();
-    } else {
-      track.unmute();
-      track.element.unmute();
-    }
-  }
-
-  undoSolo(track: TrackOf<any>, soloValue: boolean) {
-    this._app.pluginsController.selectTrack(track);
-    this.setSolo(track, soloValue);
-  }
-
   undoTrackColorChange(track: TrackOf<any>, color: string) {
     track.color = color;
     this._view.changeColor(track);
     this._app.editorView.changeWaveFormColor(track);
-  }
-
-  undoArm(track: TrackOf<any>, status: boolean) {
-    track.armed = status;
-    track.element.setArm(status);
-  }
-
-  undoMonitoring(track: TrackOf<any>, status: boolean) {
-    track.monitored = status;
-    track.element.setMonitoring(status);
-  }
-
-  undoMode(track: TrackOf<any>, stereoMode: boolean) {
-    track.stereo = stereoMode;
-    track.element.setMode(stereoMode);
-  }
-
-  undoLeft(track: TrackOf<any>, leftStatus: boolean) {
-    track.left = leftStatus;
-    track.element.setLeft(leftStatus);
-  }
-
-  undoRight(track: TrackOf<any>, rightStatus: boolean) {
-    track.right = rightStatus;
-    track.element.setRight(rightStatus);
-  }
-
-  undoMerge(track: TrackOf<any>, mergeStatus: boolean) {
-    track.merge = mergeStatus;
-    track.element.setMerge(mergeStatus);
   }
 
   undoFx(track: TrackOf<any>, fxStatus: boolean) {

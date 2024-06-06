@@ -1,4 +1,5 @@
 import TrackElement from "../../Components/TrackElement.js";
+import type TracksController from "../../Controllers/Editor/Track/TracksController";
 import { audioCtx } from "../../index";
 import Automation from "../Automation";
 import Plugin from "../Plugin.js";
@@ -51,47 +52,20 @@ export default abstract class TrackOf<REGION extends Region> {
   /** The regions associated to the track. */
   public regions: REGION[]
 
-  /**
-   * The old volume of the track. It is used to store the volume before muting the track.
-   */
-  public _oldVolume: number
-
-  /**
-   * The muted state of the track.
-   */
-  public muted: boolean
-
-  /**
-   * The solo state of the track.
-   */
-  public solo: boolean
-
   private _modified: boolean
-
+  
   /**
    * The armed state of the track. It is used to record the track.
    */
-  public armed: boolean
+  set isArmed(value: boolean){
+    this._armed=value
+    console.log("Armed", value)
+    this.element.setArm(value)
+  }
 
-  /**
-   * The stereo state of the track. It is used to know if the track is stereo or mono.
-   */
-  public stereo: boolean
+  get isArmed(){ return this._armed }
 
-  /**
-   * The merge state of the track. It is used to know if the track is merged or not.
-   */
-  public merge: boolean;
-
-  /**
-   * The left state of the track. It is used to know if the track is left or right when recording.
-   */
-  public left: boolean;
-  
-  /**
-   * The right state of the track. It is used to know if the track is left or right when recording.
-   */
-  public right: boolean;
+  private _armed: boolean=false
   
   /**
    * The deleted state of the track. It is used to know if the track has been deleted.
@@ -126,17 +100,12 @@ export default abstract class TrackOf<REGION extends Region> {
 
     // Default Controls
     this.volume = 0.5;
-    this._oldVolume = 0.5;
-    this.muted = false;
-    this.solo = false;
     this.deleted = false;
 
-    // Stereo and recording controls.
-    this.stereo = false;
-    this.merge = true;
-    this.left = true;
-    this.right = false;
-    this.armed = false;
+    // Recording controls.
+    this.isMuted=false
+    this.isSolo=false
+    this.isArmed = false;
     this.monitored = false;
 
     // Loop controls.
@@ -151,54 +120,84 @@ export default abstract class TrackOf<REGION extends Region> {
     this._connectPlugin(this.pannerNode)
   }
 
+
+  /** VOLUME, MUTE and SOLO */
+
+  /** The volume of the track. */
+  private _volume: number
+
+  private updateVolume(){
+    if( this.isSolo || (!this.isMuted && !this.isSoloMuted) )this.gainNode.gain.value=this._volume
+    else this.gainNode.gain.value=0
+  }
+
   /**
-   * Set the volume of the track.
-   * @param value 
+   * The volume of the track
    */
   public set volume(value:number){
-    if(value==this.volume)return
-    this._oldVolume=this.volume
-    this.gainNode.gain.value=value
+    // Set volume
+    this._volume=value
+    if(this.element.volumeSlider)this.element.volumeSlider.value = "" + value * 100;
+
+    this.updateVolume()
   }
 
+  public get volume() { return this._volume }
+
   /**
-   * Get the volume of the track
-   * @param value
+   * Is the track muted, if a track is muted it emits no sound
    */
-  public get volume(): number{
-    return this.gainNode.gain.value
+  public set isMuted(value: boolean) {
+    this._muted=value
+    this.element.setMute(value)
+    this.updateVolume()
   }
 
-  /** Mute the track. */
-  public mute(): void {
-    if(this.volume!=0)this.volume=0
+  public get isMuted() { return this._muted }
+
+  private _muted: boolean=false
+
+  /**
+   * Is the track muted by the solo mode of other tracks, if a track is muted it emits no sound
+   */
+  public set isSoloMuted(value: boolean) {
+    this._solo_muted=value
+    this.element.setSoloMute(value)
+    this.updateVolume()
   }
 
-  /** Unmute the track. */
-  public unmute(): void {
-    this.volume=this._oldVolume
+  public get isSoloMuted() { return this._solo_muted }
+
+  private _solo_muted: boolean=false
+  
+  /**
+   * Is the track soloed, if at least one track is soloed, only soloed tracks emit sound
+   * [WARNING] Don't set isSolo directly, use {@link TracksController#setSolo} instead.
+   */
+  public set isSolo(value: boolean){
+    if(value){
+      this.isMuted=false
+      this.isSoloMuted=false
+    }
+    this._solo=value
+    this.updateVolume()
+    this.element.setSolo(value)
   }
 
-  /** Mute the track. */
-  public muteSolo(): void {
-    this.mute()
-  }
+  public get isSolo() { return this._solo }
+
+  private _solo: boolean=false
 
 
   /**
-   * Changes the balance of the track with a value between -1 and 1.
-   * @param value - The balance to set.
+   * The balance of the track. The panning of the track.
    */
   public set balance(value: number){
-    this.pannerNode.pan.value = value;
+    this.pannerNode.pan.value = value
+    if(this.element.balanceSlider)this.element.balanceSlider.value = "" + value
   }
 
-  /**
-   * Get the balance of the track
-   */
-  public get balance():number {
-    return this.pannerNode.pan.value;
-  }
+  public get balance() { return this.pannerNode.pan.value }
 
   /**
    * Adds a region to the regions list.
@@ -280,6 +279,7 @@ export default abstract class TrackOf<REGION extends Region> {
    */
   public set monitored(value: boolean){
     this.monitoredNode.gain.value = value?1:0
+    this.element.setMonitoring(value)
   }
 
   public get monitored(){
