@@ -58,6 +58,10 @@ export abstract class RegionOf<THIS extends RegionOf<THIS>> extends Region {
 
     abstract override split(cut:number, id1:number, id2: number): [THIS, THIS]
 
+    /**
+     * Merge the region with another region.
+     * The don't have to be consecutive, and they can overlap.
+     */
     abstract mergeWith(other: THIS): void
 
     abstract override clone(id: number): THIS

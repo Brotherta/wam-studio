@@ -519,7 +519,7 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
     let leftRegion: REGION|null = null
     let leftRegionEnd = -1
     for(const candidate of track.regions){
-      if(candidate.end<=rightRegion.start && candidate.end>leftRegionEnd){
+      if(candidate.end<=rightRegion.end && candidate.end>leftRegionEnd && candidate.id!=rightRegion.id){
         leftRegion=candidate
         leftRegionEnd=candidate.end
       }
@@ -773,12 +773,12 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
     const newX = this.draggedRegionState.region.pos
     const region = this.draggedRegionState.region
 
-    this.moveRegion(region, newTrack, newX);
-
-    this._app.undoManager.add({
-      undo: ()=> this.moveRegion(region, oldTrack, oldX),
-      redo: ()=> this.moveRegion(region, newTrack, newX)
-    })
+    if(oldTrack.id!=newTrack.id || oldX!=newX){
+      this.doIt(true,
+        ()=> this.moveRegion(region, newTrack, newX),
+        ()=> this.moveRegion(region, oldTrack, oldX),
+      )
+    }
 
     this.draggedRegionState = undefined;
   }

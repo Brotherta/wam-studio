@@ -20,7 +20,7 @@ export default class HostTrack extends TrackOf<Region> {
     public hostGroupId: string
 
     /**
-     * Playhead of the host.
+     * The host playhead position in sample.
      */
     public playhead: number
 
@@ -95,7 +95,7 @@ export default class HostTrack extends TrackOf<Region> {
         this.hostGroupId = hostGroupId;
 
         let audio = audioCtx.createBuffer(2, MAX_DURATION_SEC * audioCtx.sampleRate, audioCtx.sampleRate)
-        const operableAudioBuffer = Object.setPrototypeOf(audio, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+        const operableAudioBuffer = OperableAudioBuffer.make(audio);
         
         this.hostNode = new AudioPlayerNode(audioCtx, 2);
         this.hostNode.setAudio(operableAudioBuffer.toArray());

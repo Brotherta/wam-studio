@@ -207,7 +207,7 @@ export default class Loader {
                         return;
                     }
 
-                    let opAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                    let opAudioBuffer = OperableAudioBuffer.make(audioBuffer);
                     this._app.regionsController.createRegion(track, id=>new SampleRegion(track.id,opAudioBuffer,region.start,id));
 
                     // All regions have been loaded, call progressDone
@@ -257,7 +257,7 @@ export default class Loader {
                             xhr.abort();
                             return;
                         }
-                        let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                        let operableAudioBuffer = OperableAudioBuffer.make(audioBuffer);
                         operableAudioBuffer = operableAudioBuffer.makeStereo();
                         this._app.regionsController.createRegion(track, id=>new SampleRegion(track.id,operableAudioBuffer,0,id));
                         track.element.progressDone();

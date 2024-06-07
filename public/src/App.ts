@@ -104,6 +104,11 @@ export default class App {
             this.projectView, this.aboutView, this.keyboardShortcutsView);
 
         this.undoManager = new UndoManager();
+        const old=this.undoManager.add.bind(this.undoManager)
+        this.undoManager.add=(...args)=>{
+            old(...args)
+            console.trace()
+        }
     }
 
     /**
@@ -123,24 +128,30 @@ export default class App {
    */
     doIt(undoable: boolean, todo: ()=>void, undo: ()=>void){
         todo()
-        if(undoable){
-            // to disable/enable undo/redo buttons if undo/redo is available
-            const refreshButtons= ()=>{
-                this.hostView.setUndoButtonState(this.undoManager.hasUndo())
-                this.hostView.setRedoButtonState(this.undoManager.hasRedo())
-            }
+        if(undoable) this.addRedoUndo(todo, undo)
+    }
 
-            this.undoManager.add({
-                undo: ()=>{
-                    undo()
-                    refreshButtons()
-                },
-                redo: ()=>{
-                    todo()
-                    refreshButtons()
-                }
-            })
-            refreshButtons()
+    /**
+     * Add redo and undo functions to the undo manager
+     * @param redo The redo function
+     * @param undo The undo function
+     */
+    addRedoUndo(redo: ()=>void, undo: ()=>void){
+        // to disable/enable undo/redo buttons if undo/redo is available
+        const refreshButtons= ()=>{
+            this.hostView.setUndoButtonState(this.undoManager.hasUndo())
+            this.hostView.setRedoButtonState(this.undoManager.hasRedo())
         }
+        this.undoManager.add({
+            undo: ()=>{
+                undo()
+                refreshButtons()
+            },
+            redo: ()=>{
+                redo()
+                refreshButtons()
+            }
+        })
+        refreshButtons()
     }
 }

@@ -348,7 +348,7 @@ export default class EditorController {
 
                 let audioArrayBuffer = await file.arrayBuffer();
                 let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
-                let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+                let operableAudioBuffer = OperableAudioBuffer.make(audioBuffer);
 
                 this._app.regionsController.createRegion(track, id=>new SampleRegion(track.id,operableAudioBuffer,start,id), waveform)
                 acc += HEIGHT_TRACK;
@@ -423,7 +423,7 @@ export default class EditorController {
             // decode as audio buffer
             let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
             // create an operable audio buffer
-            let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+            let operableAudioBuffer = OperableAudioBuffer.make(audioBuffer);
 
             this._app.regionsController.createRegion(track, id=>new SampleRegion(track.id,operableAudioBuffer,start,id), waveform);
             this.showLoadingIcon(false);

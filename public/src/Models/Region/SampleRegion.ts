@@ -6,7 +6,7 @@ import { RegionOf } from "./Region";
 
 export default class SampleRegion extends RegionOf<SampleRegion>{
 
-    buffer: OperableAudioBuffer;
+    buffer;
 
     constructor(trackId: number, buffer: OperableAudioBuffer, start: number, regionId: number) {
         super(trackId, start, regionId);
@@ -29,7 +29,8 @@ export default class SampleRegion extends RegionOf<SampleRegion>{
 
     /** @inheritdoc */
     override mergeWith(other: SampleRegion): void {
-        this.buffer=this.buffer.concat(other.buffer)
+        this.buffer=this.buffer.merge(other.buffer, (other.start-this.start)*audioCtx.sampleRate/1000)
+        if(other.start<this.start)this.start=other.start
     }
 
     /** @inheritdoc */

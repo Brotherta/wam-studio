@@ -23,7 +23,7 @@ export default class SampleRegionController extends RegionController<SampleRegio
   }
 
   protected override _dummyRegion(track: SampleTrack, start: number, id: number, duration?: number): SampleRegion{
-    let buffer = new OperableAudioBuffer({ length: duration ? duration*audioCtx.sampleRate/1000 : 128, sampleRate:audioCtx.sampleRate, numberOfChannels:2});
+    let buffer = OperableAudioBuffer.create({ length: duration ? duration*audioCtx.sampleRate/1000 : 128, sampleRate:audioCtx.sampleRate, numberOfChannels:2});
     return new SampleRegion(track.id,buffer,start,id)
   }
   

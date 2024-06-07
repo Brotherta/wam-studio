@@ -127,7 +127,7 @@ export default abstract class TrackOf<REGION extends Region> {
   private _volume: number
 
   private updateVolume(){
-    if( this.isSolo || (!this.isMuted && !this.isSoloMuted) )this.gainNode.gain.value=this._volume
+    if(!this.isMuted && !this.isSoloMuted)this.gainNode.gain.value=this._volume
     else this.gainNode.gain.value=0
   }
 

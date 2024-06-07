@@ -106,7 +106,7 @@ export default class RecorderController {
                     const pcm = new Float32Array(e.data.buffer);
                     if (pcm.length > 0) {
                         // Create an AudioBuffer from the PCM data.
-                        const audioBuffer = new OperableAudioBuffer({
+                        const audioBuffer = OperableAudioBuffer.create({
                             length: pcm.length / 2,
                             sampleRate: audioCtx.sampleRate,
                             numberOfChannels: 2
@@ -117,8 +117,8 @@ export default class RecorderController {
                             left[i / 2] = pcm[i];
                             right[i / 2] = pcm[i + 1];
                         }
-
-                        this.app.regionsController.updateTemporaryRegion(region, track, new SampleRegion(0,audioBuffer,0,region.id));
+                        const new_start=(this.app.host.playhead-audioBuffer.length)/audioBuffer.sampleRate*1000
+                        this.app.regionsController.updateTemporaryRegion(region, track, new SampleRegion(0,audioBuffer,new_start,region.id));
                     }
                     break;
                 }
@@ -129,7 +129,7 @@ export default class RecorderController {
 
                     if (pcm.length > 0) {
                         // Create an AudioBuffer from the PCM data.
-                        const audioBuffer = new OperableAudioBuffer({
+                        const audioBuffer = OperableAudioBuffer.create({
                             length: pcm.length / 2,
                             sampleRate: audioCtx.sampleRate,
                             numberOfChannels: 2

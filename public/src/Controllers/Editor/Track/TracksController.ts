@@ -240,7 +240,7 @@ export default class TracksController{
 
       let audioArrayBuffer = await file.arrayBuffer();
       let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
-      let operableAudioBuffer = Object.setPrototypeOf(audioBuffer, OperableAudioBuffer.prototype) as OperableAudioBuffer;
+      let operableAudioBuffer = OperableAudioBuffer.make(audioBuffer);
       operableAudioBuffer = operableAudioBuffer.makeStereo();
 
       node.setAudio(operableAudioBuffer.toArray());

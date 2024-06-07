@@ -133,10 +133,7 @@ export default class SampleTrack extends TrackOf<SampleRegion> {
             sampleRate
           );
           //console.log("after createBuffer");
-          let emptyOpBuffer = Object.setPrototypeOf(
-            emptyBuffer,
-            OperableAudioBuffer.prototype
-          ) as OperableAudioBuffer;
+          let emptyOpBuffer = OperableAudioBuffer.make(emptyBuffer);
           if (opBuffer == undefined) {
             // First empty buffer
             opBuffer = emptyOpBuffer;
@@ -173,10 +170,7 @@ export default class SampleTrack extends TrackOf<SampleRegion> {
         // mix the overlap of the last buffer and the current one
         if (lastOverlapBuffer !== null) {
           // If there is an overlap, mix the overlap
-          lastOverlapBuffer = OperableAudioBuffer.mix(
-            lastOverlapBuffer,
-            currentOverlapBuffer!
-          );
+          lastOverlapBuffer.mix(currentOverlapBuffer!);
         } else {
           // If there is no overlap, the overlap is the current buffer
           lastOverlapBuffer = currentOverlapBuffer!;
