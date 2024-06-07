@@ -278,8 +278,6 @@ export default class EditorController {
 
 
             this._app.tracksController.tracks.forEach(track => {
-                // MB : below seems also unecessary
-                track.update(audioCtx, this._app.host.playhead);
                 this._view.drawRegions(track);
             });
         }, 1000);

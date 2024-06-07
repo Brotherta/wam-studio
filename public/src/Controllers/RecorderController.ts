@@ -198,6 +198,11 @@ export default class RecorderController {
             if (!this.app.host.isPlaying) {
                 this.app.hostController.play(true);
             }
+            else if(!this.app.host.inRecordingMode){
+                this.app.hostController.play();
+                this.app.hostController.play(true);
+
+            }
             for (let track of this.app.tracksController.sampleTracks) {
                 if (track.isArmed) {
                     this.startRecording(track, this.app.host.playhead);

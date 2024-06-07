@@ -100,95 +100,35 @@ export default class SampleTrack extends TrackOf<SampleRegion> {
 
   public override update(context: AudioContext, playhead: number): void {
     console.debug("update track");
-    this.modified = false;
-    if (this.regions.length === 0) {
-      // No regions in the track
-      this.audioBuffer = undefined;
-      this.node?.setAudio([new Float32Array()]);
-      return;
+    // Merge the buffer of all regions into a single big buffer
+    
+    // Get big buffer informations and create it
+    let max_length=0
+    let max_channel=0
+    for(const region of this.regions){
+      const end= region.start * audioCtx.sampleRate/1000 + region.buffer.length
+      if(end>max_length)max_length=end
+      if(region.buffer.numberOfChannels>max_channel)max_channel=region.buffer.numberOfChannels
     }
 
-    let sampleRate = context.sampleRate;
-    let opBuffer: OperableAudioBuffer | undefined = undefined;
-
-    this.regions = this.regions.sort((a, b) => a.start - b.start);
-
-    let currentTime = 0; // in milliseconds
-    for (let i = 0; i < this.regions.length; i++) {
-      // For each region in the track buffer regions list, concat the buffer
-      let region = this.regions[i];
-      let start = region.start; // in milliseconds
-      let duration = region.duration; // in milliseconds
-
-      if (start > currentTime) {
-        // No buffer until the current time, create an empty buffer and concat it to the buffer.
-        const delta = start - currentTime;
-        //console.log("delta", delta)
-        // MB : create new region only if there is a minimal ammount between two consecutive regions
-        // otherwise createBuffer will fail.
-        if (delta > 0.03) { 
-          let emptyBuffer = context.createBuffer(
-            NUM_CHANNELS,
-            ((start - currentTime) * sampleRate) / 1000,
-            sampleRate
-          );
-          //console.log("after createBuffer");
-          let emptyOpBuffer = OperableAudioBuffer.make(emptyBuffer);
-          if (opBuffer == undefined) {
-            // First empty buffer
-            opBuffer = emptyOpBuffer;
-          } else {
-            opBuffer = opBuffer.concat(emptyOpBuffer);
-          }
-        }
-        currentTime = start;
+    const big_buffer = (()=>{
+      if(max_length==0 || max_channel==0){
+        // Default buffer if there is no region
+        return OperableAudioBuffer.create({numberOfChannels:2, length:1, sampleRate:context.sampleRate})
       }
-      if (start === currentTime) {
-        // Buffer is at the current time, concat the buffer to the current buffer.
-        if (opBuffer == undefined) {
-          // It is the first buffer of the track if opBuffer is undefined
-          opBuffer = region.buffer;
-        } else {
-          opBuffer = opBuffer.concat(region.buffer);
+      else{
+        // Merge everything
+        let big_buffer = OperableAudioBuffer.create({numberOfChannels:max_channel, length:max_length, sampleRate:context.sampleRate})
+        for(const region of this.regions){
+          big_buffer = big_buffer.merge(region.buffer, region.start*audioCtx.sampleRate/1000)
         }
-        currentTime += duration;
-      } else if (start < currentTime) {
-        // Overlap of the buffer with the last one, mix the overlap and concat the buffer to the current buffer.
-        let overlap = currentTime - start;
-
-        // slice the overlap of the last buffer and the current one
-        let overlapSample = Math.floor((overlap * sampleRate) / 1000);
-        let buffers = opBuffer!.split(opBuffer!.length - overlapSample);
-        let buffers2 = region.buffer.split(overlapSample);
-
-        opBuffer = buffers[0]!;
-        let currentBuffer = buffers2[1];
-
-        let lastOverlapBuffer = buffers[1];
-        let currentOverlapBuffer = buffers2[0];
-
-        // mix the overlap of the last buffer and the current one
-        if (lastOverlapBuffer !== null) {
-          // If there is an overlap, mix the overlap
-          lastOverlapBuffer.mix(currentOverlapBuffer!);
-        } else {
-          // If there is no overlap, the overlap is the current buffer
-          lastOverlapBuffer = currentOverlapBuffer!;
-        }
-
-        opBuffer = opBuffer.concat(lastOverlapBuffer);
-        if (currentBuffer !== null) {
-          // If there is a buffer after the overlap, concat it to the current buffer
-          opBuffer = opBuffer.concat(currentBuffer);
-        }
-        currentTime = start + duration;
+        return big_buffer
       }
-    }
-    this.audioBuffer = opBuffer;
-    this.node?.setAudio(this.audioBuffer!.toArray());
-    this.node?.port.postMessage({ playhead: playhead });
-
-    console.debug(this.audioBuffer?.length)
+    })()
+    
+    // Set the buffer
+    this.audioBuffer = big_buffer;
+    this.node?.setAudio(this.audioBuffer!.toArray())
   }
 
   protected override _connectPlugin(node: AudioNode): void {

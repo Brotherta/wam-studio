@@ -68,7 +68,7 @@ export default class HostController {
    *
    * @param stop - Boolean to know if the button is a stop button or not when recording.
    */
-  public play(stop: boolean = false): void {
+  public play(inRecordingMode: boolean = false): void {
     const host=this._app.host
     if (!host.isPlaying) {
       // disable zoom buttons when playing (this confuses the player in this version)
@@ -79,7 +79,11 @@ export default class HostController {
       //console.log("Playing zoom-disabled");
 
       this._app.automationController.applyAllAutomations();
-      if (host.modified)host.update(audioCtx, this._app.host.playhead)
+      if (host.modified){
+        host.update(audioCtx, this._app.host.playhead)
+        host.modified=false
+      }
+      host.inRecordingMode = inRecordingMode;
       host.play()
       this.launchTimerInterval();
 
@@ -102,6 +106,7 @@ export default class HostController {
           track.plugin.instance!._audioNode.clearEvents()
         }
       });
+      host.inRecordingMode=false
       host.pause()
       if (this._app.host.recording) {
         this._app.recorderController.stopRecordingAllTracks()
@@ -111,7 +116,7 @@ export default class HostController {
       // Always stop the metronome when playback is stopped
       (this._view.MetronomeElement as MetronomeComponent).pauseMetronome()
     }
-    this._view.updatePlayButton(host.isPlaying, stop)
+    this._view.updatePlayButton(host.isPlaying, inRecordingMode)
   }
 
   /**

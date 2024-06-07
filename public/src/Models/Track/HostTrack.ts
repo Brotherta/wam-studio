@@ -102,9 +102,26 @@ export default class HostTrack extends TrackOf<Region> {
         this.outputNode.connect(this.hostNode);
     }
 
+    private previousTracks: Track[]=[]
     public override update(context: AudioContext, playhead: number): void {
+        // Cleanup
+        for(const track of this.previousTracks){
+            try{
+                track.outputNode.disconnect(this.mainNode)
+                track.monitoredOutputNode.disconnect(this.outputNode)
+            }catch(_){}
+        }
+        this.previousTracks=[]
+
+        // Connections
         for(const track of this.tracks){
-            if (track.modified)track.update(context, playhead)
+            this.previousTracks.push(track)
+            if (track.modified){
+                track.update(context, playhead)
+                track.modified=false
+            }
+            if (this.inRecordingMode)track.monitoredOutputNode.connect(this.mainNode)
+            else track.outputNode.connect(this.mainNode)
         }
     }
 
@@ -128,7 +145,6 @@ export default class HostTrack extends TrackOf<Region> {
         // Setup children tracks
         for(const track of this.tracks){
             track.loop(this.looping)
-            track.outputNode.connect(this.mainNode)
             track.updateLoopTime(this.leftTime, this.rightTime)
         }
 
@@ -146,14 +162,12 @@ export default class HostTrack extends TrackOf<Region> {
         this.hostNode?.play()
         this._playing=true
 
-        // Update tracks that are modifie while playing.
+        // Check for updates while playing
         const host=this
         setTimeout(function updateTrack(){
-            for(const track of host.tracks){
-                if (track.modified)track.update(audioCtx, 0)
-            }
-            if (host._playing) setTimeout(updateTrack, 100)
-        },100)
+            if(host.modified)host.update(audioCtx, host.playhead)
+            if (host._playing) setTimeout(updateTrack, 300)
+        },300)
     }
 
     public override pause(): void {
@@ -161,6 +175,15 @@ export default class HostTrack extends TrackOf<Region> {
         this.hostNode?.pause()
         this._playing=false
     }
+
+    
+    /** MONITORING */
+    private _recordingMode=false
+    set inRecordingMode(value: boolean){
+        this._recordingMode=value
+        this.modified=true
+    }
+    get inRecordingMode(){return this._recordingMode}
 
 
     /** LOOP */
