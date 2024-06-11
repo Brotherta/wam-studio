@@ -83,7 +83,7 @@ export default abstract class TrackOf<REGION extends Region> {
    */
   public loopEnd: number;
 
-  constructor(id: number, element: TrackElement) {
+  constructor(element: TrackElement) {
     // Audio Nodes
     this.monitoredNode= audioCtx.createGain();
     this.gainNode = audioCtx.createGain();
@@ -92,7 +92,6 @@ export default abstract class TrackOf<REGION extends Region> {
     this.pannerNode.connect(this.gainNode).connect(this.monitoredNode)
 
     // Track properties
-    this.id = id;
     this.element = element;
     this.color = "";
     this.automation = new Automation();

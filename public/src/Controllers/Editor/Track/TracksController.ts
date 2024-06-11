@@ -11,8 +11,10 @@ import TracksView from "../../../Views/TracksView";
 import { audioCtx } from "../../../index";
 
 import WebAudioPeakMeter from "../../../Audio/Utils/PeakMeter";
+import MIDIRegion, { MIDI } from "../../../Models/Region/MIDIRegion";
 import { RegionOf } from "../../../Models/Region/Region";
 import SampleRegion from "../../../Models/Region/SampleRegion";
+import MIDITrack from "../../../Models/Track/MIDITrack";
 import TrackOf from "../../../Models/Track/Track.js";
 import FriendlyIterable from "../../../Utils/FriendlyIterable";
 
@@ -54,13 +56,15 @@ export default class TracksController{
   private _oldVolume: number = 0.5;
   private _oldBalance = 1;
 
-  /**
-   * The list of tracks.
+  /*
+   * The lists of tracks.
    * You have to add one for all the type tracks you want to manage. 
-   * */
+   */
   public readonly sampleTracks= new TrackList<SampleRegion,SampleTrack>()
 
-  private readonly track_lists: TrackList<any,any>[]= [this.sampleTracks]
+  public readonly midiTracks= new TrackList<MIDIRegion,MIDITrack>()
+
+  private readonly track_lists: TrackList<any,any>[]= [this.sampleTracks,this.midiTracks]
 
   constructor(app: App) {
     this._app = app
@@ -81,7 +85,8 @@ export default class TracksController{
 
     // Create its track element (GUI)
     track.plugin = new Plugin(this._app);
-    track.element.trackId = this.trackIdCount++;
+    track.id = this.trackIdCount++;
+    track.element.trackId = track.id;
     // wait until the trackElement WebComponent is connected
     // to the DOM before initializing the peak meter
     let id = setInterval(() => {
@@ -110,9 +115,7 @@ export default class TracksController{
     this._view.changeColor(track);
     this.bindTrackEvents(track);
     
-    if(track instanceof SampleTrack){
-      this._app.waveformController.initializeWaveform(track);
-    }
+    this._app.waveformController.initializeWaveform(track);
     this._app.automationView.initializeAutomation(track.id);
 
     if(this.tracks.find(it=>it.isSolo))track.isSoloMuted=true
@@ -202,7 +205,7 @@ export default class TracksController{
    * @private
    */
   private createTrackFromNode(node: WamAudioWorkletNode): SampleTrack {
-    let track = new SampleTrack(this.trackIdCount, new TrackElement(), node);
+    let track = new SampleTrack(new TrackElement(), node);
     return track;
   }
 
@@ -267,6 +270,7 @@ export default class TracksController{
     track.color = deletedTrack.color;
     track.isMuted = deletedTrack.isMuted;
     track.isSolo = deletedTrack.isSolo;
+    track.isSoloMuted = deletedTrack.isSoloMuted;
     track.isMerged = deletedTrack.isMerged;
     track.left = deletedTrack.left;
     track.right = deletedTrack.right;
@@ -287,6 +291,7 @@ export default class TracksController{
       ((pos * RATIO_MILLS_BY_PX) / 1000) * audioCtx.sampleRate
     );
 
+    // TODO Encapsulé ce machin là
     for(const track of this.tracks) if(track instanceof SampleTrack) track.node!.port.postMessage({ playhead: this._app.host.playhead + 1 })
 
     this._app.host.hostNode?.port.postMessage({
@@ -300,10 +305,23 @@ export default class TracksController{
    */
   private bindEvents(): void {
     this._view.newTrackDiv.addEventListener("click", () => {
-      this._app.tracksController.createEmptySampleTrack().then((track) => {
+      // Add track
+      const track=new MIDITrack(new TrackElement())
+      this._app.tracksController.addTrack(this.midiTracks, track);
+      track.element.progressDone()
+
+      // Add region
+      const midi=MIDI.fromString(
+`000   1   1 1
+0 1 2  4  5
+   000   1   2   4`,1000
+      )
+      this._app.midiRegionsController.createRegion(track, id=>new MIDIRegion(track.id,midi,0,id))
+
+      /*this._app.tracksController.createEmptySampleTrack().then((track) => {
         this.addTrack(this.sampleTracks,track)
         track.element.progressDone()
-      });
+      });*/
     });
   }
 

@@ -213,7 +213,7 @@ export default class EditorView extends Application {
      * Add a waveform into the canvas fot the given track and update the position of the other waveforms.
      * @param track - The track where the new waveform will be created.
      */
-    public createWaveformView(track: SampleTrack): WaveformView {
+    public createWaveformView(track: Track): WaveformView {
         let wave = new WaveformView(this, track);
         this.waveforms.push(wave);
         this.resizeCanvas();

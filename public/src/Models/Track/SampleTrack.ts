@@ -49,8 +49,8 @@ export default class SampleTrack extends TrackOf<SampleRegion> {
   public sab: SharedArrayBuffer;
 
 
-  constructor(id: number, element: TrackElement, node?: WamAudioWorkletNode) {
-    super(id,element)
+  constructor(element: TrackElement, node?: WamAudioWorkletNode) {
+    super(element)
     this.url = ""
 
     // Recording nodes

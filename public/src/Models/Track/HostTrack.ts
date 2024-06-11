@@ -63,7 +63,7 @@ export default class HostTrack extends TrackOf<Region> {
      * @param tracks Its children tracks
      */
     constructor(app: App, tracks: Iterable<Track>) {
-        super(-1, new TrackElement());
+        super(new TrackElement());
         this.tracks=tracks
         this.playhead = 0;
         this.latency = 0;

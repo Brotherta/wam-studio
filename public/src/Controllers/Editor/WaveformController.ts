@@ -1,9 +1,9 @@
 import App from "../../App";
-import EditorView from "../../Views/Editor/EditorView";
-import SampleTrack from "../../Models/Track/SampleTrack";
-import WaveformView from "../../Views/Editor/WaveformView";
-import RegionOf from "../../Models/Region/Region";
 import SampleRegion from "../../Models/Region/SampleRegion";
+import SampleTrack from "../../Models/Track/SampleTrack";
+import { Track } from "../../Models/Track/Track";
+import EditorView from "../../Views/Editor/EditorView";
+import WaveformView from "../../Views/Editor/WaveformView";
 
 /**
  * Class that control the waveforms of the editor.
@@ -28,12 +28,8 @@ export default class WaveformController {
      * Add the according waveform to the track in the canvas. It also resizes the canvas.
      * @param track
      */
-    public initializeWaveform(track: SampleTrack): void {
+    public initializeWaveform(track: Track): void {
         let waveformView = this._editorView.createWaveformView(track);
-        const audioBuffer=track.audioBuffer
-        if (audioBuffer !== undefined) {
-            if(track instanceof SampleTrack)this._app.regionsController.createRegion( track, id=>new SampleRegion(track.id,audioBuffer,0,id), waveformView);
-        }
     }
 
     public recreateRegionsAndRegionViews(track: SampleTrack, regions: SampleRegion[]): WaveformView {

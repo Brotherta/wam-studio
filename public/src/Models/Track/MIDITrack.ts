@@ -1,5 +1,5 @@
+import MIDIAudioNode from "../../Audio/MIDI/MIDIAudioNode";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
-import { RingBuffer } from "../../Audio/Utils/Ringbuffer";
 import WamAudioWorkletNode from "../../Audio/WAM/WamAudioWorkletNode.js";
 import TrackElement from "../../Components/TrackElement.js";
 import { NUM_CHANNELS } from "../../Env";
@@ -10,7 +10,7 @@ import TrackOf from "./Track";
 export default class MIDITrack extends TrackOf<MIDIRegion> {
 
   /** The audio node associated to the track. */
-  public node: WamAudioWorkletNode | undefined;
+  public node: MIDIAudioNode;
   
   /** The recorder node associated to the track. It is used to record the track. */
   public micRecNode: MediaStreamAudioSourceNode | undefined;
@@ -24,6 +24,7 @@ export default class MIDITrack extends TrackOf<MIDIRegion> {
    * @see mergerNode
    */
   public splitterNode: ChannelSplitterNode;
+  
   /**
    * The merger node associated to the track. It is used to merge the track channels according
    * to the selected mode (Stereo, merge, left or right).
@@ -49,12 +50,13 @@ export default class MIDITrack extends TrackOf<MIDIRegion> {
   public sab: SharedArrayBuffer;
 
 
-  constructor(id: number, element: TrackElement, node?: WamAudioWorkletNode) {
-    super(id,element)
+  constructor(element: TrackElement) {
+    super(element)
     this.url = "";
 
     // Nodes creation and connection.
-    this.node = node;
+    audioCtx.audioWorklet.addModule(new URL("../../Audio/MIDI/MIDIAudioProcessor", import.meta.url))
+    this.node = new MIDIAudioNode(audioCtx, {});
     this.micRecNode = undefined;
     this.splitterNode = audioCtx.createChannelSplitter(NUM_CHANNELS);
     this.mergerNode = audioCtx.createChannelMerger(NUM_CHANNELS);
@@ -62,10 +64,6 @@ export default class MIDITrack extends TrackOf<MIDIRegion> {
     // Audio Buffers
     this.audioBuffer = undefined;
     this.modified = true;
-    if (this.node) {
-      this.sab = RingBuffer.getStorageForCapacity(audioCtx.sampleRate * 2,Float32Array);
-      this.node!.port.postMessage({ sab: this.sab });
-    }
 
     this.postInit()
   }
@@ -93,7 +91,10 @@ export default class MIDITrack extends TrackOf<MIDIRegion> {
   }
 
   public override update(context: AudioContext, playhead: number): void {
-    
+    for(const region of this.regions){
+      this.node.midi=region.midi
+      break
+    }
   }
 
   protected override _connectPlugin(node: AudioNode): void {
@@ -105,14 +106,14 @@ export default class MIDITrack extends TrackOf<MIDIRegion> {
   }
 
   public override play(){
-    this.node?.play()
+    this.node.isPlaying = true
   }
 
   public override pause(){
-    this.node?.pause()
+    this.node.isPlaying = false
   }
 
   public override loop(value:boolean): void{
-    this.node?.loop(value)
+    //this.node?.loop(value)
   }
 }

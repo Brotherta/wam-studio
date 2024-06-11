@@ -28,7 +28,7 @@ export default class MIDIRegionView extends RegionView<MIDIRegion> {
 
         let colorHex = +("0x" + color.slice(1));
         target.clear();
-        target.beginFill(colorHex, 0.8);
+        target.beginFill(colorHex, 0.5);
 
         // Get max amplitude
         let minnote=Infinity
@@ -40,40 +40,19 @@ export default class MIDIRegionView extends RegionView<MIDIRegion> {
         let amplitude=maxnote-minnote
 
         // Draw notes
-        const note_height=HEIGHT_TRACK/amplitude
+        const note_height=(HEIGHT_TRACK-HEIGHT_TRACK/10)/amplitude
         const note_width=range/region.duration
-        const duration=region.duration
         region.midi.forEachNote((note, start)=>{
-            const y=note.note*note_height
+            const local_note=note.note-minnote
+            const y=local_note*note_height
             const x=start*note_width
-            target.drawRect(x, y, note_width, note_height)
+            const w=Math.max(1,note.duration*note_width)
+            const h=HEIGHT_TRACK/10
+            console.log("Drawing note at", note, start)
+            target.drawRect(x, y, w, h)
+            target.drawRect(x+w-HEIGHT_TRACK/20, y, HEIGHT_TRACK/20, h)
+            this.width=x+w
         })
-
-        let amp = (HEIGHT_TRACK-1) / 2;
-        /*for (let channel = 0; channel < region.buffer.numberOfChannels; channel++) {
-            let data = region.buffer.getChannelData(channel);
-            let step = Math.round(data.length / range);
-
-            for (let i = 0; i < range; i++) {
-                let min = 1.0;
-                let max = -1.0;
-                for (let j = 0; j < step; j++) {
-                    let dataum = data[i * step + j];
-                    if (dataum < min) min = dataum;
-                    if (dataum > max) max = dataum;
-                }
-                const rectWidth = 1;
-                let rectHeight = Math.max(1, (max-min) * amp);
-
-                // MB: we need to clip the rectangle so that if does not go over track dimensions
-                if(rectHeight < HEIGHT_TRACK) {
-                    target.drawRect(i, (1+min) * amp, rectWidth, rectHeight);
-                } else {
-                    rectHeight = HEIGHT_TRACK;
-                    target.drawRect(i, 0 * amp, rectWidth, rectHeight);
-                }
-            }
-        }*/
     }
 
 }

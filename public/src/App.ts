@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-ignore
 import UndoManager from "undo-manager/lib/undomanager.js";
 
 
@@ -10,6 +10,7 @@ import AutomationController from "./Controllers/AutomationController";
 import EditorController from "./Controllers/Editor/EditorController";
 import LoopController from "./Controllers/Editor/LoopController";
 import PlayheadController from "./Controllers/Editor/PlayheadController";
+import MIDIRegionController from "./Controllers/Editor/Region/MIDIRegionController";
 import SampleRegionController from "./Controllers/Editor/Region/SampleRegionController";
 import WaveformController from "./Controllers/Editor/WaveformController";
 import ExporterController from "./Controllers/ExportController";
@@ -46,6 +47,7 @@ export default class App {
     projectController: ProjectController;
     editorController: EditorController;
     waveformController: WaveformController;
+    midiRegionsController: MIDIRegionController;
     regionsController: SampleRegionController;
     playheadController: PlayheadController
     keyboardController: KeyboardController;
@@ -86,6 +88,7 @@ export default class App {
         this.editorController = new EditorController(this);
         this.waveformController = new WaveformController(this);
         this.regionsController = new SampleRegionController(this);
+        this.midiRegionsController = new MIDIRegionController(this);
         this.playheadController = new PlayheadController(this);
         this.tracksController = new TracksController(this);
         this.host = new HostTrack(this,this.tracksController.tracks);
@@ -105,6 +108,8 @@ export default class App {
 
         this.undoManager = new UndoManager();
         const old=this.undoManager.add.bind(this.undoManager)
+        
+        //@ts-ignore
         this.undoManager.add=(...args)=>{
             old(...args)
             console.trace()

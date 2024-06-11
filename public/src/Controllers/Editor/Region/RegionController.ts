@@ -525,17 +525,10 @@ export default abstract class RegionController<REGION extends RegionOf<REGION>, 
       }
     }
     if(!leftRegion)return
-
-    // Create a padding region
-    const padding_length=rightRegion.start-leftRegion.end
-    let padding
-    if(padding_length>1)padding=this._dummyRegion(track,leftRegion.end,this.getNewId(),padding_length)
-    else padding=null
-
-    // Merge the tree regions into a new region
+    
+    // Merge the two regions into a new region
     const newRegion=leftRegion.clone(this.getNewId())
-    if(padding)newRegion.mergeWith(padding)
-      newRegion.mergeWith(rightRegion)
+    newRegion.mergeWith(rightRegion)
 
     this.doIt(true,
       ()=>{

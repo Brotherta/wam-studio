@@ -1,6 +1,22 @@
 
 /**
  * A audio buffer decorator that add some operations to the AudioBuffer class.
+ * @example
+ * // You can operate on any AudioBuffer:
+ * val buffer = OperableAudioBuffer.make(audioBuffer)
+ * buffer.reverse()
+ * 
+ * // You can directly create a new OperableAudioBuffer:
+ * val buffer = OperableAudioBuffer.create({numberOfChannels: 2, length: 44100, sampleRate: 44100})
+ * 
+ * // You can operate on a subpart of an AudioBuffer:
+ * val buffer = OperableAudioBuffer.view(audioBuffer, 1000, 10000)
+ * buffer.reverse()
+ * 
+ * // You can also use the buffer as a normal AudioBuffer:
+ * val buffer = OperableAudioBuffer.create({numberOfChannels: 2, length: 44100, sampleRate: 44100})
+ * buffer.copyToChannel(new Float32Array(44100), 0)
+ * 
  */
 export default abstract class OperableAudioBuffer implements AudioBuffer {
 

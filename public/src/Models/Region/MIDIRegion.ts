@@ -75,9 +75,7 @@ export class MIDI{
                 const char=lines[notei][instanti]
                 if(char<'0' || '9'<char)continue
                 const duration=instant_duration*(1+parseInt(char))
-                if(lines[notei][instanti]==="1"){
-                    ret.addNode(new MIDINote(note, 1, 0, duration), instanti*instant_duration)
-                }
+                ret.addNode(new MIDINote(note, 1, 0, duration), instanti*instant_duration)
             }
         }
         return ret
@@ -100,7 +98,7 @@ export class MIDI{
         const instant_index=Math.floor(start/this.instant_duration)
         const offset=start-instant_index*this.instant_duration
         while(instant_index>=this.instants.length)this.instants.push([])
-        this.instants.push([{offset,note}])
+        this.instants[instant_index].push({offset,note})
     }
 
     /**
