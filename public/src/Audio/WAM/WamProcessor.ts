@@ -48,35 +48,22 @@ const getProcessor = (moduleId: string) => {
     }
 
     async _onMessage(e: any) {
-      await super._onMessage(e);
-      if (e.data.audio) {
-        this.audio = e.data.audio;
-      } else if (e.data.playhead) {
-        this.playhead = Math.round(e.data.playhead);
-      } else if (e.data.removeAudio) {
-        this.audio = undefined;
-      } else if (e.data.arm) {
-        this._audioWriter = new AudioWriter(
-          new RingBuffer(this.sab, Float32Array)
-        );
-      } else if (e.data.startRecording) {
-        this.recording = true;
-      } else if (e.data.stopRecording) {
-        this.recording = false;
-      } else if (e.data.sab) {
-        this.sab = e.data.sab;
-      } else if (e.data.stereo !== undefined) {
+      await super._onMessage(e)
+
+      if ("audio" in e.data) this.audio = e.data.audio
+      else if ("playhead" in e.data) this.playhead = Math.round(e.data.playhead)
+      else if ("removeAudio" in e.data) this.audio = undefined
+      else if ("arm" in e.data) this._audioWriter = new AudioWriter(new RingBuffer(this.sab, Float32Array))
+      else if ("startRecording" in e.data) this.recording = true
+      else if ("stopRecording" in e.data) this.recording = false
+      else if ("sab" in e.data) this.sab = e.data.sab
+      else if ("stereo" in e.data) {
         console.log("stereo", e.data);
         let { stereo, channelNum } = e.data;
-        if (stereo) {
-          this.inputChannel = undefined;
-        } else {
-          this.inputChannel = channelNum;
-        }
-      } else if (e.data.loop) {
-        this.loopStart = e.data.loopStart;
-        this.loopEnd = e.data.loopEnd;
-      }
+        this.inputChannel = stereo ? undefined : channelNum;
+      } 
+      else if ("loopStart" in e.data) this.loopStart = e.data.loopStart
+      else if ("loopEnd" in e.data) this.loopEnd = e.data.loopEnd
     }
 
     _processEvent(event) {

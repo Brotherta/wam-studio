@@ -3,45 +3,29 @@ import type TracksController from "../../Controllers/Editor/Track/TracksControll
 import { audioCtx } from "../../index";
 import Automation from "../Automation";
 import Plugin from "../Plugin.js";
-import Region from "../Region/Region";
 
-export type TrackRegionType<Type> = Type extends TrackOf<infer X> ? X : never
+export default abstract class Track {
 
-export type Track=TrackOf<Region>
-
-export default abstract class TrackOf<REGION extends Region> {
-
-  // Output Node
-  /** 
-   * The gain node associated to the track. It is used to control the volume of the track and is the outputNode of the track.
-   * pannerNode -> gainNode
-   **/
+  /* -~- OUTPUT NODES -~- */
+  /* junctionNode -> pannerNode -> gainNode -> monitoredNode */
+  /** The gain node associated to the track. It is used to control the volume of the track and is the outputNode of the track. **/
   private gainNode: GainNode
 
-  /** 
-   * The panner node associated to the track. It is used to control the balance of the track.
-   * pannerNode -> gainNode
-   **/
+  /** The panner node associated to the track. It is used to control the balance of the track. **/
   private pannerNode: StereoPannerNode
 
-  /**
-   * The plugin node if a plugin is connected to the track.
-   */
+  /** The plugin node if a plugin is connected to the track. */
   private pluginNode?: AudioNode
 
-  /**
-   * The monitored output node. It output the sound of the track only when it is monitored.
-   */
+  /** The monitored output node. It output the sound of the track only when it is monitored. */
   private monitoredNode: GainNode
 
+  /* -~- TRACK PROPERTIES -~- */
   /** The unique id of the track. */
   public id: number
 
   /** The track element associated to the track. */
   public element: TrackElement
-
-  /** The color of the track in HEX format (#FF00FF). It is used to display the waveform. */
-  public color: string
 
   /** The plugin associated to the track. */
   public plugin: Plugin
@@ -49,11 +33,8 @@ export default abstract class TrackOf<REGION extends Region> {
   /** The automation associated to the track. */
   public automation: Automation
 
-  /** The regions associated to the track. */
-  public regions: REGION[]
-
   private _modified: boolean
-  
+
   /**
    * The armed state of the track. It is used to record the track.
    */
@@ -66,12 +47,6 @@ export default abstract class TrackOf<REGION extends Region> {
   get isArmed(){ return this._armed }
 
   private _armed: boolean=false
-  
-  /**
-   * The deleted state of the track. It is used to know if the track has been deleted.
-   * It is used when downloading the url of the track.
-   */
-  public deleted: boolean;
 
   /**
    * Position of the loop start in milliseconds.
@@ -95,11 +70,9 @@ export default abstract class TrackOf<REGION extends Region> {
     this.element = element;
     this.color = "";
     this.automation = new Automation();
-    this.regions = [];
 
     // Default Controls
     this.volume = 0.5;
-    this.deleted = false;
 
     // Recording controls.
     this.isMuted=false
@@ -116,7 +89,7 @@ export default abstract class TrackOf<REGION extends Region> {
   }
 
   protected postInit(){
-    this._connectPlugin(this.pannerNode)
+    this._connect(this.pannerNode)
   }
 
 
@@ -188,6 +161,18 @@ export default abstract class TrackOf<REGION extends Region> {
   private _solo: boolean=false
 
 
+  /** The color of the track in HEX format (#FF00FF). It is used to display the waveform. */
+  private _color: string
+
+  public set color(newColor: string){
+    this._color = newColor
+    if(this.element.color)this.element.color.style.background = newColor
+  }
+
+  public get color() { return this._color }
+  
+
+
   /**
    * The balance of the track. The panning of the track.
    */
@@ -197,33 +182,7 @@ export default abstract class TrackOf<REGION extends Region> {
   }
 
   public get balance() { return this.pannerNode.pan.value }
-
-  /**
-   * Adds a region to the regions list.
-   *
-   * @param region - The region to add.
-   */
-  public addRegion(region: REGION): void {
-    this.regions.push(region);
-  }
-
-  /**
-   * Gets the region according to its id.
-   * @param regionId - The id of the region.
-   * @returns The region if it exists, undefined otherwise.
-   */
-  public getRegionById(regionId: number): REGION | undefined {
-    return this.regions.find((region) => region.id === regionId);
-  }
-
-  /**
-   * Removes a region from the regions list according to its id.
-   * @param regionId - The id of the region to remove.
-   */
-  public removeRegionById(regionId: number): void {
-    this.regions = this.regions.filter((region) => region.id !== regionId);
-  }
-
+  
   /**
    * Sets the start and end of the loop.
    *
@@ -233,17 +192,14 @@ export default abstract class TrackOf<REGION extends Region> {
   public updateLoopTime(loopStart: number, loopEnd: number): void {
     this.loopStart = loopStart;
     this.loopEnd = loopEnd;
-    this._onLoopChange(loopStart, loopEnd);
   }
-
-  public abstract _onLoopChange(leftTime: number, rightTime: number):void;
 
   /**
    * Updates the track cached data when his content has been modified.
    * @param context - The audio context.
    * @param playhead - The playhead position in buffer samples.
    */
-  public abstract update(context: AudioContext, playhead: number): void;
+  public abstract update(context: AudioContext, playhead: number): void
 
   /**
    * Connect the track to the audio node input/output of a plugin and disconnect the previous one.
@@ -253,24 +209,28 @@ export default abstract class TrackOf<REGION extends Region> {
     // Disconnect the previous plugin node if it exists.
     if(this.pluginNode){
       this.pluginNode.disconnect(this.pannerNode)
-      this._disconnectPlugin(this.pluginNode)
+      this._disconnect(this.pluginNode)
       this.pluginNode=undefined
     }
     // Disconnect from panner node
     else {
-      this._disconnectPlugin(this.pannerNode)
+      this._disconnect(this.pannerNode)
     }
 
     // Connect to a plugin node
     if(node){
       this.pluginNode=node
-      this._connectPlugin(node)
+      this._connect(node)
       node.connect(this.pannerNode)
     }
     else{
-      this._connectPlugin(this.pannerNode)
+      this._connect(this.pannerNode)
     }
   }
+
+  public abstract _connect(node: AudioNode): void
+
+  public abstract _disconnect(node: AudioNode): void
 
   /**
    * Set the track to be monitored or not.
@@ -285,16 +245,6 @@ export default abstract class TrackOf<REGION extends Region> {
     return this.monitoredNode.gain.value>0
   }
 
-  /**
-   * Connect the track direct output to the plugin node input.
-   */
-  protected abstract _connectPlugin(node: AudioNode): void;
-
-  /**
-   * Disconnect the track direct output from the plugin node input/output.
-   */
-  protected abstract _disconnectPlugin(node: AudioNode): void;
-
   public get outputNode(): AudioNode {
     return this.gainNode
   }
@@ -308,6 +258,9 @@ export default abstract class TrackOf<REGION extends Region> {
   public abstract pause(): void
 
   public abstract loop(value:boolean): void
+
+  /** The playhead positions of the track in milliseconds. */
+  public abstract playhead: number
 
   /**
    * The modified state of the track. It is used to know if the track has been modified and should be updated.

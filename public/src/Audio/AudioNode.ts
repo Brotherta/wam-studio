@@ -45,6 +45,26 @@ class AudioPlayerNode extends AudioWorkletNode {
             console.error('Parameter "looping" does not exist.');
         }
     }
+
+    /**
+     * Set the playhead position in sample
+     */
+    set playhead(value: number) {
+        this.port.postMessage({playhead:value})
+    }
+
+    /**
+     * Set the loop start and end in sample
+     * @param start in sample
+     * @param end in sample
+     */
+    setLoop(start:number, end:number){
+        this.port.postMessage({
+            loop: true,
+            loopStart: start,
+            loopEnd: end,
+        });
+    }
 }
 
 export default AudioPlayerNode;

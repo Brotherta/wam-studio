@@ -1,9 +1,6 @@
 import App from "../App";
-import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import { URLFromFiles } from "../Audio/Utils/UrlFiles";
-import SampleRegion from "../Models/Region/SampleRegion";
-import SampleTrack from "../Models/Track/SampleTrack";
-import { audioCtx } from "../index";
+import RegionTrack from "../Models/Track/RegionTrack";
 
 
 export default class RecorderController {
@@ -19,8 +16,8 @@ export default class RecorderController {
      *
      * @param track - The track to set up recording for.
      */
-    async setupRecording(track: SampleTrack) {
-        track.node?.port.postMessage({"arm": true});
+    async setupRecording(track: RegionTrack) {
+        /*TODO track.node?.port.postMessage({"arm": true});
 
         if (track.micRecNode === undefined) {
             if (this.app.settingsController.constraints === undefined) {
@@ -29,7 +26,7 @@ export default class RecorderController {
             let stream = await navigator.mediaDevices.getUserMedia(this.app.settingsController.constraints);
             track.micRecNode = new MediaStreamAudioSourceNode(audioCtx, {mediaStream: stream,});
             track.micRecNode.connect(track.recordingInputNode);
-        }
+        }*/
     }
 
     /**
@@ -37,17 +34,17 @@ export default class RecorderController {
      *
      * @param track - The track to set up the Web Worker for.
      */
-    async setupWorker(track: SampleTrack) {
+    async setupWorker(track: RegionTrack) {
         let url1 = new URL('../Audio/Utils/wav-writer.js', import.meta.url);
         let url2 = new URL('../Audio/Utils/Ringbuffer/index.js', import.meta.url);
         await URLFromFiles([url1, url2]).then((e) => {
-            track.worker = new Worker(e);
+            /*TODO track.worker = new Worker(e);
             track.worker.postMessage({
                 command: "init",
                 sab: track.sab,
                 channelCount: 2,
                 sampleRate: audioCtx.sampleRate
-            });
+            });*/
         })
     }
 
@@ -56,7 +53,7 @@ export default class RecorderController {
      *
      * @param track - The track to start monitoring.
      */
-    startMonitoring(track: SampleTrack) {
+    startMonitoring(track: RegionTrack) {
         if (track.isArmed) track.monitored = true
     }
 
@@ -65,7 +62,7 @@ export default class RecorderController {
      *
      * @param track - The track to stop monitoring.
      */
-    stopMonitoring(track: SampleTrack) {
+    stopMonitoring(track: RegionTrack) {
         track.monitored = false
     }
 
@@ -73,7 +70,7 @@ export default class RecorderController {
      * Stops recording all armed tracks.
      */
     stopRecordingAllTracks() {
-        for (let track of this.app.tracksController.sampleTracks) {
+        for (let track of this.app.tracksController.tracks) {
             if (track.isArmed) {
                 this.stopRecording(track);
             }
@@ -85,10 +82,10 @@ export default class RecorderController {
      *
      *
      * @param track - The track to start recording on.
-     * @param playhead - The current playhead position.
+     * @param playhead - The current playhead position in milliseconds.
      */
-    startRecording(track: SampleTrack, playhead: number) {
-        this.app.host.recording = true;
+    startRecording(track: RegionTrack, playhead: number) {
+        /*TODO this.app.host.recording = true;
         track.recordingOutputNode.connect(track.node!);
 
         let start = (playhead / audioCtx.sampleRate) * 1000;
@@ -146,7 +143,7 @@ export default class RecorderController {
                     }
                 }
             }
-        }
+        }*/
     }
 
     /**
@@ -154,11 +151,11 @@ export default class RecorderController {
      *
      * @param track
      */
-    stopRecording(track: SampleTrack) {
-        this.app.host.recording = false;
+    stopRecording(track: RegionTrack) {
+        /* TODO this.app.host.recording = false;
         track.worker?.postMessage({ command: "stopAndSendAsBuffer" });
         track.node?.port.postMessage({ "stopRecording": true });
-        track.recordingOutputNode?.disconnect(track.node!);
+        track.recordingOutputNode?.disconnect(track.node!);*/
     }
 
     /**
@@ -166,7 +163,7 @@ export default class RecorderController {
      *
      * @param track - The track to toggle the armed status of.
      */
-    async clickArm(track: SampleTrack) {
+    async clickArm(track: RegionTrack) {
         track.isArmed = !track.isArmed;
 
         if (track.isArmed) {
@@ -175,8 +172,8 @@ export default class RecorderController {
         }
         else {
             if (this.app.host.isPlaying) this.stopRecording(track);
-            track.worker?.terminate();
-            track.node?.port.postMessage({"stopRecording": true});
+            //track.worker?.terminate();
+            //TODO track.node?.port.postMessage({"stopRecording": true});
             if (track.monitored) {
                 this.stopMonitoring(track);
             }
@@ -190,7 +187,7 @@ export default class RecorderController {
         const recording = !this.app.host.recording;
         this.app.host.recording = recording;
         if (recording) {
-            let armed = this.app.tracksController.sampleTracks._tracks.find((e) => e.isArmed);
+            let armed = this.app.tracksController.tracks.find((e) => e.isArmed);
             // if (armed === undefined) {
             //     alert("No track armed");
             //     return;
@@ -203,7 +200,7 @@ export default class RecorderController {
                 this.app.hostController.play(true);
 
             }
-            for (let track of this.app.tracksController.sampleTracks) {
+            for (let track of this.app.tracksController.tracks) {
                 if (track.isArmed) {
                     this.startRecording(track, this.app.host.playhead);
                 }
@@ -221,7 +218,7 @@ export default class RecorderController {
      *
      * @param track - The track to toggle the monitoring status of.
      */
-    clickMonitoring(track: SampleTrack) {
+    clickMonitoring(track: RegionTrack) {
         track.monitored = !track.monitored
         if (track.monitored) {
             this.startMonitoring(track);

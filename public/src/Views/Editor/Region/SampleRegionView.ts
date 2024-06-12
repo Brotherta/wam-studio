@@ -10,8 +10,8 @@ import RegionView from "./RegionView";
  */
 export default class SampleRegionView extends RegionView<SampleRegion> {
 
-    constructor(editor: EditorView, trackId: number, region: SampleRegion) {
-        super(editor,trackId,region);
+    constructor(editor: EditorView, region: SampleRegion) {
+        super(editor,region);
     }
 
   

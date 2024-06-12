@@ -1,5 +1,5 @@
 import App from "../App";
-import {BACKEND_URL} from "../Env";
+import { BACKEND_URL } from "../Env";
 import ProjectView from "../Views/ProjectView";
 
 /**
@@ -119,7 +119,7 @@ export default class ProjectController {
             });
         }
         exportElement.setTitle("export project");
-        exportElement.update([...this._app.tracksController.sampleTracks]);
+        exportElement.update([...this._app.tracksController.tracks]);
     }
 
     /**

@@ -2,7 +2,7 @@ import { Container } from "pixi.js";
 import TrackElement from "../../Components/TrackElement";
 import { HEIGHT_TRACK } from "../../Env";
 import Region from "../../Models/Region/Region";
-import { Track } from "../../Models/Track/Track";
+import RegionTrack from "../../Models/Track/RegionTrack";
 import EditorView from "./EditorView";
 import RegionView from "./Region/RegionView";
 
@@ -30,7 +30,7 @@ export default class WaveformView extends Container {
      */
     private _editorView: EditorView;
 
-    constructor(editor: EditorView, track: Track) {
+    constructor(editor: EditorView, track: RegionTrack) {
         super();
         this._editorView = editor;
         this.trackId = track.id;
@@ -86,7 +86,7 @@ export default class WaveformView extends Container {
      * @param track - The track to set the position.
      * @private
      */
-    private setPos(track: Track): void {
+    private setPos(track: RegionTrack): void {
         let trackContainer = document.getElementById("track-container") as HTMLDivElement;
         let pos = Array.from(trackContainer.children).filter(e => e instanceof TrackElement).indexOf(track.element);
 

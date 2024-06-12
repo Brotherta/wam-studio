@@ -1,5 +1,5 @@
 import App from "../App";
-import TrackOf from "../Models/Track/Track.js";
+import RegionTrack from "../Models/Track/RegionTrack";
 import PluginsView from "../Views/PluginsView";
 import { audioCtx } from "../index";
 
@@ -33,7 +33,7 @@ export default class PluginsController {
     }
 
     private get selectedTrack(){ return this._app.tracksController.selectedTrack }
-    private set selectedTrack(value: TrackOf<any>|undefined){ this._app.tracksController.selectedTrack=value }
+    private set selectedTrack(value: RegionTrack|undefined){ this._app.tracksController.selectedTrack=value }
 
     /**
      * Adds a new pedalboard to the selected track.
@@ -51,7 +51,7 @@ export default class PluginsController {
      * Remove the plugins of the given track.
      * @param track
      */
-    public removePedalBoard(track: TrackOf<any>): void {
+    public removePedalBoard(track: RegionTrack): void {
         track.plugin.instance?._audioNode.clearEvents();
         this._app.pluginsController.disconnectPedalBoard(track);
         track.plugin.unloadPlugin();
@@ -65,7 +65,7 @@ export default class PluginsController {
      * Connects the plugin to the track. If the track is the host, it connects the plugin to the host gain node.
      * @param track - The track to connect.
      */
-    public connectPedalBoard(track: TrackOf<any>): void {
+    public connectPedalBoard(track: RegionTrack): void {
         track.connectPlugin(track.plugin.instance!._audioNode)
     }
 
@@ -74,7 +74,7 @@ export default class PluginsController {
      *
      * @param track - The track where the plugin is connected.
      */
-    public disconnectPedalBoard(track: TrackOf<any>): void {
+    public disconnectPedalBoard(track: RegionTrack): void {
         track.connectPlugin(undefined)
     }
 
@@ -84,34 +84,31 @@ export default class PluginsController {
      *
      * @param track The track to select
      */
-    public selectTrack(track: TrackOf<any>): void {
-        if (this.selectedTrack === undefined) {
-            this.selectedTrack = track;
-            this.selectedTrack.element.select();
-            this.selectPlugins();
-        }
-        else if (this.selectedTrack.id !== track.id) {
+    public selectTrack(track: RegionTrack|undefined): void {
+        if(this.selectedTrack !== undefined){
             this.selectedTrack.element.unSelect();
-            this._view.unselectHost();
+            this.selectedTrack = undefined;
+        }
+        if(track !==undefined){
             this.selectedTrack = track;
             this.selectedTrack.element.select();
-            this.selectPlugins();
         }
+        this.selectPlugins();
+        // TODO Check what is the purpose of this._view.unselectHost();
     }
 
+    // TODO See if this can be removed, how it can be modified.
     /**
      * Selects the main track and show the plugins of the main track.
      */
     public selectHost(): void {
         let host = this._app.host;
         if (this.selectedTrack === undefined) {
-            this.selectedTrack = host;
             this._view.selectHost();
             this.selectPlugins();
         }
         else if (this.selectedTrack.id !== host.id) {
             this.selectedTrack.element.unSelect();
-            this.selectedTrack = host;
             this._view.selectHost();
             this.selectPlugins();
         }
@@ -122,7 +119,7 @@ export default class PluginsController {
      *
      * @param track - The track that was clicked.
      */
-    public fxButtonClicked(track: TrackOf<any>): void {
+    public fxButtonClicked(track: RegionTrack): void {
         this.selectTrack(track);
         if (track.plugin.initialized) {
             if (this._view.windowOpened) {
@@ -186,7 +183,7 @@ export default class PluginsController {
             this._app.tracksController.tracks.forEach(track => { // Hide all plugins to the loading zone
                 this._view.movePluginLoadingZone(track);
             })
-            this._view.movePluginLoadingZone(this._app.host); // Hide the host plugin to the loading zone
+            //TODO this._view.movePluginLoadingZone(this._app.host); // Hide the host plugin to the loading zone
             this._view.showPlugins(this.selectedTrack); // Show the plugins of the selected track
             if (this._view.floating.hidden) { // If the floating window is hidden, show the show button
                 this.hideAllButtons();

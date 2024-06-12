@@ -1,5 +1,5 @@
 import { WebAudioModule } from "@webaudiomodules/api";
-import {addFunctionModule, WamNode} from "@webaudiomodules/sdk";
+import { addFunctionModule, WamNode } from "@webaudiomodules/sdk";
 import getProcessor from "./WamProcessor";
 
 export default class WamAudioWorkletNode extends WamNode {
@@ -59,5 +59,24 @@ export default class WamAudioWorkletNode extends WamNode {
         } else {
             console.error('Parameter "looping" does not exist.');
         }
+    }
+
+    /**
+     * Set the playhead position in sample
+     */
+    set playhead(value: number) {
+        this.port.postMessage({playhead:value})
+    }
+
+    /**
+     * Set the loop start and end in sample
+     * @param start in sample
+     * @param end in sample
+     */
+    setLoop(start:number, end:number){
+        this.port.postMessage({
+            loopStart: start,
+            loopEnd: end,
+        });
     }
 }

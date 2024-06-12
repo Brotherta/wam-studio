@@ -10,8 +10,7 @@ import AutomationController from "./Controllers/AutomationController";
 import EditorController from "./Controllers/Editor/EditorController";
 import LoopController from "./Controllers/Editor/LoopController";
 import PlayheadController from "./Controllers/Editor/PlayheadController";
-import MIDIRegionController from "./Controllers/Editor/Region/MIDIRegionController";
-import SampleRegionController from "./Controllers/Editor/Region/SampleRegionController";
+import RegionController from "./Controllers/Editor/Region/RegionController";
 import WaveformController from "./Controllers/Editor/WaveformController";
 import ExporterController from "./Controllers/ExportController";
 import KeyboardController from "./Controllers/KeyboardController";
@@ -47,8 +46,7 @@ export default class App {
     projectController: ProjectController;
     editorController: EditorController;
     waveformController: WaveformController;
-    midiRegionsController: MIDIRegionController;
-    regionsController: SampleRegionController;
+    regionsController: RegionController;
     playheadController: PlayheadController
     keyboardController: KeyboardController;
     exportController: ExporterController;
@@ -87,11 +85,10 @@ export default class App {
 
         this.editorController = new EditorController(this);
         this.waveformController = new WaveformController(this);
-        this.regionsController = new SampleRegionController(this);
-        this.midiRegionsController = new MIDIRegionController(this);
-        this.playheadController = new PlayheadController(this);
+        this.regionsController = new RegionController(this);
         this.tracksController = new TracksController(this);
         this.host = new HostTrack(this,this.tracksController.tracks);
+        this.playheadController = new PlayheadController(this);
         this.hostController = new HostController(this);
         this.pluginsController = new PluginsController(this);
         this.automationController = new AutomationController(this);
@@ -159,4 +156,16 @@ export default class App {
         })
         refreshButtons()
     }
+}
+
+/**
+ * In debug mode, the program should crash and print error for every unintended behaviors.
+ * In production mode, the program should try to recover from errors and continue running.
+ * Per example, removing a track that is not in the editor should crash the program in debug mode, but should be ignored in production mode.
+ */
+export const DEBUG_MODE = true;
+
+export function crashOnDebug(...msgs: any[]){
+    console.error(...msgs)
+    if(DEBUG_MODE) throw new Error(msgs.map(m=>m.toString()).join())
 }

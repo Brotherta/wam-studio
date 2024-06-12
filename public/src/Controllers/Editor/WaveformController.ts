@@ -1,7 +1,6 @@
 import App from "../../App";
 import SampleRegion from "../../Models/Region/SampleRegion";
-import SampleTrack from "../../Models/Track/SampleTrack";
-import { Track } from "../../Models/Track/Track";
+import RegionTrack from "../../Models/Track/RegionTrack";
 import EditorView from "../../Views/Editor/EditorView";
 import WaveformView from "../../Views/Editor/WaveformView";
 
@@ -28,15 +27,15 @@ export default class WaveformController {
      * Add the according waveform to the track in the canvas. It also resizes the canvas.
      * @param track
      */
-    public initializeWaveform(track: Track): void {
+    public initializeWaveform(track: RegionTrack): void {
         let waveformView = this._editorView.createWaveformView(track);
     }
 
-    public recreateRegionsAndRegionViews(track: SampleTrack, regions: SampleRegion[]): WaveformView {
+    public recreateRegionsAndRegionViews(track: RegionTrack, regions: SampleRegion[]): WaveformView {
         let waveformView = this._editorView.createWaveformView(track);
         // for all regions in the oldTrack, create a region view in the waveform of newTrack
         for (let region of regions) {
-            this._app.regionsController.createRegion(track, id=>region.clone(id), waveformView);
+            this._app.regionsController.addRegion(track, region.clone(), waveformView);
         }
         // return the waveformView
         return waveformView;
@@ -46,7 +45,7 @@ export default class WaveformController {
      * Remove the according waveform from the track in the canvas. It also resizes the canvas.
      * @param track - The track that will be removed.
      */
-    public removeWaveformOfTrack(track: SampleTrack): void {
+    public removeWaveformOfTrack(track: RegionTrack): void {
         this._editorView.removeWaveForm(track);
     }
 

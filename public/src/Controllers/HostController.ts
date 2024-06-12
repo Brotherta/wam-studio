@@ -123,8 +123,7 @@ export default class HostController {
    * Handles the back button. It goes back to the beginning of the song.
    */
   public back(): void {
-    this._app.editorView.playhead.moveToFromPlayhead(0);
-    this._app.tracksController.jumpTo(0);
+    this._app.host.playhead = 0;
     this._app.automationController.applyAllAutomations();
 
     // recenter viewport at center of current viewport width
@@ -216,7 +215,7 @@ export default class HostController {
         if (file !== undefined) {
           this._app.tracksController.createTrackWithFile(file).then((track) => {
             if (track !== undefined) {
-              this._app.tracksController.addTrack(this._app.tracksController.sampleTracks,track);
+              this._app.tracksController.addTrack(track);
               track.element.progressDone();
             }
           });
@@ -229,23 +228,17 @@ export default class HostController {
    * Binds the events of the host node.
    */
   public bindNodeListeners(): void {
-    if (this._app.host.hostNode) {
+    /*if (this._app.host.hostNode) {
+      const prev=this._app.host.hostNode.port.onmessage
       this._app.host.hostNode.port.onmessage = (ev) => {
-        // MB !
-        //if(!ev.data.volume) return;
-
-        if (ev.data.playhead) {
-          this._app.host.playhead = ev.data.playhead;
-        } else if (ev.data.volume >= 0) {
+        if (ev.data.volume >= 0) {
           let vol = ev.data.volume;
           let sensitivity = 2.3;
-          // MB replaced by another vu-meter
-          //this.vuMeter.update(Math.abs(vol) * sensitivity);
         }
       };
     } else {
       console.warn("Host node not initialized.");
-    }
+    }*/
   }
 
   /**
@@ -399,7 +392,7 @@ export default class HostController {
 
       updateTempo(newTempo);
 
-      this._app.playheadController.moveTo(this._app.host.playhead/audioCtx.sampleRate*1000,false)
+      this._app.playheadController.moveTo(this._app.host.playhead,false)
 
       // redraw all tracks according to new tempo
       this._app.tracksController.tracks.forEach((track) => {
@@ -507,12 +500,9 @@ export default class HostController {
         this._app.tracksController.clearAllTracks();
         for (let trackSong of song.songs) {
           const url = SONGS_FILE_URL + trackSong;
-          let track = await this._app.tracksController.createEmptySampleTrack(url);
-          track.url = url;
-          this._app.tracksController.addTrack(this._app.tracksController.sampleTracks, track);
-        }
-        for (let track of this._app.tracksController.sampleTracks) {
-          this._app.loader.loadTrackUrl(track);
+          let track = await this._app.tracksController.createTrack(url);
+          this._app.tracksController.addTrack(track);
+          this._app.loader.loadTrackUrl(track,url);
         }
       };
     });
@@ -529,7 +519,6 @@ export default class HostController {
       if (lastPos !== newPos) {
         lastPos = newPos;
         if (!this._timerIntervalPaused) {
-          this._app.editorView.playhead.moveToFromPlayhead(newPos);
           this._view.updateTimer(newPos);
         }
       }

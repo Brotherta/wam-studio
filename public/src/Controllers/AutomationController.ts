@@ -1,9 +1,8 @@
 import App from "../App";
-import SampleTrack from "../Models/Track/SampleTrack";
-import {audioCtx} from "../index";
+import { MAX_DURATION_SEC, RATIO_MILLS_BY_PX } from "../Env";
+import RegionTrack from "../Models/Track/RegionTrack";
 import AutomationView from "../Views/AutomationView";
-import {MAX_DURATION_SEC, RATIO_MILLS_BY_PX} from "../Env";
-import TrackOf from "../Models/Track/Track.js";
+import { audioCtx } from "../index";
 
 
 /**
@@ -34,7 +33,7 @@ export default class AutomationController {
      * Applies all automations to the track and opens the automation menu.
      * @param track - The track to apply the automations.
      */
-    public async openAutomationMenu(track: TrackOf<any>): Promise<void> {
+    public async openAutomationMenu(track: RegionTrack): Promise<void> {
         this._view.clearMenu();
         await this.updateAutomations(track);
         this._view.openAutomationMenu(track);
@@ -46,7 +45,7 @@ export default class AutomationController {
      *
      * @param track - The track to update the automations.
      */
-     public async updateAutomations(track: TrackOf<any>): Promise<void> {
+     public async updateAutomations(track: RegionTrack): Promise<void> {
         let plugin = track.plugin;
         if (plugin.initialized) {
             let params = await plugin.instance?._audioNode.getParameterInfo();
@@ -120,8 +119,7 @@ export default class AutomationController {
      */
     public applyAllAutomations(): void {
         const tracks = this._app.tracksController.tracks;
-        const playhead = this._app.host.playhead;
-        const time = (playhead / audioCtx.sampleRate) * 1000;
+        const time = this._app.host.playhead;
 
         for (let track of tracks) {
             track.plugin.instance?._audioNode.clearEvents();

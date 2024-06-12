@@ -1,6 +1,10 @@
 // @ts-check
 
 /** @typedef {import("../../Models/Region/MIDIRegion.js").MIDIInstant} MIDIInstant */
+
+
+// TODO gérer la durée de vie du processor pour éviter les fuites de mémoire
+// Voir: https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor/process#return_value
 class MIDIAudioProcessor extends AudioWorkletProcessor {
 
     /** @type {MIDIInstant[]} @see MIDI */

@@ -5,24 +5,17 @@ import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import TrackElement from "../../Components/TrackElement";
 import { BACKEND_URL, MAX_DURATION_SEC } from "../../Env";
 import Plugin from "../Plugin";
-import Region from "../Region/Region";
-import TrackOf, { Track } from "./Track";
-
+import Track from "./Track";
 /**
  * Host class that contains the master track.
  * It is used to control the global volume and the playhead.
  */
-export default class HostTrack extends TrackOf<Region> {
+export default class HostTrack extends Track {
 
     /**
      * Id of the host group.
      */
     public hostGroupId: string
-
-    /**
-     * The host playhead position in sample.
-     */
-    public playhead: number
 
     /**
      * Latency of the host.
@@ -32,7 +25,7 @@ export default class HostTrack extends TrackOf<Region> {
     /**
      * Host node.
      */
-    public hostNode: AudioPlayerNode | undefined
+    private hostNode: AudioPlayerNode | undefined
 
     /**
      * WAM instance.
@@ -98,6 +91,16 @@ export default class HostTrack extends TrackOf<Region> {
         const operableAudioBuffer = OperableAudioBuffer.make(audio);
         
         this.hostNode = new AudioPlayerNode(audioCtx, 2);
+        this.hostNode.port.onmessage = (event) => {
+            if(event.data.playhead){
+                const playhead = (event.data.playhead/audioCtx.sampleRate)*1000;
+                this.onPlayHeadMove?.(playhead)
+                this._playhead = playhead;
+            }
+            else if(event.data.volume){
+                this.current_volume = event.data.volume;
+            }
+        }
         this.hostNode.setAudio(operableAudioBuffer.toArray());
         this.outputNode.connect(this.hostNode);
     }
@@ -118,6 +121,7 @@ export default class HostTrack extends TrackOf<Region> {
             this.previousTracks.push(track)
             if (track.modified){
                 track.update(context, playhead)
+                track.playhead=this.playhead
                 track.modified=false
             }
             if (this.inRecordingMode)track.monitoredOutputNode.connect(this.mainNode)
@@ -125,13 +129,32 @@ export default class HostTrack extends TrackOf<Region> {
         }
     }
 
-    protected override _connectPlugin(node: AudioNode): void {
+    override _connect(node: AudioNode): void {
         this.mainNode.connect(node)
     }
 
-    protected override _disconnectPlugin(node: AudioNode): void {
+    override _disconnect(node: AudioNode): void {
         this.mainNode.disconnect(node)
     }
+
+
+    /* PLAYHEAD */
+    /** Called when the playhead is moved, with the new position in milliseconds */
+    public onPlayHeadMove?: (position:number)=>void
+
+    private _playhead: number
+
+    public override get playhead(){ return this._playhead }
+    public override set playhead(value: number){
+        this._playhead=value
+        this.hostNode?.port.postMessage({playhead: value*audioCtx.sampleRate/1000});
+        this.onPlayHeadMove?.(value)
+        for(const track of this.tracks) track.playhead=value
+    }
+
+
+    /* ANALYSIS */
+    public current_volume=0
 
 
     /* PLAY AND PAUSE */
@@ -195,7 +218,8 @@ export default class HostTrack extends TrackOf<Region> {
 
     private leftTime: number=0
     private rightTime: number=10
-    public override _onLoopChange(leftTime: number, rightTime: number): void {
+    public override updateLoopTime(leftTime: number, rightTime: number): void {
+        super.updateLoopTime(leftTime, rightTime)
         this.leftTime=leftTime
         this.rightTime=rightTime
         this.hostNode?.port.postMessage({

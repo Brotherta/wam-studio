@@ -3,18 +3,16 @@ import { RATIO_MILLS_BY_PX } from "../../Env";
 export default abstract class Region{
 
     start: number; // in milliseconds
-    trackId: number;
-    id: number;
+    trackId: number=-1;
+    id: number=-1;
 
     /**
      * @param trackId The unique ID of the track. 
      * @param start The start position of the region in milliseconds.
      * @param regionId The unique ID of the region.
      */
-    constructor(trackId: number, start: number, regionId: number) {
+    constructor(start: number) {
         this.start = start;
-        this.trackId = trackId;
-        this.id = regionId;
     }
 
     /** Region duration in milliseconds */
@@ -27,12 +25,15 @@ export default abstract class Region{
      * Split the region into two region 
      * @param {number} cut The cut position in milliseconds relative to the region start
      */
-    abstract split(cut:number, id1:number, id2: number): [Region, Region]
+    abstract split(cut:number): [Region, Region]
 
     /** Clone the region. @param newid */
-    abstract clone(id: number): Region
+    abstract clone(): Region
 
-    abstract cloneWith(newid: number, {start}:{start?:number}): Region
+    abstract cloneWith({start}:{start?:number}): Region
+
+    /** Create a new region of the same type. */
+    abstract emptyAlike(start: number, duration: number): Region
 
     /** Region start in PX */
     get pos(){ return this.start / RATIO_MILLS_BY_PX }
@@ -43,6 +44,9 @@ export default abstract class Region{
     /** Region end in PX */
     get endpos(){ return this.pos + this.width}
 
+    /** Create a region player, that can be used to play the content of the region. */
+   abstract createPlayer(groubid: string, audioContext: AudioContext): Promise<RegionPlayer>
+
     /**
      * Save the region in a Blob.
      */
@@ -52,11 +56,45 @@ export default abstract class Region{
      * Load the region from a Blob.
      */
     //async static load(blob: Blob, id: number): Promise<Region>{throw new Error("Not implemented")}
+
+    /**
+     * Merge many regions into a single region.
+     * @param regions 
+     * @returns 
+     */
+    static mergeAll<T extends RegionOf<T>>(regions: T[], fromStart:boolean=false): T{
+        console.assert(regions.length>0, "No region to merge")
+
+        // Get size
+        let start=Infinity
+        let duration=-Infinity
+        for(const region of regions){
+            if(region.start<start)start=region.start
+            if(region.end>duration)duration=region.end
+        }
+
+        if(fromStart){
+            duration+=start
+            start=0
+        }
+
+        // Merge
+        const merged=regions[0].emptyAlike(start, duration)
+        for(const region of regions){
+            merged.mergeWith(region)
+        }
+
+        return merged
+    }
 }
+
+export type RegionType<T extends RegionOf<T>> = string
 
 export abstract class RegionOf<THIS extends RegionOf<THIS>> extends Region {
 
-    abstract override split(cut:number, id1:number, id2: number): [THIS, THIS]
+    abstract override split(cut:number): [THIS, THIS]
+
+    abstract override emptyAlike(start: number, duration: number): THIS
 
     /**
      * Merge the region with another region.
@@ -64,12 +102,18 @@ export abstract class RegionOf<THIS extends RegionOf<THIS>> extends Region {
      */
     abstract mergeWith(other: THIS): void
 
-    abstract override clone(id: number): THIS
+    abstract override clone(): THIS
 
-    override cloneWith(newid: number, {start}:{start?:number}): THIS{
-        const clone=this.clone(newid)
+    override cloneWith({start}:{start?:number}): THIS{
+        const clone=this.clone()
         if(start!=null)clone.start=start
         return clone
+    }
+
+    abstract get regionType(): RegionType<THIS>
+
+    isCompatibleWith(other: Region): other is RegionOf<THIS>{
+        return other instanceof RegionOf && other.regionType===this.regionType
     }
 
 }

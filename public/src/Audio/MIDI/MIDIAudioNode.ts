@@ -25,4 +25,8 @@ export default class MIDIAudioNode extends AudioWorkletNode{
         })
     }
 
+    set playhead(value: number){
+        this.port.postMessage({playhead: value})
+    }
+
 }

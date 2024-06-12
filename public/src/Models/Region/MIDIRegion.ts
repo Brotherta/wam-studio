@@ -1,4 +1,6 @@
-import { RegionOf } from "./Region";
+import { audioCtx } from "../..";
+import MIDIAudioNode from "../../Audio/MIDI/MIDIAudioNode";
+import { RegionOf, RegionType } from "./Region";
 
 /**
  * A note on a MIDI track.
@@ -186,22 +188,22 @@ export default class MIDIRegion extends RegionOf<MIDIRegion>{
 
     midi: MIDI;
 
-    constructor(trackId: number, midi: MIDI, start: number, regionId: number) {
-        super(trackId, start, regionId);
+    constructor(midi: MIDI, start: number) {
+        super(start);
         this.midi = midi;
     }
     
     override get duration(): number { return this.midi.duration; }
 
-    override split(cut:number, id1:number, id2:number): [MIDIRegion, MIDIRegion] {
+    override split(cut:number): [MIDIRegion, MIDIRegion] {
         console.assert(cut>this.duration)
         const first=this.midi.clone({to:cut})
         const second=this.midi.clone({from:cut})
-        return [new MIDIRegion(this.trackId, first, this.start, id1), new MIDIRegion(this.trackId, second, this.start+cut, id2)]
+        return [new MIDIRegion(first, this.start), new MIDIRegion(second, this.start+cut)]
     }
 
-    override clone(id: number): MIDIRegion {
-        return new MIDIRegion(this.trackId, this.midi.clone(), this.start, id);
+    override clone(): MIDIRegion {
+        return new MIDIRegion(this.midi.clone(), this.start);
     }
 
     override mergeWith(other: MIDIRegion): void {
@@ -212,4 +214,60 @@ export default class MIDIRegion extends RegionOf<MIDIRegion>{
         return new Blob()//bufferToWave(this.buffer)
     }
 
+    override emptyAlike(start: number, duration: number): MIDIRegion {
+        return new MIDIRegion(MIDI.empty(this.midi.instant_duration, duration), start)
+    }
+    
+    static TYPE: RegionType<MIDIRegion>="MIDI"
+    get regionType(): RegionType<MIDIRegion> { return MIDIRegion.TYPE } 
+
+    override createPlayer(): Promise<RegionPlayer> {
+        return Promise.resolve(new MIDIRegionPlayer(this.midi))
+    }
+
+}
+
+
+class MIDIRegionPlayer implements RegionPlayer{
+
+    constructor(content: MIDI){
+        this.node=new MIDIAudioNode(audioCtx,{})
+        this.node.midi=content
+    }
+
+    public node: MIDIAudioNode
+
+    setLoop(start: number|false, end: number): void{
+        /*if(start===false){
+            this.node.loop(false)
+        }
+        else{
+            this.node.loop(true)
+            this.node.setLoop(start, end)
+        }*/
+    }
+
+    connect(node: AudioNode): void {
+        node.connect(this.node)
+    }
+
+    disconnect(node: AudioNode): void {
+        node.disconnect(this.node)
+    }
+
+    play(): void {
+        this.node.isPlaying=true
+    }
+
+    pause(): void {
+        this.node.isPlaying=false
+    }
+
+    set playhead(value: number) {
+        this.node.playhead=value
+    }
+
+    clear(): void {
+        this.node.disconnect()
+    }
 }

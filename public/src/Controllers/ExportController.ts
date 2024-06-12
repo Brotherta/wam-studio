@@ -1,7 +1,7 @@
 import App from "../App";
 import { bufferToWave, combineBuffers, downloadBlob } from "../Audio/Utils/audioBufferToWave";
 import Plugin from "../Models/Plugin";
-import SampleTrack from "../Models/Track/SampleTrack";
+import RegionTrack from "../Models/Track/RegionTrack";
 import { audioCtx } from "../index";
 import AutomationController from "./AutomationController";
 
@@ -46,7 +46,7 @@ export default class ExporterController {
         const { default: initializeWamHost } = await import("@webaudiomodules/sdk/src/initializeWamHost");
 
         // Process and export individual tracks.
-        for (let track of this._app.tracksController.sampleTracks) {
+        for (let track of this._app.tracksController.tracks) {
             track.update(audioCtx, 0);
             let buffer = await this.processTrack(track, maxDuration, initializeWamHost);
             if (buffer) buffers.push(buffer);
@@ -70,7 +70,8 @@ export default class ExporterController {
      *
      * @returns The audio buffer of the track.
      */
-    private async processTrack(track: SampleTrack, maxDuration: number, initializeWamHost: any): Promise<AudioBuffer> {
+    private async processTrack(track: RegionTrack, maxDuration: number, initializeWamHost: any): Promise<AudioBuffer> {
+        /*TODO Exports of tracks 
         console.log("Exporting track " + track.id);
 
         // Create offline audio context.
@@ -104,7 +105,8 @@ export default class ExporterController {
         plugin.instance?._audioNode.disconnect();
         plugin.unloadPlugin();
 
-        return renderedBuffer;
+        return renderedBuffer;*/
+        return new AudioBuffer({length: 0, sampleRate: audioCtx.sampleRate});
     }
 
     /**
@@ -154,6 +156,8 @@ export default class ExporterController {
         downloadBlob(blob, fileName);
     }
 
+
+    // TODO Find how it is useful, the base track audio graph should work as good
     /**
      * Rebuilds the track graph to export it. It will create a new gain node, panner node and source node.
      * It uses an offline audio context to render the track. It also creates a new plugin instance if the track has one.
@@ -163,7 +167,7 @@ export default class ExporterController {
      * @param hostGroupId - Host group ID.
      * @private
      */
-    private async rebuildTrackGraph(offlineCtx: OfflineAudioContext, track: SampleTrack, hostGroupId: string) {
+    /*private async rebuildTrackGraph(offlineCtx: OfflineAudioContext, track: RegionTrack, hostGroupId: string) {
         let gainNode = offlineCtx.createGain()
         let pannerNode = offlineCtx.createStereoPanner()
         let sourceNode = offlineCtx.createBufferSource()
@@ -182,7 +186,7 @@ export default class ExporterController {
             }
         }
         return {gainNode, pannerNode, sourceNode, plugin}
-    }
+    }*/
 
     /**
      * Applies the automation to the plugin.
@@ -193,7 +197,7 @@ export default class ExporterController {
      * @param offlineAudioContext - Offline audio context to render the track.
      * @private
      */
-    private applyAutomation(track:SampleTrack, plugin: Plugin, offlineAudioContext: OfflineAudioContext) {
+    private applyAutomation(track:RegionTrack, plugin: Plugin, offlineAudioContext: OfflineAudioContext) {
         plugin.instance?._audioNode.clearEvents();
         let automation = track.automation;
         let events = [];

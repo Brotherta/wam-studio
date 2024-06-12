@@ -39,12 +39,12 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
      */
     private _selected: boolean;
 
-    constructor(editor: EditorView, trackId: number, region: REGION) {
+    constructor(editor: EditorView, region: REGION) {
         super();
         this.eventMode = "dynamic";
 
         this._editorView = editor;
-        this.trackId = trackId;
+        this.trackId = region.trackId;
         this.id = region.id;
         this._selected = false;
 

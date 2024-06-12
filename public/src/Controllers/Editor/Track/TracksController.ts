@@ -1,39 +1,20 @@
-import App from "../../../App";
+import App, { crashOnDebug } from "../../../App";
 import OperableAudioBuffer from "../../../Audio/OperableAudioBuffer";
 import WamAudioWorkletNode from "../../../Audio/WAM/WamAudioWorkletNode";
 import WamEventDestination from "../../../Audio/WAM/WamEventDestination";
 import TrackElement from "../../../Components/TrackElement";
 import { RATIO_MILLS_BY_PX } from "../../../Env";
 import Plugin from "../../../Models/Plugin";
-import SampleTrack from "../../../Models/Track/SampleTrack";
 import WaveformView from "../../../Views/Editor/WaveformView";
 import TracksView from "../../../Views/TracksView";
 import { audioCtx } from "../../../index";
 
 import WebAudioPeakMeter from "../../../Audio/Utils/PeakMeter";
-import MIDIRegion, { MIDI } from "../../../Models/Region/MIDIRegion";
-import { RegionOf } from "../../../Models/Region/Region";
 import SampleRegion from "../../../Models/Region/SampleRegion";
-import MIDITrack from "../../../Models/Track/MIDITrack";
-import TrackOf from "../../../Models/Track/Track.js";
+import RegionTrack from "../../../Models/Track/RegionTrack";
+import { getRandomColor } from "../../../Utils/Color";
 import FriendlyIterable from "../../../Utils/FriendlyIterable";
-
-export class TrackList<REGION extends RegionOf<REGION>, TRACK extends TrackOf<REGION>> {
-  
-  _tracks: TRACK[]=[]
-
-  /**
-   * Get a track by his id
-   * @param id 
-   */
-  public getById(id:number): TRACK|undefined {
-    return this._tracks.find( track => track.id === id );
-  }
-
-  [Symbol.iterator](){
-    return this._tracks[Symbol.iterator]()
-  }
-}
+import { registerOnKeyDown } from "../../../Utils/keys";
 
 /**
  * Class that controls the tracks view. It creates, removes and manages the tracks. It also defines the listeners for the tracks.
@@ -41,7 +22,7 @@ export class TrackList<REGION extends RegionOf<REGION>, TRACK extends TrackOf<RE
 export default class TracksController{
 
   /** Selected track. It is undefined if the host is selected. */
-  public selectedTrack: TrackOf<any> | undefined;
+  public selectedTrack?: RegionTrack
 
   /** The app instance. */
   private _app: App;
@@ -56,15 +37,8 @@ export default class TracksController{
   private _oldVolume: number = 0.5;
   private _oldBalance = 1;
 
-  /*
-   * The lists of tracks.
-   * You have to add one for all the type tracks you want to manage. 
-   */
-  public readonly sampleTracks= new TrackList<SampleRegion,SampleTrack>()
-
-  public readonly midiTracks= new TrackList<MIDIRegion,MIDITrack>()
-
-  private readonly track_lists: TrackList<any,any>[]= [this.sampleTracks,this.midiTracks]
+  /** The tracks */
+  private readonly track_list: RegionTrack[]= []
 
   constructor(app: App) {
     this._app = app
@@ -79,9 +53,9 @@ export default class TracksController{
    *
    * @param track - The track to be initialized.
    */
-  public addTrack<T extends TrackOf<any>>(list: TrackList<any,T>, track: T): void {
+  public addTrack(track: RegionTrack): void {
     // Add the track to the list
-    list._tracks.push(track)
+    this.track_list.push(track)
 
     // Create its track element (GUI)
     track.plugin = new Plugin(this._app);
@@ -112,7 +86,7 @@ export default class TracksController{
       }
     }, 100);
     this._view.addTrack(track.element);
-    this._view.changeColor(track);
+    this.setColor(track,getRandomColor())
     this.bindTrackEvents(track);
     
     this._app.waveformController.initializeWaveform(track);
@@ -126,27 +100,19 @@ export default class TracksController{
    *
    * @param track - Track to be removed from the track view.
    */
-  public removeTrack(track: TrackOf<any>): void {
+  public removeTrack(track: RegionTrack): void {
     // Remove from the lists
-    for(const list of this.track_lists){
-      const index=list._tracks.indexOf(track)
-      if(index>=0){
-        list._tracks.splice(index,1)
-        break
-      }
-    }
-
-    track.deleted = true; // Used to stop the track to be loaded on xhr request
-    this._app.pluginsController.removePedalBoard(track);
-    this._view.removeTrack(track.element);
-    this._app.automationView.removeAutomationBpf(track.id);
-    track.outputNode.disconnect()
-    if(track instanceof SampleTrack){
+    const index=this.track_list.indexOf(track)
+    if(index>=0){
+      this.track_list.splice(index,1)
+      track.close()
+      this._app.pluginsController.removePedalBoard(track);
+      this._view.removeTrack(track.element);
+      this._app.automationView.removeAutomationBpf(track.id);
+      track.outputNode.disconnect()
       this._app.waveformController.removeWaveformOfTrack(track);
-      track.node!.removeAudio();
-      track.node!.disconnectEvents();
-      track.node!.disconnect();
     }
+    else crashOnDebug("TracksController - removeTrack - Track not found!")
   }
 
   /**
@@ -154,10 +120,9 @@ export default class TracksController{
    * @param id - The id of the track.
    * @returns the track with the given id if it exists, undefined otherwise.
    */
-  public getTrackById(id: number): TrackOf<any> | undefined {
-    for(let list of this.track_lists){
-      let ret=list.getById(id)
-      if(ret!=null)return ret
+  public getTrackById(id: number): RegionTrack | undefined {
+    for(let track of this.track_list){
+      if(track.id===id)return track
     }
     return undefined
   }
@@ -165,26 +130,7 @@ export default class TracksController{
   /**
    * An iterator for iterating over all tracks of all track lists
    */
-  public readonly tracks_and_lists=new FriendlyIterable(()=>this._tracks_and_lists())
-  private *_tracks_and_lists(): Generator<[TrackOf<any>,TrackList<any,any>]>{
-    for(let list of this.track_lists){
-      for(let track of list){
-        yield [track,list]
-      }
-    }
-  }
-
-  /**
-   * An iterator for iterating over all tracks of all track lists
-   */
-  public readonly tracks=new FriendlyIterable(()=>this._tracks())
-  private *_tracks(): Generator<TrackOf<any>>{
-    for(let list of this.track_lists){
-      for(let track of list){
-        yield track
-      }
-    }
-  }
+  public readonly tracks=new FriendlyIterable(()=>this.track_list[Symbol.iterator]())
 
   /**
    * Clears all tracks.
@@ -192,9 +138,8 @@ export default class TracksController{
    */
   public clearAllTracks(): void {
     for (let track of [...this.tracks]) this.removeTrack(track)
-    for(let list of this.track_lists)
-      if(list._tracks.length!=0)
-        console.error("TracksControllers - clearAllTracks - There is remaining tracks!")
+    if(this.track_list.length!=0)crashOnDebug("TracksControllers - clearAllTracks - There is remaining tracks!")
+    this.track_list.length=0
   }
 
   /**
@@ -204,8 +149,9 @@ export default class TracksController{
    * @returns the created track
    * @private
    */
-  private createTrackFromNode(node: WamAudioWorkletNode): SampleTrack {
-    let track = new SampleTrack(new TrackElement(), node);
+  private createEmptyTrack(): RegionTrack {
+    let track = new RegionTrack(new TrackElement(),audioCtx,this._app.host.hostGroupId)
+    this.addTrack(track)
     return track;
   }
 
@@ -215,11 +161,8 @@ export default class TracksController{
    * @param url - The url of the track.
    * @returns the created track
    */
-  public async createEmptySampleTrack(url?: string): Promise<SampleTrack> {
-    let wamInstance = await WamEventDestination.createInstance(this._app.host.hostGroupId, audioCtx);
-    let node = wamInstance.audioNode as WamAudioWorkletNode;
-
-    let track = this.createTrackFromNode(node);
+  public async createTrack(url?: string): Promise<RegionTrack> {
+    let track = this.createEmptyTrack();
     if (url) {
       let urlSplit = url.split("/");
       track.element.name = urlSplit[urlSplit.length - 1];
@@ -236,7 +179,7 @@ export default class TracksController{
    *
    * @param file - The file to create the track.
    */
-  public async createTrackWithFile(file: File): Promise<SampleTrack | undefined> {
+  public async createTrackWithFile(file: File): Promise<RegionTrack | undefined> {
     if (["audio/ogg", "audio/wav", "audio/mpeg", "audio/x-wav"].includes(file.type)) {
       let wamInstance = await WamEventDestination.createInstance(this._app.host.hostGroupId, audioCtx);
       let node = wamInstance.audioNode as WamAudioWorkletNode;
@@ -248,8 +191,8 @@ export default class TracksController{
 
       node.setAudio(operableAudioBuffer.toArray());
 
-      let track = this.createTrackFromNode(node);
-      track.setAudioBuffer(operableAudioBuffer);
+      let track = this.createEmptyTrack();
+      this._app.regionsController.addRegion(track, new SampleRegion(operableAudioBuffer,0))
       track.element.name = file.name;
       return track;
     } else {
@@ -258,23 +201,23 @@ export default class TracksController{
     }
   }
 
-  public async newTrackFromDeletedTrack(deletedTrack: SampleTrack) {
+  public async newTrackFromDeletedTrack(deletedTrack: RegionTrack) {
     let wamInstance = await WamEventDestination.createInstance(
       this._app.host.hostGroupId,
       audioCtx
     );
     let node = wamInstance.audioNode as WamAudioWorkletNode;
-    let track = this.createTrackFromNode(node);
+    let track = this.createEmptyTrack();
     //track.setAudioBuffer(deletedTrack.audioBuffer!);
     track.element = deletedTrack.element;
     track.color = deletedTrack.color;
     track.isMuted = deletedTrack.isMuted;
     track.isSolo = deletedTrack.isSolo;
     track.isSoloMuted = deletedTrack.isSoloMuted;
-    track.isMerged = deletedTrack.isMerged;
+    /* TODO track.isMerged = deletedTrack.isMerged;
     track.left = deletedTrack.left;
     track.right = deletedTrack.right;
-    track.isStereo = deletedTrack.isStereo;
+    track.isStereo = deletedTrack.isStereo;*/
     track.isArmed = deletedTrack.isArmed;
     track.monitored = deletedTrack.monitored;
     track.volume=deletedTrack.volume;
@@ -287,16 +230,7 @@ export default class TracksController{
    * @param pos - The position in px
    */
   public jumpTo(pos: number): void {
-    this._app.host.playhead = Math.floor(
-      ((pos * RATIO_MILLS_BY_PX) / 1000) * audioCtx.sampleRate
-    );
-
-    // TODO Encapsulé ce machin là
-    for(const track of this.tracks) if(track instanceof SampleTrack) track.node!.port.postMessage({ playhead: this._app.host.playhead + 1 })
-
-    this._app.host.hostNode?.port.postMessage({
-      playhead: this._app.host.playhead + 1,
-    });
+    this._app.host.playhead = Math.floor(pos * RATIO_MILLS_BY_PX);
   }
 
   /**
@@ -304,24 +238,22 @@ export default class TracksController{
    * @private
    */
   private bindEvents(): void {
+    registerOnKeyDown(e=>{
+      //TODO Remove this debug code
+      if(e!=="a")return
+
+      console.log(this.tracks)
+      let toptrack=this.tracks.find((v,i)=>i===0)!
+      let bottomtrack=this.tracks.find((v,i)=>i===1)!
+
+      let merged=toptrack?.merged_regions.get(SampleRegion.TYPE)![0]
+
+      this._app.regionsController.addRegion(bottomtrack,merged.clone())
+    })
+
     this._view.newTrackDiv.addEventListener("click", () => {
-      // Add track
-      const track=new MIDITrack(new TrackElement())
-      this._app.tracksController.addTrack(this.midiTracks, track);
+      const track=this._app.tracksController.createEmptyTrack()
       track.element.progressDone()
-
-      // Add region
-      const midi=MIDI.fromString(
-`000   1   1 1
-0 1 2  4  5
-   000   1   2   4`,1000
-      )
-      this._app.midiRegionsController.createRegion(track, id=>new MIDIRegion(track.id,midi,0,id))
-
-      /*this._app.tracksController.createEmptySampleTrack().then((track) => {
-        this.addTrack(this.sampleTracks,track)
-        track.element.progressDone()
-      });*/
     });
   }
 
@@ -331,24 +263,19 @@ export default class TracksController{
    * @param track - Track to be binded.
    * @private
    */
-  private bindTrackEvents(track: TrackOf<any>): void {
+  private bindTrackEvents(track: RegionTrack): void {
+
     // TRACK SELECT
     track.element.addEventListener("click", () => {
-      // for undo/redo
+      if(track.deleted)return
+
       let oldSelectedTrack = this.selectedTrack
+      let newSelectedTrack = track
 
-      // Select the track when it is clicked.
-      if (!track.deleted) {
-        this._app.pluginsController.selectTrack(track);
-      }
-
-      let newSelectedTrack = this.selectedTrack;
-
-      if(newSelectedTrack!=oldSelectedTrack)this._app.undoManager.add({
-        undo: () => this.undoSelect(track, oldSelectedTrack),
-        redo: () => this.undoSelect(track, newSelectedTrack),
-      });
-      this.updateUndoButtons();
+      this._app.doIt(true,
+        ()=> this._app.pluginsController.selectTrack(newSelectedTrack),
+        ()=> this._app.pluginsController.selectTrack(oldSelectedTrack),
+      )
     });
 
     // REMOVE TRACK
@@ -428,22 +355,14 @@ export default class TracksController{
 
     // TRACK COLOR
     track.element.color.addEventListener("click", () => {
-      // Change the color of the track when the color button is clicked.
-      // for undo/redo
-      let oldColor = track.color;
-      this.changeColor(track);
-      let newColor = track.color;
+      let oldColor = track.color
+      let newColor = getRandomColor()
 
-      this._app.undoManager.add({
-        undo: () => {
-          this.undoTrackColorChange(track, oldColor);
-        },
-        redo: () => {
-          this.undoTrackColorChange(track, newColor);
-        },
-      });
-      this.updateUndoButtons();
-    });
+      this._app.doIt(true,
+        ()=> this.setColor(track, newColor),
+        ()=> this.setColor(track, oldColor),
+      )
+    })
 
     // TRACK AUTOMATION
     track.element.automationBtn.addEventListener("click", async (e) => {
@@ -451,83 +370,65 @@ export default class TracksController{
       this.automationMenu(e, track);
     })
     
-    if(track instanceof SampleTrack){
-      // TRACK ARM
-      track.element.armBtn.addEventListener("click", () => {
-        let initialArm: boolean = track.isArmed;
-        this._app.doIt(true,
-          ()=> this._app.recorderController.clickArm(track),
-          ()=> this._app.recorderController.clickArm(track),
-        );
-      })
+    // TRACK ARM
+    track.element.armBtn.addEventListener("click", () => {
+      let initialArm: boolean = track.isArmed;
+      this._app.doIt(true,
+        ()=> this._app.recorderController.clickArm(track),
+        ()=> this._app.recorderController.clickArm(track),
+      );
+    })
 
-      // TRACK MONITOR
-      track.element.monitoringBtn.addEventListener("click", () => {
-        this._app.doIt(true,
-          ()=> this._app.recorderController.clickMonitoring(track),
-          ()=> this._app.recorderController.clickMonitoring(track),
-        );
-      })
+    // TRACK MONITOR
+    track.element.monitoringBtn.addEventListener("click", () => {
+      this._app.doIt(true,
+        ()=> this._app.recorderController.clickMonitoring(track),
+        ()=> this._app.recorderController.clickMonitoring(track),
+      );
+    })
 
-      // TRACK MODE STEREO or (MONO to STEREO)
-      track.element.modeBtn.addEventListener("click", () => {
-        if(!(track instanceof SampleTrack))return
-        let initialStereo: boolean = track.isStereo
-        this._app.doIt(true,
-          ()=> track.isStereo = !initialStereo,
-          ()=> track.isStereo = initialStereo,
-        )
-      })
+    // TRACK MODE STEREO or (MONO to STEREO)
+    /*track.element.modeBtn.addEventListener("click", () => {
+      let initialStereo: boolean = track.isStereo
+      this._app.doIt(true,
+        ()=> track.isStereo = !initialStereo,
+        ()=> track.isStereo = initialStereo,
+      )
+    })
 
-      // TRACK LEFT INPUT
-      track.element.leftBtn.addEventListener("click", () => {
-        if(!(track instanceof SampleTrack))return
-        let initialLeft: boolean = track.left
-        this._app.doIt(true,
-          ()=> track.left = !initialLeft,
-          ()=> track.left = initialLeft,
-        )
-      })
+    // TRACK LEFT INPUT
+    track.element.leftBtn.addEventListener("click", () => {
+      let initialLeft: boolean = track.left
+      this._app.doIt(true,
+        ()=> track.left = !initialLeft,
+        ()=> track.left = initialLeft,
+      )
+    })
 
-      // TRACK RIGHT INPUT
-      track.element.rightBtn.addEventListener("click", () => {
-        if(!(track instanceof SampleTrack))return
-        let initialRight: boolean = track.right
-        this._app.doIt(true,
-          ()=> track.right = !initialRight,
-          ()=> track.right = initialRight,
-        )
-      })
+    // TRACK RIGHT INPUT
+    track.element.rightBtn.addEventListener("click", () => {
+      let initialRight: boolean = track.right
+      this._app.doIt(true,
+        ()=> track.right = !initialRight,
+        ()=> track.right = initialRight,
+      )
+    })
 
-      // TRACK MERGE LEFT/RIGHT
-      track.element.mergeBtn.addEventListener("click", () => {
-        if(!(track instanceof SampleTrack))return
-        let initialMerge: boolean = track.isMerged
-        this._app.doIt(true,
-          ()=> track.isMerged = !initialMerge,
-          ()=> track.isMerged = initialMerge,
-        )
-      })
-    }
+    // TRACK MERGE LEFT/RIGHT
+    track.element.mergeBtn.addEventListener("click", () => {
+      let initialMerge: boolean = track.isMerged
+      this._app.doIt(true,
+        ()=> track.isMerged = !initialMerge,
+        ()=> track.isMerged = initialMerge,
+      )
+    })*/
 
     // TRACK FX/PLUGINS
     track.element.fxBtn.addEventListener("click", () => {
-      // for undo/redo
-      let oldFxStatus = this._app.pluginsView.windowOpened;
-
-      // Open the fx menu when the fx button is clicked.
-      this._app.pluginsController.fxButtonClicked(track);
-
-      let newFxStatus = this._app.pluginsView.windowOpened;
-
-      this._app.undoManager.add({
-        undo: () => {
-          this.undoFx(track, oldFxStatus);
-        },
-        redo: () => {
-          this.undoFx(track, newFxStatus);
-        },
-      });
+      this._app.doIt(true,
+        ()=> this._app.pluginsController.fxButtonClicked(track),
+        ()=> this._app.pluginsController.fxButtonClicked(track),
+      )
     });
   }
 
@@ -536,20 +437,19 @@ export default class TracksController{
    * @param track - The track to open the automation menu.
    * @private
    */
-  private async automationMenu(e: Event, track: TrackOf<any>): Promise<void> {
+  private async automationMenu(e: Event, track: RegionTrack): Promise<void> {
     this._app.pluginsController.selectTrack(track);
     await this._app.automationController.openAutomationMenu(track);
     e.stopImmediatePropagation();
   }
 
   /**
-   * Handles the color button of the given track.
+   * Set the color of the track
    * @param track - The track to change the color.
-   * @private
+   * @param string - The new color
    */
-  private changeColor(track: TrackOf<any>): void {
-    //this._app.pluginsController.selectTrack(track);
-    this._view.changeColor(track);
+  public setColor(track: RegionTrack, color: string): void {
+    track.color=color
     this._app.editorView.changeWaveFormColor(track);
   }
 
@@ -558,7 +458,7 @@ export default class TracksController{
    * @param track - The track to solo.
    * @param soloValue - Do solo the track else unsolo it.
    */
-  private setSolo(track: TrackOf<any>, soloValue: boolean) {
+  private setSolo(track: RegionTrack, soloValue: boolean) {
     // When soloed, mute every non-soloed track
     if(soloValue){
       this.tracks.forEach(it=>{
@@ -582,64 +482,46 @@ export default class TracksController{
     this._app.hostView.setRedoButtonState(this._app.undoManager.hasRedo());
   }
 
-  undoTrackColorChange(track: TrackOf<any>, color: string) {
-    track.color = color;
-    this._view.changeColor(track);
-    this._app.editorView.changeWaveFormColor(track);
-  }
-
-  undoFx(track: TrackOf<any>, fxStatus: boolean) {
-    this._app.pluginsController.fxButtonClicked(track);
-  }
-
-  undoSelect(track: TrackOf<any>, trackToSelect: TrackOf<any> | undefined) {
-    if (trackToSelect) {
-      this._app.pluginsController.selectTrack(trackToSelect);
-    }
-  }
-
   async undoTrackRemove(
-    oldTrack: SampleTrack,
+    oldTrack: RegionTrack,
     element: TrackElement,
     oldTrackWaveform: WaveformView | undefined,
     oldPlugin: Plugin
   ) {
     
     // restore track element with old track element state
-    this.createEmptySampleTrack().then((track) => {
-        this.addTrack(this.sampleTracks,track);
-        let elementState = element.getState();
-        track.element.setState(elementState);
-        // to show the hidden buttons...
-        track.element.progressDone();
+    const track=this.createEmptyTrack()
+    let elementState = element.getState();
+    track.element.setState(elementState);
+    // to show the hidden buttons...
+    track.element.progressDone();
 
-        track.color = oldTrack.color;
-        // get regionView of track
-        let waveformView = this._app.editorView.getWaveformById(track.id);
-        if(waveformView) waveformView.color = oldTrack.color;
+    track.color = oldTrack.color;
+    // get regionView of track
+    let waveformView = this._app.editorView.getWaveformById(track.id);
+    if(waveformView) waveformView.color = oldTrack.color;
+
+    // restore waveformView with old waveformView state
     
-        // restore waveformView with old waveformView state
-        
-        oldTrack.regions.forEach(region => {
-            region.trackId = track.id;
-            track.regions.push(region);
-            //TODO const regionView = waveformView!.createRegionView(region);
-            //TODO this._app.regionsController.bindRegionEvents(region, regionView);
-          });
-
-          // restore plugin controller  with old plugin controller state
-          // connect oldPlugin to the track and audio graph
-          // TODO
-
-          track.plugin = oldPlugin;
-          track.plugin.initialized = true;
-          // reconnect it to the track
-          this._app.pluginsController.connectPedalBoard(track);
-
-          this._app.pluginsController.selectTrack(track);
-
-          track.modified = true;
+    oldTrack.regions.forEach(region => {
+        region.trackId = track.id;
+        track.regions.push(region);
+        //TODO const regionView = waveformView!.createRegionView(region);
+        //TODO this._app.regionsController.bindRegionEvents(region, regionView);
       });
+
+      // restore plugin controller  with old plugin controller state
+      // connect oldPlugin to the track and audio graph
+      // TODO
+
+      track.plugin = oldPlugin;
+      track.plugin.initialized = true;
+      // reconnect it to the track
+      this._app.pluginsController.connectPedalBoard(track);
+
+      this._app.pluginsController.selectTrack(track);
+
+      track.modified = true;
       
     return;
   }

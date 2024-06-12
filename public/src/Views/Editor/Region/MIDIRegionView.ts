@@ -10,8 +10,8 @@ import RegionView from "./RegionView";
  */
 export default class MIDIRegionView extends RegionView<MIDIRegion> {
 
-    constructor(editor: EditorView, trackId: number, region: MIDIRegion) {
-        super(editor,trackId,region);
+    constructor(editor: EditorView, region: MIDIRegion) {
+        super(editor,region);
     }
 
   
