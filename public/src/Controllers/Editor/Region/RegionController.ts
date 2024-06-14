@@ -1,5 +1,6 @@
 import { FederatedPointerEvent } from "pixi.js";
 import App, { crashOnDebug } from "../../../App";
+import { MIDI } from "../../../Audio/MIDI";
 import { RATIO_MILLS_BY_PX } from "../../../Env";
 import MIDIRegion from "../../../Models/Region/MIDIRegion";
 import Region, { RegionOf, RegionType } from "../../../Models/Region/Region";
@@ -99,6 +100,7 @@ export default class RegionController {
 
     // Add to the track
     track.addRegion(region)
+    track.modified=true
 
     // Create the view
     let regionView= factory(this._editorView,region)
@@ -270,6 +272,20 @@ export default class RegionController {
 
         case "v":
           if(isKeyPressed("Control"))this.pasteRegion(true);
+          break;
+
+        case "m":
+          const selected=this._app.tracksController.selectedTrack
+          if(selected){
+            const start=this._app.host.playhead
+            const midi=MIDI.fromString(
+`
+0  1    0  1
+ 0   1   0   2
+  0    1  0     0`,1000)
+            const region=new MIDIRegion(midi,start)
+            this.addRegion(selected,region)
+          }
           break;
       }
     });

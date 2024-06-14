@@ -3,7 +3,6 @@ import TempoSelectorElement from "../Components/TempoSelectorElement";
 import TimeSignatureSelectorElement from "../Components/TimeSignatureSelectorElement";
 import AudioLoopBrowser from "../Components/WamAudioLoopBrowser";
 import { RATIO_MILLS_BY_PX } from "../Env";
-import { audioCtx } from "../index";
 
 /**
  * Class responsible for the host view. It displays the host controls and the host track.
@@ -99,12 +98,10 @@ export default class HostView {
     /**
      * Updates the timer of the host view.
      *
-     * @param pos - The current pos of the playhead. It is used to calculate the time.
-     * pos unit is in samples.
+     * @param pos - The current time in milliseconds
      */
     public updateTimer(pos: number) {
-        let millseconds = (pos / audioCtx.sampleRate) * 1000;
-        this.timer.innerHTML = HostView.millisToMinutesAndSeconds(millseconds);
+        this.timer.innerHTML = HostView.millisToMinutesAndSeconds(pos);
     }
 
     /**

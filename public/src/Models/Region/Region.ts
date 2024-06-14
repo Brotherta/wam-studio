@@ -67,11 +67,12 @@ export default abstract class Region{
 
         // Get size
         let start=Infinity
-        let duration=-Infinity
+        let end=-Infinity
         for(const region of regions){
             if(region.start<start)start=region.start
-            if(region.end>duration)duration=region.end
+            if(region.end>end)end=region.end
         }
+        let duration=end-start
 
         if(fromStart){
             duration+=start

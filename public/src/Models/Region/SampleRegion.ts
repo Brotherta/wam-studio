@@ -1,9 +1,9 @@
 import { WamNode, WebAudioModule } from "@webaudiomodules/api";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
+import SamplePlayerNode from "../../Audio/Players/Sample/SamplePlayerNode";
+import SamplePlayerWAM from "../../Audio/Players/Sample/SamplePlayerWAM";
 import { RingBuffer } from "../../Audio/Utils/Ringbuffer";
 import { bufferToWave } from "../../Audio/Utils/audioBufferToWave";
-import WamAudioWorkletNode from "../../Audio/WAM/WamAudioWorkletNode";
-import WamEventDestination from "../../Audio/WAM/WamEventDestination";
 import { audioCtx } from "../../index";
 import { RegionOf, RegionType } from "./Region";
 
@@ -46,8 +46,8 @@ export default class SampleRegion extends RegionOf<SampleRegion>{
     get regionType(): RegionType<SampleRegion> { return SampleRegion.TYPE } 
 
     override async createPlayer(groupid: string, audioContext: AudioContext): Promise<RegionPlayer> {
-        const wam=await WamEventDestination.createInstance(groupid, audioContext);
-        return new SampleRegionPlayer(wam, this.buffer)
+        const player=await SamplePlayerWAM.createInstance(groupid,audioContext)
+        return new SampleRegionPlayer(player, this.buffer)
     }
 
 }
@@ -55,23 +55,16 @@ export default class SampleRegion extends RegionOf<SampleRegion>{
 class SampleRegionPlayer implements RegionPlayer{
 
     constructor(wam:WebAudioModule<WamNode>, buffer: OperableAudioBuffer){
-        let node = wam.audioNode as WamAudioWorkletNode;
         const sab = RingBuffer.getStorageForCapacity(audioCtx.sampleRate * 2,Float32Array);
-        this.node = wam.audioNode as WamAudioWorkletNode;
+        this.node = wam.audioNode as SamplePlayerNode;
         this.node!.port.postMessage({ sab });
-        this.node.setAudio(buffer.toArray())
+        this.node.audio=buffer.toArray()
     }
 
-    public node: WamAudioWorkletNode
+    public node: SamplePlayerNode
 
     setLoop(start: number|false, end: number): void{
-        if(start===false){
-            this.node.loop(false)
-        }
-        else{
-            this.node.loop(true)
-            this.node.setLoop(start, end)
-        }
+        this.node.setLoop(start!==false?start:undefined,end)
     }
 
     connect(node: AudioNode): void {
@@ -84,20 +77,24 @@ class SampleRegionPlayer implements RegionPlayer{
         this.node.disconnect(node)
     }
 
-    play(): void {
-        this.node.play()
+    set isPlaying(value: boolean){
+        this.node.isPlaying=value
     }
-
-    pause(): void {
-        this.node.pause()
+    
+    get isPlaying(): boolean{
+        return this.node.isPlaying
     }
 
     set playhead(value: number) {
-        this.node.playhead=value*audioCtx.sampleRate/1000
+        this.node.playhead=value
+    }
+
+    get playhead(): number {
+        return this.node.playhead
     }
 
     clear(): void {
-        this.node.removeAudio()
+        this.node.kill()
         this.node.disconnectEvents()
         this.node.disconnect()
     }

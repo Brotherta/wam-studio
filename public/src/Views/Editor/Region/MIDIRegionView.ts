@@ -1,5 +1,5 @@
 import { Graphics } from "pixi.js";
-import { HEIGHT_TRACK } from "../../../Env";
+import { HEIGHT_TRACK, RATIO_MILLS_BY_PX } from "../../../Env";
 import MIDIRegion from "../../../Models/Region/MIDIRegion";
 import EditorView from "../EditorView";
 import RegionView from "./RegionView";
@@ -23,11 +23,13 @@ export default class MIDIRegionView extends RegionView<MIDIRegion> {
      * @param region - The region that will contain the buffer to draw.
      */
     override drawContent(target: Graphics, color: string, region: MIDIRegion){
-        let range = region.width;
+        let range = this.width = region.duration/RATIO_MILLS_BY_PX;
+        this.height=HEIGHT_TRACK
         this.scale.x = 1;
 
         let colorHex = +("0x" + color.slice(1));
         target.clear();
+
         target.beginFill(colorHex, 0.5);
 
         // Get max amplitude
@@ -38,6 +40,11 @@ export default class MIDIRegionView extends RegionView<MIDIRegion> {
             if(note.note>maxnote) maxnote=note.note
         })
         let amplitude=maxnote-minnote
+        if(amplitude<100){
+            minnote-=(100-amplitude)/2
+            maxnote+=(100-amplitude)/2
+            amplitude=100
+        }
 
         // Draw notes
         const note_height=(HEIGHT_TRACK-HEIGHT_TRACK/10)/amplitude
@@ -48,10 +55,8 @@ export default class MIDIRegionView extends RegionView<MIDIRegion> {
             const x=start*note_width
             const w=Math.max(1,note.duration*note_width)
             const h=HEIGHT_TRACK/10
-            console.log("Drawing note at", note, start)
             target.drawRect(x, y, w, h)
             target.drawRect(x+w-HEIGHT_TRACK/20, y, HEIGHT_TRACK/20, h)
-            this.width=x+w
         })
     }
 

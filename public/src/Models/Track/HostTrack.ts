@@ -116,12 +116,12 @@ export default class HostTrack extends Track {
         }
         this.previousTracks=[]
 
-        // Connections
+        // Connection
         for(const track of this.tracks){
             this.previousTracks.push(track)
+            track.playhead=this.playhead
             if (track.modified){
                 track.update(context, playhead)
-                track.playhead=this.playhead
                 track.modified=false
             }
             if (this.inRecordingMode)track.monitoredOutputNode.connect(this.mainNode)

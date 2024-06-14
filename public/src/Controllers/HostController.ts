@@ -501,7 +501,6 @@ export default class HostController {
         for (let trackSong of song.songs) {
           const url = SONGS_FILE_URL + trackSong;
           let track = await this._app.tracksController.createTrack(url);
-          this._app.tracksController.addTrack(track);
           this._app.loader.loadTrackUrl(track,url);
         }
       };

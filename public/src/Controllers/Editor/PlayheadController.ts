@@ -44,7 +44,6 @@ export default class PlayheadController {
 
     this.bindEvents();
     this._app.host.onPlayHeadMove=(pos) => {
-      console.log("move")
       this._app.editorView.playhead.moveTo(pos/RATIO_MILLS_BY_PX)
     }
   }

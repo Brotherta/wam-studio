@@ -14,19 +14,16 @@ interface RegionPlayer{
     disconnect(node: AudioNode): void
 
     /**
-     * Play the region
+     * Is the region playing?
      */
-    play(): void
+    set isPlaying(value: boolean)
+    get isPlaying(): boolean
 
     /**
-     * Pause the region
-     */
-    pause(): void
-
-    /**
-     * Set the region cursor playhead position in milliseconds.
+     * The region cursor playhead position in milliseconds.
      */
     set playhead(value: number)
+    get playhead(): number
 
     /**
      * Set the loop mode.

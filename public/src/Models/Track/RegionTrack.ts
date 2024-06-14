@@ -44,6 +44,21 @@ export default class RegionTrack extends Track {
         new_merged_regions.set(type, [merged,player])
       }
 
+      // Get playstate
+      let playstate=false
+      let playhead=0
+      for(const [_,[__,player]] of this.merged_regions){
+        playstate=player.isPlaying
+        playhead=player.playhead
+        break
+      }
+
+      // Change playstate
+      for(const [_,[__,player]] of new_merged_regions){
+        player.isPlaying=playstate
+        player.playhead=playhead
+      }
+
       // Clear regions
       const old_merged_regions=this.merged_regions
       this.merged_regions=new_merged_regions
@@ -108,11 +123,9 @@ export default class RegionTrack extends Track {
   private updatePlayState(){
     console.log("UPDATE PLAY STATE")
     for(const [_,[__,player]] of this.merged_regions){
-      if(this._playing)player.play()
-      else player.pause()
+      player.isPlaying=this._playing
       if(!this._doLoop)player.setLoop(false)
       else player.setLoop(this.loopStart, this.loopEnd)
-      player.playhead=this._playhead
     }
   }
 
@@ -140,14 +153,12 @@ export default class RegionTrack extends Track {
     this.junctionNode.disconnect(node)
   }
 
-  private _playhead=0
   public override set playhead(value: number){
-    console.log("SET PLAYHEAD", value)
-    this._playhead=value
-    this.updatePlayState()
+    for(const [_,[__,player]] of this.merged_regions){ player.playhead=value }
   }
   public override get playhead(): number{
-    return this._playhead
+    for(const [_,[__,player]] of this.merged_regions){ return player.playhead }
+    return 0
   }
 
 

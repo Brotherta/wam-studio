@@ -9,34 +9,25 @@ import EditorView from "../EditorView";
  */
 export default abstract class RegionView<REGION extends RegionOf<REGION>> extends Container {
 
-    /**
-     * The unique ID of the track that contains the region.
-     */
+    /** The unique ID of the track that contains the region. */
     public trackId: number;
 
-    /**
-     * The unique ID of the region.
-     */
+    /** The unique ID of the region. */
     public id: number;
 
-    /**
-     * The main editor of the application.
-     */
+    /** The main editor of the application. */
     private _editorView: EditorView;
 
-    /**
-     * The PIXI.Graphics that represent the waveform.
-     */
+    /** The PIXI.Graphics that represent the waveform. */
     private _wave: Graphics;
 
-    /**
-     * The background of the region, borders included.
-     */
+    /** The background of the region, borders included. */
     private _background: Graphics;
+
+    /** The contained region  */
+    private region_width: number;
     
-    /**
-     * Boolean to know if the region is selected or not. Use to draw the current border of the background.
-     */
+    /** Boolean to know if the region is selected or not. Use to draw the current border of the background. */
     private _selected: boolean;
 
     constructor(editor: EditorView, region: REGION) {
@@ -64,30 +55,27 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
      * @param region - The region that will contain the buffer to draw.
      */
     public initializeRegionView(color: string, region: REGION): void {
-        this.position.x = region.pos;
-        this.drawContent(this._wave, color, region);
-        this.drawBackground();
+        this.position.x = region.pos
+        this.region_width = region.width
+
+        this.drawContent(this._wave, color, region)
+        this.drawBackground()
     }
 
     protected abstract drawContent(target: Graphics, color: string, region: REGION): void
 
     public redraw(color: string, region: REGION){
-        this.drawContent(this._wave, color, region);
+        this.region_width = region.width
+        this.drawContent(this._wave, color, region)
     }
 
-
-
-    /**
-     * Draws the background of the region to be selected. (White border)
-     */
+    /** Draws the background of the region to be selected. (White border) */
     public select(): void {
         this._selected = true;
         this.drawBackground();
     }
 
-    /**
-     * Draws the background of the region to be deselected. (No border)
-     */
+    /** Draws the background of the region to be deselected. (No border) */
     public deselect():void {
         this._selected = false;
         this.drawBackground();
@@ -107,16 +95,13 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
         this.position.x = start / RATIO_MILLS_BY_PX;
     }
 
-    /**
-     * Draws the background of the region. It will check if the region is selected or not to draw the border.
-     * @private
-     */
+    /** Draws the background of the region. It will check if the region is selected or not to draw the border. */
     private drawBackground(): void {
         let color = this._selected ? 0xffffff : 0x000000
         this._background.clear();
         this._background.beginFill(0xffffff, 0.3);
         this._background.lineStyle({width: 1, color: color});
-        this._background.drawRect(0, 0, this.width, HEIGHT_TRACK-1);
+        this._background.drawRect(0, 0, this.region_width, HEIGHT_TRACK-1);
     }
 
 }

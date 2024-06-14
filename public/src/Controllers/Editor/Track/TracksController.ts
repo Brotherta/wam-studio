@@ -10,6 +10,7 @@ import TracksView from "../../../Views/TracksView";
 import { audioCtx } from "../../../index";
 
 import WebAudioPeakMeter from "../../../Audio/Utils/PeakMeter";
+import { RegionOf } from "../../../Models/Region/Region";
 import SampleRegion from "../../../Models/Region/SampleRegion";
 import RegionTrack from "../../../Models/Track/RegionTrack";
 import { getRandomColor } from "../../../Utils/Color";
@@ -54,6 +55,9 @@ export default class TracksController{
    * @param track - The track to be initialized.
    */
   public addTrack(track: RegionTrack): void {
+    // Check if already exists
+    if(this.track_list.includes(track))crashOnDebug("TracksController - addTrack - Track already exists!")
+    
     // Add the track to the list
     this.track_list.push(track)
 
@@ -242,11 +246,13 @@ export default class TracksController{
       //TODO Remove this debug code
       if(e!=="a")return
 
-      console.log(this.tracks)
+      console.log(...this.tracks)
       let toptrack=this.tracks.find((v,i)=>i===0)!
       let bottomtrack=this.tracks.find((v,i)=>i===1)!
 
-      let merged=toptrack?.merged_regions.get(SampleRegion.TYPE)![0]
+      let merged: RegionOf<any>|null=null
+      for(const m of toptrack?.merged_regions.values())merged=m[0]
+      if(!merged)return
 
       this._app.regionsController.addRegion(bottomtrack,merged.clone())
     })
