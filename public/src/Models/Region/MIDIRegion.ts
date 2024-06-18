@@ -5,6 +5,7 @@ import MIDIPlayerNode from "../../Audio/Players/MIDI/MIDIPlayerNode";
 import MIDIPlayerWAM from "../../Audio/Players/MIDI/MIDIPlayerWAM";
 import { RingBuffer } from "../../Audio/Utils/Ringbuffer";
 import { RegionOf, RegionType } from "./Region";
+import RegionPlayer from "./RegionPlayer";
 
 export default class MIDIRegion extends RegionOf<MIDIRegion>{
 
@@ -65,12 +66,21 @@ class MIDIRegionPlayer implements RegionPlayer{
         this.node.setLoop(start!==false?start:undefined,end)
     }
 
-    connect(node: AudioNode): void {
+    connect(node: WamNode): void {
         this.node.connect(node)
     }
 
-    disconnect(node: AudioNode): void {
+    disconnect(node: WamNode): void {
         this.node.disconnect(node)
+    }
+
+    connectEvents(node: WamNode): void {
+        console.log("PROCESSOR, connectEvents")
+        this.node.connectEvents(node.instanceId)
+    }
+
+    disconnectEvents(node: WamNode): void {
+        this.node.disconnectEvents(node.instanceId)
     }
 
     set isPlaying(value: boolean){
@@ -91,5 +101,7 @@ class MIDIRegionPlayer implements RegionPlayer{
 
     clear(): void {
         this.node.disconnect()
+        this.node.disconnectEvents()
+        this.node.kill()
     }
 }

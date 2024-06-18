@@ -1,3 +1,4 @@
+import { WamNode } from "@webaudiomodules/sdk";
 import { audioCtx } from "../..";
 import App from "../../App";
 import AudioPlayerNode from "../../Audio/AudioNode";
@@ -111,7 +112,7 @@ export default class HostTrack extends Track {
         for(const track of this.previousTracks){
             try{
                 track.outputNode.disconnect(this.mainNode)
-                track.monitoredOutputNode.disconnect(this.outputNode)
+                track.monitoredOutputNode.disconnect(this.mainNode)
             }catch(_){}
         }
         this.previousTracks=[]
@@ -137,6 +138,11 @@ export default class HostTrack extends Track {
         this.mainNode.disconnect(node)
     }
 
+    override _connectEvents(node: WamNode): void{
+    }
+
+    override _disconnectEvents(node: WamNode): void{
+    }
 
     /* PLAYHEAD */
     /** Called when the playhead is moved, with the new position in milliseconds */

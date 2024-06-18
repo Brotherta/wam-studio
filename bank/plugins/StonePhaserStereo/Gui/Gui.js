@@ -458,7 +458,7 @@ export default class StonePhaserStereoGui extends HTMLElement {
 }
 try {
   customElements.define("wap-stonephaserstereo", StonePhaserStereoGui);
-  console.log("Element defined");
+  
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

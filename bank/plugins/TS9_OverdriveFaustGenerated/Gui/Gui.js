@@ -401,7 +401,7 @@ export default class TS9_OverdriveFaustGeneratedGui extends HTMLElement {
 }
 try {
   customElements.define("wap-ts9_overdrivefaustgenerated", TS9_OverdriveFaustGeneratedGui);
-  console.log("Element defined");
+  
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

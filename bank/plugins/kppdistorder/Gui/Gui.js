@@ -1157,7 +1157,7 @@ export default class compressorGui extends HTMLElement {
 }
 try {
   customElements.define("wap-compressor", compressorGui);
-  console.log("Element defined");
+  
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

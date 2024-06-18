@@ -6,7 +6,8 @@
  * A base audio processor for playing audio content.
  */
 
-import type { AudioWorkletGlobalScope, WamProcessor as WPT } from "@webaudiomodules/api";
+import { AudioWorkletGlobalScope } from "@webaudiomodules/api";
+import type { WamProcessor as WPT } from "@webaudiomodules/sdk";
 
 export interface IBaseAudioPlayerProcessor{
     /**
@@ -25,7 +26,7 @@ export interface IBaseAudioPlayerProcessor{
      * Treat a received message
      * @param event 
      */
-    onmessage(event: MessageEvent): void
+    _onMessage(event: MessageEvent): Promise<void>
 }
 
 export function getBaseAudioPlayerProcessor(moduleId: string){
@@ -52,10 +53,10 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
     
         constructor(options: any){
             super(options)
-            this.port.onmessage= this.onmessage.bind(this)
         }
     
-        onmessage(event: MessageEvent){
+        override async _onMessage(event: MessageEvent){
+            await super._onMessage(event)
             if("playhead" in event.data){
                 this.playhead = event.data.playhead
                 this.previousPlayhead = this.playhead-1
@@ -63,6 +64,7 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
             if("loopStart" in event.data) this.loopStart = event.data.loopStart
             if("loopEnd" in event.data) this.loopEnd = event.data.loopEnd
             if("shouldLive" in event.data) this.shouldLive = event.data.shouldLive
+            if(!this.shouldLive)console.log("Killing processor")
         }
         
         override process(inputs:Float32Array[][], outputs:Float32Array[][], parameters:Record<string, Float32Array>): boolean  {

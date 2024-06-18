@@ -528,7 +528,7 @@ export default class smoothDelayGui extends HTMLElement {
 }
 try {
   customElements.define("wap-smoothdelay", smoothDelayGui);
-  console.log("Element defined");
+  
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

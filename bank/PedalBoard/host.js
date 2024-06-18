@@ -5,6 +5,7 @@ const saveState = document.getElementById("save");
 const restoreState = document.getElementById("restore");
 const deleteState = document.getElementById("delete");
 const inCache = document.getElementById("inCache");
+const bip = document.getElementById("sendbip");
 
 const currentProtocol = window.location.protocol; // http: or https:
 const currentDomain = window.location.hostname;
@@ -77,6 +78,13 @@ const mountPlugin = (domNode) => {
   deleteState.addEventListener("click", async () => {
     localStorage.removeItem("instanceState");
     inCache.setAttribute("data", false);
+  });
+
+  bip?.addEventListener("click", async () => {
+    console.log("bip");
+    instance.audioNode.getParameterInfo().then(p=>console.dir("params",p))
+    instance.audioNode.scheduleEvents({ type: 'wam-midi', time: audioContext.currentTime, data: { bytes: new Uint8Array([0x90, 74, 100]) } });
+		instance.audioNode.scheduleEvents({ type: 'wam-midi', time: audioContext.currentTime + 0.25, data: { bytes: new Uint8Array([0x80, 74, 100]) } });
   });
 
   document.querySelector("#toggleGuitarIn").onclick = (event) => {

@@ -459,7 +459,7 @@ export default class OwlDirtyGui extends HTMLElement {
 }
 try {
   customElements.define("wap-owldirty", OwlDirtyGui);
-  console.log("Element defined");
+  
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

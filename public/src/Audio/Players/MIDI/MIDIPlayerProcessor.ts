@@ -1,5 +1,6 @@
 import type { AudioWorkletGlobalScope } from "@webaudiomodules/api"
-import { IBaseAudioPlayerProcessor } from "../BaseAudioPlayerProcessor"
+import type { MIDIInstant } from "../../MIDI"
+import type { IBaseAudioPlayerProcessor } from "../BaseAudioPlayerProcessor"
 
 
 export function getMIDIPlayerProcessor(moduleId:string){
@@ -17,8 +18,8 @@ export function getMIDIPlayerProcessor(moduleId:string){
             super(options)
         }
     
-        onmessage(e: MessageEvent<any>): void {
-            super.onmessage(e)
+        async _onMessage(e: MessageEvent<any>) { 
+            await super._onMessage(e)
             if("instants" in e.data) this.instants = e.data.instants
             if("instant_duration" in e.data) this.instant_duration=e.data.instant_duration
         }
@@ -44,13 +45,19 @@ export function getMIDIPlayerProcessor(moduleId:string){
                         }
                     }
                     this.emitEvents(
-                        { type: 'wam-midi', time: 0, data: { bytes: [0x90 | note.channel, note.note, note.velocity] } },
-                        { type: 'wam-midi', time: note.duration-0.001, data: { bytes: [0x80 | note.channel, note.note, note.velocity] } }
-                    )
+                        { type: 'wam-midi', time: currentTime, data: { bytes: new Uint8Array([0x90 /*| note.channel*/, note.note, note.velocity]) } },
+                        { type: 'wam-midi', time: currentTime+note.duration/1000, data: { bytes: new Uint8Array([0x80 /*| note.channel*/, note.note, note.velocity]) } },
+                    );
                 }
             }
         }
+
+        _connectEvents(...args: any[]){
+            super._connectEvents(...args)
+        }
     
     }
-    registerProcessor(moduleId, MIDIPlayerProcessor)
+
+    
+    try{ registerProcessor(moduleId, MIDIPlayerProcessor) } catch(e){}
 }

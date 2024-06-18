@@ -1,5 +1,6 @@
+import { WamNode } from "@webaudiomodules/api"
 
-interface RegionPlayer{
+export default interface RegionPlayer{
     
     /**
      * Connects the player to a node
@@ -12,6 +13,18 @@ interface RegionPlayer{
      * @param node 
      */
     disconnect(node: AudioNode): void
+
+    /**
+     * Connect the player events to a WamNode
+     * @param node
+     */
+    connectEvents(node: WamNode): void
+
+    /**
+     * Disconnect the player events from a WamNode
+     * @param node
+     */
+    disconnectEvents(node: WamNode): void
 
     /**
      * Is the region playing?

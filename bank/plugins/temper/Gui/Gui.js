@@ -916,7 +916,7 @@ webaudio-switch{
 }
 try {
   customElements.define("wap-temper", temperGui);
-  console.log("Element defined");
+  
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

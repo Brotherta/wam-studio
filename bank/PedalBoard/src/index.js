@@ -24,7 +24,8 @@ export default class PedalBoardPlugin extends WebAudioModule {
     } else {
       return `${this._baseURL.replace('/src', '')}${relativeURL}`;
     }
-  };
+
+  }
 
   async _loadDescriptor() {
     const url = this._descriptorUrl;

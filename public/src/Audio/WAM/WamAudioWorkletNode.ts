@@ -1,5 +1,4 @@
-import { WebAudioModule } from "@webaudiomodules/api";
-import { addFunctionModule, WamNode } from "@webaudiomodules/sdk";
+import { addFunctionModule, WamNode, WebAudioModule } from "@webaudiomodules/sdk";
 import getProcessor from "./WamProcessor";
 
 export default class WamAudioWorkletNode extends WamNode {

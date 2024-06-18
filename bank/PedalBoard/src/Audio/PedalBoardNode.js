@@ -1,8 +1,10 @@
-import WamNode from "../../../plugins/utils/sdk/src/WamNode.js";
+
+import WamNode from "../../plugins/utils/sdk/src/WamNode.js";
 import addFunctionModule from "../../plugins/utils/sdk/src/addFunctionModule.js";
 import getCustomProcessor from "./CustomProcessor.js";
 
 export default class PedalBoardNode extends WamNode {
+
   /**
    * Register scripts required for the processor. Must be called before constructor.
    * @param {BaseAudioContext} audioContext
@@ -15,11 +17,15 @@ export default class PedalBoardNode extends WamNode {
   }
 
   nodeId = 0;
+
+  /** @type {{ [key: number]:{ name:string, node:WamNode } }} */
   nodes = {};
-  pedalBoardInfos = {};
-  lastParameterValue = {};
+
   MAX_NODES = 30;
 
+  /**
+   * @param {WebAudioModule} plugin 
+   */
   constructor(plugin) {
     super(plugin, {
       processorOptions: {
@@ -36,6 +42,7 @@ export default class PedalBoardNode extends WamNode {
    */
   async _initialize() {
     await super._initialize();
+    // @ts-ignore
     const { default: initializeWamHost } = await import("../../plugins/utils/sdk/src/initializeWamHost.js");
     let [subGroupId, subGroupKey] = await initializeWamHost(this.module.audioContext);
     this.subGroupId = subGroupId;
@@ -63,16 +70,13 @@ export default class PedalBoardNode extends WamNode {
     this._output.smoothingTimeConstant = 0.85;
   }
 
-  connect(destination, outputIndex, inputIndex) {
-    return this._output.connect(destination, outputIndex, inputIndex);
+  connect(...args){
+    return this._output?.connect(...args);
   }
 
-  disconnect(destination, outputIndex, inputIndex) {
-    if (destination) {
-      return this._output.disconnect(destination, outputIndex, inputIndex);
-    } else {
-      return this._output.disconnect();
-    }
+
+  disconnect(...args) {
+    return this._output?.disconnect(...args);
   }
 
   /**
@@ -159,7 +163,7 @@ export default class PedalBoardNode extends WamNode {
    * Add the audioNode the the audio of the PedalBoard,then it calls updateInfos() to refresh the automation labels.
    * @param {WamNode} audioNode The audioNode.
    * @param {string} pedalName The name of the node.
-   * @param {int} id The unique id of the node, it help to map the audioNode to it's Gui.
+   * @param {number} id The unique id of the node, it help to map the audioNode to it's Gui.
    * @author Quentin Beauchet
    */
   addPlugin(audioNode, pedalName, id) {

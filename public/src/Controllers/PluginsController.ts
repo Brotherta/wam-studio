@@ -66,7 +66,7 @@ export default class PluginsController {
      * @param track - The track to connect.
      */
     public connectPedalBoard(track: RegionTrack): void {
-        track.connectPlugin(track.plugin.instance!._audioNode)
+        track.connectPlugin(track.plugin.instance!)
     }
 
     /**

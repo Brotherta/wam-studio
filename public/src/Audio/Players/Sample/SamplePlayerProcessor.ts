@@ -15,8 +15,8 @@ export function getSamplePlayerProcessor(moduleId:string){
             super(options)
         }
     
-        onmessage(e: MessageEvent<any>): void {
-            super.onmessage(e)
+        async _onMessage(e: MessageEvent<any>){
+            await super._onMessage(e)
             if ("audio" in e.data) this.audio = e.data.audio
         }
     
@@ -40,5 +40,5 @@ export function getSamplePlayerProcessor(moduleId:string){
         }
     
     }
-    registerProcessor(moduleId, SamplePlayerProcessor)
+    try{ registerProcessor(moduleId, SamplePlayerProcessor) } catch(e){}
 }

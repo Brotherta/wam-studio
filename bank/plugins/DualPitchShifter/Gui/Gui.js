@@ -468,7 +468,7 @@ export default class DualPitchShifterGui extends HTMLElement {
 }
 try {
   customElements.define("wap-dualpitchshifter", DualPitchShifterGui);
-  console.log("Element defined");
+  
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

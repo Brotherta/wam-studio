@@ -6,6 +6,7 @@ import { RingBuffer } from "../../Audio/Utils/Ringbuffer";
 import { bufferToWave } from "../../Audio/Utils/audioBufferToWave";
 import { audioCtx } from "../../index";
 import { RegionOf, RegionType } from "./Region";
+import RegionPlayer from "./RegionPlayer";
 
 
 export default class SampleRegion extends RegionOf<SampleRegion>{
@@ -68,13 +69,19 @@ class SampleRegionPlayer implements RegionPlayer{
     }
 
     connect(node: AudioNode): void {
-        console.log("Connecting to", node)
         this.node.connect(node)
     }
 
     disconnect(node: AudioNode): void {
-        console.log("Disconnecting from", node)
         this.node.disconnect(node)
+    }
+
+    connectEvents(node: WamNode): void {
+        this.node.connectEvents(node.instanceId)
+    }
+
+    disconnectEvents(node: WamNode): void {
+        this.node.disconnectEvents(node.instanceId)
     }
 
     set isPlaying(value: boolean){
@@ -94,8 +101,8 @@ class SampleRegionPlayer implements RegionPlayer{
     }
 
     clear(): void {
-        this.node.kill()
         this.node.disconnectEvents()
         this.node.disconnect()
+        this.node.kill()
     }
 }

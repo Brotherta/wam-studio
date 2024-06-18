@@ -1,3 +1,4 @@
+import { WamNode, WebAudioModule } from "@webaudiomodules/api";
 import TrackElement from "../../Components/TrackElement.js";
 import type TracksController from "../../Controllers/Editor/Track/TracksController";
 import { audioCtx } from "../../index";
@@ -15,7 +16,7 @@ export default abstract class Track {
   private pannerNode: StereoPannerNode
 
   /** The plugin node if a plugin is connected to the track. */
-  private pluginNode?: AudioNode
+  private pluginWam?: WebAudioModule<WamNode>
 
   /** The monitored output node. It output the sound of the track only when it is monitored. */
   private monitoredNode: GainNode
@@ -205,12 +206,13 @@ export default abstract class Track {
    * Connect the track to the audio node input/output of a plugin and disconnect the previous one.
    * @param node 
    */
-  public connectPlugin(node?: AudioNode){
+  public connectPlugin(plugin?: WebAudioModule<WamNode>){
     // Disconnect the previous plugin node if it exists.
-    if(this.pluginNode){
-      this.pluginNode.disconnect(this.pannerNode)
-      this._disconnect(this.pluginNode)
-      this.pluginNode=undefined
+    if(this.pluginWam){
+      this.pluginWam.audioNode.disconnect(this.pannerNode)
+      this._disconnect(this.pluginWam.audioNode)
+      this._disconnectEvents(this.pluginWam.audioNode)
+      this.pluginWam=undefined
     }
     // Disconnect from panner node
     else {
@@ -218,10 +220,11 @@ export default abstract class Track {
     }
 
     // Connect to a plugin node
-    if(node){
-      this.pluginNode=node
-      this._connect(node)
-      node.connect(this.pannerNode)
+    if(plugin){
+      this.pluginWam=plugin
+      this._connect(plugin.audioNode)
+      this._connectEvents(plugin.audioNode)
+      plugin.audioNode.connect(this.pannerNode)
     }
     else{
       this._connect(this.pannerNode)
@@ -231,6 +234,10 @@ export default abstract class Track {
   public abstract _connect(node: AudioNode): void
 
   public abstract _disconnect(node: AudioNode): void
+
+  public abstract _connectEvents(node: WamNode): void
+
+  public abstract _disconnectEvents(node: WamNode): void
 
   /**
    * Set the track to be monitored or not.

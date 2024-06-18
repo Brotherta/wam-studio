@@ -1,4 +1,5 @@
 import { RATIO_MILLS_BY_PX } from "../../Env";
+import RegionPlayer from "./RegionPlayer";
 
 export default abstract class Region{
 

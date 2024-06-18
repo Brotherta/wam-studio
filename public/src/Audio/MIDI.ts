@@ -118,6 +118,7 @@ export abstract class MIDIView{
  * A MIDI track, represented as a sequence of MIDIInstant.
  */
 export class MIDI extends MIDIView{
+    
 
     /* FACTORIES */
 
@@ -170,7 +171,6 @@ export class MIDI extends MIDIView{
                 ret.putNote(new MIDINote(note, 1, 0, duration), instanti*instant_duration)
             }
         }
-        ret.forEachNote((note,start)=>console.log(note,start))
         return ret
     }
 
@@ -245,7 +245,6 @@ export class MIDI extends MIDIView{
     override putNote(note: MIDINote, start: number): void {
         const instant_index=Math.floor(start/this.instant_duration)
         const offset=start-instant_index*this.instant_duration
-        console.log(start,note,instant_index,this.instant_count)
         if(instant_index>=this.instant_count)return
         const list=this.instantAt(instant_index)
         list.push({offset,note})

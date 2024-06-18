@@ -588,7 +588,6 @@ export default class RegionController {
 
     let newX = x - this._offsetX;
     newX = Math.max(0, Math.min(newX, this._editorView.worldWidth));
-    console.log(newX)
 
     // If reaching end of world, do nothing
     const regionEndPos = newX + this._selectedRegion.view.width;

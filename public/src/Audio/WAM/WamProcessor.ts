@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { AudioWorkletGlobalScope } from "@webaudiomodules/api";
+import { AudioWorkletGlobalScope } from "@webaudiomodules/sdk";
 
 const getProcessor = (moduleId: string) => {
   // @ts-ignore

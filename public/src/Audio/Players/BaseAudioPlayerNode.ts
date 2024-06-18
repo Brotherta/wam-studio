@@ -48,7 +48,7 @@ export default class BaseAudioPlayerNode extends WamNode{
     }
 
     kill(){
-        this.port.postMessage({shouldLive: true})
+        this.port.postMessage({shouldLive: false})
     }
 
     static override async addModules(audioContext: BaseAudioContext, moduleId: string){

@@ -1,4 +1,4 @@
-import '../../utils/webaudio-controls.js'
+import '../../utils/webaudio-controls.js';
 
       const getBaseURL = () => {
         const base = new URL('.', import.meta.url);
@@ -593,7 +593,7 @@ this._root.getElementById("/CompressorGuitarix/Threshold").addEventListener("inp
       try {
           customElements.define('wap-compressorguitarix', 
                                 CompressorGuitarixGui);
-          console.log("Element defined");
+          
       } catch(error){
           console.log(error);
           console.log("Element already defined");      

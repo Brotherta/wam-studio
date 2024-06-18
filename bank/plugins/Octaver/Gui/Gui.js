@@ -1,4 +1,4 @@
-import '../../utils/webaudio-controls.js'
+import '../../utils/webaudio-controls.js';
 
       const getBaseURL = () => {
         const base = new URL('.', import.meta.url);
@@ -416,7 +416,7 @@ this._root.getElementById("/Octaver/Up").addEventListener("input", (e) =>this._p
       try {
           customElements.define('wap-octaver', 
                                 OctaverGui);
-          console.log("Element defined");
+          
       } catch(error){
           console.log(error);
           console.log("Element already defined");      

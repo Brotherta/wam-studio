@@ -1,5 +1,7 @@
+import { WamNode } from "@webaudiomodules/api";
 import TrackElement from "../../Components/TrackElement.js";
 import Region, { RegionOf, RegionType } from "../Region/Region";
+import RegionPlayer from "../Region/RegionPlayer";
 import Track from "./Track";
 
 export default class RegionTrack extends Track {
@@ -41,6 +43,7 @@ export default class RegionTrack extends Track {
         const merged=Region.mergeAll(regions,true)
         const player=await merged.createPlayer(this.groupId, this.audioCtx)
         player.connect(this.junctionNode)
+        for(const node of this._connectedWamNodes)player.connectEvents(node)
         new_merged_regions.set(type, [merged,player])
       }
 
@@ -64,6 +67,7 @@ export default class RegionTrack extends Track {
       this.merged_regions=new_merged_regions
       for(const [type,[region,player]] of old_merged_regions){
         player.disconnect(this.junctionNode)
+        for(const node of this._connectedWamNodes)player.disconnectEvents(node)
         player.clear()
       }
 
@@ -145,6 +149,7 @@ export default class RegionTrack extends Track {
     this.updatePlayState()
   }
 
+  /* CONNECTION */
   public override _connect(node: AudioNode): void {
     this.junctionNode.connect(node)
   }
@@ -152,6 +157,20 @@ export default class RegionTrack extends Track {
   public override _disconnect(node: AudioNode): void {
     this.junctionNode.disconnect(node)
   }
+
+  private _connectedWamNodes = new Array<WamNode>()
+
+  override _connectEvents(node: WamNode): void{
+    console.log("CONNECT EVENTS")
+    this._connectedWamNodes.push(node)
+    for(const [_,[__,player]] of this.merged_regions){ player.connectEvents(node) }
+  }
+
+  override _disconnectEvents(node: WamNode): void{
+    this._connectedWamNodes.splice(this._connectedWamNodes.indexOf(node),1)
+    for(const [_,[__,player]] of this.merged_regions){ player.disconnectEvents(node) }
+  }
+
 
   public override set playhead(value: number){
     for(const [_,[__,player]] of this.merged_regions){ player.playhead=value }
@@ -171,8 +190,11 @@ export default class RegionTrack extends Track {
   public close(){
     for(const [_,[__,player]] of this.merged_regions){
       player.disconnect(this.junctionNode)
+      for(const node of this._connectedWamNodes)player.disconnectEvents(node)
       player.clear()
     }
+    this.outputNode.disconnect()
+    this.monitoredOutputNode.disconnect()
     this.deleted=true
   }
 

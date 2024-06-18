@@ -107,10 +107,10 @@ export default class App {
         const old=this.undoManager.add.bind(this.undoManager)
         
         //@ts-ignore
-        this.undoManager.add=(...args)=>{
+        /*this.undoManager.add=(...args)=>{
             old(...args)
             console.trace()
-        }
+        }*/
     }
 
     /**

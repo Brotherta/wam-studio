@@ -113,7 +113,6 @@ export default class TracksController{
       this._app.pluginsController.removePedalBoard(track);
       this._view.removeTrack(track.element);
       this._app.automationView.removeAutomationBpf(track.id);
-      track.outputNode.disconnect()
       this._app.waveformController.removeWaveformOfTrack(track);
     }
     else crashOnDebug("TracksController - removeTrack - Track not found!")

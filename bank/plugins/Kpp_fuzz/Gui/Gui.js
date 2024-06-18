@@ -401,7 +401,7 @@ export default class Kpp_fuzzGui extends HTMLElement {
 }
 try {
   customElements.define("wap-kpp_fuzz", Kpp_fuzzGui);
-  console.log("Element defined");
+  
 } catch (error) {
   console.log(error);
   console.log("Element already defined");
