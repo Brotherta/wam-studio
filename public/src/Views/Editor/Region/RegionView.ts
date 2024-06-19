@@ -43,7 +43,6 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
         this._wave = new Graphics();
         this.addChild(this._background);
         this.addChild(this._wave);
-        // TODO CLIP WAVE
     }
 
     /**

@@ -33,7 +33,7 @@ export default class MIDIRegion extends RegionOf<MIDIRegion>{
     }
 
     override save(): Blob {
-        return new Blob()//bufferToWave(this.buffer)
+        return this.midi.save()
     }
 
     override emptyAlike(start: number, duration: number): MIDIRegion {

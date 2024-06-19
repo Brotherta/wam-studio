@@ -139,10 +139,11 @@ export default class TracksController{
    * Clears all tracks.
    * It removes all tracks from the track list and disconnects the audio nodes.
    */
-  public clearAllTracks(): void {
+  public clearTracks(): void {
     for (let track of [...this.tracks]) this.removeTrack(track)
     if(this.track_list.length!=0)crashOnDebug("TracksControllers - clearAllTracks - There is remaining tracks!")
     this.track_list.length=0
+    this.trackIdCount=1
   }
 
   /**
@@ -159,8 +160,7 @@ export default class TracksController{
   }
 
   /**
-   * Creates a new empty track. It creates the audio node and the track.
-   *
+   * Creates a new empty track and add it to the track view.
    * @param url - The url of the track.
    * @returns the created track
    */

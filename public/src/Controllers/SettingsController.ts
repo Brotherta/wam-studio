@@ -140,14 +140,15 @@ export default class SettingsController {
                 autoGainControl: false
             }
         }
-        // TODO Convert from sample track to global track
+
         for (let track of this._app.tracksController.tracks) {
-            /*TODO if (track.micRecNode) {
+            const {sampleRecorder} = track
+            if (sampleRecorder.micRecNode) {
                 let stream = await navigator.mediaDevices.getUserMedia(this.constraints);
-                track.micRecNode.disconnect();
-                track.micRecNode = audioCtx.createMediaStreamSource(stream);
-                track.micRecNode.connect(track.recordingInputNode);
-            }*/
+                sampleRecorder.micRecNode.disconnect();
+                sampleRecorder.micRecNode = audioCtx.createMediaStreamSource(stream);
+                sampleRecorder.micRecNode.connect(sampleRecorder.recordingInputNode);
+            }
         }
     }
 

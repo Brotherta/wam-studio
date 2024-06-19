@@ -18,6 +18,17 @@ export class MIDINote{
         public readonly channel: number, 
         public readonly duration: number,
     ){}
+
+    /*static load(array: Float32Array): MIDINote{
+        return new MIDINote(array[0],array[1],array[2],array[3])
+    }
+
+    saveTo(array: Float32Array){
+        array[0]=this.note
+        array[1]=this.velocity
+        array[2]=this.channel
+        array[3]=this.duration
+    }*/
 }
 
 
@@ -121,7 +132,6 @@ export class MIDI extends MIDIView{
     
 
     /* FACTORIES */
-
     /**
      * Create a new MIDI track.
      * @param instant_duration The duration of a single instant in milliseconds.
@@ -261,6 +271,28 @@ export class MIDI extends MIDIView{
         })
         this.duration=target_duration
     }
+
+    /** SERIALIZATION */
+
+    /**
+     * Serialize the MIDI track to a Blob.
+     * //TODO Write something more memory efficient.
+     */
+    save(){
+        return new Blob([JSON.stringify({instants:this._instants, instant_duration:this._instant_duration, duration:this._duration})])
+    }
+
+    /**
+     * Deserialize a MIDI track from a Blob.
+     * //TODO Write something more memory efficient.
+     */
+    static async load(blob: Blob){
+        const {instants,instant_duration,duration} = JSON.parse(await blob.text()) as {instants:MIDIInstant[], instant_duration:number, duration:number}
+        const midi=new MIDI(instant_duration,duration)
+        for(let i=0; i<instants.length; i++)midi.instantAt(i).push(...instants[i])
+            return midi
+    }
+
 }
 
 /**

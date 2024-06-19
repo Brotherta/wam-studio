@@ -1,5 +1,6 @@
 import App, { crashOnDebug } from "../App";
 import { BACKEND_URL } from "../Env";
+import { RegionContent } from "../Loader/Loader";
 import ProjectView from "../Views/ProjectView";
 
 /**
@@ -152,30 +153,30 @@ export default class ProjectController {
         let url = BACKEND_URL + "/projects";
 
         let user = this._view.saveElement.user.value;
-        let project = this._view.saveElement.project.value;
-        if (user === "" || project === "") {
+        let name = this._view.saveElement.project.value;
+        if (user === "" || name === "") {
             this._view.saveElement.showError("Please fill in all fields");
             return;
         }
 
-        let data = await this._app.loader.saveProject();
-        let wavs = data.wavs;
+        let [project,contents] = await this._app.loader.saveProject();
 
+        // Upload the project file
         let response = await fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "username": user,
-                "projectName": project,
-                "override": override,
-                "data": data.project
+                username: name,
+                projectName: name,
+                override: override,
+                data: project
             })
         });
         if (response.status === 201) {
             let json = await response.json();
-            this.uploadWav(json.id, wavs);
+            this.uploadContents(json.id, contents);
         }
         else if (response.status === 400 && !override) {
             let json = await response.json();
@@ -225,7 +226,14 @@ export default class ProjectController {
             let response = await fetch(url);
             if (response.status === 200) {
                 let responseData = await response.json();
-                await this._app.loader.loadProject(responseData);
+                await this._app.loader.loadProject(
+                    responseData.data,
+                    id=>{
+                        const xhr=new XMLHttpRequest()
+                        xhr.open('GET',url+'/audio/'+id,true)
+                        return xhr
+                    }
+                );
                 this._view.close();
             }
         }
@@ -336,17 +344,17 @@ export default class ProjectController {
      * @param waves - The waves to upload.
      * @private
      */
-    private uploadWav(projectId: string, waves: { blob: Blob; name: string }[]): void {
+    private uploadContents(projectId: string, contents: RegionContent[]): void {
         let url = BACKEND_URL + "/projects/" + projectId + "/audio";
 
-        let totalSize = waves.reduce((sum, wav) => sum + wav.blob.size, 0);
-        let loadedSizes = Array(waves.length).fill(0);
+        let totalSize = contents.reduce((sum, wav) => sum + wav.blob.size, 0);
+        let loadedSizes = Array(contents.length).fill(0);
 
-        let uploadsRemaining = waves.length;
+        let uploadsRemaining = contents.length;
 
-        waves.forEach((wav, index) => {
+        contents.forEach((wav, index) => {
             let formData = new FormData();
-            formData.append('audio', wav.blob, wav.name);
+            formData.append('audio', wav.blob, wav.content_name);
 
             const xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
@@ -367,7 +375,7 @@ export default class ProjectController {
             xhr.addEventListener('load', async () => {
                 if (xhr.status >= 200 && xhr.status < 300) {
                     // When the audio has been uploaded
-                    console.log(`Audio ${wav.name} uploaded to ${xhr.responseText}`);
+                    console.log(`Audio ${wav.content_name} uploaded to ${xhr.responseText}`);
 
                     uploadsRemaining--;
                     if (uploadsRemaining <= 0) {
@@ -376,13 +384,13 @@ export default class ProjectController {
                     }
                 } else {
                     // If the request failed
-                    console.log(`Failed to upload audio ${wav.name}: ${xhr.statusText}`);
+                    console.log(`Failed to upload audio ${wav.content_name}: ${xhr.statusText}`);
                 }
             });
 
             // Error listener
             xhr.addEventListener('error', () => {
-                console.log(`Failed to upload audio ${wav.name}: ${xhr.statusText}`);
+                console.log(`Failed to upload audio ${wav.content_name}: ${xhr.statusText}`);
             });
 
             xhr.send(formData);

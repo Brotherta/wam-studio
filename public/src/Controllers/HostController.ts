@@ -495,7 +495,7 @@ export default class HostController {
       let name = song.name;
       let el = this._view.createNewSongItem(name);
       el.onclick = async () => {
-        this._app.tracksController.clearAllTracks();
+        this._app.tracksController.clearTracks();
         for (let trackSong of song.songs) {
           const url = SONGS_FILE_URL + trackSong;
           let track = await this._app.tracksController.createTrack(url);

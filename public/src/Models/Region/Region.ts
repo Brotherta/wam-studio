@@ -64,6 +64,8 @@ export default abstract class Region{
      */
     abstract save(): Blob
 
+    abstract get regionType(): RegionType<any>
+
     /**
      * Load the region from a Blob.
      */
@@ -123,7 +125,7 @@ export abstract class RegionOf<THIS extends RegionOf<THIS>> extends Region {
         return clone
     }
 
-    abstract get regionType(): RegionType<THIS>
+    abstract override  get regionType(): RegionType<THIS>
 
     isCompatibleWith(other: Region): other is RegionOf<THIS>{
         return other instanceof RegionOf && other.regionType===this.regionType

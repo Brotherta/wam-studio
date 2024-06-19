@@ -90,6 +90,8 @@ export default class RegionController {
    * @param waveform - The waveform where to add the region. If not given, the waveform will be search using the ID of the track.
    */
   public addRegion<T extends RegionOf<T>>(track: Track, region: RegionOf<T>, waveform?: WaveformView): RegionView<T>{
+    if(track.regions.indexOf(region)>=0)crashOnDebug("Try to add a region already in the track")
+
     if(region.id===-1)region.id=this.getNewId()
     const factory=RegionController.regionViewFactories[region.regionType]!
 

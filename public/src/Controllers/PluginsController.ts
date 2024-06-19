@@ -97,7 +97,7 @@ export default class PluginsController {
         // TODO Check what is the purpose of this._view.unselectHost();
     }
 
-    // TODO See if this can be removed, how it can be modified.
+    // TODO See if this can be removed, how it can be modified. And make it work again
     /**
      * Selects the main track and show the plugins of the main track.
      */
