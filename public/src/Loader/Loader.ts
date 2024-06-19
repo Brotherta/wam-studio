@@ -2,7 +2,7 @@ import App from "../App";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import { BACKEND_URL } from "../Env";
 import SampleRegion from "../Models/Region/SampleRegion";
-import RegionTrack from "../Models/Track/RegionTrack";
+import Track from "../Models/Track/Track";
 import { audioCtx } from "../index";
 import APP_VERSION from "../version";
 
@@ -164,7 +164,7 @@ export default class Loader {
         }
     }
 
-    loadTrackRegions(track: RegionTrack, regions: any, projectId: string) {
+    loadTrackRegions(track: Track, regions: any, projectId: string) {
         let loadedRegions = 0;
         let totalSize = new Map();
         let totalLoaded = 0;
@@ -226,7 +226,7 @@ export default class Loader {
         }
     }
 
-    loadTrackUrl(track: RegionTrack, url: string) {
+    loadTrackUrl(track: Track, url: string) {
         console.log("Load Track" +url)
 
         let xhr = new XMLHttpRequest();

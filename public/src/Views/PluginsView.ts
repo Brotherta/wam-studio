@@ -1,4 +1,4 @@
-import RegionTrack from "../Models/Track/RegionTrack";
+import SoundProvider from "../Models/Track/SoundProvider";
 import Track from "../Models/Track/Track";
 import DraggableWindow from "../Utils/DraggableWindow";
 
@@ -59,7 +59,7 @@ export default class PluginsView extends DraggableWindow {
      * Mounts the plugin's view in the DOM.
      * @param track - The track whom plugin will be mounted.
      */
-    showPlugins(track: Track) {
+    showPlugins(track: SoundProvider) {
         this.mount.appendChild(track.plugin.dom);
     }
 
@@ -160,7 +160,7 @@ export default class PluginsView extends DraggableWindow {
      * Moves the plugin's view of the given track to the loading zone.
      * @param track - The track to move the plugin's view from.
      */
-    movePluginLoadingZone(track: RegionTrack) {
+    movePluginLoadingZone(track: Track) {
         if (track.plugin.initialized) {
             this.loadingZone.appendChild(track.plugin.dom);
         }

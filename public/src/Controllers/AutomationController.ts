@@ -1,6 +1,6 @@
 import App from "../App";
 import { MAX_DURATION_SEC, RATIO_MILLS_BY_PX } from "../Env";
-import RegionTrack from "../Models/Track/RegionTrack";
+import Track from "../Models/Track/Track";
 import AutomationView from "../Views/AutomationView";
 import { audioCtx } from "../index";
 
@@ -33,7 +33,7 @@ export default class AutomationController {
      * Applies all automations to the track and opens the automation menu.
      * @param track - The track to apply the automations.
      */
-    public async openAutomationMenu(track: RegionTrack): Promise<void> {
+    public async openAutomationMenu(track: Track): Promise<void> {
         this._view.clearMenu();
         await this.updateAutomations(track);
         this._view.openAutomationMenu(track);
@@ -45,11 +45,10 @@ export default class AutomationController {
      *
      * @param track - The track to update the automations.
      */
-     public async updateAutomations(track: RegionTrack): Promise<void> {
+     public async updateAutomations(track: Track): Promise<void> {
         let plugin = track.plugin;
         if (plugin.initialized) {
             let params = await plugin.instance?._audioNode.getParameterInfo();
-            console.log(params);
             
             track.automation.updateAutomation(params);
             this._view.clearMenu();
@@ -63,7 +62,6 @@ export default class AutomationController {
                 track.plugin.instance?._audioNode.clearEvents();
             })
             for (let param in params) {
-                console.log(param);
                 
                 let active = false;
                 let bpf = track.automation.getBpfOfParam(param);

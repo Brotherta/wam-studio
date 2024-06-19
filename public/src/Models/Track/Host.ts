@@ -6,12 +6,12 @@ import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import TrackElement from "../../Components/TrackElement";
 import { BACKEND_URL, MAX_DURATION_SEC } from "../../Env";
 import Plugin from "../Plugin";
-import Track from "./Track";
+import SoundProvider from "./SoundProvider";
 /**
- * Host class that contains the master track.
- * It is used to control the global volume and the playhead.
+ * Host class that work as the master sound provider.
+ * Its output is the combined output of all the tracks.
  */
-export default class HostTrack extends Track {
+export default class Host extends SoundProvider {
 
     /**
      * Id of the host group.
@@ -19,7 +19,7 @@ export default class HostTrack extends Track {
     public hostGroupId: string
 
     /**
-     * Latency of the host.
+     * Latency of the host in milliseconds.
      */
     public latency: number
 
@@ -49,14 +49,14 @@ export default class HostTrack extends Track {
     metronomeOn: any;
     MetronomeElement: any;
     
-    private tracks: Iterable<Track>
+    private tracks: Iterable<SoundProvider>
 
     /**
      * Create a new host track, a compisite track composed of multiple tracks.
      * @param app The app
      * @param tracks Its children tracks
      */
-    constructor(app: App, tracks: Iterable<Track>) {
+    constructor(app: App, tracks: Iterable<SoundProvider>) {
         super(new TrackElement());
         this.tracks=tracks
         this.playhead = 0;
@@ -106,7 +106,7 @@ export default class HostTrack extends Track {
         this.outputNode.connect(this.hostNode);
     }
 
-    private previousTracks: Track[]=[]
+    private previousTracks: SoundProvider[]=[]
     public override update(context: AudioContext, playhead: number): void {
         // Cleanup
         for(const track of this.previousTracks){

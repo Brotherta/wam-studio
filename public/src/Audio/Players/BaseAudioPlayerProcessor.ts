@@ -1,11 +1,8 @@
 
 
-// TODO gérer la durée de vie du processor pour éviter les fuites de mémoire
-// Voir: https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor/process#return_value
 /**
  * A base audio processor for playing audio content.
  */
-
 import { AudioWorkletGlobalScope } from "@webaudiomodules/api";
 import type { WamProcessor as WPT } from "@webaudiomodules/sdk";
 
@@ -64,11 +61,10 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
             if("loopStart" in event.data) this.loopStart = event.data.loopStart
             if("loopEnd" in event.data) this.loopEnd = event.data.loopEnd
             if("shouldLive" in event.data) this.shouldLive = event.data.shouldLive
-            if(!this.shouldLive)console.log("Killing processor")
         }
         
         override process(inputs:Float32Array[][], outputs:Float32Array[][], parameters:Record<string, Float32Array>): boolean  {
-            if(parameters["isPlaying"][0]<0.5)return true
+            if(parameters["isPlaying"][0]<0.5)return this.shouldLive
     
             // Move the playhead
             this.previousPlayhead= this.playhead
@@ -80,7 +76,8 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
     
             // Move the playhead in the node
             this.port.postMessage({playhead: this.playhead})
-    
+            
+            
             return this.shouldLive
         }
     

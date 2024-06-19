@@ -1,6 +1,6 @@
 import { Container, Graphics, Text } from "pixi.js";
+import { DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, MAX_DURATION_SEC, RATIO_MILLS_BY_PX, ZOOM_LEVEL } from "../../Env";
 import EditorView from "./EditorView";
-import { RATIO_MILLS_BY_PX, MAX_DURATION_SEC, TEMPO, ZOOM_LEVEL, DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM } from "../../Env";
 
 export default class GridView extends Container {
   /**
@@ -74,7 +74,6 @@ export default class GridView extends Container {
 
     // number of pixels per bar
     //const barWidth = nbSteps * stepWidth;
-    //console.log("stepWidth=" + stepWidth + " barWidth=" + barWidth);
     let displayBarsEvery = 1;
     if (barWidth < 20) {
       // display only one bar out of 2

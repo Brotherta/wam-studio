@@ -1,7 +1,7 @@
 import App from "../App";
-import LatencyView from "../Views/LatencyView";
 import HostView from "../Views/HostView";
-import {audioCtx} from "../index";
+import LatencyView from "../Views/LatencyView";
+import { audioCtx } from "../index";
 
 
 export default class LatencyController {

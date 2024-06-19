@@ -12,7 +12,7 @@ import { audioCtx } from "../../../index";
 import WebAudioPeakMeter from "../../../Audio/Utils/PeakMeter";
 import { RegionOf } from "../../../Models/Region/Region";
 import SampleRegion from "../../../Models/Region/SampleRegion";
-import RegionTrack from "../../../Models/Track/RegionTrack";
+import Track from "../../../Models/Track/Track";
 import { getRandomColor } from "../../../Utils/Color";
 import FriendlyIterable from "../../../Utils/FriendlyIterable";
 import { registerOnKeyDown } from "../../../Utils/keys";
@@ -23,7 +23,7 @@ import { registerOnKeyDown } from "../../../Utils/keys";
 export default class TracksController{
 
   /** Selected track. It is undefined if the host is selected. */
-  public selectedTrack?: RegionTrack
+  public selectedTrack?: Track
 
   /** The app instance. */
   private _app: App;
@@ -39,7 +39,7 @@ export default class TracksController{
   private _oldBalance = 1;
 
   /** The tracks */
-  private readonly track_list: RegionTrack[]= []
+  private readonly track_list: Track[]= []
 
   constructor(app: App) {
     this._app = app
@@ -54,7 +54,7 @@ export default class TracksController{
    *
    * @param track - The track to be initialized.
    */
-  public addTrack(track: RegionTrack): void {
+  public addTrack(track: Track): void {
     // Check if already exists
     if(this.track_list.includes(track))crashOnDebug("TracksController - addTrack - Track already exists!")
     
@@ -104,7 +104,7 @@ export default class TracksController{
    *
    * @param track - Track to be removed from the track view.
    */
-  public removeTrack(track: RegionTrack): void {
+  public removeTrack(track: Track): void {
     // Remove from the lists
     const index=this.track_list.indexOf(track)
     if(index>=0){
@@ -123,7 +123,7 @@ export default class TracksController{
    * @param id - The id of the track.
    * @returns the track with the given id if it exists, undefined otherwise.
    */
-  public getTrackById(id: number): RegionTrack | undefined {
+  public getTrackById(id: number): Track | undefined {
     for(let track of this.track_list){
       if(track.id===id)return track
     }
@@ -152,8 +152,8 @@ export default class TracksController{
    * @returns the created track
    * @private
    */
-  private createEmptyTrack(): RegionTrack {
-    let track = new RegionTrack(new TrackElement(),audioCtx,this._app.host.hostGroupId)
+  private createEmptyTrack(): Track {
+    let track = new Track(new TrackElement(),audioCtx,this._app.host.hostGroupId)
     this.addTrack(track)
     return track;
   }
@@ -164,7 +164,7 @@ export default class TracksController{
    * @param url - The url of the track.
    * @returns the created track
    */
-  public async createTrack(url?: string): Promise<RegionTrack> {
+  public async createTrack(url?: string): Promise<Track> {
     let track = this.createEmptyTrack();
     if (url) {
       let urlSplit = url.split("/");
@@ -182,7 +182,7 @@ export default class TracksController{
    *
    * @param file - The file to create the track.
    */
-  public async createTrackWithFile(file: File): Promise<RegionTrack | undefined> {
+  public async createTrackWithFile(file: File): Promise<Track | undefined> {
     if (["audio/ogg", "audio/wav", "audio/mpeg", "audio/x-wav"].includes(file.type)) {
       let wamInstance = await WamEventDestination.createInstance(this._app.host.hostGroupId, audioCtx);
       let node = wamInstance.audioNode as WamAudioWorkletNode;
@@ -204,7 +204,7 @@ export default class TracksController{
     }
   }
 
-  public async newTrackFromDeletedTrack(deletedTrack: RegionTrack) {
+  public async newTrackFromDeletedTrack(deletedTrack: Track) {
     let wamInstance = await WamEventDestination.createInstance(
       this._app.host.hostGroupId,
       audioCtx
@@ -268,7 +268,7 @@ export default class TracksController{
    * @param track - Track to be binded.
    * @private
    */
-  private bindTrackEvents(track: RegionTrack): void {
+  private bindTrackEvents(track: Track): void {
 
     // TRACK SELECT
     track.element.addEventListener("click", () => {
@@ -442,7 +442,7 @@ export default class TracksController{
    * @param track - The track to open the automation menu.
    * @private
    */
-  private async automationMenu(e: Event, track: RegionTrack): Promise<void> {
+  private async automationMenu(e: Event, track: Track): Promise<void> {
     this._app.pluginsController.selectTrack(track);
     await this._app.automationController.openAutomationMenu(track);
     e.stopImmediatePropagation();
@@ -453,7 +453,7 @@ export default class TracksController{
    * @param track - The track to change the color.
    * @param string - The new color
    */
-  public setColor(track: RegionTrack, color: string): void {
+  public setColor(track: Track, color: string): void {
     track.color=color
     this._app.editorView.changeWaveFormColor(track);
   }
@@ -463,7 +463,7 @@ export default class TracksController{
    * @param track - The track to solo.
    * @param soloValue - Do solo the track else unsolo it.
    */
-  private setSolo(track: RegionTrack, soloValue: boolean) {
+  private setSolo(track: Track, soloValue: boolean) {
     // When soloed, mute every non-soloed track
     if(soloValue){
       this.tracks.forEach(it=>{
@@ -488,7 +488,7 @@ export default class TracksController{
   }
 
   async undoTrackRemove(
-    oldTrack: RegionTrack,
+    oldTrack: Track,
     element: TrackElement,
     oldTrackWaveform: WaveformView | undefined,
     oldPlugin: Plugin

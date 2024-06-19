@@ -1,9 +1,20 @@
+import type RegionController from "../../Controllers/Editor/Region/RegionController";
 import { RATIO_MILLS_BY_PX } from "../../Env";
 import RegionPlayer from "./RegionPlayer";
 
+/**
+ * A region on a Track.
+ * You can add new region types by extending this class. You should also:
+ * - Create a new RegionPlayer clas for the new region type.
+ * - Write a valid mergeWith method. If not, the regions will make no sound.
+ * - Create a new RegionView class for the new region type.
+ * - Make sure regionType is unique for each region type.
+ * - Associate the regionType to a RegionView factory in {@link RegionController#regionViewFactories}
+ */
 export default abstract class Region{
 
-    start: number; // in milliseconds
+    /** The region start in milliseconds */
+    start: number;
     trackId: number=-1;
     id: number=-1;
 

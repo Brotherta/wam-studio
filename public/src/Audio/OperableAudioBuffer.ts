@@ -266,7 +266,6 @@ export default abstract class OperableAudioBuffer implements AudioBuffer {
      * @returns {OperableAudioBuffer}
      */
     makeStereo() {
-        console.log("makeStereo",this)
         if (this.numberOfChannels > 1) return this;  // Already stereo or more.
 
         let newBuffer = OperableAudioBuffer.create({numberOfChannels: 2, length: this.length, sampleRate: this.sampleRate});

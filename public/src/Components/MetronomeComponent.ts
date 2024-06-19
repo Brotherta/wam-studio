@@ -1,4 +1,4 @@
-import {BACKEND_URL} from "../Env";
+import { BACKEND_URL } from "../Env";
 
 export default class MetronomeComponent extends HTMLElement {
     private isPlaying: boolean = false;
@@ -106,7 +106,6 @@ export default class MetronomeComponent extends HTMLElement {
         });
 
         this.metroBtnArrow.addEventListener('click', () => {
-            console.log('clicked');
             const metronomeContainer = this.shadowRoot?.querySelector('.metronome-container') as HTMLDivElement;
             metronomeContainer.style.display = metronomeContainer.style.display === 'none' ? 'flex' : 'none';
         });

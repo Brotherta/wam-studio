@@ -58,7 +58,6 @@ const getProcessor = (moduleId: string) => {
       else if ("stopRecording" in e.data) this.recording = false
       else if ("sab" in e.data) this.sab = e.data.sab
       else if ("stereo" in e.data) {
-        console.log("stereo", e.data);
         let { stereo, channelNum } = e.data;
         this.inputChannel = stereo ? undefined : channelNum;
       } 
@@ -80,7 +79,6 @@ const getProcessor = (moduleId: string) => {
     ) {
       super.process(inputs, outputs, parameters);
 
-      if (!this.audio) return true;
       if (this.recording) {
         if (inputs[0].length === 0) return true;
         if (inputs[0]) {

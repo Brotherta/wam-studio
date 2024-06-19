@@ -8,7 +8,7 @@ import {
     MAX_DURATION_SEC,
     RATIO_MILLS_BY_PX,
 } from "../../Env";
-import RegionTrack from "../../Models/Track/RegionTrack";
+import Track from "../../Models/Track/Track";
 import GridView from "./GridView";
 import LoopView from "./LoopView";
 import PlayheadView from "./PlayheadView";
@@ -212,7 +212,7 @@ export default class EditorView extends Application {
      * Add a waveform into the canvas fot the given track and update the position of the other waveforms.
      * @param track - The track where the new waveform will be created.
      */
-    public createWaveformView(track: RegionTrack): WaveformView {
+    public createWaveformView(track: Track): WaveformView {
         let wave = new WaveformView(this, track);
         this.waveforms.push(wave);
         this.resizeCanvas();
@@ -231,7 +231,7 @@ export default class EditorView extends Application {
      * Remove the waveform from the canvas for the given track and update the position of the other waveforms.
      * @param track - The track that contain the waveform to delete.
      */
-    public removeWaveForm(track: RegionTrack): void {
+    public removeWaveForm(track: Track): void {
         let wave = this.waveforms.find(wave => wave.trackId === track.id);
         let index = this.waveforms.indexOf(wave!);
 
@@ -291,7 +291,7 @@ export default class EditorView extends Application {
      * Change the color of the waveform for the given track.
      * @param track - The track where the Waveform must be redrawn.
      */
-    public changeWaveFormColor(track: RegionTrack): void {
+    public changeWaveFormColor(track: Track): void {
         let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
         if (waveFormView !== undefined) {
             waveFormView.color = track.color;
@@ -309,7 +309,7 @@ export default class EditorView extends Application {
      *
      * @param track - The track that contains the regions.
      */
-    public drawRegions(track: RegionTrack): void {
+    public drawRegions(track: Track): void {
         requestAnimationFrame(() => {
             let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
             if (!waveFormView) return
@@ -327,7 +327,7 @@ export default class EditorView extends Application {
      * milliseconds.
      * @param track - The track that contains the regions.
      */
-    public stretchRegions(track: RegionTrack): void {
+    public stretchRegions(track: Track): void {
         requestAnimationFrame(()=> {
             let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
             if (!waveFormView) return
@@ -337,7 +337,6 @@ export default class EditorView extends Application {
                 let region = track.getRegionById(regionView.id);
                 if (region) {
                     regionView.stretch(region.duration/1000, region.start);
-                    //console.log("STRECHED REGION !")
                 }
             }
         });

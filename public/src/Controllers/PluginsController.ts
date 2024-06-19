@@ -1,5 +1,5 @@
 import App from "../App";
-import RegionTrack from "../Models/Track/RegionTrack";
+import Track from "../Models/Track/Track";
 import PluginsView from "../Views/PluginsView";
 import { audioCtx } from "../index";
 
@@ -33,7 +33,7 @@ export default class PluginsController {
     }
 
     private get selectedTrack(){ return this._app.tracksController.selectedTrack }
-    private set selectedTrack(value: RegionTrack|undefined){ this._app.tracksController.selectedTrack=value }
+    private set selectedTrack(value: Track|undefined){ this._app.tracksController.selectedTrack=value }
 
     /**
      * Adds a new pedalboard to the selected track.
@@ -51,7 +51,7 @@ export default class PluginsController {
      * Remove the plugins of the given track.
      * @param track
      */
-    public removePedalBoard(track: RegionTrack): void {
+    public removePedalBoard(track: Track): void {
         track.plugin.instance?._audioNode.clearEvents();
         this._app.pluginsController.disconnectPedalBoard(track);
         track.plugin.unloadPlugin();
@@ -65,7 +65,7 @@ export default class PluginsController {
      * Connects the plugin to the track. If the track is the host, it connects the plugin to the host gain node.
      * @param track - The track to connect.
      */
-    public connectPedalBoard(track: RegionTrack): void {
+    public connectPedalBoard(track: Track): void {
         track.connectPlugin(track.plugin.instance!)
     }
 
@@ -74,7 +74,7 @@ export default class PluginsController {
      *
      * @param track - The track where the plugin is connected.
      */
-    public disconnectPedalBoard(track: RegionTrack): void {
+    public disconnectPedalBoard(track: Track): void {
         track.connectPlugin(undefined)
     }
 
@@ -84,7 +84,7 @@ export default class PluginsController {
      *
      * @param track The track to select
      */
-    public selectTrack(track: RegionTrack|undefined): void {
+    public selectTrack(track: Track|undefined): void {
         if(this.selectedTrack !== undefined){
             this.selectedTrack.element.unSelect();
             this.selectedTrack = undefined;
@@ -119,7 +119,7 @@ export default class PluginsController {
      *
      * @param track - The track that was clicked.
      */
-    public fxButtonClicked(track: RegionTrack): void {
+    public fxButtonClicked(track: Track): void {
         this.selectTrack(track);
         if (track.plugin.initialized) {
             if (this._view.windowOpened) {

@@ -1,4 +1,4 @@
-import App from "../App";
+import App, { crashOnDebug } from "../App";
 import { BACKEND_URL } from "../Env";
 import ProjectView from "../Views/ProjectView";
 
@@ -210,7 +210,7 @@ export default class ProjectController {
             this._view.loadElement.addResults(responseData);
         }
         else if (response.status === 400) {
-            console.log("Something went wrong");
+            crashOnDebug("Backend unreachable")
         }
     }
 
@@ -353,7 +353,6 @@ export default class ProjectController {
             xhr.withCredentials = true
 
             xhr.upload.addEventListener('progress', (e) => {
-                console.log('progress');
                 if (e.lengthComputable) {
                     loadedSizes[index] = e.loaded;  // store the loaded bytes for this file
                     let totalLoaded = loadedSizes.reduce((sum, loaded) => sum + loaded, 0);  // calculate the total loaded bytes for all files

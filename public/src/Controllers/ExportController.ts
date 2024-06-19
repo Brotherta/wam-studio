@@ -1,7 +1,7 @@
 import App from "../App";
 import { bufferToWave, combineBuffers, downloadBlob } from "../Audio/Utils/audioBufferToWave";
 import Plugin from "../Models/Plugin";
-import RegionTrack from "../Models/Track/RegionTrack";
+import Track from "../Models/Track/Track";
 import { audioCtx } from "../index";
 import AutomationController from "./AutomationController";
 
@@ -70,7 +70,7 @@ export default class ExporterController {
      *
      * @returns The audio buffer of the track.
      */
-    private async processTrack(track: RegionTrack, maxDuration: number, initializeWamHost: any): Promise<AudioBuffer> {
+    private async processTrack(track: Track, maxDuration: number, initializeWamHost: any): Promise<AudioBuffer> {
         /*TODO Exports of tracks 
         console.log("Exporting track " + track.id);
 
@@ -197,7 +197,7 @@ export default class ExporterController {
      * @param offlineAudioContext - Offline audio context to render the track.
      * @private
      */
-    private applyAutomation(track:RegionTrack, plugin: Plugin, offlineAudioContext: OfflineAudioContext) {
+    private applyAutomation(track:Track, plugin: Plugin, offlineAudioContext: OfflineAudioContext) {
         plugin.instance?._audioNode.clearEvents();
         let automation = track.automation;
         let events = [];

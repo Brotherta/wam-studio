@@ -88,7 +88,6 @@ export default class EditorController {
             let level = this._currentLevel;
 
             this._currentLevel = Math.max(this._currentLevel - 1, 0);
-            //console.log("_currentLevel", this._currentLevel)
 
             if (this._currentLevel === 0) {
                 // level is at max zoom value
@@ -99,7 +98,6 @@ export default class EditorController {
             if (level === this._currentLevel) return;
 
             ratio = this.getZoomRatioByLevel(this._currentLevel);
-            //console.log(ratio)
         }
         //updateRatioMillsByPx(ratio);
         incrementZoomLevel();
@@ -234,13 +232,8 @@ export default class EditorController {
      */
     private async updateZoom(): Promise<void> {
         let offsetPlayhead = this._view.playhead.position.x;
-        //console.log("playhad pos before zoom = " + offsetPlayhead)
 
         this._view.resizeCanvas();
-        /*
-       console.log("after zoom playhead=" + playhead + 
-               " pos="  + this._view.playhead.position.x + " ms=" + (playhead / audioCtx.sampleRate) * 1000);
-       */
         this._view.loop.updatePositionFromTime(this._app.host.loopStart, this._app.host.loopEnd);
         this._app.automationController.updateBPFWidth();
 

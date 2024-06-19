@@ -35,7 +35,7 @@ function deinterleave(input, output) {
  * planar format), into something that a codec or network streaming library
  * would expect.
  *
- * @param {Float32Array} input An array of n*128 frames Float32Array that hold the audio data.
+ * @param {Float32Array[]} input An array of n*128 frames Float32Array that hold the audio data.
  * @param {Float32Array} output A Float32Array that is n*128 elements long.
  */
 function interleave(input, output) {

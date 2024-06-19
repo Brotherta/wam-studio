@@ -1,198 +1,124 @@
-import { WamNode, WebAudioModule } from "@webaudiomodules/api";
-import TrackElement from "../../Components/TrackElement.js";
-import type TracksController from "../../Controllers/Editor/Track/TracksController";
-import { audioCtx } from "../../index";
-import Automation from "../Automation";
-import Plugin from "../Plugin.js";
+import { WamNode } from "@webaudiomodules/api";
+import { RingBuffer } from "../../Audio/Utils/Ringbuffer";
+import WamAudioWorkletNode from "../../Audio/WAM/WamAudioWorkletNode";
+import WamEventDestination from "../../Audio/WAM/WamEventDestination";
+import TrackElement from "../../Components/TrackElement";
+import { NUM_CHANNELS } from "../../Env";
+import Region, { RegionOf, RegionType } from "../Region/Region";
+import RegionPlayer from "../Region/RegionPlayer";
+import SoundProvider from "./SoundProvider";
 
-export default abstract class Track {
+export default class Track extends SoundProvider {
 
-  /* -~- OUTPUT NODES -~- */
-  /* junctionNode -> pannerNode -> gainNode -> monitoredNode */
-  /** The gain node associated to the track. It is used to control the volume of the track and is the outputNode of the track. **/
-  private gainNode: GainNode
 
-  /** The panner node associated to the track. It is used to control the balance of the track. **/
-  private pannerNode: StereoPannerNode
+  /** The audio context. */
+  private audioCtx: AudioContext
 
-  /** The plugin node if a plugin is connected to the track. */
-  private pluginWam?: WebAudioModule<WamNode>
-
-  /** The monitored output node. It output the sound of the track only when it is monitored. */
-  private monitoredNode: GainNode
-
-  /* -~- TRACK PROPERTIES -~- */
-  /** The unique id of the track. */
-  public id: number
-
-  /** The track element associated to the track. */
-  public element: TrackElement
-
-  /** The plugin associated to the track. */
-  public plugin: Plugin
-
-  /** The automation associated to the track. */
-  public automation: Automation
-
-  private _modified: boolean
-
-  /**
-   * The armed state of the track. It is used to record the track.
-   */
-  set isArmed(value: boolean){
-    this._armed=value
-    console.log("Armed", value)
-    this.element.setArm(value)
-  }
-
-  get isArmed(){ return this._armed }
-
-  private _armed: boolean=false
-
-  /**
-   * Position of the loop start in milliseconds.
-   */
-  public loopStart: number;
+  /** The group id of the track. */
+  private groupId: string
   
-  /**
-   * Position of the loop end in milliseconds.
-   */
-  public loopEnd: number;
+  /** The junction node to which all region type output are connected. */
+  private junctionNode: GainNode
 
-  constructor(element: TrackElement) {
-    // Audio Nodes
-    this.monitoredNode= audioCtx.createGain();
-    this.gainNode = audioCtx.createGain();
-    this.gainNode.gain.value = 0.5;
-    this.pannerNode = audioCtx.createStereoPanner();
-    this.pannerNode.connect(this.gainNode).connect(this.monitoredNode)
-
-    // Track properties
-    this.element = element;
-    this.color = "";
-    this.automation = new Automation();
-
-    // Default Controls
-    this.volume = 0.5;
-
-    // Recording controls.
-    this.isMuted=false
-    this.isSolo=false
-    this.isArmed = false;
-    this.monitored = false;
-
-    // Loop controls.
-    this.loopStart = 0;
-    this.loopEnd = 0;
-
-    this.modified=true
-
-  }
-
-  protected postInit(){
-    this._connect(this.pannerNode)
-  }
+  public readonly sampleRecorder: SampleRecorder
 
 
-  /** VOLUME, MUTE and SOLO */
+  /* -~- REGIONS -~- */
+  /** The regions associated to the track. */
+  public regions: Region[] = []
 
-  /** The volume of the track. */
-  private _volume: number
+  /** The merger regions, for each type of region there is big merger region. */
+  public merged_regions = new Map<RegionType<any>, [RegionOf<any>,RegionPlayer]>()
 
-  private updateVolume(){
-    if(!this.isMuted && !this.isSoloMuted)this.gainNode.gain.value=this._volume
-    else this.gainNode.gain.value=0
-  }
-
-  /**
-   * The volume of the track
-   */
-  public set volume(value:number){
-    // Set volume
-    this._volume=value
-    if(this.element.volumeSlider)this.element.volumeSlider.value = "" + value * 100;
-
-    this.updateVolume()
-  }
-
-  public get volume() { return this._volume }
-
-  /**
-   * Is the track muted, if a track is muted it emits no sound
-   */
-  public set isMuted(value: boolean) {
-    this._muted=value
-    this.element.setMute(value)
-    this.updateVolume()
-  }
-
-  public get isMuted() { return this._muted }
-
-  private _muted: boolean=false
-
-  /**
-   * Is the track muted by the solo mode of other tracks, if a track is muted it emits no sound
-   */
-  public set isSoloMuted(value: boolean) {
-    this._solo_muted=value
-    this.element.setSoloMute(value)
-    this.updateVolume()
-  }
-
-  public get isSoloMuted() { return this._solo_muted }
-
-  private _solo_muted: boolean=false
-  
-  /**
-   * Is the track soloed, if at least one track is soloed, only soloed tracks emit sound
-   * [WARNING] Don't set isSolo directly, use {@link TracksController#setSolo} instead.
-   */
-  public set isSolo(value: boolean){
-    if(value){
-      this.isMuted=false
-      this.isSoloMuted=false
+  /** Merge all regions into big merged regions. */
+  private updateMergedRegions(){
+    // Sort all regions
+    const regionMap= new Map<RegionType<any>,RegionOf<any>[]>()
+    for(const region of this.regions as RegionOf<any>[]){
+      const list=regionMap.get(region.regionType) ?? []
+      regionMap.set(region.regionType, list)
+      list.push(region)
     }
-    this._solo=value
-    this.updateVolume()
-    this.element.setSolo(value)
+
+    // Collect all player THEN clear and replace them (Probable race condition)
+    // TODO Make sure there is no race condition
+    (async()=>{
+
+      // Merge regions
+      const new_merged_regions = new Map<RegionType<any>, [RegionOf<any>,RegionPlayer]>()
+      for(const [type, regions] of regionMap){
+        const merged=Region.mergeAll(regions,true)
+        const player=await merged.createPlayer(this.groupId, this.audioCtx)
+        player.connect(this.junctionNode)
+        for(const node of this._connectedWamNodes)player.connectEvents(node)
+        new_merged_regions.set(type, [merged,player])
+      }
+
+      // Get playstate
+      let playstate=false
+      let playhead=0
+      for(const [_,[__,player]] of this.merged_regions){
+        playstate=player.isPlaying
+        playhead=player.playhead
+        break
+      }
+
+      // Change playstate
+      for(const [_,[__,player]] of new_merged_regions){
+        player.isPlaying=playstate
+        player.playhead=playhead
+      }
+
+      // Clear regions
+      const old_merged_regions=this.merged_regions
+      this.merged_regions=new_merged_regions
+      for(const [type,[region,player]] of old_merged_regions){
+        player.disconnect(this.junctionNode)
+        for(const node of this._connectedWamNodes)player.disconnectEvents(node)
+        player.clear()
+      }
+
+      this.updatePlayState()
+      
+    })()
+
   }
-
-  public get isSolo() { return this._solo }
-
-  private _solo: boolean=false
-
-
-  /** The color of the track in HEX format (#FF00FF). It is used to display the waveform. */
-  private _color: string
-
-  public set color(newColor: string){
-    this._color = newColor
-    if(this.element.color)this.element.color.style.background = newColor
-  }
-
-  public get color() { return this._color }
   
 
-
-  /**
-   * The balance of the track. The panning of the track.
-   */
-  public set balance(value: number){
-    this.pannerNode.pan.value = value
-    if(this.element.balanceSlider)this.element.balanceSlider.value = "" + value
+  constructor(element: TrackElement, audioCtx: AudioContext, groupId: string) {
+    super(element)
+    this.junctionNode=audioCtx.createGain()
+    this.audioCtx=audioCtx
+    this.groupId=groupId
+    this.sampleRecorder=new SampleRecorder(this.element,groupId,audioCtx)
+    this.postInit()
   }
 
-  public get balance() { return this.pannerNode.pan.value }
-  
   /**
-   * Sets the start and end of the loop.
+   * Adds a region to the regions list.
    *
-   * @param leftTime - Start of the loop in milliseconds.
-   * @param rightTime - End of the loop in milliseconds.
+   * @param region - The region to add.
    */
-  public updateLoopTime(loopStart: number, loopEnd: number): void {
-    this.loopStart = loopStart;
-    this.loopEnd = loopEnd;
+  public addRegion(region: Region): void {
+    region.trackId=this.id
+    this.regions.push(region);
+  }
+
+  /**
+   * Gets the region according to its id.
+   * @param regionId - The id of the region.
+   * @returns The region if it exists, undefined otherwise.
+   */
+  public getRegionById(regionId: number): Region | undefined {
+    return this.regions.find((region) => region.id === regionId);
+  }
+
+  /**
+   * Removes a region from the regions list according to its id.
+   * @param regionId - The id of the region to remove.
+   */
+  public removeRegionById(regionId: number): void {
+    this.regions = this.regions.filter((region) => region.id !== regionId);
   }
 
   /**
@@ -200,90 +126,212 @@ export default abstract class Track {
    * @param context - The audio context.
    * @param playhead - The playhead position in buffer samples.
    */
-  public abstract update(context: AudioContext, playhead: number): void
+  public update(context: AudioContext, playhead: number): void{
+    this.updateMergedRegions()
+  }
 
-  /**
-   * Connect the track to the audio node input/output of a plugin and disconnect the previous one.
-   * @param node 
-   */
-  public connectPlugin(plugin?: WebAudioModule<WamNode>){
-    // Disconnect the previous plugin node if it exists.
-    if(this.pluginWam){
-      this.pluginWam.audioNode.disconnect(this.pannerNode)
-      this._disconnect(this.pluginWam.audioNode)
-      this._disconnectEvents(this.pluginWam.audioNode)
-      this.pluginWam=undefined
-    }
-    // Disconnect from panner node
-    else {
-      this._disconnect(this.pannerNode)
-    }
 
-    // Connect to a plugin node
-    if(plugin){
-      this.pluginWam=plugin
-      this._connect(plugin.audioNode)
-      this._connectEvents(plugin.audioNode)
-      plugin.audioNode.connect(this.pannerNode)
+  /* PLAY */
+  private updatePlayState(){
+    for(const [_,[__,player]] of this.merged_regions){
+      player.isPlaying=this._playing
+      if(!this._doLoop)player.setLoop(false)
+      else player.setLoop(this.loopStart, this.loopEnd)
+    }
+  }
+
+  private _playing=false
+  public override play(): void{
+    this._playing=true
+    this.updatePlayState()
+  }
+
+  public override pause(): void{
+    this._playing=false
+    this.updatePlayState()
+  }
+
+  private _doLoop=false
+  public override loop(value:boolean): void{
+    this.updatePlayState()
+  }
+
+  /* CONNECTION */
+  public override _connect(node: AudioNode): void {
+    this.junctionNode.connect(node)
+  }
+
+  public override _disconnect(node: AudioNode): void {
+    this.junctionNode.disconnect(node)
+  }
+
+  private _connectedWamNodes = new Array<WamNode>()
+
+  override _connectEvents(node: WamNode): void{
+    this._connectedWamNodes.push(node)
+    for(const [_,[__,player]] of this.merged_regions){ player.connectEvents(node) }
+  }
+
+  override _disconnectEvents(node: WamNode): void{
+    this._connectedWamNodes.splice(this._connectedWamNodes.indexOf(node),1)
+    for(const [_,[__,player]] of this.merged_regions){ player.disconnectEvents(node) }
+  }
+
+
+  public override set playhead(value: number){
+    for(const [_,[__,player]] of this.merged_regions){ player.playhead=value }
+  }
+  public override get playhead(): number{
+    for(const [_,[__,player]] of this.merged_regions){ return player.playhead }
+    return 0
+  }
+
+
+  /* LIFETIME */
+
+  /** Is the track deleted */
+  public deleted=false;
+  
+  /** Should be called when the track is deleted and no more used. */
+  public close(){
+    for(const [_,[__,player]] of this.merged_regions){
+      player.disconnect(this.junctionNode)
+      for(const node of this._connectedWamNodes)player.disconnectEvents(node)
+      player.clear()
+    }
+    this.outputNode.disconnect()
+    this.monitoredOutputNode.disconnect()
+    this.deleted=true
+  }
+
+
+}
+
+
+/**
+ * Responsible of track sample recording.
+ */
+class SampleRecorder{
+  
+  public worker?: Worker
+  public sab: SharedArrayBuffer
+  public recorder: WamAudioWorkletNode
+  public micRecNode?: MediaStreamAudioSourceNode
+  private splitterNode: ChannelSplitterNode
+  private mergerNode: ChannelMergerNode
+  private element: TrackElement
+  
+  constructor(element: TrackElement, groupId: string, audioContext: AudioContext){
+    this.element=element;
+    this.sab=RingBuffer.getStorageForCapacity(audioContext.sampleRate*2, Float32Array);
+    (async ()=>{
+      const instance=await WamEventDestination.createInstance(groupId,audioContext,{})
+      this.recorder=instance.audioNode as WamAudioWorkletNode
+      this.recorder!.port.postMessage({ sab: this.sab });
+      console.log("OK")
+    })()
+    this.splitterNode= audioContext.createChannelSplitter(NUM_CHANNELS)
+    this.mergerNode= audioContext.createChannelMerger(NUM_CHANNELS)
+    this.linkNodes()
+  }
+
+  private linkNodes(){
+    try{
+      this.splitterNode.disconnect(this.mergerNode)
+    }catch(e){}
+
+    if(this.isStereo){
+      if(this.isMerged){
+        this.splitterNode.connect(this.mergerNode,0,0)
+        this.splitterNode.connect(this.mergerNode,1,0)
+        this.splitterNode.connect(this.mergerNode,0,1)
+        this.splitterNode.connect(this.mergerNode,1,1)
+      }
+      else{
+        this.splitterNode.connect(this.mergerNode,0,0)
+        this.splitterNode.connect(this.mergerNode,1,1)
+      }
     }
     else{
-      this._connect(this.pannerNode)
+      if(this.isMerged){
+        this.splitterNode.connect(this.mergerNode,0,0)
+        this.splitterNode.connect(this.mergerNode,0,1)
+      }
+      else{
+        if(this.left){
+          this.splitterNode.connect(this.mergerNode,0,0)
+          this.splitterNode.connect(this.mergerNode,0,1)
+        }
+        if(this.right){
+          this.splitterNode.connect(this.mergerNode,1,0)
+          this.splitterNode.connect(this.mergerNode,1,1)
+        }
+
+      }
     }
   }
 
-  public abstract _connect(node: AudioNode): void
+  /**
+   * The stereo state of the track. It is used to know if the track is stereo or mono.
+   */
+  set isStereo(value: boolean){
+    this._stereo=value
+    this.element.setMode(value)
+    this.linkNodes()
+  }
 
-  public abstract _disconnect(node: AudioNode): void
+  get isStereo(){ return this._stereo }
 
-  public abstract _connectEvents(node: WamNode): void
-
-  public abstract _disconnectEvents(node: WamNode): void
+  private _stereo: boolean = true
 
   /**
-   * Set the track to be monitored or not.
-   * If the track is monitored, its output is connected, else it is not.
+   * The merge state of the track. It is used to know if the track is merged or not.
    */
-  public set monitored(value: boolean){
-    this.monitoredNode.gain.value = value?1:0
-    this.element.setMonitoring(value)
+  set isMerged(value: boolean){
+    this._merge=value
+    this.element.setMerge(value)
+    this.linkNodes()
   }
 
-  public get monitored(){
-    return this.monitoredNode.gain.value>0
-  }
+  get isMerged(){ return this._merge }
 
-  public get outputNode(): AudioNode {
-    return this.gainNode
-  }
-
-  public get monitoredOutputNode(): AudioNode {
-    return this.monitoredNode
-  }
-
-  public abstract play(): void
-
-  public abstract pause(): void
-
-  public abstract loop(value:boolean): void
-
-  /** The playhead positions of the track in milliseconds. */
-  public abstract playhead: number
+  private _merge: boolean = true
 
   /**
-   * The modified state of the track. It is used to know if the track has been modified and should be updated.
+   * The left state of the track. It is used to know if the track is left or right when recording.
    */
-  public set modified(value: boolean){
-    this._modified=value
-  }
-  public get modified(): boolean{
-    return this._modified || this._isModified()
+  set left(value: boolean){
+    this._left=value
+    this.element.setLeft(value)
+    this.linkNodes()
   }
 
+  get left(){ return this._left }
+
+  private _left: boolean = true
+
   /**
-   * Override this method to add more conditions to the modified state.
-   * @returns 
+   * The right state of the track. It is used to know if the track is left or right when recording.
    */
-  protected _isModified():boolean{
-    return false
+  set right(value: boolean){
+    this._right=value
+    this.element.setRight(value)
+    this.linkNodes()
   }
+
+  get right(){ return this._right }
+
+  private _right: boolean = false
+
+  /**
+   * The recording input node of the track. Microphone is connected to this node when recording.
+   */
+  get recordingInputNode(){ return this.splitterNode }
+
+  /**
+   * The recording output node of the track. It is used to record the track. Its output is what
+   * is recorded.
+   */
+  get recordingOutputNode(){ return this.mergerNode }
+
 }

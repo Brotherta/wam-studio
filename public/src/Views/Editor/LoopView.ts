@@ -1,6 +1,6 @@
-import {Container, Graphics} from "pixi.js";
+import { Container, Graphics } from "pixi.js";
+import { RATIO_MILLS_BY_PX } from "../../Env";
 import EditorView from "./EditorView";
-import {RATIO_MILLS_BY_PX} from "../../Env";
 
 /**
  * Class that represent the loop. It's a PIXI.JS Container that will contain the track, the handle and the line of the loop.
@@ -107,16 +107,13 @@ export default class LoopView extends Container {
      * @param looping
      */
     public updateActive(looping: boolean) {
-        console.log("updateActive", looping);
         this.active = looping;
         const color = this.active ? this.activeColor : this.inactiveColor;
         this.background.tint = color;
         this.leftHandle.tint = color;
         this.rightHandle.tint = color;
         this.drawWindow();
-
-        console.log("updateActive this.leftHandle.x", this.leftHandle.position.x + " this.rightHandle.x", this.rightHandle.x)
-;    }
+    }
 
     /**
      * Only redraw the children of the track containers.

@@ -386,10 +386,7 @@ export default class TrackElement extends HTMLElement {
     }
 
     connectedCallback() {
-        //console.log("TrackElement connectedCallback");
-
         if (this.shadowRoot !== null) {
-            //console.log("TrackElement shadowRoot not null")
             this.shadowRoot.innerHTML = template.innerHTML;
             
             this.defineTrackElementListeners();
@@ -399,7 +396,6 @@ export default class TrackElement extends HTMLElement {
             this.isLoading = true;
 
             this.vuMeterDiv = this.shadowRoot.querySelector("#vu-meter-div") as HTMLDivElement;
-            //console.log(this.vuMeterDiv);
             this.update()
         }
     }

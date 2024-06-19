@@ -28,7 +28,7 @@ export function getMIDIPlayerProcessor(moduleId:string){
             if (!this.instants) return
 
             // Get the instant
-            let instantI = Math.floor(from/this.instant_duration)
+            let instantI = Math.floor(to/this.instant_duration)
             if(instantI>=this.instants.length)return
             let instant = this.instants[instantI]
 

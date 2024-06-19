@@ -20,7 +20,7 @@ import ProjectController from "./Controllers/ProjectController";
 import RecorderController from "./Controllers/RecorderController";
 import SettingsController from "./Controllers/SettingsController";
 import Loader from "./Loader/Loader";
-import HostTrack from "./Models/Track/HostTrack";
+import Host from "./Models/Track/Host";
 import AboutView from "./Views/AboutView";
 import AutomationView from "./Views/AutomationView";
 import EditorView from "./Views/Editor/EditorView";
@@ -63,7 +63,7 @@ export default class App {
     aboutView: AboutView;
     keyboardShortcutsView: KeyboardShortcutsView;
 
-    host: HostTrack;
+    host: Host;
     loader: Loader;
 
     undoManager:UndoManager;
@@ -87,7 +87,7 @@ export default class App {
         this.waveformController = new WaveformController(this);
         this.regionsController = new RegionController(this);
         this.tracksController = new TracksController(this);
-        this.host = new HostTrack(this,this.tracksController.tracks);
+        this.host = new Host(this,this.tracksController.tracks);
         this.playheadController = new PlayheadController(this);
         this.hostController = new HostController(this);
         this.pluginsController = new PluginsController(this);

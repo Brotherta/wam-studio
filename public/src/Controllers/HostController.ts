@@ -408,8 +408,6 @@ export default class HostController {
           region.start=region.start / TEMPO_DELTA
         }
 
-        // MB : is this necessary ? Apparently yes as start of regions changed.
-        // TODO : check if this is really necessary.
         track.modified=true
 
         this._app.editorView.drawRegions(track);
