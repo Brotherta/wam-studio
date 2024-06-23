@@ -47,7 +47,7 @@ export default class AutomationController {
      */
      public async updateAutomations(track: Track): Promise<void> {
         let plugin = track.plugin;
-        if (plugin.initialized) {
+        if (plugin?.instance) {
             let params = await plugin.instance?._audioNode.getParameterInfo();
             
             track.automation.updateAutomation(params);
@@ -59,7 +59,7 @@ export default class AutomationController {
             this._view.createItem("Clear All Automations", "clear-all", () => {
                 this._view.hideBpf(track.id);
                 track.automation.clearAllAutomation(params);
-                track.plugin.instance?._audioNode.clearEvents();
+                track.plugin?.instance?._audioNode.clearEvents();
             })
             for (let param in params) {
                 
@@ -120,7 +120,7 @@ export default class AutomationController {
         const time = this._app.host.playhead;
 
         for (let track of tracks) {
-            track.plugin.instance?._audioNode.clearEvents();
+            track.plugin?.instance?._audioNode?.clearEvents();
             const automation = track.automation;
             const events = [];
             for (let bpf of automation.bpfList) {
@@ -142,7 +142,7 @@ export default class AutomationController {
             }
             events.sort((a, b) => a.time - b.time);
             // @ts-ignore
-            track.plugin.instance?._audioNode.scheduleEvents(...events);
+            track.plugin?.instance?._audioNode?.scheduleEvents(...events);
         }
     }
 

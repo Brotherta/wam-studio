@@ -5,7 +5,6 @@ import AudioPlayerNode from "../../Audio/AudioNode";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import TrackElement from "../../Components/TrackElement";
 import { BACKEND_URL, MAX_DURATION_SEC } from "../../Env";
-import Plugin from "../Plugin";
 import SoundProvider from "./SoundProvider";
 /**
  * Host class that work as the master sound provider.
@@ -57,7 +56,7 @@ export default class Host extends SoundProvider {
      * @param tracks Its children tracks
      */
     constructor(app: App, tracks: Iterable<SoundProvider>) {
-        super(new TrackElement());
+        super(new TrackElement(),"NO_GROUP_ID");
         this.tracks=tracks
         this.playhead = 0;
         this.latency = 0;
@@ -67,7 +66,6 @@ export default class Host extends SoundProvider {
         this.looping = false;
 
         this.volume=1;
-        this.plugin = new Plugin(app);
         this.mainNode = audioCtx.createGain();
         this.outputNode.connect(audioCtx.destination)
         this.postInit()
@@ -78,6 +76,7 @@ export default class Host extends SoundProvider {
      * It is asynchronous because it needs to load the WAM SDK and the AudioPlayerNode.
      */
     async initWAM() {
+        console.log("Loading WAM SDK",BACKEND_URL+"/src/index.js")
         const {default: WAM} = await import(/* webpackIgnore: true */BACKEND_URL+"/src/index.js");
         this.pluginWAM = WAM;
 

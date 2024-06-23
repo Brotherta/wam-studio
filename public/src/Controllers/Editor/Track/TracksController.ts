@@ -12,6 +12,7 @@ import { audioCtx } from "../../../index";
 import WebAudioPeakMeter from "../../../Audio/Utils/PeakMeter";
 import { RegionOf } from "../../../Models/Region/Region";
 import SampleRegion from "../../../Models/Region/SampleRegion";
+import SoundProvider from "../../../Models/Track/SoundProvider";
 import Track from "../../../Models/Track/Track";
 import { getRandomColor } from "../../../Utils/Color";
 import FriendlyIterable from "../../../Utils/FriendlyIterable";
@@ -21,9 +22,6 @@ import { registerOnKeyDown } from "../../../Utils/keys";
  * Class that controls the tracks view. It creates, removes and manages the tracks. It also defines the listeners for the tracks.
  */
 export default class TracksController{
-
-  /** Selected track. It is undefined if the host is selected. */
-  public selectedTrack?: Track
 
   /** The app instance. */
   private _app: App;
@@ -48,6 +46,33 @@ export default class TracksController{
     this.bindEvents()
   }
 
+
+  
+  /** -~- Selection -~- */
+  private _selectedSoundProvider: SoundProvider|null = null
+  readonly afterSelectedChange=new Set<(preivous:SoundProvider|null, selected: SoundProvider|null)=>void>()
+
+  /** Select an SoundProvider (A track or the host) */
+  public select(soundProvider: SoundProvider|null){
+    if(this._selectedSoundProvider){
+      this._selectedSoundProvider.element.unSelect()
+    }
+    
+    if(soundProvider){
+      this._selectedSoundProvider=soundProvider
+      soundProvider.element.select()
+    }
+    this.afterSelectedChange.forEach(it=>it(this._selectedSoundProvider,soundProvider))
+  }
+
+  /** Get the selected SoundProvider */
+  public get selected(){ return this._selectedSoundProvider }
+
+  /** Get the selected SoundProvider if it is a track. */
+  public get selectedTrack(){ return this._selectedSoundProvider instanceof Track ? this._selectedSoundProvider : null }
+
+
+  
   /**
    * Add a track and Initializes its view.
    * It also initializes the waveforms and the automations.
@@ -62,7 +87,6 @@ export default class TracksController{
     this.track_list.push(track)
 
     // Create its track element (GUI)
-    track.plugin = new Plugin(this._app);
     track.id = this.trackIdCount++;
     track.element.trackId = track.id;
     // wait until the trackElement WebComponent is connected
@@ -110,7 +134,7 @@ export default class TracksController{
     if(index>=0){
       this.track_list.splice(index,1)
       track.close()
-      this._app.pluginsController.removePedalBoard(track);
+      this._app.pluginsController.connectPlugin(track,null);
       this._view.removeTrack(track.element);
       this._app.automationView.removeAutomationBpf(track.id);
       this._app.waveformController.removeWaveformOfTrack(track);
@@ -278,8 +302,8 @@ export default class TracksController{
       let newSelectedTrack = track
 
       this._app.doIt(true,
-        ()=> this._app.pluginsController.selectTrack(newSelectedTrack),
-        ()=> this._app.pluginsController.selectTrack(oldSelectedTrack),
+        ()=> this.select(newSelectedTrack),
+        ()=> this.select(oldSelectedTrack),
       )
     });
 
@@ -393,40 +417,40 @@ export default class TracksController{
     })
 
     // TRACK MODE STEREO or (MONO to STEREO)
-    /*track.element.modeBtn.addEventListener("click", () => {
-      let initialStereo: boolean = track.isStereo
+    track.element.modeBtn.addEventListener("click", () => {
+      let initialStereo: boolean = track.sampleRecorder.isStereo
       this._app.doIt(true,
-        ()=> track.isStereo = !initialStereo,
-        ()=> track.isStereo = initialStereo,
+        ()=> track.sampleRecorder.isStereo = !initialStereo,
+        ()=> track.sampleRecorder.isStereo = initialStereo,
       )
     })
 
     // TRACK LEFT INPUT
     track.element.leftBtn.addEventListener("click", () => {
-      let initialLeft: boolean = track.left
+      let initialLeft: boolean = track.sampleRecorder.left
       this._app.doIt(true,
-        ()=> track.left = !initialLeft,
-        ()=> track.left = initialLeft,
+        ()=> track.sampleRecorder.left = !initialLeft,
+        ()=> track.sampleRecorder.left = initialLeft,
       )
     })
 
     // TRACK RIGHT INPUT
     track.element.rightBtn.addEventListener("click", () => {
-      let initialRight: boolean = track.right
+      let initialRight: boolean = track.sampleRecorder.right
       this._app.doIt(true,
-        ()=> track.right = !initialRight,
-        ()=> track.right = initialRight,
+        ()=> track.sampleRecorder.right = !initialRight,
+        ()=> track.sampleRecorder.right = initialRight,
       )
     })
 
     // TRACK MERGE LEFT/RIGHT
     track.element.mergeBtn.addEventListener("click", () => {
-      let initialMerge: boolean = track.isMerged
+      let initialMerge: boolean = track.sampleRecorder.isMerged
       this._app.doIt(true,
-        ()=> track.isMerged = !initialMerge,
-        ()=> track.isMerged = initialMerge,
+        ()=> track.sampleRecorder.isMerged = !initialMerge,
+        ()=> track.sampleRecorder.isMerged = initialMerge,
       )
-    })*/
+    })
 
     // TRACK FX/PLUGINS
     track.element.fxBtn.addEventListener("click", () => {
@@ -443,7 +467,7 @@ export default class TracksController{
    * @private
    */
   private async automationMenu(e: Event, track: Track): Promise<void> {
-    this._app.pluginsController.selectTrack(track);
+    this.select(track);
     await this._app.automationController.openAutomationMenu(track);
     e.stopImmediatePropagation();
   }
@@ -492,7 +516,7 @@ export default class TracksController{
     element: TrackElement,
     oldTrackWaveform: WaveformView | undefined,
     oldPlugin: Plugin
-  ) {
+  ) {/*
     
     // restore track element with old track element state
     const track=this.createEmptyTrack()
@@ -528,6 +552,6 @@ export default class TracksController{
 
       track.modified = true;
       
-    return;
+    return;*/
   }
 }

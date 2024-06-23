@@ -1,47 +1,46 @@
-import {WebAudioModule} from "@webaudiomodules/sdk";
+import { WebAudioModule } from "@webaudiomodules/sdk";
 import App from "../App";
 
 /**
  * Class that represents a plugin.
+ * The plugin have to be instantiated then to be used.
  */
 export default class Plugin {
 
-    instance: WebAudioModule | undefined;
-    dom: Element;
-    app: App;
-    initialized: boolean
+    instance: WebAudioModule|null = null
+    dom: Element
 
-    constructor(app: App) {
-        this.app = app;
-        this.initialized = false;
+
+    /** ~ FACTORIES ~ **/
+    constructor(private app: App, readonly name: string, private wam_type: typeof WebAudioModule) {}
+
+    clone(){
+        return new Plugin(this.app,this.name,this.wam_type)
     }
+    
 
     /**
      * Initialize the plugin by loading the WAM script and creating the instance.
      */
-    async initPlugin(WAM: any, audioCtx: AudioContext, offlineAudioContext?: OfflineAudioContext, exportGroupId?: string) {
-        if (offlineAudioContext && exportGroupId) {
-            //@ts-ignore
-            this.instance = await WAM.createInstance(exportGroupId, offlineAudioContext);
-        }
-        else {
-            //@ts-ignore
-            this.instance = await WAM.createInstance(this.app.host.hostGroupId, audioCtx);
-        }
-        // @ts-ignore
+    async instantiate(audioCtx: BaseAudioContext, groupid: string) {
+        this.destroy()
+        console.log(">>>> Create instance",groupid,audioCtx,this.wam_type)
+        this.instance = await this.wam_type.createInstance(groupid, audioCtx);
+        console.log(">>>> Create GUI")
         this.dom = await this.instance.createGui();
-        this.initialized = true;
+        console.log(">>>> End")
     }
 
     /**
-     * Unload the plugin by destroying the instance and the GUI.
+     * Destroy the plugin instance and remove the GUI.
      */
-    unloadPlugin() {
-        if (this.initialized) {
-            // @ts-ignore
-            this.instance.destroyGui(this.dom);
-            this.instance = undefined;
-            this.initialized = false;
+    destroy() {
+        if (this.instance !== null) {
+            this.instance.audioNode.disconnect()
+            this.instance.audioNode.destroy()
+            this.instance.audioNode.disconnectEvents()
+            this.instance.destroyGui(this.dom)
+            this.instance = null
         }
     }
 
@@ -51,7 +50,7 @@ export default class Plugin {
      *
      * @param state The state of the plugin to set (Json Object)
      */
-    async setStateAsync(state: any) {
+    async setState(state: any) {
         if (state.current.length === 0) return;
         await this.instance!._audioNode.setState(state);
 
@@ -73,5 +72,13 @@ export default class Plugin {
             }, 200);
         });
         await statePlugin;
+    }
+
+    /**
+     * Get the state of the plugin.
+     * @returns The state of the plugin (Json Object)
+     */
+    getState():any|null{
+        return this.instance?._audioNode?.getState()
     }
 }

@@ -13,9 +13,6 @@ export default class Track extends SoundProvider {
 
   /** The audio context. */
   private audioCtx: AudioContext
-
-  /** The group id of the track. */
-  private groupId: string
   
   /** The junction node to which all region type output are connected. */
   private junctionNode: GainNode
@@ -86,10 +83,9 @@ export default class Track extends SoundProvider {
   
 
   constructor(element: TrackElement, audioCtx: AudioContext, groupId: string) {
-    super(element)
+    super(element,groupId)
     this.junctionNode=audioCtx.createGain()
     this.audioCtx=audioCtx
-    this.groupId=groupId
     this.sampleRecorder=new SampleRecorder(this.element,groupId,audioCtx)
     this.postInit()
   }

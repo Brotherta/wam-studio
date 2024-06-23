@@ -9,8 +9,9 @@ import Track from "../Models/Track/Track";
 import { audioCtx } from "../index";
 
 
+// TODO A better way to check compatibility with the project version without having to add all the compatible versions in the array.
 /** The current project version */
-const CURRENT_PROJECT_VERSION="project-0.0.1"
+const CURRENT_PROJECT_VERSION="project-1.0"
 
 /**
  * The list of compatible versions of the project format.
@@ -46,7 +47,10 @@ export interface ProjectData {
     host: {
         playhead: number;
         volume: number;
-        plugin?: any;
+        plugin?: {
+            name: string;
+            state: any;
+        };
     }
     tracks:{
         name: string;
@@ -55,7 +59,10 @@ export interface ProjectData {
         balance: number;
         volume: number;
         color: string;
-        plugins?: any;
+        plugin?: {
+            name: string;
+            state: any;
+        };
         automations:{
             param: string;
             state: State
@@ -90,23 +97,19 @@ export default class Loader {
      */
     async saveProject(): Promise<[ProjectData,RegionContent[]]> {
 
-        let pluginHostState = null;
-        if (this._app.host.plugin.initialized) {
-            pluginHostState = await this._app.host.plugin.instance!._audioNode.getState();
-        }
+        let pluginHostState = await this._app.host.plugin?.getState();
         
         // Save the tracks
         let contents: RegionContent[] = [];
         let tracks: ProjectData['tracks'] = [];
         for (let track of this._app.tracksController.tracks) {
-            let hasPlugin = track.plugin.initialized;
-            let pluginState = null;
-
             // Add automations to the track
             let automations: ProjectData['tracks'][0]['automations'] = [];
-            if (hasPlugin) {
-                pluginState = await track.plugin.instance!._audioNode.getState();
-                let parameters = await track.plugin.instance!._audioNode.getParameterInfo();
+            let pluginState=await track.plugin?.getState()
+            let pluginData= pluginState ? undefined : {name:track.plugin!.name,state:pluginState}
+            
+            if (pluginState) {
+                let parameters = await track.plugin!.instance!._audioNode.getParameterInfo();
                 for (let param in parameters) {
                     let bpf = track.automation.getBpfOfParam(param);
                     if (bpf !== undefined) {
@@ -146,7 +149,7 @@ export default class Loader {
                 solo: track.isSolo,
                 volume: track.volume,
                 balance: track.balance,
-                plugins: hasPlugin ? pluginState : null,
+                plugin: pluginData,
                 regions: regions,
                 automations: automations
             });
@@ -182,11 +185,15 @@ export default class Loader {
         this._app.host.playhead = 0;
         this._app.host.volume=project.host.volume;
 
-        if (project.host.plugin !== null) {
-            await this._app.host.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
+        if (project.host.plugin) {
+            //Remember: this._app.host.pluginWAM
+            //await this._app.host.plugin?.instantiate(audioCtx,this._app.host.hostGroupId);
+            const plugin=await this._app.pluginsController.fetchPlugin(project.host.plugin.name)
+            if(!plugin)return
+            await this._app.host.connectPlugin(plugin);
+            await plugin.setState(project.host.plugin.state)
             //TODO this._app.pluginsController.connectPedalBoard(this._app.host);
             //this._app.pluginsView.movePluginLoadingZone(this._app.host);
-            await this._app.host.plugin.instance?._audioNode.setState(project.host.plugin);
         }
 
         // Load tracks
@@ -202,13 +209,14 @@ export default class Loader {
             track.volume= trackJson.volume;
             this._app.tracksController.setColor(track, trackJson.color);
 
-            let plugins = trackJson.plugins;
-            if (plugins !== null) {
-                await track.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
-                this._app.pluginsController.connectPedalBoard(track);
+            const pluginData = trackJson.plugin;
+            if (pluginData) {
+                const plugin=await this._app.pluginsController.fetchPlugin(pluginData.name)
+                if(!plugin)return
+                await this._app.host.connectPlugin(plugin);
+                await plugin.setState(pluginData.state)
+                //await track.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
                 this._app.pluginsView.movePluginLoadingZone(track);
-
-                await track.plugin.setStateAsync(plugins);
                 await this._app.automationController.updateAutomations(track);
 
                 let automations = trackJson.automations;

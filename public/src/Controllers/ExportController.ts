@@ -71,6 +71,12 @@ export default class ExporterController {
      * @returns The audio buffer of the track.
      */
     private async processTrack(track: Track, maxDuration: number, initializeWamHost: any): Promise<AudioBuffer> {
+        // 1) We render a AudioBuffer in the online audio context so we don't have to rebuild the track graph.
+        // 2) We play the buffer in the offline audio context to render it.
+
+        /* 1) Create a buffer in the online audio context. */
+        track.outputNode.connect(audioCtx.destination);
+
         /*TODO Exports of tracks 
         console.log("Exporting track " + track.id);
 

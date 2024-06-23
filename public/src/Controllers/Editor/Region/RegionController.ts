@@ -202,7 +202,7 @@ export default class RegionController {
       this._offsetX = _e.data.global.x - regionView.position.x;
       // select the track that corresponds to the clicked region
       let track = this._app.tracksController.getTrackById(region.trackId);
-      if (track) this._app.pluginsController.selectTrack(track);
+      if (track) this._app.tracksController.select(track);
     });
     regionView.on("pointerup", () => this.handlePointerUp());
     regionView.on("pointerupoutside", () => this.handlePointerUp() );
@@ -412,11 +412,11 @@ export default class RegionController {
     const {region}=this.regionClipboard
 
     // Try to get the selected track as pasting destination
-    let track: Track | undefined = this._app.tracksController.selectedTrack
-    if(track?.deleted)track=undefined
+    let track = this._app.tracksController.selectedTrack
+    if(track?.deleted)track=null
     // If no track is selected, try to paste in the track from which the region has been copied
     if (!track) track = this.regionClipboard.track
-    if(track.deleted)track=undefined
+    if(track.deleted)track=null
     // Else, the is nothing we can do
     if(!track)return
 

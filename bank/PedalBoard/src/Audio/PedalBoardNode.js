@@ -3,6 +3,19 @@ import WamNode from "../../plugins/utils/sdk/src/WamNode.js";
 import addFunctionModule from "../../plugins/utils/sdk/src/addFunctionModule.js";
 import getCustomProcessor from "./CustomProcessor.js";
 
+/**
+ * //TODO Better support for wam with not sound input, no midi input, no sound input, no midi 
+ * // If an WAM has no sound input, the previous node should try to connect to the next one, if th next one has no sound input, it shoud connect to [...]
+ * // This way, there is no unused produced audio buffer. Having such things have no sense.
+ * 
+ * O ---> O ---> O
+ * 
+ * O      O ---> O
+ * |_____________^
+ * 
+ * O      O      O ---> O
+ * |______v_____________^
+ */
 export default class PedalBoardNode extends WamNode {
 
   /**

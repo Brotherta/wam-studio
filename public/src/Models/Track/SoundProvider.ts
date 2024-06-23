@@ -1,4 +1,5 @@
-import { WamNode, WebAudioModule } from "@webaudiomodules/api";
+import { WamNode } from "@webaudiomodules/api";
+import { crashOnDebug } from "../../App";
 import TrackElement from "../../Components/TrackElement.js";
 import type TracksController from "../../Controllers/Editor/Track/TracksController";
 import { audioCtx } from "../../index";
@@ -20,9 +21,6 @@ export default abstract class SoundProvider {
   /** The panner node associated to the track. It is used to control the balance of the track. **/
   private pannerNode: StereoPannerNode
 
-  /** The plugin node if a plugin is connected to the track. */
-  private pluginWam?: WebAudioModule<WamNode>
-
   /** The monitored output node. It output the sound of the track only when it is monitored. */
   private monitoredNode: GainNode
 
@@ -32,9 +30,6 @@ export default abstract class SoundProvider {
 
   /** The track element associated to the track. */
   public element: TrackElement
-
-  /** The plugin associated to the track. */
-  public plugin: Plugin
 
   /** The automation associated to the track. */
   public automation: Automation
@@ -64,7 +59,7 @@ export default abstract class SoundProvider {
    */
   public loopEnd: number;
 
-  constructor(element: TrackElement) {
+  constructor(element: TrackElement, readonly groupId: string) {
     // Audio Nodes
     this.monitoredNode= audioCtx.createGain();
     this.gainNode = audioCtx.createGain();
@@ -207,33 +202,55 @@ export default abstract class SoundProvider {
    */
   public abstract update(context: AudioContext, playhead: number): void
 
+
+
+  /** ~ PLUGINS ~ **/
+  private _plugin: Plugin|null = null // The plugin associated to the track.
+
+  get plugin(): Plugin|null{ return this._plugin }
+
   /**
-   * Connect the track to the audio node input/output of a plugin and disconnect the previous one.
+   * Connect the track to a plugin and disconnect it from the previous one.
    * @param node 
    */
-  public connectPlugin(plugin?: WebAudioModule<WamNode>){
+  public async connectPlugin(plugin: Plugin|null){
+    console.log(">>> Instantiate")
+    if(plugin)await plugin.instantiate(this.pannerNode.context,this.groupId)//TODO 
+
+      console.log(">>> Disconnect")
     // Disconnect the previous plugin node if it exists.
-    if(this.pluginWam){
-      this.pluginWam.audioNode.disconnect(this.pannerNode)
-      this._disconnect(this.pluginWam.audioNode)
-      this._disconnectEvents(this.pluginWam.audioNode)
-      this.pluginWam=undefined
+    if(this.plugin){
+      const wam=this.plugin.instance
+      if(wam){
+        wam.audioNode.disconnect(this.pannerNode)
+        this._disconnect(wam.audioNode)
+        this._disconnectEvents(wam.audioNode)
+      }
+      this.plugin.destroy()
+      this._plugin=null
     }
     // Disconnect from panner node
     else {
       this._disconnect(this.pannerNode)
     }
 
+    console.log(">>> Connect")
     // Connect to a plugin node
     if(plugin){
-      this.pluginWam=plugin
-      this._connect(plugin.audioNode)
-      this._connectEvents(plugin.audioNode)
-      plugin.audioNode.connect(this.pannerNode)
+      if(plugin.instance===null){
+        crashOnDebug("Plugin instance is null")
+        return
+      }
+      this._plugin=plugin
+      this._connect(plugin.instance.audioNode)
+      this._connectEvents(plugin.instance.audioNode)
+      plugin.instance.audioNode.connect(this.pannerNode)
     }
+    // Connect to panner node
     else{
       this._connect(this.pannerNode)
     }
+    console.log(">>> End")
   }
 
   public abstract _connect(node: AudioNode): void
