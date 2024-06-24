@@ -1,5 +1,5 @@
 import { WebAudioModule } from "@webaudiomodules/sdk";
-import App from "../App";
+import App, { crashOnDebug } from "../App";
 import { BACKEND_URL } from "../Env";
 import Plugin from "../Models/Plugin";
 import SoundProvider from "../Models/Track/SoundProvider";
@@ -19,6 +19,7 @@ import PluginsView from "../Views/PluginsView";
  */
 export default class PluginsController {
 
+    /* -~- CONFIGURATION -~- */
     /**
      * A list of the roots plugins.
      * Only one root plugin can be associated to a Track.
@@ -31,6 +32,7 @@ export default class PluginsController {
 
     /** The default WAM to load */
     readonly DEFAULT_WAM="Pedalboard"
+
 
 
     /**
@@ -66,22 +68,20 @@ export default class PluginsController {
      * @param wam_name The name of the wam to fetch in {@link WAM_LIST} 
      */
     private async fetchWAM(wam_name: string): Promise<typeof WebAudioModule|null>{
-        console.log("Fetch WAM ",wam_name)
         let fetched=this.wam_list_fetcheds[wam_name]
-        console.log("   Cache ",fetched)
         if(!fetched){
-            console.log("   Nothing in Cache ")
             const link=this.WAM_LIST[wam_name]
-            console.log("   From link ", link)
-            if(!link)return null
+            if(!link){
+                crashOnDebug(`No such WAM Plugin as '${wam_name}' `)
+                return null
+            }
             try{
                 const {default: WAM} = await import(/* webpackIgnore: true */link) as {default:typeof WebAudioModule};
-                console.log("   Fetched ", WAM)
                 fetched={factory:WAM}
                 this.wam_list_fetcheds[wam_name]=fetched
             }
             catch(e){
-                console.error("Error while fetching WAM ",e)
+                crashOnDebug(`Error while fetching WAM Plugin "${wam_name}": `,e)
                 return null
             }
         }
@@ -104,29 +104,9 @@ export default class PluginsController {
      * @param plugin The plugin to connect
      */
     public async connectPlugin(track: SoundProvider, plugin: Plugin|null){
-        console.log(">>Connect plugin to track ",track,plugin)
         await track.connectPlugin(plugin)
-        console.log(">>Plugin connected to track ",track,plugin)
         this.updatePluginList()
     }
-
-    /**
-     * Selects a track and show the plugins of the track.
-     *
-     * @param track The track to select
-     */
-    /*public selectTrack(track: Track|undefined): void {
-        if(this.selected !== undefined){
-            this.selectedTrack.element.unSelect();
-            this.selectedTrack = undefined;
-        }
-        if(track !==undefined){
-            this.selectedTrack = track;
-            this.selectedTrack.element.select();
-        }
-        this.selectPlugins();
-        // TODO Check what is the purpose of this._view.unselectHost();
-    }*/
 
     // TODO See if this can be removed, how it can be modified. And make it work again
     /**
@@ -151,8 +131,12 @@ export default class PluginsController {
      * @param track - The track that was clicked.
      */
     public async fxButtonClicked(track: SoundProvider) {
+        this._app.tracksController.select(track)
+
         // Create a plugin if there is none
         if(!track.plugin){
+            this.hideAllButtons()
+            this._view.setLoadingPlugin(this.DEFAULT_WAM)
             const plugin= await this.fetchPlugin(this.DEFAULT_WAM)
             if(!plugin)return
             await this.connectPlugin(track,plugin)
@@ -164,16 +148,16 @@ export default class PluginsController {
     }
 
     private showPlugin(){
-        this._view.showFloatingWindow();
-        this._view.hideShowButton();
-        this._view.showHidePlugin(this.selected?.plugin?.name ?? "NO PLUGIN")
+        this._view.showFloatingWindow(true);
+        this._view.setShowPlugin(null);
+        this._view.setHidePlugin(this.selected?.plugin?.name ?? "NO PLUGIN")
         this._app.hostController.focus(this._view);
     }
 
     private hidePlugin(){
-        this._view.hideFloatingWindow()
-        this._view.hideHideButton()
-        this._view.showShowPlugin(this.selected?.plugin?.name ?? "NO PLUGIN")
+        this._view.showFloatingWindow(false)
+        this._view.setHidePlugin(null)
+        this._view.setShowPlugin(this.selected?.plugin?.name ?? "NO PLUGIN")
     }
         
     /**
@@ -184,17 +168,13 @@ export default class PluginsController {
         // On plugin selected
         this._view.onPluginClick= async (plugin_name)=>{
             const plugin=await this.fetchPlugin(plugin_name)
-            console.log("Should we connect?", this.selected, this.selected?.plugin)
             if(this.selected!=null && this.selected.plugin==null){
-                console.log(">Connect plugin ",plugin_name)
+                this.hideAllButtons()
+                this._view.setLoadingPlugin(this.DEFAULT_WAM)
                 await this.connectPlugin(this.selected,plugin)
-                console.log(">Is connected")
                 this.updatePluginList()
+                this.showPlugin()
             }
-            console.log(`Plugin name: "${plugin_name}" "${this.WAM_LIST[plugin_name]}"`)
-            console.log("  Plugin: ",plugin)
-            console.log("  Selected: ",this.selected)
-            console.log("  Selected plugin: ",this.selected?.plugin)
         }
 
         // On plugin removed
@@ -232,25 +212,25 @@ export default class PluginsController {
      * Update the dom of the plugin list.
      */
     private updatePluginList(){
-        console.log("Update plugin list")
         this.hideAllButtons()
-        this._view.hideFloatingWindow()
-        this._view.setPluginView(null)
+
         if(!this.selected){ 
-            console.log("No selected track")
             // No sound provider is selected => an empty plugin window
+            this._view.showFloatingWindow(true)
+            this._view.setPluginView(null)
         }
         else{
             if(this.selected.plugin==null){
-                console.log("No plugin selected")
                 // Selected but no plugin => Available plugins list
-                this._view.showNew(Object.keys(this.WAM_LIST))
+                this._view.showFloatingWindow(false)
+                this._view.setPluginView(null)
+                this._view.setNewPlugins(Object.keys(this.WAM_LIST))
             }
             else{
-                console.log("Plugin selected")
                 // Selected and plugin => Remove plugin button + Show plugin button + Set plugin view
-                this._view.showRemovePlugin(this.selected.plugin.name)
-                this._view.showShowPlugin(this.selected.plugin.name)
+                this._view.setRemovePlugin(this.selected.plugin.name)
+                if(this._view.windowOpened)this._view.setHidePlugin(this.selected.plugin.name)
+                else this._view.setShowPlugin(this.selected.plugin.name)
                 this._view.setPluginView(this.selected.plugin.dom)
             }
         }
@@ -260,11 +240,11 @@ export default class PluginsController {
      * Hides all the buttons in the plugins view.
      */
     private hideAllButtons(): void {
-        this._view.hideNewButton();
-        this._view.hideFloatingWindow();
-        this._view.hideShowButton();
-        this._view.hideRemoveButton();
-        this._view.hideHideButton();
+        this._view.setNewPlugins([]);
+        this._view.setShowPlugin(null);
+        this._view.setRemovePlugin(null);
+        this._view.setHidePlugin(null);
+        this._view.setLoadingPlugin(null);
     }
 
     /**

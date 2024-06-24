@@ -15,6 +15,7 @@ export default class PluginsView extends DraggableWindow {
     showPlugin = document.getElementById("show-pedalboard") as HTMLDivElement;
     hidePlugin = document.getElementById("hide-pedalboard") as HTMLDivElement;
     removePlugin = document.getElementById("remove-plugins") as HTMLDivElement;
+    loadingPlugin = document.getElementById("loading-pedalboard") as HTMLDivElement;
     closeWindowButton = document.getElementById("plugin-close-button") as HTMLDivElement;
     mainTrack = document.getElementById("main-track") as HTMLDivElement;
     minMaxIcon = document.getElementById("min-max-icon") as HTMLImageElement;
@@ -58,18 +59,16 @@ export default class PluginsView extends DraggableWindow {
         if (element != null) this.mount.appendChild(element);
     }
 
-    /** Hides the new plugins button. */
-    hideNewButton() {
+    /** Show the new plugin buttons. */
+    setNewPlugins(names: string[]) {
+        // Hide the previous
         for (const plugin of this.newPlugins) {
             plugin.remove();
             console.log("removing",plugin)
         }
         this.newPlugins = [];
-    }
 
-    /** Show the new plugin buttons. */
-    showNew(names: string[]) {
-        this.hideNewButton()
+        // Show the new
         for (const name of names) {
             const element = document.createElement("div");
             element.className="new-track"
@@ -87,64 +86,50 @@ export default class PluginsView extends DraggableWindow {
         }
     }
 
-
     /**
-     * Shows the floating window with the plugin's view.
+     * Show or hide the floating window
+     * @param doShow Do show the floating window or hide it
      */
-    showFloatingWindow() {
-        this.floating.hidden = false;
-        this.windowOpened = true;
-    }
-
-    /**
-     * Hides the floating window with the plugin's view.
-     */
-    hideFloatingWindow() {
-        this.floating.hidden = true;
-        this.windowOpened = false;
+    showFloatingWindow(doShow: boolean){
+        this.floating.hidden= !doShow
+        this.windowOpened= doShow
     }
 
 
     /**
-     * Shows the show plugin button.
-     * @param name The plugin name
+     * Shows or hide the show plugin button.
+     * @param name The plugin name or null for hiding
      */
-    showShowPlugin(name: string) {
-        this.showPlugin.querySelector(".new-track-text")!.innerHTML=`Show ${name}`
-        this.showPlugin.hidden = false;
-    }
-
-    /** Hides the show plugin button. */
-    hideShowButton() { this.showPlugin.hidden = true; }
-
-
-    /**
-     * Shows the hide plugin button.
-     * @param name The plugin name
-     */
-    showHidePlugin(name: string) {
-        this.removePlugin.querySelector(".new-track-text")!.innerHTML=`Hide ${name}`
-        this.hidePlugin.hidden = false;
-    }
-
-    /** Hides the hide plugin button. */
-    hideHideButton() { this.hidePlugin.hidden = true; }
-
-
-    /**
-     * Shows the remove plugin button.
-     * @param name The plugin name
-     */
-    showRemovePlugin(name: string) {
-        this.removePlugin.querySelector(".new-track-text")!.innerHTML=`Remove ${name}`
-        this.removePlugin.hidden = false;
+    setShowPlugin(name: string|null) {
+        this.showPlugin.hidden = !name;
+        if(name)this.showPlugin.querySelector(".new-track-text")!.innerHTML=`Show ${name}`
     }
 
     /**
-     * Hides the remove plugin button.
+     * Shows or hide the hide plugin button.
+     * @param name The plugin name or null for hiding
      */
-    hideRemoveButton() {
-        this.removePlugin.hidden = true;
+    setHidePlugin(name: string|null) {
+        this.hidePlugin.hidden = !name;
+        if(name)this.hidePlugin.querySelector(".new-track-text")!.innerHTML=`Hide ${name}`
+    }
+
+    /**
+     * Shows or hide the remove plugin button.
+     * @param name The plugin name or null for hiding
+     */
+    setRemovePlugin(name: string|null) {
+        this.removePlugin.hidden =  !name;
+        if(name)this.removePlugin.querySelector(".new-track-text")!.innerHTML=`Remove ${name}`
+    }
+
+    /**
+     * Shows or hide the remove plugin button.
+     * @param name The plugin name or null for hiding
+     */
+    setLoadingPlugin(name: string|null) {
+        this.loadingPlugin.hidden = !name;
+        if(name)this.loadingPlugin.querySelector(".new-track-text")!.innerHTML=`Loading ${name}`
     }
 
     /**

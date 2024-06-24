@@ -1,6 +1,10 @@
 [
+  "https://mainline.i3s.unice.fr/WamSampler/src/",
   "https://mainline.i3s.unice.fr/wam2/packages/quadrafuzz/dist/",
   "https://mainline.i3s.unice.fr/wam2/packages/faustPingPongDelay/plugin/",
   "https://mainline.i3s.unice.fr/wam2/packages/pingpongdelay/dist/",
-  "https://www.webaudiomodules.com/community/plugins/burns-audio/soundfont/"
+  "https://www.webaudiomodules.com/community/plugins/burns-audio/soundfont/",
+  "https://www.webaudiomodules.com/community/plugins/burns-audio/synth101/",
+  "https://www.webaudiomodules.com/community/plugins/burns-audio/drumsampler/",
+  "https://mainline.i3s.unice.fr/wam2/packages/obxd/"
 ]

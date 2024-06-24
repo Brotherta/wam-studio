@@ -196,6 +196,21 @@
     height: auto;
 }
 
+.loading-icon{
+    content: url("data:image/svg+xml,%3Csvg width='16' height='16' fill='lightgrey' class='bi bi-loading' viewBox='0 0 16 16' version='1.1' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 8,0 A 8,8 0 0 0 0,8 8,8 0 0 0 8,16 8,8 0 0 0 16,8 H 13.380859 A 5.3799834,5.3799834 0 0 1 8,13.380859 5.3799834,5.3799834 0 0 1 2.6191406,8 5.3799834,5.3799834 0 0 1 8,2.6191406 Z' /%3E%3C/svg%3E%0A");
+    width: 40px;
+    height: auto;
+    animation: loading-rotation 1s infinite linear;
+}
+
+@keyframes loading-rotation {
+    0%{ transform: rotate(0deg); }
+    25%{ transform: rotate(90deg); }
+    50%{ transform: rotate(180deg); }
+    75%{ transform: rotate(270deg); }
+    100%{ transform: rotate(360deg); }
+}
+
 .arrow-down-icon {
     content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='lightgrey' class='bi bi-chevron-up' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z'/%3E%3C/svg%3E");
     width: 16px;
