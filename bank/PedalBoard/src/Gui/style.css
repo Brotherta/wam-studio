@@ -28,14 +28,18 @@ img {
 }
 
 .placeholder-thumbnail{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
   max-height: 6rem;
   min-width: 6rem;
-  padding: auto;
-  text-align: center;
-  vertical-align: middle;
-  background-color: black;
+
   border: white solid 0.1rem;
   border-radius: 0.5em;
+
+  text-shadow: black 0.08em 0.08em 0em, black -0.08em -0.08em 0em, black -0.08em 0.08em 0em, black 0.08em -0.08em 0em;
 }
 
 #preview {

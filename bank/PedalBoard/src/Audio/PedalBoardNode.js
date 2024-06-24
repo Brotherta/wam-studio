@@ -166,10 +166,16 @@ export default class PedalBoardNode extends WamNode {
    */
   connectPlugin(audioNode) {
     this.lastNode.disconnect(this._output);
-    this.lastNode.connect(audioNode);
 
-    audioNode.connect(this._output);
-    this.lastNode = audioNode;
+    try{
+      this.lastNode.connect(audioNode);
+      audioNode.connect(this._output);
+      this.lastNode = audioNode;
+    }
+    catch(e){
+      this.lastNode.connect(this._output)
+    }
+    
   }
 
   /**

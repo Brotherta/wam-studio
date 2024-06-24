@@ -1,6 +1,7 @@
 import "../../../plugins/utils/webaudio-controls.js";
 import PedalBoardPlugin from "../index.js";
 import Visualizer from "./Visualizer.js";
+import { elementOf } from "./html.js";
 
 /**
  * @param {URL} relativeURL
@@ -136,16 +137,17 @@ export default class pedalboardGui extends HTMLElement {
       let img = document.createElement("img");
       img.src = el.thumbnail;
       img.onerror=()=>{
-        const namevalue=Math.floor(el.name.length+(el.name.codePointAt(0)??0)+(el.name.codePointAt(1)??0)+(el.name.codePointAt(2)??0))
-        img.outerHTML=/*html*/`
+        const namevalue=Math.floor(el.name.length+(el.name.codePointAt(0)??0)+(el.name.codePointAt(1)??0)*100+(el.name.codePointAt(2)??0)*10000)
+        const placeholder = elementOf(/*html*/`
           <div class="placeholder-thumbnail" style="background: rgb(${namevalue%255} ${Math.floor(namevalue/255)%255} ${Math.floor(namevalue/255/255)%255})">
             ${el.name??"Unamed WAM"}
-          </div>`
+          </div>
+        `)
+        placeholder.addEventListener("click", () => this._plug.addWAM(wams[index]), {passive: false});
+        img.replaceWith(placeholder)
       }
       img.setAttribute("crossorigin", "anonymous");
-      img.addEventListener("click", () => this._plug.addWAM(wams[index]), {
-        passive: false,
-      });
+      img.addEventListener("click", () => this._plug.addWAM(wams[index]), {passive: false});
       this._plug.WAMS[wams[index]].img = img;
     });
     preview.appendChild(this.images);
