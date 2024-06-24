@@ -1,4 +1,5 @@
 import "../../../plugins/utils/webaudio-controls.js";
+import PedalBoardPlugin from "../index.js";
 import Visualizer from "./Visualizer.js";
 
 /**
@@ -18,6 +19,7 @@ export default class pedalboardGui extends HTMLElement {
   _deleteSVGUrl = `${this._baseURL}/assets/deleteButton.svg`;
   _crossIMGUrl = `${this._baseURL}/assets/cross.png`;
 
+  /** @param {PedalBoardPlugin} plug */
   constructor(plug) {
     super();
     this._plug = plug;
@@ -97,7 +99,7 @@ export default class pedalboardGui extends HTMLElement {
           }
           keywords[k].push(el);
         });
-        return `${wam.url}${wam.descriptor.thumbnail}`;
+        return {thumbnail: `${wam.url}${wam.descriptor.thumbnail}`, name:/**@type {string}*/(wam.descriptor.name)}
       })
     );
 
@@ -132,7 +134,14 @@ export default class pedalboardGui extends HTMLElement {
     this.images = document.createElement("div");
     urls.forEach((el, index) => {
       let img = document.createElement("img");
-      img.src = el;
+      img.src = el.thumbnail;
+      img.onerror=()=>{
+        const namevalue=Math.floor(el.name.length+(el.name.codePointAt(0)??0)+(el.name.codePointAt(1)??0)+(el.name.codePointAt(2)??0))
+        img.outerHTML=/*html*/`
+          <div class="placeholder-thumbnail" style="background: rgb(${namevalue%255} ${Math.floor(namevalue/255)%255} ${Math.floor(namevalue/255/255)%255})">
+            ${el.name??"Unamed WAM"}
+          </div>`
+      }
       img.setAttribute("crossorigin", "anonymous");
       img.addEventListener("click", () => this._plug.addWAM(wams[index]), {
         passive: false,

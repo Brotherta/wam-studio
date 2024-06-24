@@ -18,6 +18,12 @@ export default class PedalBoardPlugin extends WebAudioModule {
 
   id = 0;
 
+  gui
+
+  WAMS
+
+  /** @type {PedalBoardNode} */ pedalboardNode
+
   removeRelativeUrl = (relativeURL) => {
     if (relativeURL[0] == ".") {
       return `${this._baseURL}${relativeURL.substring(1)}`;

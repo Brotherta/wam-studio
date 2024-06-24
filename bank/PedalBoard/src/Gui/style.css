@@ -27,6 +27,17 @@ img {
   max-height: 6rem;
 }
 
+.placeholder-thumbnail{
+  max-height: 6rem;
+  min-width: 6rem;
+  padding: auto;
+  text-align: center;
+  vertical-align: middle;
+  background-color: black;
+  border: white solid 0.1rem;
+  border-radius: 0.5em;
+}
+
 #preview {
   border: 1px solid var(--border-color, gray);
   border-width: 0 1px 0 1px;
