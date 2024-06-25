@@ -94,7 +94,7 @@ export default class PluginsController {
      */
     public async fetchPlugin(wam_name: string): Promise<Plugin|null>{
         const wam=await this.fetchWAM(wam_name)
-        if(wam) return new Plugin(this._app, wam_name, wam)
+        if(wam) return await new Plugin(wam_name, wam)
         else return null
     }
 
@@ -178,9 +178,9 @@ export default class PluginsController {
         }
 
         // On plugin removed
-        this._view.removePlugin.addEventListener("click", () => {
+        this._view.removePlugin.addEventListener("click", async () => {
             if (this.selected !== null) {
-                this.connectPlugin(this.selected,null)
+                await this.connectPlugin(this.selected,null)
                 this.updatePluginList()
             }
         });
@@ -231,7 +231,7 @@ export default class PluginsController {
                 this._view.setRemovePlugin(this.selected.plugin.name)
                 if(this._view.windowOpened)this._view.setHidePlugin(this.selected.plugin.name)
                 else this._view.setShowPlugin(this.selected.plugin.name)
-                this._view.setPluginView(this.selected.plugin.dom)
+                this._view.setPluginView(this.selected.plugin.gui)
             }
         }
     }

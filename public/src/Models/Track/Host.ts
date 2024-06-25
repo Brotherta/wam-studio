@@ -86,6 +86,8 @@ export default class Host extends SoundProvider {
 
         const [hostGroupId] = await initializeWamHost(audioCtx);
         this.hostGroupId = hostGroupId;
+        // @ts-ignore
+        this.groupId = hostGroupId
 
         let audio = audioCtx.createBuffer(2, MAX_DURATION_SEC * audioCtx.sampleRate, audioCtx.sampleRate)
         const operableAudioBuffer = OperableAudioBuffer.make(audio);

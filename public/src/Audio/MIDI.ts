@@ -7,7 +7,7 @@ export class MIDINote{
 
     /**
      * Create a new MIDI note.
-     * @param note The note frequency in Hz.
+     * @param note The note as MIDI note, an integer between 0 and 128.
      * @param velocity The note velocity, between 0 and 1.
      * @param channel The MIDI channel, an integer.
      * @param duration The note duration in milliseconds.
@@ -173,7 +173,7 @@ export class MIDI extends MIDIView{
         const ret=new MIDI(instant_duration,max_length*instant_duration)
 
         for(let notei=0; notei<lines.length; notei++){
-            let note=261.63+notei*15.60
+            let note=64+notei
             for(let instanti=0; instanti<lines[notei].length; instanti++){
                 const char=lines[notei][instanti]
                 if(char<'0' || '9'<char)continue

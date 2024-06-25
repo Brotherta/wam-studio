@@ -3,6 +3,7 @@ import PedalBoardPlugin from "../index.js";
 import Visualizer from "./Visualizer.js";
 import { elementOf } from "./html.js";
 
+/** @typedef {import("../../../plugins/utils/api/src/AbstractWebAudioModule.js").default} WebAudioModule */
 /**
  * @param {URL} relativeURL
  * @returns {string}
@@ -239,7 +240,7 @@ export default class pedalboardGui extends HTMLElement {
    * with a new id until it's free to be defined.
    * @param {WebAudioModule} instance
    * @param {HTMLElement} img
-   * @param {int} id
+   * @param {number} id
    * @author Quentin Beauchet
    */
   async addPlugin(instance, img, id) {
@@ -262,86 +263,100 @@ export default class pedalboardGui extends HTMLElement {
         throw e;
       }
     }
-    let wrapper = document.createElement("article");
-    wrapper.draggable = true;
-    wrapper.ondragstart = (event) => {
+
+    // Create the article
+    let article = document.createElement("article");
+    article.classList.add("nodeArticle");
+    article.draggable = true;
+    article.id=""+id;
+    
+    article.ondragstart = (event) => {
       event.dataTransfer.setDragImage(img, img.width / 2, img.height / 2);
       this.dragOrigin = wrapper;
     };
-    wrapper.ondragover = (event) => {
-      let target = this.getWrapper(event);
+
+    article.ondragover = (event) => {
+      let target = this.getWrapperAt(event);
       let mid = target.getBoundingClientRect().x + target.getBoundingClientRect().width / 2;
       if (target && this.dragOrigin) {
         this.board.insertBefore(this.dropZone, mid > event.x ? target : target.nextSibling);
       }
     };
-    wrapper.ondragend = (event) => {
+
+    article.ondragend = (event) => {
       event.preventDefault();
       if (this.dropZone.parentElement == this.board) {
         this.board.removeChild(this.dropZone);
       }
     };
 
+
+    // Create the header
     let header = document.createElement("header");
+
+      // Title
     let title = document.createElement("h2");
     title.innerHTML = instance.name;
     header.appendChild(title);
 
+      // Cross
     let cross = document.createElement("img");
     cross.src = this._crossIMGUrl;
     cross.setAttribute("crossorigin", "anonymous");
     cross.addEventListener("click", () => {
-      this._plug.pedalboardNode.disconnectNodes(this.board.childNodes, false, () => wrapper.remove());
+      this._plug.pedalboardNode.disconnectNodes(this.board.childNodes, false, () => article.remove());
     });
+
     header.append(cross);
-    wrapper.appendChild(gui);
-    wrapper.id = id;
-    wrapper.classList.add("nodeArticle");
+    article.append(header);
 
-    this.board.appendChild(wrapper);
+    // Create the gui wrapper
+    const gui_wrapper= document.createElement("div");
+    gui_wrapper.classList.add("guiWrapper");
+    gui_wrapper.appendChild(gui);
+    article.append(gui_wrapper)
 
-    // await gui.loaded;
+    this.board?.appendChild(article);
 
-    this.resizeWrapper(wrapper, header, title, cross, gui);
-    wrapper.insertBefore(header, gui);
+    this.resizeArticle(article, header, gui_wrapper, gui);
   }
 
   /**
    * Scale the gui of the plugin.
-   * @param {HTMLElement} wrapper
+   * @param {HTMLElement} article
    * @param {HTMLElement} header
-   * @param {HTMLElement} title
-   * @param {HTMLElement} cross
+   * @param {HTMLElement} gui_wrapper
    * @param {HTMLElement} gui
    * @author Quentin Beauchet
+   * @author Samuel DEMONT
    */
-  resizeWrapper(wrapper, header, title, cross, gui) {
-    const parentScale = this.getBoundingClientRect().width / this.offsetWidth;
-    const scale = (250 / gui.getBoundingClientRect().height) * parentScale;
-
-    wrapper.style.transformOrigin = "top left";
-    wrapper.style.transform = "scale(" + scale + ")";
-
-    const width = Math.round(wrapper.getBoundingClientRect().width / scale);
-
-    wrapper.style.width = `${wrapper.getBoundingClientRect().width / parentScale}px`;
-    wrapper.style.height = `${wrapper.getBoundingClientRect().height / parentScale}px`;
-
-    header.style.height = `${Math.round(30 / scale)}px`;
-    header.style.width = `${Math.round(width / parentScale)}px`;
-    header.style.borderWidth = `${Math.round(2 / scale)}px`;
-
-    title.style.fontSize = `${100 / scale}%`;
-    cross.style.width = `${Math.round(15 / scale)}px`;
-    cross.style.height = `${Math.round(15 / scale)}px`;
+  resizeArticle(article, header, gui_wrapper, gui) {
+    function resize(){
+      const articleHeight= article.offsetHeight-header.clientHeight
+      const wamBaseHeight= gui.getBoundingClientRect().height
+      const wamBaseWidth= gui.getBoundingClientRect().width
+      const scale= articleHeight/wamBaseHeight
+      
+      gui_wrapper.style.transformOrigin = "top left"
+      gui_wrapper.style.transform = `scale(${scale})`
+      gui_wrapper.style.width=`${wamBaseWidth}px`
+      article.style.width = `${wamBaseWidth*scale}px`
+      console.log("resize")
+    }
+    // TODO Find an alternative method
+    // Some WAM takes too much time to load and getting their client size too early will a wrong value
+    // ResizeObservable is called to early
+    // Calling resize one time make the gui change its size, and it is then not possible to call it again
+    // We cannot call it multiple time in a row because it will make the gui smaller and smaller
+    setTimeout(()=>resize.call(this),500)
   }
 
   /**
    * Return the nodeArticle when selecting child node instead of itself with drag and drop.
-   * @param {HTMLElement[]} event
+   * @param {DragEvent} event
    * @returns The wrapper selected.
    */
-  getWrapper(event) {
+  getWrapperAt(event) {
     let pre = this._root.elementFromPoint(event.clientX, event.clientY);
     while (pre && pre.parentNode != this.board) {
       pre = pre.parentNode;

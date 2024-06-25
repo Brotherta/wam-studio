@@ -6,6 +6,8 @@ import { audioCtx } from "../index";
 
 
 /**
+ * //TODO Correct: Automation don't stop and start when they should, they don't stop when they should. (With any root WAM that is not the pedalboard.)
+ * //TODO Correct: The automation don't scroll as they should with the autoscroll.
  * Controller for the automation menu. This controller is responsible for applying all the automations to the tracks.
  */
 export default class AutomationController {

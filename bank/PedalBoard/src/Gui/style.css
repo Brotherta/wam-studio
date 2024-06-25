@@ -1,3 +1,4 @@
+
 :root {
   --border-color: gray;
   --text-color: black;
@@ -15,6 +16,7 @@ main {
   position: relative;
   width: 1000px;
   min-width: 500px;
+  height: 550px;
   resize: horizontal;
   overflow: auto;
   color: var(--text-color, white);
@@ -23,6 +25,7 @@ main {
   font-family: "helvetica", sans-serif, cursive;
 }
 
+/* THUMBNAIL */
 img {
   max-height: 6rem;
 }
@@ -41,7 +44,9 @@ img {
 
   text-shadow: black 0.08em 0.08em 0em, black -0.08em -0.08em 0em, black -0.08em 0.08em 0em, black 0.08em -0.08em 0em;
 }
+/* */
 
+/* PREVIEW LIST */
 #preview {
   border: 1px solid var(--border-color, gray);
   border-width: 0 1px 0 1px;
@@ -61,6 +66,8 @@ img {
   pointer-events: none;
   user-select: none;
 }
+/* */
+
 
 #WASMErrorMsg {
   color: #ff4500;
@@ -70,11 +77,12 @@ img {
   text-align: center;
 }
 
+/* WAMs BOARD */
 #board {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  height: 270px;
+  height: 50%;
   padding: 1rem;
   overflow-x: auto;
   overflow-y: hidden;
@@ -85,7 +93,46 @@ img {
   cursor: move;
   flex-shrink: 0;
 }
+/* */
 
+
+/* ARTICLES: Wams on the board */
+
+.nodeArticle{
+  height: 100%;
+  width: fit-content;
+}
+
+.nodeArticle > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-style: solid;
+  background-color: black;
+  border-color: lightgray;
+  color: white;
+  box-sizing: border-box;
+  width: 100%;
+  font-size: 0.7em;
+  height: 2.5em;
+}
+
+.nodeArticle > header > h2 {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-left: 0.5rem;
+}
+
+.nodeArticle > header > img {
+  filter: contrast(300%);
+  margin-right: 0.5rem;
+  height: 1.9em;
+}
+/* */
+
+/* PRESETS */
 #presetsInfos {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -95,6 +142,7 @@ img {
   border-bottom-right-radius: 0.25rem;
   margin: 0;
 }
+/* */
 
 #banks,
 #presets,
@@ -130,30 +178,6 @@ img {
 
 li {
   list-style-type: square;
-}
-
-.nodeArticle > header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-style: solid;
-  background-color: black;
-  border-color: lightgray;
-  color: white;
-  box-sizing: border-box;
-}
-
-.nodeArticle > header > h2 {
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-left: 0.5rem;
-}
-
-.nodeArticle > header > img {
-  filter: contrast(300%);
-  margin-right: 0.5rem;
 }
 
 .addBtn {

@@ -101,11 +101,12 @@ export default class HostController {
       this._view.zoomInBtn.classList.add("zoom-enabled")
       this._view.zoomOutBtn.classList.add("zoom-enabled")
       //console.log("Stopping zoom-enabled");
-      /*TODO this._app.tracksController.tracks.forEach((track) => {
-        if (track.plugin.initialized) {
-          track.plugin.instance!._audioNode.clearEvents()
+
+      this._app.tracksController.tracks.forEach((track) => {
+        if (track.plugin && track.plugin.instance) {
+          track.plugin.instance?.audioNode?.clearEvents()
         }
-      });*/
+      });
       host.inRecordingMode=false
       host.pause()
       if (this._app.host.recording) {

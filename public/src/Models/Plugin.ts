@@ -1,47 +1,84 @@
 import { WebAudioModule } from "@webaudiomodules/sdk";
-import App from "../App";
+
 
 /**
- * Class that represents a plugin.
+ * Represents a plugin you can instantiate in an audio context.
+ */
+export default class Plugin{
+
+    constructor(readonly name: string, readonly wam_type: typeof WebAudioModule){}
+
+    public async instantiate(audioCtx: AudioContext, groupId: string, isHeadless: boolean = false){
+        return PluginInstance.create(this.name, this, audioCtx, groupId, isHeadless)
+    }
+}
+
+/**
+ * Class that represents a plugin instance linked to
  * The plugin have to be instantiated then to be used.
  */
-export default class Plugin {
-
-    instance: WebAudioModule|null = null
-    dom: Element
-
+export class PluginInstance {
 
     /** ~ FACTORIES ~ **/
-    constructor(private app: App, readonly name: string, private wam_type: typeof WebAudioModule) {}
-
-    clone(){
-        return new Plugin(this.app,this.name,this.wam_type)
-    }
+    private constructor(
+        readonly name: string,
+        readonly plugin: Plugin,
+        readonly instance: WebAudioModule,
+        readonly gui: Element,
+        readonly isHeadless: boolean = false
+    ) { }
     
+    /**
+     * Create a new plugin instance.
+     * @param name The name of the plugin.
+     * @param wam_type The WAM Class of the plugin.
+     * @param audioCtx The audio context to create the plugin in.
+     * @param groupId The group id to create the plugin in.
+     * @param isHeadless Is the plugin headless or not. If it is headless, a default low overhead GUI is created.
+     * @returns The plugin instance.
+     */
+    static async create(
+        name: string,
+        plugin: Plugin,
+        audioCtx: BaseAudioContext, 
+        groupId: string,
+        isHeadless: boolean = false
+    ) {
+        // Create the wam instance
+        const instance= await plugin.wam_type.createInstance(groupId, audioCtx);
+
+        // Create the gui
+        const gui= await (async ()=>{
+            if(isHeadless){
+                const headlessdiv=document.createElement("div")
+                headlessdiv.innerHTML=plugin.wam_type.name+" Headless"
+                return headlessdiv
+            }
+            else return await instance.createGui()
+        })()
+
+        // Return the plugin
+        return new PluginInstance(name,plugin,instance,gui,isHeadless)
+    }
 
     /**
-     * Initialize the plugin by loading the WAM script and creating the instance.
+     * Clone the plugin in a new audio context and group.
      */
-    async instantiate(audioCtx: BaseAudioContext, groupid: string) {
-        this.destroy()
-        console.log(">>>> Create instance",groupid,audioCtx,this.wam_type)
-        this.instance = await this.wam_type.createInstance(groupid, audioCtx);
-        console.log(">>>> Create GUI")
-        this.dom = await this.instance.createGui();
-        console.log(">>>> End")
+    async cloneInto(audioCtx: BaseAudioContext, groupId: string, isHeadless: boolean = false){
+        const thisState=this.getState()
+        const newPlugin=await PluginInstance.create(this.name, this.plugin, audioCtx, groupId, isHeadless)
+        await newPlugin.setState(thisState)
+        return newPlugin
     }
+    
 
     /**
      * Destroy the plugin instance and remove the GUI.
      */
     destroy() {
-        if (this.instance !== null) {
-            this.instance.audioNode.disconnect()
-            this.instance.audioNode.destroy()
-            this.instance.audioNode.disconnectEvents()
-            this.instance.destroyGui(this.dom)
-            this.instance = null
-        }
+        this.instance.audioNode.destroy()
+        if(this.isHeadless) this.gui.remove()
+        else this.instance.destroyGui(this.gui)
     }
 
     /**
@@ -52,9 +89,9 @@ export default class Plugin {
      */
     async setState(state: any) {
         if (state.current.length === 0) return;
-        await this.instance!._audioNode.setState(state);
+        await this.instance._audioNode.setState(state);
 
-        let curState = await this.instance!._audioNode.getState();
+        let curState = await this.instance._audioNode.getState();
         let statePlugin = new Promise<void>((resolve) => {
             let test = 0;
             let maxTest = 10;
@@ -63,11 +100,11 @@ export default class Plugin {
                     clearInterval(interval);
                     resolve();
                 }
-                curState = await this.instance!._audioNode.getState();
+                curState = await this.instance._audioNode.getState();
                 test++;
                 if (test > maxTest) {
                     test = 0;
-                    await this.instance!._audioNode.setState(state);
+                    await this.instance._audioNode.setState(state);
                 }
             }, 200);
         });
@@ -79,6 +116,11 @@ export default class Plugin {
      * @returns The state of the plugin (Json Object)
      */
     getState():any|null{
-        return this.instance?._audioNode?.getState()
+        return this.instance.audioNode.getState()
     }
+
+    /**
+     * The audio node of the plugin.
+     */
+    get audioNode(){ return this.instance.audioNode }
 }

@@ -45,8 +45,8 @@ export function getMIDIPlayerProcessor(moduleId:string){
                         }
                     }
                     this.emitEvents(
-                        { type: 'wam-midi', time: currentTime, data: { bytes: new Uint8Array([0x90 /*| note.channel*/, note.note, note.velocity]) } },
-                        { type: 'wam-midi', time: currentTime+note.duration/1000, data: { bytes: new Uint8Array([0x80 /*| note.channel*/, note.note, note.velocity]) } },
+                        { type: 'wam-midi', time: currentTime, data: { bytes: new Uint8Array([0x90 | note.channel, note.note, note.velocity]) } },
+                        { type: 'wam-midi', time: currentTime+note.duration/1000, data: { bytes: new Uint8Array([0x80 | note.channel, note.note, note.velocity]) } },
                     );
                 }
             }

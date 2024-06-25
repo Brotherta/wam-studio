@@ -1,10 +1,9 @@
 import { WamNode } from "@webaudiomodules/api";
-import { crashOnDebug } from "../../App";
 import TrackElement from "../../Components/TrackElement.js";
 import type TracksController from "../../Controllers/Editor/Track/TracksController";
 import { audioCtx } from "../../index";
 import Automation from "../Automation";
-import Plugin from "../Plugin";
+import Plugin, { PluginInstance } from "../Plugin";
 
 /**
  * A sound output, controlled by a playhead, and with a volume and a balance.
@@ -205,19 +204,18 @@ export default abstract class SoundProvider {
 
 
   /** ~ PLUGINS ~ **/
-  private _plugin: Plugin|null = null // The plugin associated to the track.
+  private _plugin: PluginInstance|null = null // The plugin associated to the track.
 
-  get plugin(): Plugin|null{ return this._plugin }
+  get plugin(): PluginInstance|null{ return this._plugin }
 
   /**
    * Connect the track to a plugin and disconnect it from the previous one.
    * @param node 
    */
   public async connectPlugin(plugin: Plugin|null){
-    console.log(">>> Instantiate")
-    if(plugin)await plugin.instantiate(this.pannerNode.context,this.groupId)//TODO 
+    // Create the instance first
+    const pluginInstance = plugin ? await plugin.instantiate(audioCtx, this.groupId) : null
 
-      console.log(">>> Disconnect")
     // Disconnect the previous plugin node if it exists.
     if(this.plugin){
       const wam=this.plugin.instance
@@ -234,23 +232,17 @@ export default abstract class SoundProvider {
       this._disconnect(this.pannerNode)
     }
 
-    console.log(">>> Connect")
     // Connect to a plugin node
-    if(plugin){
-      if(plugin.instance===null){
-        crashOnDebug("Plugin instance is null")
-        return
-      }
-      this._plugin=plugin
-      this._connect(plugin.instance.audioNode)
-      this._connectEvents(plugin.instance.audioNode)
-      plugin.instance.audioNode.connect(this.pannerNode)
+    if(pluginInstance){
+      this._plugin=pluginInstance
+      this._connect(pluginInstance.audioNode)
+      this._connectEvents(pluginInstance.audioNode)
+      pluginInstance.audioNode.connect(this.pannerNode)
     }
     // Connect to panner node
     else{
       this._connect(this.pannerNode)
     }
-    console.log(">>> End")
   }
 
   public abstract _connect(node: AudioNode): void
@@ -308,4 +300,5 @@ export default abstract class SoundProvider {
   protected _isModified():boolean{
     return false
   }
+
 }

@@ -54,14 +54,15 @@ export default class TracksController{
 
   /** Select an SoundProvider (A track or the host) */
   public select(soundProvider: SoundProvider|null){
+    if(this._selectedSoundProvider===soundProvider)return
     if(this._selectedSoundProvider){
       this._selectedSoundProvider.element.unSelect()
     }
     
     if(soundProvider){
-      this._selectedSoundProvider=soundProvider
       soundProvider.element.select()
     }
+    this._selectedSoundProvider=soundProvider
     this.afterSelectedChange.forEach(it=>it(this._selectedSoundProvider,soundProvider))
   }
 

@@ -57,7 +57,7 @@ export default abstract class Region{
     get endpos(){ return this.pos + this.width}
 
     /** Create a region player, that can be used to play the content of the region. */
-   abstract createPlayer(groubid: string, audioContext: AudioContext): Promise<RegionPlayer>
+   abstract createPlayer(groubid: string, audioContext: BaseAudioContext): Promise<RegionPlayer>
 
     /**
      * Save the region in a Blob.

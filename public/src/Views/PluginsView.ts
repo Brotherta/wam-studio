@@ -152,7 +152,7 @@ export default class PluginsView extends DraggableWindow {
      */
     movePluginLoadingZone(track: Track) {
         if (track.plugin?.instance) {
-            this.loadingZone.appendChild(track.plugin.dom);
+            this.loadingZone.appendChild(track.plugin.gui);
         }
     }
 }

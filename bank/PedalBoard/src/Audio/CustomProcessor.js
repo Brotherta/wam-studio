@@ -163,6 +163,7 @@ const getCustomProcessor = (moduleId) => {
      * @author Quentin Beauchet
      */
     clearEvents() {
+      console.log("Clear Events")
       for (let node of this.nodes) {
         this.group.processors.get(node.nodeId).clearEvents();
       }

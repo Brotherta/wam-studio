@@ -191,7 +191,7 @@ export default class Loader {
             const plugin=await this._app.pluginsController.fetchPlugin(project.host.plugin.name)
             if(!plugin)return
             await this._app.host.connectPlugin(plugin);
-            await plugin.setState(project.host.plugin.state)
+            await this._app.host.plugin?.setState(project.host.plugin.state)
             //TODO this._app.pluginsController.connectPedalBoard(this._app.host);
             //this._app.pluginsView.movePluginLoadingZone(this._app.host);
         }
@@ -214,7 +214,7 @@ export default class Loader {
                 const plugin=await this._app.pluginsController.fetchPlugin(pluginData.name)
                 if(!plugin)return
                 await this._app.host.connectPlugin(plugin);
-                await plugin.setState(pluginData.state)
+                await this._app.host.plugin?.setState(pluginData.state)
                 //await track.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
                 this._app.pluginsView.movePluginLoadingZone(track);
                 await this._app.automationController.updateAutomations(track);
