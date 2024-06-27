@@ -8,7 +8,7 @@ export default class Plugin{
 
     constructor(readonly name: string, readonly wam_type: typeof WebAudioModule){}
 
-    public async instantiate(audioCtx: AudioContext, groupId: string, isHeadless: boolean = false){
+    public async instantiate(audioCtx: BaseAudioContext, groupId: string, isHeadless: boolean = false){
         return PluginInstance.create(this.name, this, audioCtx, groupId, isHeadless)
     }
 }

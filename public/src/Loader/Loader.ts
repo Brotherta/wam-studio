@@ -106,9 +106,9 @@ export default class Loader {
             // Add automations to the track
             let automations: ProjectData['tracks'][0]['automations'] = [];
             let pluginState=await track.plugin?.getState()
-            let pluginData= pluginState ? undefined : {name:track.plugin!.name,state:pluginState}
+            let pluginData= pluginState ? {name:track.plugin!.name,state:pluginState} : undefined
             
-            if (pluginState) {
+            if (pluginData) {
                 let parameters = await track.plugin!.instance!._audioNode.getParameterInfo();
                 for (let param in parameters) {
                     let bpf = track.automation.getBpfOfParam(param);
@@ -186,14 +186,11 @@ export default class Loader {
         this._app.host.volume=project.host.volume;
 
         if (project.host.plugin) {
-            //Remember: this._app.host.pluginWAM
-            //await this._app.host.plugin?.instantiate(audioCtx,this._app.host.hostGroupId);
             const plugin=await this._app.pluginsController.fetchPlugin(project.host.plugin.name)
-            if(!plugin)return
-            await this._app.host.connectPlugin(plugin);
+            if(plugin){
+                await this._app.host.connectPlugin(plugin);
             await this._app.host.plugin?.setState(project.host.plugin.state)
-            //TODO this._app.pluginsController.connectPedalBoard(this._app.host);
-            //this._app.pluginsView.movePluginLoadingZone(this._app.host);
+            }
         }
 
         // Load tracks
@@ -210,15 +207,14 @@ export default class Loader {
             this._app.tracksController.setColor(track, trackJson.color);
 
             const pluginData = trackJson.plugin;
+            console.log("Load Plugin",pluginData)
             if (pluginData) {
                 const plugin=await this._app.pluginsController.fetchPlugin(pluginData.name)
-                if(!plugin)return
-                await this._app.host.connectPlugin(plugin);
-                await this._app.host.plugin?.setState(pluginData.state)
-                //await track.plugin.initPlugin(this._app.host.pluginWAM, audioCtx);
-                this._app.pluginsView.movePluginLoadingZone(track);
-                await this._app.automationController.updateAutomations(track);
-
+                if(plugin){
+                    await this._app.pluginsController.connectPlugin(track,plugin);
+                    await track.plugin?.setState(pluginData.state)
+                    await this._app.automationController.updateAutomations(track);
+                }
                 let automations = trackJson.automations;
                 for (let automation of automations) {
                     let bpf = track.automation.getBpfOfParam(automation.param);

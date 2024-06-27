@@ -1,4 +1,5 @@
 import { WamNode } from "@webaudiomodules/api";
+import AudioGraph, { AudioGraphInstance } from "../../Audio/Graph/AudioGraph";
 import { RingBuffer } from "../../Audio/Utils/Ringbuffer";
 import WamAudioWorkletNode from "../../Audio/WAM/WamAudioWorkletNode";
 import WamEventDestination from "../../Audio/WAM/WamEventDestination";
@@ -6,10 +7,9 @@ import TrackElement from "../../Components/TrackElement";
 import { NUM_CHANNELS } from "../../Env";
 import Region, { RegionOf, RegionType } from "../Region/Region";
 import RegionPlayer from "../Region/RegionPlayer";
-import SoundProvider from "./SoundProvider";
+import SoundProvider, { SoundProviderGraphInstance } from "./SoundProvider";
 
 export default class Track extends SoundProvider {
-
 
   /** The audio context. */
   private audioCtx: AudioContext
@@ -200,8 +200,50 @@ export default class Track extends SoundProvider {
     this.deleted=true
   }
 
+  /** Audio Graph Creation */
+  /**
+   * Get the sound provider graph of this sound provider.
+   */
+  get track_graph(){
+    const that=this
+    return this._track_graph=this._track_graph ?? {
+      async instantiate(audioContext: BaseAudioContext, groupId: string) {
+        // Create sound provider graph
+        const audioProviderInstance=await that.sound_provider_graph.instantiate(audioContext,groupId)
+
+        // Create players graph
+        const players=await Promise.all(that.regions.map(region=>region.createPlayer(groupId,audioContext)))
+        for(const player of players){
+          player.connect(audioProviderInstance.inputNode)
+          if(audioProviderInstance.plugin)player.connectEvents(audioProviderInstance.plugin.audioNode)
+        }
+        return new TrackGraphInstance(audioProviderInstance,players)
+      }
+    }
+  }
+
+  private _track_graph: AudioGraph<TrackGraphInstance>|null=null
 }
 
+
+
+export class TrackGraphInstance implements AudioGraphInstance{
+
+  constructor(
+    public soundProvider: SoundProviderGraphInstance,
+    public players: RegionPlayer[]
+  ){}
+
+  connect(destination: AudioNode): void { this.soundProvider.connect(destination) }
+  connectEvents(destination: WamNode): void { this.soundProvider.connectEvents(destination) }
+  disconnect(destination?: AudioNode | undefined): void { this.soundProvider.disconnect(destination) }
+  disconnectEvents(destination?: WamNode | undefined): void { this.soundProvider.disconnectEvents(destination) }
+  destroy(): void {
+    this.soundProvider.destroy()
+    for(const player of this.players)player.clear()
+  }
+
+}
 
 
 
@@ -331,5 +373,5 @@ class SampleRecorder{
    * is recorded.
    */
   get recordingOutputNode(){ return this.mergerNode }
-
+  
 }

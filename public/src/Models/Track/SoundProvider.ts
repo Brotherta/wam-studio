@@ -1,4 +1,5 @@
 import { WamNode } from "@webaudiomodules/api";
+import AudioGraph from "../../Audio/Graph/AudioGraph";
 import TrackElement from "../../Components/TrackElement.js";
 import type TracksController from "../../Controllers/Editor/Track/TracksController";
 import { audioCtx } from "../../index";
@@ -301,4 +302,61 @@ export default abstract class SoundProvider {
     return false
   }
 
+
+
+  /** Audio Graph Creation */
+  /**
+   * Get the sound provider graph of this sound provider.
+   */
+  public get sound_provider_graph(){
+    const that=this
+    return this._sound_provider_graph=this._sound_provider_graph ?? {
+      async instantiate(audioContext: BaseAudioContext, groupId: string) {
+        // Create the graph
+        const gainNode = audioContext.createGain()
+        gainNode.gain.value = that.gainNode.gain.value
+    
+        const pannerNode = audioContext.createStereoPanner()
+        pannerNode.pan.value = that.pannerNode.pan.value
+        pannerNode.connect(gainNode)
+    
+        let plugin_instance=await that.plugin?.cloneInto(audioContext,groupId) ?? null
+        if(plugin_instance)plugin_instance.audioNode.connect(pannerNode)
+        return new SoundProviderGraphInstance(gainNode, pannerNode, plugin_instance, groupId)
+      }
+    }
+  }
+
+  private _sound_provider_graph: AudioGraph<SoundProviderGraphInstance>|null=null
+
+}
+
+
+export class SoundProviderGraphInstance{
+
+  constructor(
+    public gainNode: GainNode,
+    public pannerNode: StereoPannerNode,
+    public plugin: PluginInstance|null,
+    public groupId: string,
+  ){}
+
+  connect(destination: AudioNode): void { this.gainNode.connect(destination) }
+  disconnect(destination?: AudioNode): void { destination ? this.gainNode.disconnect(destination) : this.gainNode.disconnect() }
+
+  connectEvents(destination: WamNode): void { if(this.plugin)this.plugin.audioNode.connectEvents(destination.instanceId) }
+  disconnectEvents(destination?: WamNode | undefined): void {
+    if(this.plugin){
+      if(destination)this.plugin.audioNode.disconnectEvents(destination.instanceId)
+      else this.plugin.audioNode.disconnectEvents()
+    }
+  }
+
+  destroy(): void {
+    this.gainNode.disconnect()
+    this.pannerNode.disconnect()
+    this.plugin?.destroy()
+  }
+
+  get inputNode() { return this.plugin ? this.plugin.audioNode : this.pannerNode }
 }

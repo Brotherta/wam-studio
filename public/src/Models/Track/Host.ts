@@ -2,10 +2,12 @@ import { WamNode } from "@webaudiomodules/sdk";
 import { audioCtx } from "../..";
 import App from "../../App";
 import AudioPlayerNode from "../../Audio/AudioNode";
+import AudioGraph, { AudioGraphInstance } from "../../Audio/Graph/AudioGraph";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import TrackElement from "../../Components/TrackElement";
 import { BACKEND_URL, MAX_DURATION_SEC } from "../../Env";
-import SoundProvider from "./SoundProvider";
+import SoundProvider, { SoundProviderGraphInstance } from "./SoundProvider";
+import Track, { TrackGraphInstance } from "./Track";
 /**
  * Host class that work as the master sound provider.
  * Its output is the combined output of all the tracks.
@@ -48,14 +50,14 @@ export default class Host extends SoundProvider {
     metronomeOn: any;
     MetronomeElement: any;
     
-    private tracks: Iterable<SoundProvider>
+    private tracks: Iterable<Track>
 
     /**
      * Create a new host track, a compisite track composed of multiple tracks.
      * @param app The app
      * @param tracks Its children tracks
      */
-    constructor(app: App, tracks: Iterable<SoundProvider>) {
+    constructor(app: App, tracks: Iterable<Track>) {
         super(new TrackElement(),"NO_GROUP_ID");
         this.tracks=tracks
         this.playhead = 0;
@@ -249,4 +251,47 @@ export default class Host extends SoundProvider {
         }
         return false
     }
+
+    /** Audio Graph Creation */
+    /**
+     * Get the sound provider graph of this sound provider.
+     */
+    get host_graph(){
+        const that=this
+        return this._host_graph=this._host_graph ?? {
+        async instantiate(audioContext: BaseAudioContext, groupId: string) {
+            // Create sound provider graph
+            const audioProviderInstance=await that.sound_provider_graph.instantiate(audioContext,groupId)
+
+            // Create players graph
+            const tracks=await Promise.all([...that.tracks].map(it=>it.track_graph.instantiate(audioContext,groupId)))
+            for(const track of tracks){
+                track.connect(audioProviderInstance.inputNode)
+                if(audioProviderInstance.plugin)track.connectEvents(audioProviderInstance.plugin.audioNode)
+            }
+            return new HostGraphInstance(audioProviderInstance,tracks)
+        }
+        }
+    }
+
+    private _host_graph: AudioGraph<HostGraphInstance>|null=null
+}
+
+
+export class HostGraphInstance implements AudioGraphInstance{
+
+    constructor(
+        public soundProvider: SoundProviderGraphInstance,
+        public tracks: TrackGraphInstance[]
+    ){}
+
+    connect(destination: AudioNode): void { this.soundProvider.connect(destination) }
+    connectEvents(destination: WamNode): void { this.soundProvider.connectEvents(destination) }
+    disconnect(destination?: AudioNode | undefined): void { this.soundProvider.disconnect(destination) }
+    disconnectEvents(destination?: WamNode | undefined): void { this.soundProvider.disconnectEvents(destination) }
+    destroy(): void {
+        this.soundProvider.destroy()
+        for(const track of this.tracks) track.destroy()
+    }
+
 }
