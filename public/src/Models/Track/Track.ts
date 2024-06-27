@@ -28,7 +28,7 @@ export default class Track extends SoundProvider {
   public merged_regions = new Map<RegionType<any>, [RegionOf<any>,RegionPlayer]>()
 
   /** Merge all regions into big merged regions. */
-  private updateMergedRegions(){
+  private async updateMergedRegions(){
     // Sort all regions
     const regionMap= new Map<RegionType<any>,RegionOf<any>[]>()
     for(const region of this.regions as RegionOf<any>[]){
@@ -39,45 +39,43 @@ export default class Track extends SoundProvider {
 
     // Collect all player THEN clear and replace them (Probable race condition)
     // TODO Make sure there is no race condition
-    (async()=>{
 
-      // Merge regions
-      const new_merged_regions = new Map<RegionType<any>, [RegionOf<any>,RegionPlayer]>()
-      for(const [type, regions] of regionMap){
-        const merged=Region.mergeAll(regions,true)
-        const player=await merged.createPlayer(this.groupId, this.audioCtx)
-        player.connect(this.junctionNode)
-        for(const node of this._connectedWamNodes)player.connectEvents(node)
-        new_merged_regions.set(type, [merged,player])
-      }
+    // Merge regions
+    const new_merged_regions = new Map<RegionType<any>, [RegionOf<any>,RegionPlayer]>()
+    for(const [type, regions] of regionMap){
+      const merged=Region.mergeAll(regions,true)
+      const player=await merged.createPlayer(this.groupId, this.audioCtx)
+      player.connect(this.junctionNode)
+      for(const node of this._connectedWamNodes)player.connectEvents(node)
+      new_merged_regions.set(type, [merged,player])
+    }
 
-      // Get playstate
-      let playstate=false
-      let playhead=0
-      for(const [_,[__,player]] of this.merged_regions){
-        playstate=player.isPlaying
-        playhead=player.playhead
-        break
-      }
+    // Get playstate
+    let playstate=false
+    let playhead=0
+    for(const [_,[__,player]] of this.merged_regions){
+      playstate=player.isPlaying
+      playhead=player.playhead
+      break
+    }
 
-      // Change playstate
-      for(const [_,[__,player]] of new_merged_regions){
-        player.isPlaying=playstate
-        player.playhead=playhead
-      }
+    // Change playstate
+    for(const [_,[__,player]] of new_merged_regions){
+      player.isPlaying=playstate
+      player.playhead=playhead
+    }
 
-      // Clear regions
-      const old_merged_regions=this.merged_regions
-      this.merged_regions=new_merged_regions
-      for(const [type,[region,player]] of old_merged_regions){
-        player.disconnect(this.junctionNode)
-        for(const node of this._connectedWamNodes)player.disconnectEvents(node)
-        player.clear()
-      }
+    // Clear regions
+    const old_merged_regions=this.merged_regions
+    this.merged_regions=new_merged_regions
+    for(const [type,[region,player]] of old_merged_regions){
+      player.disconnect(this.junctionNode)
+      for(const node of this._connectedWamNodes)player.disconnectEvents(node)
+      player.destroy()
+    }
 
-      this.updatePlayState()
+    this.updatePlayState()
       
-    })()
 
   }
   
@@ -189,11 +187,11 @@ export default class Track extends SoundProvider {
   public deleted=false;
   
   /** Should be called when the track is deleted and no more used. */
-  public close(){
+  public destroy(){
     for(const [_,[__,player]] of this.merged_regions){
       player.disconnect(this.junctionNode)
       for(const node of this._connectedWamNodes)player.disconnectEvents(node)
-      player.clear()
+      player.destroy()
     }
     this.outputNode.disconnect()
     this.monitoredOutputNode.disconnect()
@@ -207,18 +205,20 @@ export default class Track extends SoundProvider {
   get track_graph(){
     const that=this
     return this._track_graph=this._track_graph ?? {
+
       async instantiate(audioContext: BaseAudioContext, groupId: string) {
         // Create sound provider graph
         const audioProviderInstance=await that.sound_provider_graph.instantiate(audioContext,groupId)
 
         // Create players graph
-        const players=await Promise.all(that.regions.map(region=>region.createPlayer(groupId,audioContext)))
+        await that.updateMergedRegions()
+        const players=await Promise.all([...that.merged_regions.values()].map(region=>region[0].createPlayer(groupId,audioContext)))
         for(const player of players){
           player.connect(audioProviderInstance.inputNode)
           if(audioProviderInstance.plugin)player.connectEvents(audioProviderInstance.plugin.audioNode)
         }
         return new TrackGraphInstance(audioProviderInstance,players)
-      }
+      },
     }
   }
 
@@ -234,14 +234,24 @@ export class TrackGraphInstance implements AudioGraphInstance{
     public players: RegionPlayer[]
   ){}
 
-  connect(destination: AudioNode): void { this.soundProvider.connect(destination) }
-  connectEvents(destination: WamNode): void { this.soundProvider.connectEvents(destination) }
-  disconnect(destination?: AudioNode | undefined): void { this.soundProvider.disconnect(destination) }
-  disconnectEvents(destination?: WamNode | undefined): void { this.soundProvider.disconnectEvents(destination) }
+  connect(destination: AudioNode) { this.soundProvider.connect(destination) }
+  disconnect(destination?: AudioNode | undefined) { this.soundProvider.disconnect(destination) }
+  connectEvents(destination: WamNode) { this.soundProvider.connectEvents(destination) }
+  disconnectEvents(destination?: WamNode | undefined) { this.soundProvider.disconnectEvents(destination) }
   destroy(): void {
     this.soundProvider.destroy()
-    for(const player of this.players)player.clear()
+    for(const player of this.players)player.destroy()
   }
+
+  set playhead(value: number){
+    for(const player of this.players){ player.playhead=value }
+  }
+
+  set isPlaying(value: boolean){
+    for(const player of this.players){ player.isPlaying=value }
+  }
+
+
 
 }
 

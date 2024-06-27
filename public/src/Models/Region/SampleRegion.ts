@@ -100,9 +100,9 @@ class SampleRegionPlayer implements RegionPlayer{
         return this.node.playhead
     }
 
-    clear(): void {
+    destroy(): void {
         this.node.disconnectEvents()
         this.node.disconnect()
-        this.node.kill()
+        this.node.destroy()
     }
 }

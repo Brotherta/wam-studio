@@ -1,4 +1,4 @@
-import {audioCtx} from "../../index";
+import { audioCtx } from "../../index";
 
 function bufferToWave(abuffer: AudioBuffer) {
     var numOfChan = abuffer.numberOfChannels,
@@ -89,4 +89,4 @@ function downloadBlob(blob: Blob, fileName: string) {
 }
 
 
-export {downloadBlob, combineBuffers, bufferToWave}
+export { bufferToWave, combineBuffers, downloadBlob };

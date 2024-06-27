@@ -55,12 +55,14 @@ class MIDIRegionPlayer implements RegionPlayer{
 
     constructor(wam:WebAudioModule<WamNode>, midi: MIDI){
         const sab = RingBuffer.getStorageForCapacity(audioCtx.sampleRate * 2,Float32Array);
+        this.wam=wam
         this.node = wam.audioNode as MIDIPlayerNode;
         this.node!.port.postMessage({ sab });
         this.node.midi=midi
     }
 
-    public node: MIDIPlayerNode
+    public node
+    public wam
 
     setLoop(start: number|false, end: number): void{
         this.node.setLoop(start!==false?start:undefined,end)
@@ -99,9 +101,9 @@ class MIDIRegionPlayer implements RegionPlayer{
         return this.node.playhead
     }
 
-    clear(): void {
+    destroy(): void {
         this.node.disconnect()
         this.node.disconnectEvents()
-        this.node.kill()
+        this.node.destroy()
     }
 }

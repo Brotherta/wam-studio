@@ -134,7 +134,7 @@ export default class TracksController{
     const index=this.track_list.indexOf(track)
     if(index>=0){
       this.track_list.splice(index,1)
-      track.close()
+      track.destroy()
       this._app.pluginsController.connectPlugin(track,null);
       this._view.removeTrack(track.element);
       this._app.automationView.removeAutomationBpf(track.id);
@@ -267,6 +267,20 @@ export default class TracksController{
    */
   private bindEvents(): void {
     registerOnKeyDown(e=>{
+      if(e=="p"){
+        (async ()=>{
+          console.log("Playing",this.selectedTrack)
+          if(!this.selectedTrack)return
+          let graph= await this.selectedTrack.track_graph.instantiate(audioCtx, this._app.host.groupId)
+          graph.connect(audioCtx.destination)
+          graph.playhead=0
+          graph.isPlaying=true
+          setTimeout(()=>{
+            graph.isPlaying=false
+            graph.destroy()
+          },5000)
+        })()
+      }
       //TODO Remove this debug code
       if(e!=="a")return
 

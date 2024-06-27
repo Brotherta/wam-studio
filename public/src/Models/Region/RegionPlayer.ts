@@ -47,7 +47,7 @@ export default interface RegionPlayer{
      * Clear the region player.
      * This method should be called if the player is not used anymore.
      */
-    clear(): void
+    destroy(): void
 
 
 }

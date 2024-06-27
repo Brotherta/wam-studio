@@ -215,7 +215,7 @@ export default class PedalBoardNode extends WamNode {
 
   /**
    * This function clear the board, disconnect all the modules, add the new modules from the param and set their states
-   * @param {Object} state
+   * @param {any} state
    * @author  Yann Forner
    */
   async setState(state) {

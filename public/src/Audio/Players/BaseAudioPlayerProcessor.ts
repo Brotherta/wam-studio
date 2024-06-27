@@ -43,11 +43,7 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
         loopStart= -1
         /** The loop end in milliseconds */
         loopEnd= 0
-    
-        /** Do the processor should live or be destroyed*/
-        shouldLive= true
         
-    
         constructor(options: any){
             super(options)
         }
@@ -60,12 +56,11 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
             }
             if("loopStart" in event.data) this.loopStart = event.data.loopStart
             if("loopEnd" in event.data) this.loopEnd = event.data.loopEnd
-            if("shouldLive" in event.data) this.shouldLive = event.data.shouldLive
         }
-        
-        override process(inputs:Float32Array[][], outputs:Float32Array[][], parameters:Record<string, Float32Array>): boolean  {
-            if(parameters["isPlaying"][0]<0.5)return this.shouldLive
-    
+
+        override _process(startSample: number, endSample: number, inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): void {
+            if(parameters["isPlaying"][0]<0.5)return
+            console.log("PLAY")
             // Move the playhead
             this.previousPlayhead= this.playhead
             const msRate= 1000/sampleRate
@@ -76,9 +71,6 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
     
             // Move the playhead in the node
             this.port.postMessage({playhead: this.playhead})
-            
-            
-            return this.shouldLive
         }
     
         /**

@@ -65,7 +65,7 @@ export class PluginInstance {
      * Clone the plugin in a new audio context and group.
      */
     async cloneInto(audioCtx: BaseAudioContext, groupId: string, isHeadless: boolean = false){
-        const thisState=this.getState()
+        const thisState=await this.getState()
         const newPlugin=await PluginInstance.create(this.name, this.plugin, audioCtx, groupId, isHeadless)
         await newPlugin.setState(thisState)
         return newPlugin
@@ -83,15 +83,16 @@ export class PluginInstance {
 
     /**
      * Set the state of the plugin.
-     * It is asynchronous because it needs to wait for the plugin to be ready.
+     * The plugin is considered ready to receive the state.
+     * /////~It is asynchronous because it needs to wait for the plugin to be ready.~/////
      *
      * @param state The state of the plugin to set (Json Object)
      */
     async setState(state: any) {
-        if (state.current.length === 0) return;
-        await this.instance._audioNode.setState(state);
+        //if (state.current.length === 0) return;
+        return await this.instance._audioNode.setState(state);
 
-        let curState = await this.instance._audioNode.getState();
+        /* WTF? let curState = await this.instance._audioNode.getState();
         let statePlugin = new Promise<void>((resolve) => {
             let test = 0;
             let maxTest = 10;
@@ -107,8 +108,8 @@ export class PluginInstance {
                     await this.instance._audioNode.setState(state);
                 }
             }, 200);
-        });
-        await statePlugin;
+        });*/
+        //await statePlugin;
     }
 
     /**
