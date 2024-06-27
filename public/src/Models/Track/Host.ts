@@ -294,4 +294,12 @@ export class HostGraphInstance implements AudioGraphInstance{
         for(const track of this.tracks) track.destroy()
     }
 
+    set playhead(value: number){
+        for(const track of this.tracks) track.playhead=value
+    }
+
+    public play(): void {
+        for(const track of this.tracks) track.isPlaying=true
+    }
+
 }

@@ -248,6 +248,7 @@ export class TrackGraphInstance implements AudioGraphInstance{
   }
 
   set isPlaying(value: boolean){
+    if(!value)return
     for(const player of this.players){ player.isPlaying=value }
   }
 

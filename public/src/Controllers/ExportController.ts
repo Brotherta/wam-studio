@@ -1,5 +1,6 @@
+import { initializeWamHost } from "@webaudiomodules/sdk";
 import App from "../App";
-import { bufferToWave, combineBuffers, downloadBlob } from "../Audio/Utils/audioBufferToWave";
+import { bufferToWave, downloadBlob } from "../Audio/Utils/audioBufferToWave";
 import { PluginInstance } from "../Models/Plugin";
 import Track from "../Models/Track/Track";
 import { audioCtx } from "../index";
@@ -113,7 +114,7 @@ export default class ExporterController {
      * @returns The audio buffer of the master track.
      */
     private async exportMasterTrack(buffers: AudioBuffer[], name: string, maxDuration: number): Promise<void> {
-        console.log("Exporting track master");
+        /*console.log("Exporting track master");
 
         let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate);
         let masterBuffer = combineBuffers(buffers);
@@ -133,7 +134,24 @@ export default class ExporterController {
 
         // Clean up connections.
         masterGainNode.disconnect();
-        masterSourceNode.disconnect();
+        masterSourceNode.disconnect();*/
+
+        // Create offline audio context.
+        let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate)
+        const [hostGroupId] = await initializeWamHost(offlineCtx)
+
+        // Recreate the graph in the online audio context.
+        const graph=await this._app.host.host_graph.instantiate(offlineCtx,hostGroupId)
+        graph.connect(offlineCtx.destination)
+
+        // Start source node and render.
+        graph.playhead=0
+        graph.play()
+        let renderedBuffer = await offlineCtx.startRendering();
+
+        // Clean up everything.
+        await graph.destroy()
+
         this.exportTrackBuffer(renderedBuffer, `${name}_master.wav`);
     }
 
