@@ -166,14 +166,14 @@ export class MIDI extends MIDIView{
      * @param instant_duration 
      * @returns 
      */
-    static fromString(str: string, instant_duration: number): MIDI{
+    static fromString(str: string, instant_duration: number, high_note=64): MIDI{
         const lines=str.split("\n")
         let max_length=0
         for(const line of lines)max_length=Math.max(max_length,line.length)
         const ret=new MIDI(instant_duration,max_length*instant_duration)
 
         for(let notei=0; notei<lines.length; notei++){
-            let note=64+notei
+            let note=high_note-notei
             for(let instanti=0; instanti<lines[notei].length; instanti++){
                 const char=lines[notei][instanti]
                 if(char<'0' || '9'<char)continue
@@ -184,6 +184,49 @@ export class MIDI extends MIDIView{
         return ret
     }
 
+    /**
+     * Create a MIDI track from a list of notes.
+     * The list contains the note at each instant, or null if there is no note.
+     * @param list 
+     * @param instant_duration 
+     * @returns 
+     */
+    static fromList(list: (number|null|-1)[], instant_duration: number): MIDI{
+        const ret=new MIDI(instant_duration, list.length*instant_duration)
+        for(let i=0; i<list.length; i++){
+            let note=list[i]
+            if(note!=null){
+                let length=1
+                if(note<MIDI.iii){note-=MIDI.iiii; length=5}
+                else if(note<MIDI.ii){note-=MIDI.iii; length=4}
+                else if(note<MIDI.i){note-=MIDI.ii; length=3}
+                else if(note<0){note-=MIDI.i; length=2}
+                ret.putNote(new MIDINote(note, 1, 0, instant_duration*length), i*instant_duration)
+            }
+        }
+        return ret
+    }
+
+    static DO=60
+        static DO_=61
+    static RE=62
+        static RE_=63
+    static MI=64
+    static FA=65
+        static FA_=66
+    static SOL=67
+        static SOL_=68
+    static LA=69
+        static LA_=70
+    static SI=71
+
+    static octave_width=12
+    static $=12
+
+    static i=-1000
+    static ii=-2000
+    static iii=-3000
+    static iiii=-4000
 
     /* DURATION */
     private _duration:number=0

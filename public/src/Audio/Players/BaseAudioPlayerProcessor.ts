@@ -60,7 +60,7 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
 
         override _process(startSample: number, endSample: number, inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): void {
             if(parameters["isPlaying"][0]<0.5)return
-            console.log("PLAY")
+
             // Move the playhead
             this.previousPlayhead= this.playhead
             const msRate= 1000/sampleRate

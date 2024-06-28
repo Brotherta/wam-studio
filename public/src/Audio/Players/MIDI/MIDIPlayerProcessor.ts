@@ -28,26 +28,31 @@ export function getMIDIPlayerProcessor(moduleId:string){
             if (!this.instants) return
 
             // Get the instant
-            let instantI = Math.floor(to/this.instant_duration)
-            if(instantI>=this.instants.length)return
-            let instant = this.instants[instantI]
+            let fromInstantI = Math.max(Math.floor(from/this.instant_duration),0)
+            let toInstantI = Math.min(Math.floor(to/this.instant_duration),this.instants.length-1)
+            if(fromInstantI>=this.instants.length)return
+            
+            for(let instantI=fromInstantI; instantI<=toInstantI; instantI++){
+                let instant = this.instants[instantI]
 
-            // Get the from and to locally in the instant
-            let localFrom= from-this.instant_duration*instantI
-            let localTo= to-this.instant_duration*instantI
-            let selectedNote=-1
-            for(const {offset,note} of instant){
-                if(localFrom<=offset && offset<localTo){
-                    selectedNote=note.note
-                    for(let c=0; c<outputs[0].length; c++){
-                        for(let i=0; i<outputs[0][c].length; i++){
-                            outputs[0][c][i] += Math.sin((currentFrame+i)/(selectedNote-200)*20)*0.2;
+                // Get the from and to locally in the instant
+                let localFrom= from-this.instant_duration*instantI
+                let localTo= to-this.instant_duration*instantI
+                let selectedNote=-1
+                for(const {offset,note} of instant){
+                    if(localFrom<=offset && offset<localTo){
+                        selectedNote=note.note
+                        for(let c=0; c<outputs[0].length; c++){
+                            for(let i=0; i<outputs[0][c].length; i++){
+                                outputs[0][c][i] += Math.sin((currentFrame+i)/(selectedNote-200)*20)*0.2;
+                            }
                         }
+                        console.log(selectedNote)
+                        this.emitEvents(
+                            { type: 'wam-midi', time: currentTime, data: { bytes: new Uint8Array([0x90 | note.channel, note.note, note.velocity]) } },
+                            { type: 'wam-midi', time: currentTime+note.duration/1000, data: { bytes: new Uint8Array([0x80 | note.channel, note.note, note.velocity]) } },
+                        );
                     }
-                    this.emitEvents(
-                        { type: 'wam-midi', time: currentTime, data: { bytes: new Uint8Array([0x90 | note.channel, note.note, note.velocity]) } },
-                        { type: 'wam-midi', time: currentTime+note.duration/1000, data: { bytes: new Uint8Array([0x80 | note.channel, note.note, note.velocity]) } },
-                    );
                 }
             }
         }

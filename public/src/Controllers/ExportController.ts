@@ -82,12 +82,9 @@ export default class ExporterController {
         graph.connect(offlineCtx.destination)
 
         // Start source node and render.
-        console.log("Before start playing")
         graph.playhead=0
         graph.isPlaying=true
-        console.log("After start playing")
         let renderedBuffer = await offlineCtx.startRendering();
-        console.log("After rendering")
         
         // Clean up everything.
         await graph.destroy()

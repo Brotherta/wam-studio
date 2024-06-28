@@ -137,7 +137,6 @@ const getCustomProcessor = (moduleId) => {
      * @author Quentin Beauchet
      */
     scheduleEvents(...events) {
-      console.log("Pedal Board",events);
       events.forEach((event) => {
         const { type, data, time } = event;
         const { id, value } = data;
@@ -150,7 +149,6 @@ const getCustomProcessor = (moduleId) => {
           });
         }
         else{
-          console.log("Process")
           this.group.processors.forEach((processor) => {
             processor.scheduleEvents(event);
           })

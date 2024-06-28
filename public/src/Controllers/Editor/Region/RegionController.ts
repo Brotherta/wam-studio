@@ -254,11 +254,11 @@ export default class RegionController {
           const selected=this._app.tracksController.selectedTrack
           if(selected){
             const start=this._app.host.playhead
-            const midi=MIDI.fromString(
-`
-0  1    0  1
- 0   1   0   2
-  0    1  0     0`,1000)
+            const { DO,DO_,RE,RE_,MI,FA,FA_,SOL,SOL_,LA,LA_,SI, $, i, ii, iii, iiii }=MIDI
+            const midi=MIDI.fromList([
+              MI, null, MI, MI, null, DO, MI+i, null, SOL+ii, null, null, null, SOL-$+i, null, null, null,
+              DO+i, null, null, SOL-$+i, null, null, MI-$, null, null, LA-$, null, SI-$, null, LA_-$, LA-$,
+            ], 200)
             const region=new MIDIRegion(midi,start)
             this.addRegion(selected,region)
           }
