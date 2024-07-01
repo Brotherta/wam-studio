@@ -92,45 +92,34 @@ export default class PedalBoardNode extends WamNode {
    * @author Samuel DEMONT
    */
   #connectNodes() {
+
+    const linkNodes=
+    /**
+    * @param {PedalBoardNode['nodeQueue']} nodes
+    * @param {string} visual
+    * @param {(a:AudioNode,b:AudioNode)=>void} callback
+    */
+    function(nodes,visual,callback){
+      const toLink=[this._input]
+      toLink[0].name="input"
+      for(const nodeentry of nodes){
+        let nextNode = nodeentry.node
+        nextNode.name=nodeentry.name
+        if(nodeentry.hasAudioInput && nextNode.numberOfInputs>0){
+          console.log(toLink.map(it=>it.name),visual,nextNode.name)
+          toLink.forEach(it=>callback(it,nextNode))
+          toLink.length=0
+        }
+        if(nodeentry.hasAudioOutput && nextNode.numberOfOutputs>0)toLink.push(nextNode)
+      }
+      console.log(toLink.map(it=>it.name),visual,"output")
+      toLink.forEach(it=>callback(it,this._output))
+    }.bind(this)
+
     // Disconnect the nodes
-    {
-      const toDisconnect=[this._input]
-      toDisconnect[0].name="input"
-      for(const nodeentry of this.#previousQueue){
-        let nextNode = nodeentry.node
-        nextNode.name=nodeentry.name
-        if(nextNode.numberOfInputs>0){
-          toDisconnect.forEach(it=>it.disconnect(nextNode))
-          console.log(toDisconnect.map(it=>it.name)," =X> ",nextNode.name)
-          toDisconnect.length=0
-        }
-        toDisconnect.push(nextNode)
-      }
-      console.log(toDisconnect.map(it=>it.name)," =X> output")
-      toDisconnect.forEach(it=>it.disconnect(this._output))
-    this._input.disconnect()
-    }
-
-    // Connect the nodes
-    {
-      const toConnect=[this._input]
-      toConnect[0].name="input"
-      for(const nodeentry of this.nodeQueue){
-        let nextNode = nodeentry.node
-        nextNode.name=nodeentry.name
-        if(nodeentry.hasAudioInput){
-          toConnect.forEach(it=>it.connect(nextNode))
-          console.log(toConnect.map(it=>it.name)," ==> ",nextNode.name)
-          toConnect.length=0
-        }
-        if(nodeentry.hasAudioOutput)toConnect.push(nextNode)
-      }
-      console.log(toConnect.map(it=>it.name)," ==> output")
-      toConnect.forEach(it=>it.connect(this._output))
-    }
-
+    linkNodes(this.#previousQueue, " =X> ", (a,b)=>a.disconnect(b))
+    linkNodes(this.nodeQueue, " ==> ", (a,b)=>a.connect(b))
     this.#previousQueue=[...this.nodeQueue]
-
     this.updateInfos();
   }
 
@@ -170,6 +159,7 @@ export default class PedalBoardNode extends WamNode {
 
     // Get node informations
     const node=wam.audioNode
+    console.log(pedalName,wam.descriptor)
     const hasAudioInput= !!wam.descriptor.hasAudioInput
     const hasAudioOutput= !!wam.descriptor.hasAudioOutput
 
