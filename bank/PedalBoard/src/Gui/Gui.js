@@ -53,7 +53,7 @@ export default class pedalboardGui extends HTMLElement {
     this.createBoard();
     await this._plug.pedalboardNode.initState();
 
-    let canvas = document.createElement("canvas");
+    let canvas = /**@type {HTMLCanvasElement&{on:boolean}}*/(document.createElement("canvas"));
     canvas.on = true;
     this.main.appendChild(canvas);
      new Visualizer(canvas, this._plug.pedalboardNode._output);
@@ -223,9 +223,11 @@ export default class pedalboardGui extends HTMLElement {
       let target = this.dropZone.nextSibling;
       this.board.removeChild(this.dropZone);
 
-      this._plug.pedalboardNode.disconnectNodes(this.board.childNodes, false, () =>
+      this._plug.pedalboardNode.movePlugin(Number.parseInt(this.dragOrigin.id), 0);
+      this.board.insertBefore(this.dragOrigin, target)
+      /*TODO this._plug.pedalboardNode.disconnectNodes(this.board.childNodes, false, () =>
         this.board.insertBefore(this.dragOrigin, target)
-      );
+      );*/
 
       this.dragOrigin = undefined;
     };
@@ -272,7 +274,7 @@ export default class pedalboardGui extends HTMLElement {
     
     article.ondragstart = (event) => {
       event.dataTransfer.setDragImage(img, img.width / 2, img.height / 2);
-      this.dragOrigin = wrapper;
+      this.dragOrigin = article;
     };
 
     article.ondragover = (event) => {
@@ -304,7 +306,11 @@ export default class pedalboardGui extends HTMLElement {
     cross.src = this._crossIMGUrl;
     cross.setAttribute("crossorigin", "anonymous");
     cross.addEventListener("click", () => {
-      this._plug.pedalboardNode.disconnectNodes(this.board.childNodes, false, () => article.remove());
+      this._plug.pedalboardNode.removePlugin(id)
+      instance.audioNode.destroy()
+      instance.destroyGui(gui)
+      article.remove()
+      // TODO Why do it use a callback? this._plug.pedalboardNode.disconnectNodes(this.board.childNodes, false, () => article.remove());
     });
 
     header.append(cross);
@@ -684,11 +690,7 @@ export default class pedalboardGui extends HTMLElement {
    * @author Quentin Beauchet
    */
   setPreviewFullness(full) {
-    if (full) {
-      this.images.setAttribute("full", "");
-    } else {
-      this.images.removeAttribute("full");
-    }
+    this?.images?.toggleAttribute("full", full)
   }
 
   /**

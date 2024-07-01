@@ -30,7 +30,6 @@ export default class PedalBoardPlugin extends WebAudioModule {
     } else {
       return `${this._baseURL.replace('/src', '')}${relativeURL}`;
     }
-
   }
 
   async _loadDescriptor() {
@@ -105,7 +104,8 @@ export default class PedalBoardPlugin extends WebAudioModule {
     this.gui.loadingPreset = true;
     this.gui.setPreviewFullness(true);
     let board = this.gui.board;
-    this.pedalboardNode.disconnectNodes(board.childNodes, true);
+    this.pedalboardNode.removeAll()
+    this.pedalboardNode.nodeQueue.forEach(it=>it.node.destroy())
     board.innerHTML = "";
 
     let size = 0;
@@ -135,7 +135,7 @@ export default class PedalBoardPlugin extends WebAudioModule {
       return false;
     }
 
-    this.pedalboardNode.addPlugin(instance.audioNode, WamName, this.id);
+    this.pedalboardNode.addPlugin(instance, WamName, this.id);
     await this.gui.addPlugin(instance, this.WAMS[WamName].img, this.id);
     if (state) {
       await instance.audioNode.setState(state);

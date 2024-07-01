@@ -4,17 +4,7 @@ import addFunctionModule from "../../plugins/utils/sdk/src/addFunctionModule.js"
 import getCustomProcessor from "./CustomProcessor.js";
 
 /**
- * //TODO Better support for wam with not sound input, no midi input, no sound input, no midi 
- * // If an WAM has no sound input, the previous node should try to connect to the next one, if th next one has no sound input, it shoud connect to [...]
- * // This way, there is no unused produced audio buffer. Having such things have no sense.
- * 
- * O ---> O ---> O
- * 
- * O      O ---> O
- * |_____________^
- * 
- * O      O      O ---> O
- * |______v_____________^
+ * //TODO It seem like the wams are not garbage collected when they are removed. They should.
  */
 export default class PedalBoardNode extends WamNode {
 
@@ -29,10 +19,14 @@ export default class PedalBoardNode extends WamNode {
     await addFunctionModule(audioWorklet, getCustomProcessor, moduleId);
   }
 
-  nodeId = 0;
+  /** @type {{ [key: number]:{ name:string, node:WamNode, wam:WebAudioModule, hasAudioInput:boolean, hasAudioOutput:boolean} }} */
+  nodes = {}
 
-  /** @type {{ [key: number]:{ name:string, node:WamNode } }} */
-  nodes = {};
+  /** @type {(typeof this.nodes)[0][]} */
+  nodeQueue = []
+
+  /** @type {typeof this.nodeQueue} */
+  #previousQueue = []
 
   MAX_NODES = 30;
 
@@ -66,7 +60,7 @@ export default class PedalBoardNode extends WamNode {
     });
 
     this.createNodes();
-    this.connectNodes([]);
+    this.#connectNodes();
   }
 
   /**
@@ -75,12 +69,13 @@ export default class PedalBoardNode extends WamNode {
    */
   createNodes() {
     this._input = this.context.createGain();
-    super.connect(this._input);
 
     this._output = this.context.createAnalyser();
     this._output.minDecibels = -90;
     this._output.maxDecibels = -10;
     this._output.smoothingTimeConstant = 0.85;
+
+    super.connect(this._input).connect(this._output);
   }
 
   connect(...args){
@@ -93,105 +88,114 @@ export default class PedalBoardNode extends WamNode {
   }
 
   /**
-   * Connect every nodes from the board of the Gui.
-   * @param {HTMLCollection} nodes
-   * @author Quentin Beauchet
+   * Connect all nodes of the pedalboard in the right order.
+   * @author Samuel DEMONT
    */
-  connectNodes(nodes) {
-    this.lastNode = this._input;
-    nodes.forEach((el) => {
-      let audioNode = this.nodes[el.id].node;
-      this.lastNode.connect(audioNode);
-      this.lastNode = audioNode;
-    });
+  #connectNodes() {
+    // Disconnect the nodes
+    {
+      const toDisconnect=[this._input]
+      toDisconnect[0].name="input"
+      for(const nodeentry of this.#previousQueue){
+        let nextNode = nodeentry.node
+        nextNode.name=nodeentry.name
+        if(nextNode.numberOfInputs>0){
+          toDisconnect.forEach(it=>it.disconnect(nextNode))
+          console.log(toDisconnect.map(it=>it.name)," =X> ",nextNode.name)
+          toDisconnect.length=0
+        }
+        toDisconnect.push(nextNode)
+      }
+      console.log(toDisconnect.map(it=>it.name)," =X> output")
+      toDisconnect.forEach(it=>it.disconnect(this._output))
+    this._input.disconnect()
+    }
 
-    this.lastNode.connect(this._output);
+    // Connect the nodes
+    {
+      const toConnect=[this._input]
+      toConnect[0].name="input"
+      for(const nodeentry of this.nodeQueue){
+        let nextNode = nodeentry.node
+        nextNode.name=nodeentry.name
+        if(nodeentry.hasAudioInput){
+          toConnect.forEach(it=>it.connect(nextNode))
+          console.log(toConnect.map(it=>it.name)," ==> ",nextNode.name)
+          toConnect.length=0
+        }
+        if(nodeentry.hasAudioOutput)toConnect.push(nextNode)
+      }
+      console.log(toConnect.map(it=>it.name)," ==> output")
+      toConnect.forEach(it=>it.connect(this._output))
+    }
+
+    this.#previousQueue=[...this.nodeQueue]
+
     this.updateInfos();
   }
 
   /**
-   * Disconnects every nodes from the board of the Gui. It then check the nodes stored in this.nodes and
-   * if they aren't needed anymore it delete them from the object.
-   * The callback is used when changing the order of the plugins on the board or when removing a plugin.
-   * The boolean forced is needed when using setState().
-   * @param {HTMLCollection} nodes
-   * @author Quentin Beauchet
+   * Remove the WAM AudioNode from the audio of the PedalBoard.
+   * @param {number} id 
    */
-  disconnectNodes(nodes, forced, callback) {
-    this.lastNode = this._input;
-    nodes.forEach((el) => {
-      let audioNode = this.nodes[el.id].node;
-      this.lastNode.disconnect();
-      this.lastNode = audioNode;
-    });
-    this.lastNode.disconnect();
-
-    if (callback) {
-      callback();
-    }
-
-    this.cleanup(nodes, forced);
-  }
-
-  /**
-   * Act like a garbage collector, it remove wap that aren't in the board anymore.
-   * @param {HTMLCollection} nodes
-   * @param {boolean} forced remove every wap if true
-   * @author Quentin Beauchet
-   */
-  cleanup(nodes, forced) {
-    if (forced) {
-      for (let key in this.nodes) {
-        this.nodes[key].node.destroy();
-        delete this.nodes[key];
-      }
-      this.nodes = {};
-      this.connectNodes([]);
-    } else {
-      let ids = Array.from(nodes).map((el) => el.id);
-      for (let key in this.nodes) {
-        if (!ids.includes(key)) {
-          this.nodes[key].node.destroy();
-          delete this.nodes[key];
-        }
-      }
-      this.connectNodes(nodes);
+  removePlugin(id){
+    if(id in this.nodes){
+      const nodeentry = this.nodes[id]
+      delete this.nodes[id]
+      this.nodeQueue.splice(this.nodeQueue.indexOf(nodeentry),1)
+      this.#connectNodes()
     }
   }
 
   /**
-   * Connect audioNode at the end of the PedalBoard beetween this.lastNode and this._output.
-   * @param {WamNode} audioNode
-   * @author Quentin Beauchet
+   * Remove all the WAM AudioNode from the audio of the PedalBoard.
    */
-  connectPlugin(audioNode) {
-    this.lastNode.disconnect(this._output);
-
-    try{
-      this.lastNode.connect(audioNode);
-      audioNode.connect(this._output);
-      this.lastNode = audioNode;
-    }
-    catch(e){
-      this.lastNode.connect(this._output)
-    }
-    
+  removeAll(){
+    for(const id of Object.keys(this.nodes)) this.removePlugin(Number.parseInt(id))
   }
 
   /**
-   * Add the audioNode the the audio of the PedalBoard,then it calls updateInfos() to refresh the automation labels.
-   * @param {WamNode} audioNode The audioNode.
+   * Add the Web Audio Module the the audio of the PedalBoard.
+   * If there is already a node with the same id, nothing is done.
+   * @param {WebAudioModule} wam The audioNode.
    * @param {string} pedalName The name of the node.
    * @param {number} id The unique id of the node, it help to map the audioNode to it's Gui.
    * @author Quentin Beauchet
    */
-  addPlugin(audioNode, pedalName, id) {
-    this.connectPlugin(audioNode);
-    this.nodes[id] = { name: pedalName, node: audioNode };
-    this.updateInfos();
-    audioNode.addEventListener("wam-info", () => {
-      this.updateInfos();
-    });
+  addPlugin(wam, pedalName, id) {
+    if(id in this.nodes){
+      console.warn("Duplicate node id",id)
+      return
+    }
+
+    // Get node informations
+    const node=wam.audioNode
+    const hasAudioInput= !!wam.descriptor.hasAudioInput
+    const hasAudioOutput= !!wam.descriptor.hasAudioOutput
+
+    // Create and add the entry
+    const entry = { name: pedalName, wam, node, hasAudioInput, hasAudioOutput }
+    this.nodes[id] = entry;
+    this.nodeQueue.push(entry)
+
+    this.#connectNodes()
+    wam.audioNode.addEventListener("wam-info", ()=>this.updateInfos())
+  }
+
+  /**
+   * Move a node in the pedalboard at the given index of the current nodeQueue configuration.
+   * @param {number} id The moved node id.
+   * @param {number} index The new index of the node.
+   */
+  movePlugin(id,index){
+    if(id in this.nodes){
+      const entry= this.nodes[id]
+      const pos= this.nodeQueue.indexOf(entry)
+      this.nodeQueue.splice(pos,1)
+      if(pos<index)index--
+      this.nodeQueue.splice(index,0,entry)
+      this.#connectNodes()
+    }
   }
 
   /**
