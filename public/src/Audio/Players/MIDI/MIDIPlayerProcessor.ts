@@ -42,11 +42,11 @@ export function getMIDIPlayerProcessor(moduleId:string){
                 for(const {offset,note} of instant){
                     if(localFrom<=offset && offset<localTo){
                         selectedNote=note.note
-                        for(let c=0; c<outputs[0].length; c++){
+                        /*for(let c=0; c<outputs[0].length; c++){
                             for(let i=0; i<outputs[0][c].length; i++){
                                 outputs[0][c][i] += Math.sin((currentFrame+i)/(selectedNote-200)*20)*0.2;
                             }
-                        }
+                        }*/
                         console.log(selectedNote)
                         this.emitEvents(
                             { type: 'wam-midi', time: currentTime, data: { bytes: new Uint8Array([0x90 | note.channel, note.note, note.velocity]) } },
