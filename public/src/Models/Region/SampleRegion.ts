@@ -48,6 +48,7 @@ export default class SampleRegion extends RegionOf<SampleRegion>{
 
     override async createPlayer(groupid: string, audioContext: AudioContext): Promise<RegionPlayer> {
         const player=await SamplePlayerWAM.createInstance(groupid,audioContext)
+        await (player.audioNode as SamplePlayerNode).setAudio(this.buffer.toArray())
         return new SampleRegionPlayer(player, this.buffer)
     }
 
@@ -58,8 +59,6 @@ class SampleRegionPlayer implements RegionPlayer{
     constructor(wam:WebAudioModule<WamNode>, buffer: OperableAudioBuffer){
         const sab = RingBuffer.getStorageForCapacity(audioCtx.sampleRate * 2,Float32Array);
         this.node = wam.audioNode as SamplePlayerNode;
-        this.node!.port.postMessage({ sab });
-        this.node.audio=buffer.toArray()
     }
 
     public node: SamplePlayerNode

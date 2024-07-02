@@ -13,9 +13,9 @@ export default class MIDIPlayerNode extends BaseAudioPlayerNode{
         })
     }
 
-    set midi(midi: MIDI | undefined){
-        if(midi) this.port.postMessage({instants:midi.instants, instant_duration:midi.instant_duration})
-        else this.port.postMessage({instants:undefined})
+    setMidi(midi: MIDI | undefined): Promise<void>{
+        if(midi) return this.postMessageAsync({instants:midi.instants, instant_duration:midi.instant_duration})
+        else return this.postMessageAsync({instants:undefined})
     }
     
 }

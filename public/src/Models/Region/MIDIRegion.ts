@@ -45,6 +45,7 @@ export default class MIDIRegion extends RegionOf<MIDIRegion>{
 
     override async createPlayer(groupid: string, audioContext: AudioContext): Promise<RegionPlayer> {
         const player=await MIDIPlayerWAM.createInstance(groupid,audioContext)
+        await (player.audioNode as MIDIPlayerNode).setMidi(this.midi)
         return new MIDIRegionPlayer(player, this.midi)
     }
 
@@ -57,8 +58,6 @@ class MIDIRegionPlayer implements RegionPlayer{
         const sab = RingBuffer.getStorageForCapacity(audioCtx.sampleRate * 2,Float32Array);
         this.wam=wam
         this.node = wam.audioNode as MIDIPlayerNode;
-        this.node!.port.postMessage({ sab });
-        this.node.midi=midi
     }
 
     public node

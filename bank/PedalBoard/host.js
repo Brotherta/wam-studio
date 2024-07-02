@@ -81,7 +81,6 @@ const mountPlugin = (domNode) => {
   });
 
   bip?.addEventListener("click", async () => {
-    console.log("bip");
     instance.audioNode.getParameterInfo().then(p=>console.dir("params",p))
     instance.audioNode.scheduleEvents({ type: 'wam-midi', time: audioContext.currentTime, data: { bytes: new Uint8Array([0x90, 74, 100]) } });
 		instance.audioNode.scheduleEvents({ type: 'wam-midi', time: audioContext.currentTime + 0.25, data: { bytes: new Uint8Array([0x80, 74, 100]) } });

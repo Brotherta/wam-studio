@@ -16,8 +16,11 @@ export function getSamplePlayerProcessor(moduleId:string){
         }
     
         async _onMessage(e: MessageEvent<any>){
+            if ("audio" in e.data){
+                this.audio = e.data.audio
+                this.port.postMessage({resolve:"audio"})
+            }
             await super._onMessage(e)
-            if ("audio" in e.data) this.audio = e.data.audio
         }
     
         play(from: number, to: number, msRate: number, inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): void {

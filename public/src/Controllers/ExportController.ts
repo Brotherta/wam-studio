@@ -48,11 +48,10 @@ export default class ExporterController {
 
         // Process and export individual tracks.
         for (let track of this._app.tracksController.tracks) {
-            track.update(audioCtx, 0);
             let buffer = await this.processTrack(track, maxDuration, initializeWamHost);
             if (buffer) buffers.push(buffer);
             if (tracksIds.includes(track.id)) {
-                this.exportTrackBuffer(buffer, `${name}_track_${track.element.name}.wav`);
+                //this.exportTrackBuffer(buffer, `${name}_track_${track.element.name}.wav`);
             }
         }
 
@@ -96,9 +95,11 @@ export default class ExporterController {
         const [hostGroupId] = await initializeWamHost(offlineCtx)
         const graph=await track.track_graph.instantiate(offlineCtx,hostGroupId)
         graph.connect(offlineCtx.destination)
+        console.log("WILL SET PLAYHEADs")
         graph.playhead=0
+        console.log("PLAYHEADS sets")
         graph.isPlaying=true
-        new AudioBuffer({length:10,sampleRate:audioCtx.sampleRate,numberOfChannels:2})*/
+        return new AudioBuffer({length:10, sampleRate:audioCtx.sampleRate, numberOfChannels:2})*/
     }
 
     /**
@@ -135,6 +136,7 @@ export default class ExporterController {
 
         // Create offline audio context.
         let offlineCtx = new OfflineAudioContext(2, audioCtx.sampleRate * maxDuration, audioCtx.sampleRate)
+        //let offlineCtx = audioCtx
         const [hostGroupId] = await initializeWamHost(offlineCtx)
 
         // Recreate the graph in the online audio context.
@@ -142,8 +144,11 @@ export default class ExporterController {
         graph.connect(offlineCtx.destination)
 
         // Start source node and render.
+        console.log(">> Set Playhead")
         graph.playhead=0
+        console.log("Play >> Play")
         graph.play()
+        console.log("Start   >> Start Rendering")
         let renderedBuffer = await offlineCtx.startRendering();
 
         // Clean up everything.

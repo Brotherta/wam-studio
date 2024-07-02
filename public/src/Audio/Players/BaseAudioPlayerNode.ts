@@ -10,12 +10,16 @@ export default class BaseAudioPlayerNode extends WamNode{
 
     constructor(module: WebAudioModule<BaseAudioPlayerNode>, options: AudioWorkletNodeOptions){
         super(module,options)
-        this.port.onmessage = this.onmessage.bind(this)
     }
 
-    private onmessage(event:MessageEvent<any>){
-        if(event.data.playhead){
-            this._playhead = event.data.playhead
+    override _onMessage(message: MessageEvent<any>): void {
+        super._onMessage(message)
+        if(message.data.playhead){
+            this._playhead = message.data.playhead
+        }
+        if(message.data.resolve){
+            this.waitMap[message.data.resolve]?.()
+            delete this.waitMap[message.data.resolve]
         }
     }
     
@@ -27,6 +31,8 @@ export default class BaseAudioPlayerNode extends WamNode{
 
     /* The player playhead position in milliseconds. */
     set playhead(value: number){
+        console.trace()
+        console.log("   => Playhead Move "+this.constructor.name)
         this.port.postMessage({playhead: value})
         this._playhead = value
     }
@@ -34,7 +40,7 @@ export default class BaseAudioPlayerNode extends WamNode{
     get playhead(): number{ return this._playhead }
 
     private _playhead: number = 0
-
+    
     /**
      * Set the loop start and end in milliseconds
      * @param start in sample
@@ -51,5 +57,19 @@ export default class BaseAudioPlayerNode extends WamNode{
         await super.addModules(audioContext, moduleId)
         await addFunctionModule(audioContext.audioWorklet, getBaseAudioPlayerProcessor, moduleId)
     }
+
+    /**
+     * Post a message and return a promise that will be resolved when after the message is treated
+     * @param message 
+     */
+    postMessageAsync(message: any): Promise<void>{
+        this.waitId++
+        message.waiting = this.waitId
+        const promise=new Promise<void>(resolve=>{ this.waitMap[this.waitId]=resolve })
+        this.port.postMessage(message)
+        return promise
+    }
+    private waitMap: {[key:number]:()=>void} = {}
+    private waitId=0
 
 }

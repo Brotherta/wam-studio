@@ -12,8 +12,12 @@ export default class SamplePlayerNode extends BaseAudioPlayerNode{
         })
     }
 
-    set audio(audio: Float32Array[] | undefined){
-        this.port.postMessage({audio})
+    override _onMessage(message: MessageEvent<any>): void {
+        super._onMessage(message)
+    }
+
+    setAudio(audio: Float32Array[] | undefined): Promise<void>{
+        return this.postMessageAsync({audio})
     }
     
 }

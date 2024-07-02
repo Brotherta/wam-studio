@@ -19,9 +19,12 @@ export function getMIDIPlayerProcessor(moduleId:string){
         }
     
         async _onMessage(e: MessageEvent<any>) { 
-            await super._onMessage(e)
-            if("instants" in e.data) this.instants = e.data.instants
+            if("instants" in e.data){
+                this.instants = e.data.instants
+                this.port.postMessage({resolve:"midi"})
+            }
             if("instant_duration" in e.data) this.instant_duration=e.data.instant_duration
+            await super._onMessage(e)
         }
     
         play(from: number, to: number, msRate: number, inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): void {
@@ -42,12 +45,11 @@ export function getMIDIPlayerProcessor(moduleId:string){
                 for(const {offset,note} of instant){
                     if(localFrom<=offset && offset<localTo){
                         selectedNote=note.note
-                        /*for(let c=0; c<outputs[0].length; c++){
+                        /* MIDI BIP BOUP for(let c=0; c<outputs[0].length; c++){
                             for(let i=0; i<outputs[0][c].length; i++){
                                 outputs[0][c][i] += Math.sin((currentFrame+i)/(selectedNote-200)*20)*0.2;
                             }
                         }*/
-                        console.log(selectedNote)
                         this.emitEvents(
                             { type: 'wam-midi', time: currentTime, data: { bytes: new Uint8Array([0x90 | note.channel, note.note, note.velocity]) } },
                             { type: 'wam-midi', time: currentTime+note.duration/1000, data: { bytes: new Uint8Array([0x80 | note.channel, note.note, note.velocity]) } },

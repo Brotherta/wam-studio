@@ -53,9 +53,11 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
             if("playhead" in event.data){
                 this.playhead = event.data.playhead
                 this.previousPlayhead = this.playhead-1
+                console.log("playhead"+this.constructor.name)
             }
             if("loopStart" in event.data) this.loopStart = event.data.loopStart
             if("loopEnd" in event.data) this.loopEnd = event.data.loopEnd
+            if("waiting" in event.data) this.port.postMessage({resolve: event.data.waiting})
         }
 
         override _process(startSample: number, endSample: number, inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): void {
