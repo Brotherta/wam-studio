@@ -51,7 +51,7 @@ export default class ExporterController {
             let buffer = await this.processTrack(track, maxDuration, initializeWamHost);
             if (buffer) buffers.push(buffer);
             if (tracksIds.includes(track.id)) {
-                //this.exportTrackBuffer(buffer, `${name}_track_${track.element.name}.wav`);
+                this.exportTrackBuffer(buffer, `${name}_track_${track.element.name}.wav`);
             }
         }
 
@@ -144,11 +144,8 @@ export default class ExporterController {
         graph.connect(offlineCtx.destination)
 
         // Start source node and render.
-        console.log(">> Set Playhead")
-        graph.playhead=0
-        console.log("Play >> Play")
         graph.play()
-        console.log("Start   >> Start Rendering")
+
         let renderedBuffer = await offlineCtx.startRendering();
 
         // Clean up everything.
