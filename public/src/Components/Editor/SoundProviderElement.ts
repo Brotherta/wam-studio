@@ -302,9 +302,6 @@ template.innerHTML = /*html*/`
             <div id="fx" class="control" style="padding-top: 6px">
                 <i class="fx-icon" style="width: 18px"></i>
             </div>
-            <div id="automation" class="control" style="padding-top: 1px">
-                <i class="icon automation-icon" style="width: 15px"></i>
-            </div>
         </div>
         <div class="control-line" id="track-controls2">
         </div>
@@ -330,22 +327,30 @@ export default class SoundProviderElement extends HTMLElement {
         return fetched ?? undefined
     }
 
-    set isMuted(value: boolean){
-        if(value){
+    private updateMuted(){
+        if(this._isMuted){
             this.muteBtn.classList.remove("_yellow")
             this.muteBtn.classList.add("_red","_toggled")
         }
-        else this.muteBtn.classList.remove("_red","_yellow","_toggled")
+        else if(this._isSoloMuted){
+            this.muteBtn.classList.remove("_red")
+            this.muteBtn.classList.add("_yellow","_toggled")
+        }
+        else{
+            this.muteBtn.classList.remove("_red","_yellow","_toggled")
+        }
     }
 
+    private _isMuted=false
+    set isMuted(value: boolean){
+        this._isMuted=value
+        this.updateMuted()
+    }
+
+    private _isSoloMuted=false
     set isSoloMuted(value: boolean){
-        this.on("mute-btn",it=>{
-            if(value){
-                it.classList.remove("_red")
-                it.classList.add("_yellow","_toggled")
-            }
-            else it.classList.remove("_red","_yellow","_toggled")
-        })
+        this._isSoloMuted=value
+        this.updateMuted()
     }
 
     set name(value:string){ this.trackNameInput.value=value }
@@ -441,7 +446,6 @@ export default class SoundProviderElement extends HTMLElement {
 
     get muteBtn() { return this.shadowRoot?.getElementById("mute-btn") as HTMLDivElement }
     get monitoringBtn() { return this.shadowRoot?.getElementById("monitoring") as HTMLDivElement }
-    get automationBtn() { return this.shadowRoot?.getElementById("automation") as HTMLDivElement }
 
     get fxBtn() { return this.shadowRoot?.getElementById("fx") as HTMLDivElement }
 

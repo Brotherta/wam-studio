@@ -263,6 +263,19 @@ export default class RegionController {
             this.addRegion(selected,region)
           }
           break;
+
+        case "n":{
+          const selected=this._app.tracksController.selectedTrack
+          if(selected){
+            const start=this._app.host.playhead
+            const { DO,DO_,RE,RE_,MI,FA,FA_,SOL,SOL_,LA,LA_,SI, $, i, ii, iii, iiii }=MIDI
+            const midi=MIDI.fromList([DO,MI,DO,MI,DO,MI,DO,MI,DO,MI,DO], 500)
+            const region=new MIDIRegion(midi,start)
+            this.addRegion(selected,region)
+          }
+          break;
+        }
+
       }
     });
     // handle moving a region on the PIXI Canvas.

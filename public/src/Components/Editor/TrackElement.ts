@@ -24,6 +24,13 @@ close_template.innerHTML = /*html*/`
     </div>
 `
 
+const automation_template = document.createElement("template")
+automation_template.innerHTML = /*html*/`
+    <div id="automation" class="control" style="padding-top: 1px">
+        <i class="icon automation-icon" style="width: 15px"></i>
+    </div>
+`
+
 /**
  * An HTMLElement that represents a track panel.
  */
@@ -35,6 +42,7 @@ export default class TrackElement extends SoundProviderElement {
             this.controls2.appendChild(controls2_template.content.cloneNode(true))
             this.muteBtn.after(controls_template.content.cloneNode(true))
             this.handBtn.after(close_template.content.cloneNode(true))
+            this.fxBtn.after(automation_template.content.cloneNode(true))
             this.trackNameInput.disabled=false
         }
     }
@@ -79,6 +87,7 @@ export default class TrackElement extends SoundProviderElement {
 
     get closeBtn() { return this.shadowRoot?.getElementById("close-btn") as HTMLDivElement }
 
+    get automationBtn() { return this.shadowRoot?.getElementById("automation") as HTMLDivElement }
 
 }
 

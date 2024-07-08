@@ -1,5 +1,5 @@
 import BPF from "../Components/BPF";
-import SoundProvider from "../Models/Track/SoundProvider";
+import Track from "../Models/Track/Track";
 import EditorView from "./Editor/EditorView";
 
 /**
@@ -15,7 +15,7 @@ export default class AutomationView {
      * Opens the automation menu next to the track.
      * @param track - The track to which the automation menu is associated.
      */
-    public openAutomationMenu(track: SoundProvider): void {
+    public openAutomationMenu(track: Track): void {
         let trackElement = track.element;
         let bd = trackElement.getBoundingClientRect();
         this.automationMenu.style.transform = `translate(${bd.left + bd.width - 15}px, ${bd.top+15}px)`;

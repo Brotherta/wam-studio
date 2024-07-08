@@ -363,13 +363,6 @@ export default class TracksController{
         ()=> track.balance = oldB,
       );
     });
-
-
-    // TRACK AUTOMATION
-    track.element.automationBtn.addEventListener("click", async (e) => {
-      // Open the automation menu when the automation button is clicked.
-      this.automationMenu(e, track);
-    })
  
     // TRACK MONITOR
     track.element.monitoringBtn.addEventListener("click", () => {
@@ -409,6 +402,12 @@ export default class TracksController{
       // Remove the track when the close button is clicked.
       this.removeTrack(track);
     });
+
+    // TRACK AUTOMATION
+    track.element.automationBtn.addEventListener("click", async (e) => {
+      // Open the automation menu when the automation button is clicked.
+      this.automationMenu(e, track);
+    })
 
     // SOLO TRACK
     track.element.soloBtn.addEventListener("click", () => {
@@ -483,7 +482,7 @@ export default class TracksController{
    * @param track - The track to open the automation menu.
    * @private
    */
-  private async automationMenu(e: Event, track: SoundProvider): Promise<void> {
+  private async automationMenu(e: Event, track: Track): Promise<void> {
     this.select(track);
     await this._app.automationController.openAutomationMenu(track);
     e.stopImmediatePropagation();
