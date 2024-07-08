@@ -1,7 +1,6 @@
 import { WamNode } from "@webaudiomodules/api";
 import AudioGraph from "../../Audio/Graph/AudioGraph";
-import TrackElement from "../../Components/TrackElement.js";
-import type TracksController from "../../Controllers/Editor/Track/TracksController";
+import SoundProviderElement from "../../Components/Editor/SoundProviderElement";
 import { audioCtx } from "../../index";
 import Automation from "../Automation";
 import Plugin, { PluginInstance } from "../Plugin";
@@ -16,7 +15,7 @@ export default abstract class SoundProvider {
   /* -~- OUTPUT NODES -~- */
   /* junctionNode -> pannerNode -> gainNode -> monitoredNode */
   /** The gain node associated to the track. It is used to control the volume of the track and is the outputNode of the track. **/
-  private gainNode: GainNode
+  protected gainNode: GainNode
 
   /** The panner node associated to the track. It is used to control the balance of the track. **/
   private pannerNode: StereoPannerNode
@@ -29,25 +28,13 @@ export default abstract class SoundProvider {
   public id: number
 
   /** The track element associated to the track. */
-  public element: TrackElement
+  public _element: SoundProviderElement
+  public get element(){ return this._element }
 
   /** The automation associated to the track. */
   public automation: Automation
 
   private _modified: boolean
-
-  /**
-   * The armed state of the track. It is used to record the track.
-   */
-  set isArmed(value: boolean){
-    this._armed=value
-    console.log("Armed", value)
-    this.element.setArm(value)
-  }
-
-  get isArmed(){ return this._armed }
-
-  private _armed: boolean=false
 
   /**
    * Position of the loop start in milliseconds.
@@ -59,7 +46,7 @@ export default abstract class SoundProvider {
    */
   public loopEnd: number;
 
-  constructor(element: TrackElement, readonly groupId: string) {
+  constructor(element: SoundProviderElement, readonly groupId: string) {
     // Audio Nodes
     this.monitoredNode= audioCtx.createGain();
     this.gainNode = audioCtx.createGain();
@@ -68,7 +55,7 @@ export default abstract class SoundProvider {
     this.pannerNode.connect(this.gainNode).connect(this.monitoredNode)
 
     // Track properties
-    this.element = element;
+    this._element = element;
     this.color = "";
     this.automation = new Automation();
 
@@ -77,8 +64,6 @@ export default abstract class SoundProvider {
 
     // Recording controls.
     this.isMuted=false
-    this.isSolo=false
-    this.isArmed = false;
     this.monitored = false;
 
     // Loop controls.
@@ -99,8 +84,8 @@ export default abstract class SoundProvider {
   /** The volume of the track. */
   private _volume: number
 
-  private updateVolume(){
-    if(!this.isMuted && !this.isSoloMuted)this.gainNode.gain.value=this._volume
+  protected updateVolume(){
+    if(!this.isMuted)this.gainNode.gain.value=this._volume
     else this.gainNode.gain.value=0
   }
 
@@ -122,7 +107,7 @@ export default abstract class SoundProvider {
    */
   public set isMuted(value: boolean) {
     this._muted=value
-    this.element.setMute(value)
+    this.element.isMuted=value
     this.updateVolume()
   }
 
@@ -130,44 +115,12 @@ export default abstract class SoundProvider {
 
   private _muted: boolean=false
 
-  /**
-   * Is the track muted by the solo mode of other tracks, if a track is muted it emits no sound
-   */
-  public set isSoloMuted(value: boolean) {
-    this._solo_muted=value
-    this.element.setSoloMute(value)
-    this.updateVolume()
-  }
-
-  public get isSoloMuted() { return this._solo_muted }
-
-  private _solo_muted: boolean=false
-  
-  /**
-   * Is the track soloed, if at least one track is soloed, only soloed tracks emit sound
-   * [WARNING] Don't set isSolo directly, use {@link TracksController#setSolo} instead.
-   */
-  public set isSolo(value: boolean){
-    if(value){
-      this.isMuted=false
-      this.isSoloMuted=false
-    }
-    this._solo=value
-    this.updateVolume()
-    this.element.setSolo(value)
-  }
-
-  public get isSolo() { return this._solo }
-
-  private _solo: boolean=false
-
-
   /** The color of the track in HEX format (#FF00FF). It is used to display the waveform. */
   private _color: string
 
   public set color(newColor: string){
     this._color = newColor
-    if(this.element.color)this.element.color.style.background = newColor
+    this.element.color = newColor
   }
 
   public get color() { return this._color }
@@ -179,7 +132,7 @@ export default abstract class SoundProvider {
    */
   public set balance(value: number){
     this.pannerNode.pan.value = value
-    if(this.element.balanceSlider)this.element.balanceSlider.value = "" + value
+    this.element.balanceSlider.value = "" + value
   }
 
   public get balance() { return this.pannerNode.pan.value }
@@ -260,7 +213,7 @@ export default abstract class SoundProvider {
    */
   public set monitored(value: boolean){
     this.monitoredNode.gain.value = value?1:0
-    this.element.setMonitoring(value)
+    this.element.isMonitoring=value
   }
 
   public get monitored(){

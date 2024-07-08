@@ -1,6 +1,6 @@
 import App from "../App";
 import { MAX_DURATION_SEC, RATIO_MILLS_BY_PX } from "../Env";
-import Track from "../Models/Track/Track";
+import SoundProvider from "../Models/Track/SoundProvider";
 import AutomationView from "../Views/AutomationView";
 import { audioCtx } from "../index";
 
@@ -35,19 +35,19 @@ export default class AutomationController {
      * Applies all automations to the track and opens the automation menu.
      * @param track - The track to apply the automations.
      */
-    public async openAutomationMenu(track: Track): Promise<void> {
+    public async openAutomationMenu(track: SoundProvider): Promise<void> {
         this._view.clearMenu();
         await this.updateAutomations(track);
         this._view.openAutomationMenu(track);
         this._automationOpened = true;
     }
 
-     /**
+    /**
      * Update all the parameters of the associated plugin and create the automation menu.
      *
      * @param track - The track to update the automations.
      */
-     public async updateAutomations(track: Track): Promise<void> {
+    public async updateAutomations(track: SoundProvider): Promise<void> {
         let plugin = track.plugin;
         if (plugin?.instance) {
             let params = await plugin.instance?._audioNode.getParameterInfo();

@@ -1,5 +1,5 @@
 import { Container } from "pixi.js";
-import TrackElement from "../../Components/TrackElement";
+import TrackElement from "../../Components/Editor/TrackElement";
 import { HEIGHT_TRACK } from "../../Env";
 import Region from "../../Models/Region/Region";
 import Track from "../../Models/Track/Track";

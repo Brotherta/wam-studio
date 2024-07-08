@@ -1,4 +1,4 @@
-import TrackElement from "../Components/TrackElement";
+import TrackElement from "../Components/Editor/TrackElement";
 
 /**
  * Class that is responsible for the view of the tracks.

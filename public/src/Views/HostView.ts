@@ -21,7 +21,6 @@ export default class HostView {
     metroBtn = document.getElementById("metro-btn") as HTMLDivElement;
     soundLoopBtn = document.getElementById("soundLoupBtn") as HTMLElement;
 
-    volumeSlider = document.getElementById("global-volume-slider") as HTMLInputElement;
     timer = document.getElementById("timer") as HTMLDivElement;
 
     tempoDiv = document.getElementById("tempo-selector") as HTMLDivElement;
@@ -46,9 +45,6 @@ export default class HostView {
     redoIcon = document.getElementById("redo-icon") as HTMLDivElement;
     metronomeIcon = document.getElementById("metro-icon") as HTMLDivElement;
 
-    vuMeterDiv = document.getElementById("vu-meter") as HTMLCanvasElement;
-    vuMeterCanvas = document.getElementById("vu-meter-canvas") as HTMLCanvasElement;
-
     songsContainer = document.getElementById("songs-container") as HTMLDivElement;
 
     // Menu buttons
@@ -69,6 +65,8 @@ export default class HostView {
     keyboardShortcutsCloseBtn = document.getElementById("keyboard-shortcuts-close-button") as HTMLDivElement;
     keyboardShortcutsWindow = document.getElementById("keyboard-shortcuts-window") as HTMLDivElement;
 
+    host = document.getElementById("main-track")
+
     constructor() {
         // add tempo and time signature selectors to the main toolbar
         this.tempoDiv.appendChild(this.tempoSelector);
@@ -77,7 +75,6 @@ export default class HostView {
         // audio loop browser
         this.audioLoopBrowserDiv.appendChild(this.audioLoopBrowserElement);
         this.MetronomeDiv.appendChild(this.MetronomeElement);
-
     }
     toggleAudioLoopBrowser = this.soundLoopBtn.addEventListener("click", () => {
         this.audioLoopBrowserDiv.style.display = this.audioLoopBrowserDiv.style.display === "none" ? "flex" : "none";

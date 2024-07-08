@@ -54,6 +54,11 @@ export default class HostController {
     this.windows = [];
     this._timerIntervalPaused = false;
 
+    this._view.host?.append(this._app.host.element)
+    this._app.host.element.progressDone()
+    this._app.host.element.name="Master Track"
+    this._app.tracksController.bindSoundProviderEvents(this._app.host)
+
     this.initializeDemoSongs();
     this.initializeVuMeter();
     this.bindEvents();
@@ -185,14 +190,6 @@ export default class HostController {
   }
 
   /**
-   * Handles the volume slider. It updates the volume of the master track.
-   */
-  public updateVolume(): void {
-    let value = parseInt(this._view.volumeSlider.value) / 100
-    this._app.host.volume=value
-  }
-
-  /**
    * Updates the loop value of the host. It is called when the user changes the loop value.
    *
    * @param leftTime - Time of the left loop in milliseconds.
@@ -311,9 +308,6 @@ export default class HostController {
     });
     this._view.loopBtn.addEventListener("click", () => {
       this.loop();
-    });
-    this._view.volumeSlider.addEventListener("input", (e: Event) => {
-      this.updateVolume();
     });
     this._view.muteBtn.addEventListener("click", () => {
       this.mute();
@@ -528,30 +522,26 @@ export default class HostController {
    * @private
    */
   private initializeVuMeter(): void {
+    let peakMeter = new WebAudioPeakMeter(
+      audioCtx,
+      this._app.host.outputNode,
+      this._app.host.element.getPeakMeterParentElement(),
+      {
+        borderSize: 2,
+        fontSize: 7, // tick fontSize. If zero -> no ticks, no labels etc.
+        backgroundColor: "#1C1E21",
+        tickColor: "#ddd",
+        labelColor: "#ddd",
+        gradient: ["red 1%", "#ff0 16%", "lime 45%", "#080 100%"],
+        dbRange: 48,
+        dbTickSize: 6,
+        maskTransition: "0.1s",
+      }
+    );
     // MB replaced by another vu-meter
     //this.vuMeter = new VuMeter(this._view.vuMeterCanvas, 30, 157);
 
     // create vu-meter. Wait until parent is visible.
-    let id = setInterval(() => {
-      if (this._view.vuMeterDiv.isConnected) {
-        let peakMeter = new WebAudioPeakMeter(
-          audioCtx,
-          this._app.host.outputNode, // MB: Check, here we should use the node at the end of the chain i.e main output
-          this._view.vuMeterDiv,
-          {
-            borderSize: 2,
-            fontSize: 7, // tick fontSize. If zero -> no ticks, no labels etc.
-            backgroundColor: "black",
-            tickColor: "#ddd",
-            labelColor: "#ddd",
-            gradient: ["red 1%", "#ff0 16%", "lime 45%", "#080 100%"],
-            dbRange: 48,
-            dbTickSize: 6,
-            maskTransition: "0.1s",
-          }
-        );
-        clearInterval(id);
-      }
-    }, 100);
+
   }
 }

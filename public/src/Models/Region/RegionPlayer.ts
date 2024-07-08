@@ -33,6 +33,13 @@ export default interface RegionPlayer{
     get isPlaying(): boolean
 
     /**
+     * Start playing the audio region with the playhead at the start position and for the duration.
+     * @param start Start position in milliseconds
+     * @param duration Duration in milliseconds
+     */
+    playEfficiently(start: number, duration: number): Promise<void>
+
+    /**
      * The region cursor playhead position in milliseconds.
      */
     set playhead(value: number)

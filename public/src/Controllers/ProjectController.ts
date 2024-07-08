@@ -168,7 +168,7 @@ export default class ProjectController {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                username: name,
+                username: user,
                 projectName: name,
                 override: override,
                 data: project

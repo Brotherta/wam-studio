@@ -13,6 +13,7 @@ export function getMIDIPlayerProcessor(moduleId:string){
 
         instants: MIDIInstant[] | undefined
         instant_duration=1000
+        current_channel=0
     
         constructor(options: any){
             super(options)
@@ -27,8 +28,14 @@ export function getMIDIPlayerProcessor(moduleId:string){
             await super._onMessage(e)
         }
     
+        static ANTI_LATENCY=0
         play(from: number, to: number, msRate: number, inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): void {
             if (!this.instants) return
+
+            const {ANTI_LATENCY}=MIDIPlayerProcessor
+
+            from += ANTI_LATENCY
+            to += ANTI_LATENCY
 
             // Get the instant
             let fromInstantI = Math.max(Math.floor(from/this.instant_duration),0)
@@ -50,14 +57,42 @@ export function getMIDIPlayerProcessor(moduleId:string){
                                 outputs[0][c][i] += Math.sin((currentFrame+i)/(selectedNote-200)*20)*0.2;
                             }
                         }*/
+                        /* MULTI CHANNEL SUPPORT  : Unactivated because of burns instruments not supporting them
+                        this.current_channel++
+                        if(this.current_channel>=16)this.current_channel=0*/
                         this.emitEvents(
-                            { type: 'wam-midi', time: currentTime, data: { bytes: new Uint8Array([0x90 | note.channel, note.note, note.velocity]) } },
-                            { type: 'wam-midi', time: currentTime+note.duration/1000, data: { bytes: new Uint8Array([0x90 | note.channel, note.note, 0]) } },
-                            { type: 'wam-midi', time: currentTime+note.duration/1000, data: { bytes: new Uint8Array([0x80 | note.channel, note.note, note.velocity]) } },
+                            { type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, note.velocity*100]) } },
+                            { type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000+note.duration/1000, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, 0]) } },
+                            { type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000+note.duration/1000, data: { bytes: new Uint8Array([0x80 | this.current_channel, note.note, note.velocity*100]) } },
                         );
                     }
                 }
             }
+        }
+
+
+        _prepareProcessing(duration: number): boolean{
+            if(!this.instants)return false
+            const startInstant= Math.max(Math.floor(this.playhead/this.instant_duration), 0)
+            const endInstant= Math.min(Math.floor((this.playhead+duration)/this.instant_duration), this.instants.length-1)
+            const endTime= this.playhead+duration
+            for(let i=startInstant; i<=endInstant; i++){
+                const instant= this.instants[i]
+                const instant_start= i*this.instant_duration-this.playhead
+                for(const {offset,note} of instant){
+                    const start= (instant_start+offset)/1000
+                    if(start<0 || start>endTime)continue
+                    /* MULTI CHANNEL SUPPORT  : Unactivated because of burns instruments not supporting them
+                    this.current_channel++
+                    if(this.current_channel>=16)this.current_channel=0*/
+                    this.emitEvents(
+                        { type: 'wam-midi', time: currentTime+start, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, note.velocity*100]) } },
+                        { type: 'wam-midi', time: currentTime+start+note.duration/1000, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, 0]) } },
+                        { type: 'wam-midi', time: currentTime+start+note.duration/1000, data: { bytes: new Uint8Array([0x80 | this.current_channel, note.note, note.velocity*100]) } },
+                    );
+                }
+            }
+            return false
         }
 
         _connectEvents(...args: any[]){

@@ -1,23 +1,18 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
-import TrackElement from './Components/TrackElement';
 import BPF from './Components/BPF';
-import SaveProjectElement from "./Components/Project/SaveProjectElement";
+import ExportProjectElement from "./Components/Project/ExportProjectElement";
 import LoadProjectElement from "./Components/Project/LoadProjectElement";
 import LoginElement from "./Components/Project/LoginElement";
-import PlaceholderElement from "./Components/Utils/PlaceholderElement";
-import ConfirmElement from "./Components/Utils/ConfirmElement";
-import DialogElement from "./Components/Utils/DialogElement";
+import SaveProjectElement from "./Components/Project/SaveProjectElement";
 import ScrollBarElement from "./Components/ScrollBarElement";
-import ExportProjectElement from "./Components/Project/ExportProjectElement";
 import TempoSelectorElement from './Components/TempoSelectorElement';
 import TimeSignatureSelectorElement from './Components/TimeSignatureSelectorElement';
+import ConfirmElement from "./Components/Utils/ConfirmElement";
+import DialogElement from "./Components/Utils/DialogElement";
+import PlaceholderElement from "./Components/Utils/PlaceholderElement";
 
-customElements.define(
-    "track-element",
-    TrackElement
-);
 customElements.define(
     "bpf-automation",
     BPF
@@ -108,4 +103,5 @@ const app = new App();
 
 
 
-export {app, audioCtx};
+export { app, audioCtx };
+

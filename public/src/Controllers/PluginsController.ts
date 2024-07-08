@@ -108,23 +108,6 @@ export default class PluginsController {
         this.updatePluginList()
     }
 
-    // TODO See if this can be removed, how it can be modified. And make it work again
-    /**
-     * Selects the main track and show the plugins of the main track.
-     */
-    /* // Repear host selection : public selectHost(): void {
-        let host = this._app.host;
-        if (this.selectedTrack === undefined) {
-            this._view.selectHost();
-            this.selectPlugins();
-        }
-        else if (this.selectedTrack.id !== host.id) {
-            this.selectedTrack.element.unSelect();
-            this._view.selectHost();
-            this.selectPlugins();
-        }
-    }*/
-
     /**
      * Handler for the FX button. It shows the plugins of the track or hides them if they are already shown.
      *

@@ -321,7 +321,7 @@ export default class EditorController {
 
                 if (!waveform) {
                     let track = await this._app.tracksController.createTrack();
-                    track.element.setName(file.name);
+                    track.element.name=file.name
 
                     track.element.progress
                     track.element.progressDone();
@@ -391,7 +391,7 @@ export default class EditorController {
             let waveform = this._view.getWaveformAtPos(clientY - offsetTop);
             if (!waveform) {
                 let track = await this._app.tracksController.createTrack();
-                track.element.setName("NEW TRACK");
+                track.element.name="NEW TRACK"
 
                 track.element.progressDone();
                 waveform = this._view.getWaveFormViewById(track.id);

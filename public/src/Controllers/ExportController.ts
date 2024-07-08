@@ -81,8 +81,7 @@ export default class ExporterController {
         graph.connect(offlineCtx.destination)
 
         // Start source node and render.
-        graph.playhead=0
-        graph.isPlaying=true
+        await graph.playEfficiently(0, maxDuration*1000)
         let renderedBuffer = await offlineCtx.startRendering();
         
         // Clean up everything.
@@ -142,9 +141,10 @@ export default class ExporterController {
         // Recreate the graph in the online audio context.
         const graph=await this._app.host.host_graph.instantiate(offlineCtx,hostGroupId)
         graph.connect(offlineCtx.destination)
+        await new Promise(it=>setTimeout(it,1000))
 
         // Start source node and render.
-        graph.play()
+        await graph.playEfficiently(0, maxDuration*1000)
 
         let renderedBuffer = await offlineCtx.startRendering();
 

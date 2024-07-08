@@ -91,6 +91,10 @@ class SampleRegionPlayer implements RegionPlayer{
         return this.node.isPlaying
     }
 
+    playEfficiently(start: number, duration: number): Promise<void>{
+        return this.node.playEfficiently(start, duration)
+    }
+
     set playhead(value: number) {
         this.node.playhead=value
     }

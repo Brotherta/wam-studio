@@ -2,7 +2,7 @@ import App, { crashOnDebug } from "../../../App";
 import OperableAudioBuffer from "../../../Audio/OperableAudioBuffer";
 import WamAudioWorkletNode from "../../../Audio/WAM/WamAudioWorkletNode";
 import WamEventDestination from "../../../Audio/WAM/WamEventDestination";
-import TrackElement from "../../../Components/TrackElement";
+import TrackElement from "../../../Components/Editor/TrackElement";
 import { RATIO_MILLS_BY_PX } from "../../../Env";
 import Plugin from "../../../Models/Plugin";
 import WaveformView from "../../../Views/Editor/WaveformView";
@@ -90,6 +90,7 @@ export default class TracksController{
     // Create its track element (GUI)
     track.id = this.trackIdCount++;
     track.element.trackId = track.id;
+    this._view.addTrack(track.element);
     // wait until the trackElement WebComponent is connected
     // to the DOM before initializing the peak meter
     let id = setInterval(() => {
@@ -114,9 +115,8 @@ export default class TracksController{
         clearInterval(id);
       }
     }, 100);
-    this._view.addTrack(track.element);
-    this.setColor(track,getRandomColor())
     this.bindTrackEvents(track);
+    this.setColor(track,getRandomColor())
     
     this._app.waveformController.initializeWaveform(track);
     this._app.automationView.initializeAutomation(track.id);
@@ -180,9 +180,12 @@ export default class TracksController{
    */
   private createEmptyTrack(): Track {
     let track = new Track(new TrackElement(),audioCtx,this._app.host.hostGroupId)
+    track.element.name=`Track ${this.trackNameCounter++}`
     this.addTrack(track)
     return track;
   }
+
+  private trackNameCounter=1
 
   /**
    * Creates a new empty track and add it to the track view.
@@ -237,7 +240,7 @@ export default class TracksController{
     let node = wamInstance.audioNode as WamAudioWorkletNode;
     let track = this.createEmptyTrack();
     //track.setAudioBuffer(deletedTrack.audioBuffer!);
-    track.element = deletedTrack.element;
+    //track.element = deletedTrack.element;
     track.color = deletedTrack.color;
     track.isMuted = deletedTrack.isMuted;
     track.isSolo = deletedTrack.isSolo;
@@ -302,30 +305,102 @@ export default class TracksController{
   }
 
   /**
-   * Binds all events of the given track. It defines the listeners for the close, solo, mute, volume and balance sliders etc.
+   * Binds all events of the given sound provider. It defines the listeners for the close, solo, mute, volume and balance sliders etc.
    *
    * @param track - Track to be binded.
    * @private
    */
-  private bindTrackEvents(track: Track): void {
+  bindSoundProviderEvents(track: SoundProvider): void {
 
     // TRACK SELECT
     track.element.addEventListener("click", () => {
-      if(track.deleted)return
-
       let oldSelectedTrack = this.selectedTrack
       let newSelectedTrack = track
-
       this._app.doIt(true,
         ()=> this.select(newSelectedTrack),
         ()=> this.select(oldSelectedTrack),
       )
     });
 
+    // MUTE TRACK
+    track.element.muteBtn.addEventListener("click", () => {
+      let initialMute = track.isMuted
+      this._app.doIt(true,
+        ()=> track.isMuted = !initialMute,
+        ()=> track.isMuted = initialMute,
+      )
+    });
+
+    // TRACK VOLUME
+    track.element.volumeSlider.addEventListener("input", (evt) => {
+      const newVolume = track.element.volume / 100
+      track.volume=newVolume;
+    });
+    track.element.volumeSlider.addEventListener("mousedown", (evt) => {
+      this._oldVolume = track.volume;
+    });
+    track.element.volumeSlider.addEventListener("change", (evt) => {
+      const newVolume = track.element.volume / 100
+      let oldV = this._oldVolume;
+      this._app.doIt(true,
+        ()=> track.volume = newVolume,
+        ()=> track.volume = oldV,
+      );
+    });
+
+    // TRACK BALANCE
+    track.element.balanceSlider.addEventListener("input", () => {
+      track.balance= track.element.balance
+    });
+    track.element.balanceSlider.addEventListener("mousedown", (evt) => {
+      this._oldBalance = track.balance;
+    });
+    track.element.balanceSlider.addEventListener("change", (evt) => {
+      const newBalance = track.element.balance;
+      let oldB = this._oldBalance;
+      this._app.doIt(true,
+        ()=> track.balance = newBalance,
+        ()=> track.balance = oldB,
+      );
+    });
+
+
+    // TRACK AUTOMATION
+    track.element.automationBtn.addEventListener("click", async (e) => {
+      // Open the automation menu when the automation button is clicked.
+      this.automationMenu(e, track);
+    })
+ 
+    // TRACK MONITOR
+    track.element.monitoringBtn.addEventListener("click", () => {
+      const oldValue=track.monitored
+      this._app.doIt(true,
+        ()=> track.monitored=!oldValue,
+        ()=> track.monitored=oldValue,
+      );
+    })
+
+    // TRACK FX/PLUGINS
+    track.element.fxBtn.addEventListener("click", () => {
+      this._app.doIt(true,
+        ()=> this._app.pluginsController.fxButtonClicked(track),
+        ()=> this._app.pluginsController.fxButtonClicked(track),
+      )
+    });
+  }
+
+  /**
+   * Binds all events of the given track. It defines the listeners for the close, solo, mute, volume and balance sliders etc.
+   *
+   * @param track - Track to be binded.
+   * @private
+   */
+  bindTrackEvents(track: Track): void {
+
+    this.bindSoundProviderEvents(track)
+
     // REMOVE TRACK
     track.element.closeBtn.addEventListener("click", () => {
-      // for undo/redo
-      // make a copy of the track
       let oldTrack = track;
       let oldWaveform = this._app.editorView.getWaveformById(oldTrack.id);
       let oldTrackElement = track.element;
@@ -344,61 +419,8 @@ export default class TracksController{
       )
     });
 
-    // MUTE TRACK
-    track.element.muteBtn.addEventListener("click", () => {
-      let initialMute = track.isMuted
-      this._app.doIt(true,
-        ()=> track.isMuted = !initialMute,
-        ()=> track.isMuted = initialMute,
-      )
-    });
-
-    // TRACK VOLUME
-    track.element.volumeSlider.addEventListener("input", (evt) => {
-      // Change the volume of the track when the volume slider is changed.
-      const newVolume: number =
-        parseInt(track.element.volumeSlider.value) / 100;
-      track.volume=newVolume;
-    });
-    // for undo / redo setVolume
-    track.element.volumeSlider.addEventListener("mousedown", (evt) => {
-      // memorize volume when we first clicked on the slider
-      this._oldVolume = track.volume;
-    });
-    track.element.volumeSlider.addEventListener("change", (evt) => {
-      const newVolume: number =
-        parseInt(track.element.volumeSlider.value) / 100;
-      // for undo/redo
-      let oldV = this._oldVolume;
-
-      this._app.doIt(true,
-        ()=> track.volume = newVolume,
-        ()=> track.volume = oldV,
-      );
-    });
-
-    // TRACK BALANCE
-    track.element.balanceSlider.addEventListener("input", () => {
-      // Change the balance of the track when the balance slider is changed.
-      track.balance=parseFloat(track.element.balanceSlider.value);
-    });
-    // for undo / redo set balance
-    track.element.balanceSlider.addEventListener("mousedown", (evt) => {
-      // memorize volume when we first clicked on the slider
-      this._oldBalance = track.balance;
-    });
-    track.element.balanceSlider.addEventListener("change", (evt) => {
-      const newBalance: number = +track.element.balanceSlider.value;
-      let oldB = this._oldBalance;
-
-      this._app.doIt(true,
-        ()=> track.balance = newBalance,
-        ()=> track.balance = oldB,
-      );
-    });
-
     // TRACK COLOR
-    track.element.color.addEventListener("click", () => {
+    track.element.colorLine.addEventListener("click", () => {
       let oldColor = track.color
       let newColor = getRandomColor()
 
@@ -408,11 +430,6 @@ export default class TracksController{
       )
     })
 
-    // TRACK AUTOMATION
-    track.element.automationBtn.addEventListener("click", async (e) => {
-      // Open the automation menu when the automation button is clicked.
-      this.automationMenu(e, track);
-    })
     
     // TRACK ARM
     track.element.armBtn.addEventListener("click", () => {
@@ -420,14 +437,6 @@ export default class TracksController{
       this._app.doIt(true,
         ()=> this._app.recorderController.clickArm(track),
         ()=> this._app.recorderController.clickArm(track),
-      );
-    })
-
-    // TRACK MONITOR
-    track.element.monitoringBtn.addEventListener("click", () => {
-      this._app.doIt(true,
-        ()=> this._app.recorderController.clickMonitoring(track),
-        ()=> this._app.recorderController.clickMonitoring(track),
       );
     })
 
@@ -467,13 +476,6 @@ export default class TracksController{
       )
     })
 
-    // TRACK FX/PLUGINS
-    track.element.fxBtn.addEventListener("click", () => {
-      this._app.doIt(true,
-        ()=> this._app.pluginsController.fxButtonClicked(track),
-        ()=> this._app.pluginsController.fxButtonClicked(track),
-      )
-    });
   }
 
   /**
@@ -481,7 +483,7 @@ export default class TracksController{
    * @param track - The track to open the automation menu.
    * @private
    */
-  private async automationMenu(e: Event, track: Track): Promise<void> {
+  private async automationMenu(e: Event, track: SoundProvider): Promise<void> {
     this.select(track);
     await this._app.automationController.openAutomationMenu(track);
     e.stopImmediatePropagation();

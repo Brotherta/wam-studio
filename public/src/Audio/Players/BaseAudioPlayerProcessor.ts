@@ -50,15 +50,18 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
     
         override async _onMessage(event: MessageEvent){
             await super._onMessage(event)
+            let payload=undefined
             if("playhead" in event.data){
                 this.playhead = event.data.playhead
                 this.previousPlayhead = this.playhead-1
-                console.log("playhead"+this.constructor.name)
             }
             if("loopStart" in event.data) this.loopStart = event.data.loopStart
             if("loopEnd" in event.data) this.loopEnd = event.data.loopEnd
-            if("waiting" in event.data) this.port.postMessage({resolve: event.data.waiting})
-        }
+            if("playEfficiently" in event.data){
+                payload=this._prepareProcessing(event.data.playEfficiently)
+            }
+            if("waiting" in event.data) this.port.postMessage({resolve: event.data.waiting, payload})
+        } 
 
         override _process(startSample: number, endSample: number, inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): void {
             if(parameters["isPlaying"][0]<0.5)return
@@ -73,6 +76,15 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
     
             // Move the playhead in the node
             this.port.postMessage({playhead: this.playhead})
+        }
+
+        /**
+         * Prepare the play for the processing of duration milliseconds of audio content when the audiocontext will resume.
+         * @param duration The duration in milliseconds of audio content to prepare
+         * @returns true if the node should also start playing by setting isPlaying to true
+         */
+        _prepareProcessing(duration: number): boolean{
+            return true
         }
     
         /**

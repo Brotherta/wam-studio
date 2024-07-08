@@ -4,7 +4,7 @@ import App from "../../App";
 import AudioPlayerNode from "../../Audio/AudioNode";
 import AudioGraph, { AudioGraphInstance } from "../../Audio/Graph/AudioGraph";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
-import TrackElement from "../../Components/TrackElement";
+import SoundProviderElement from "../../Components/Editor/SoundProviderElement";
 import { BACKEND_URL, MAX_DURATION_SEC } from "../../Env";
 import SoundProvider, { SoundProviderGraphInstance } from "./SoundProvider";
 import Track, { TrackGraphInstance } from "./Track";
@@ -58,7 +58,7 @@ export default class Host extends SoundProvider {
      * @param tracks Its children tracks
      */
     constructor(app: App, tracks: Iterable<Track>) {
-        super(new TrackElement(),"NO_GROUP_ID");
+        super(new SoundProviderElement(),"NO_GROUP_ID");
         this.tracks=tracks
         this.playhead = 0;
         this.latency = 0;
@@ -300,6 +300,10 @@ export class HostGraphInstance implements AudioGraphInstance{
 
     public play(): void {
         for(const track of this.tracks) track.isPlaying=true
+    }
+
+    public playEfficiently(start: number, duration: number): Promise<void>{
+        return Promise.all(this.tracks.map(player=>player.playEfficiently(start,duration))).then(()=>{})
     }
 
 }

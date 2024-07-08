@@ -3,7 +3,7 @@ import AudioGraph, { AudioGraphInstance } from "../../Audio/Graph/AudioGraph";
 import { RingBuffer } from "../../Audio/Utils/Ringbuffer";
 import WamAudioWorkletNode from "../../Audio/WAM/WamAudioWorkletNode";
 import WamEventDestination from "../../Audio/WAM/WamEventDestination";
-import TrackElement from "../../Components/TrackElement";
+import TrackElement from "../../Components/Editor/TrackElement";
 import { NUM_CHANNELS } from "../../Env";
 import Region, { RegionOf, RegionType } from "../Region/Region";
 import RegionPlayer from "../Region/RegionPlayer";
@@ -85,8 +85,13 @@ export default class Track extends SoundProvider {
     this.junctionNode=audioCtx.createGain()
     this.audioCtx=audioCtx
     this.sampleRecorder=new SampleRecorder(this.element,groupId,audioCtx)
+    this.sampleRecorder.isMerged=false
+    this.sampleRecorder.isStereo=true
+    this.isSolo=false
     this.postInit()
   }
+
+  override get element(){return super.element as TrackElement}
 
   /**
    * Adds a region to the regions list.
@@ -125,6 +130,7 @@ export default class Track extends SoundProvider {
   }
 
 
+
   /* PLAY */
   private updatePlayState(){
     for(const [_,[__,player]] of this.merged_regions){
@@ -149,6 +155,7 @@ export default class Track extends SoundProvider {
   public override loop(value:boolean): void{
     this.updatePlayState()
   }
+
 
   /* CONNECTION */
   public override _connect(node: AudioNode): void {
@@ -223,6 +230,54 @@ export default class Track extends SoundProvider {
   }
 
   private _track_graph: AudioGraph<TrackGraphInstance>|null=null
+
+  protected override updateVolume(){
+    if(!this.isMuted && !this.isSoloMuted)this.gainNode.gain.value=this.volume
+    else this.gainNode.gain.value=0
+  }
+
+  /**
+   * Is the track muted by the solo mode of other tracks, if a track is muted it emits no sound
+   */
+  public set isSoloMuted(value: boolean) {
+    this._solo_muted=value
+    this.element.isSoloMuted=value
+    this.updateVolume()
+  }
+
+  public get isSoloMuted() { return this._solo_muted }
+
+  private _solo_muted: boolean=false
+  
+  /**
+   * Is the track soloed, if at least one track is soloed, only soloed tracks emit sound
+   * [WARNING] Don't set isSolo directly, use {@link TracksController#setSolo} instead.
+   */
+  public set isSolo(value: boolean){
+    if(value){
+      this.isMuted=false
+      this.isSoloMuted=false
+    }
+    this._solo=value
+    this.updateVolume()
+    this.element.isSolo=value
+  }
+
+  public get isSolo() { return this._solo }
+
+  private _solo: boolean=false
+
+  /**
+   * The left state of the track. It is used to know if the track is left or right when recording.
+   */
+  set isArmed(value: boolean){
+    this._isArmed=value
+    this.element.isArmed=value
+  }
+
+  get isArmed(){ return this._isArmed }
+
+  private _isArmed: boolean = true
 }
 
 
@@ -252,7 +307,9 @@ export class TrackGraphInstance implements AudioGraphInstance{
     for(const player of this.players){ player.isPlaying=value }
   }
 
-
+  playEfficiently(start: number, duration: number): Promise<void>{
+    return Promise.all(this.players.map(player=>player.playEfficiently(start,duration))).then(()=>{})
+  }
 
 }
 
@@ -327,7 +384,7 @@ class SampleRecorder{
    */
   set isStereo(value: boolean){
     this._stereo=value
-    this.element.setMode(value)
+    this.element.isStereoMode=value
     this.linkNodes()
   }
 
@@ -340,7 +397,7 @@ class SampleRecorder{
    */
   set isMerged(value: boolean){
     this._merge=value
-    this.element.setMerge(value)
+    this.element.isMerge=value
     this.linkNodes()
   }
 
@@ -353,7 +410,7 @@ class SampleRecorder{
    */
   set left(value: boolean){
     this._left=value
-    this.element.setLeft(value)
+    this.element.isLeft=value
     this.linkNodes()
   }
 
@@ -366,7 +423,7 @@ class SampleRecorder{
    */
   set right(value: boolean){
     this._right=value
-    this.element.setRight(value)
+    this.element.isRight=value
     this.linkNodes()
   }
 
@@ -384,5 +441,6 @@ class SampleRecorder{
    * is recorded.
    */
   get recordingOutputNode(){ return this.mergerNode }
+  
   
 }
