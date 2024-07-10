@@ -1,6 +1,6 @@
 import { FederatedPointerEvent } from "pixi.js";
 import App, { crashOnDebug } from "../../../App";
-import { MIDI } from "../../../Audio/MIDI";
+import { MIDI } from "../../../Audio/MIDI/MIDI";
 import { RATIO_MILLS_BY_PX } from "../../../Env";
 import MIDIRegion from "../../../Models/Region/MIDIRegion";
 import Region, { RegionOf, RegionType } from "../../../Models/Region/Region";
@@ -276,6 +276,22 @@ export default class RegionController {
           break;
         }
 
+        case "k":{
+          const selected=this._app.tracksController.selectedTrack
+          if(selected){
+            const start=this._app.host.playhead
+            const { DO,DO_,RE,RE_,MI,FA,FA_,SOL,SOL_,LA,LA_,SI, $, i:I, ii:II, iii:III, iiii:IIII }=MIDI
+            const _=null
+            let input= prompt("Write MIDI Notes")?.toUpperCase()?.replace(/ /g,",")
+            input="["+input+"]"
+            console.log(input)
+            const midi=MIDI.fromList(eval(input) as number[]  , 500)
+            const region=new MIDIRegion(midi,start)
+            this.addRegion(selected,region)
+            this._app.host.playhead=region.end
+          }
+          break;
+        }
       }
     });
     // handle moving a region on the PIXI Canvas.

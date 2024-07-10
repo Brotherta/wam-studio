@@ -106,6 +106,7 @@ export default class RecorderController {
         sampleRecorder.recorder?.port.postMessage({ "startRecording": true });
 
         sampleRecorder.worker!.onmessage = async (e) => {
+            if(track.deleted) return
             console.log(e.data.command)
             switch (e.data.command) {
                 case "audioBufferCurrentUpdated": {
@@ -182,6 +183,7 @@ export default class RecorderController {
         if (track.isArmed) {
             await this.setupWorker(track);
             await this.setupRecording(track);
+            if(this.app.host.isPlaying) this.startRecording(track,this.app.host.playhead)
         }
         else {
             if (this.app.host.isPlaying) this.stopRecording(track);

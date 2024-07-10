@@ -1,6 +1,6 @@
 
 import { WebAudioModule } from "@webaudiomodules/sdk"
-import { MIDI } from "../../MIDI"
+import { MIDI } from "../../MIDI/MIDI"
 import BaseAudioPlayerNode from "../BaseAudioPlayerNode"
 
 export default class MIDIPlayerNode extends BaseAudioPlayerNode{

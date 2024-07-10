@@ -42,10 +42,10 @@ export default class MIDIRegionView extends RegionView<MIDIRegion> {
         let amplitude=maxnote-minnote
 
         // Draw notes
-        const note_height=(HEIGHT_TRACK-HEIGHT_TRACK/10)/amplitude
+        const note_height=(HEIGHT_TRACK-HEIGHT_TRACK/20)/amplitude
         const note_width=range/region.duration
         region.midi.forEachNote((note, start)=>{
-            const local_note=note.note-minnote
+            const local_note=amplitude-(note.note-minnote)
             const y=local_note*note_height
             const x=start*note_width
             const w=Math.max(1,note.duration*note_width)

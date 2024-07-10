@@ -127,6 +127,7 @@ export default class PedalBoardPlugin extends WebAudioModule {
    * @author Quentin Beauchet
    */
   async addWAM(WamName, state) {
+    console.assert(this.WAMS[WamName],`The WAM ${WamName} does not exist or is not loaded.`)
     const { default: WAM } = this.WAMS[WamName].module;
     let instance;
     try {

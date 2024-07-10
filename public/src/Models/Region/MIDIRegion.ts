@@ -1,6 +1,6 @@
 import { WamNode, WebAudioModule } from "@webaudiomodules/api";
 import { audioCtx } from "../..";
-import { MIDI } from "../../Audio/MIDI";
+import { MIDI } from "../../Audio/MIDI/MIDI";
 import MIDIPlayerNode from "../../Audio/Players/MIDI/MIDIPlayerNode";
 import MIDIPlayerWAM from "../../Audio/Players/MIDI/MIDIPlayerWAM";
 import { RingBuffer } from "../../Audio/Utils/Ringbuffer";

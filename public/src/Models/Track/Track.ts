@@ -88,6 +88,7 @@ export default class Track extends SoundProvider {
     this.sampleRecorder.isMerged=false
     this.sampleRecorder.isStereo=true
     this.isSolo=false
+    this.isArmed=false
     this.postInit()
   }
 

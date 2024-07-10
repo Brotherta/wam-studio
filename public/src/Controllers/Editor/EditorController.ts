@@ -1,7 +1,12 @@
-import App from "../../App";
+import App, { crashOnDebug } from "../../App";
+import { MIDI } from "../../Audio/MIDI/MIDI";
+import { parseNoteList } from "../../Audio/MIDI/MIDILoaders";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
-import { HEIGHT_TRACK, RATIO_MILLS_BY_PX, ZOOM_LEVEL, decrementZoomLevel, incrementZoomLevel } from "../../Env";
+import { RATIO_MILLS_BY_PX, ZOOM_LEVEL, decrementZoomLevel, incrementZoomLevel } from "../../Env";
+import MIDIRegion from "../../Models/Region/MIDIRegion";
+import { RegionOf } from "../../Models/Region/Region";
 import SampleRegion from "../../Models/Region/SampleRegion";
+import Track from "../../Models/Track/Track";
 import EditorView from "../../Views/Editor/EditorView";
 import { audioCtx } from "../../index";
 
@@ -21,41 +26,65 @@ export interface ScrollEvent extends Event {
 export default class EditorController {
 
     /**
-     * Route Application.
+     * The file loaders used to load dragged files.
+     * It should return the loaded region or null if the file is not supported.
      */
+    static DRAG_LOADERS: ((start:number, file:ArrayBuffer, type: string)=>Promise<RegionOf<any>|null>)[]= [
+        // Load MIDI files through note list
+        async function(start, buffer, type){
+            console.log("NOTE LIST LOAD,", type)
+            const midi= await parseNoteList(buffer)
+            if(midi)return new MIDIRegion(midi, start)
+            else return null
+        },
+        // Load MIDI files
+        async function(start, buffer, type){
+            if(!["audio/mid"])return null
+            console.log("MIDI LOAD,", type)
+            const midi= await MIDI.load2(buffer)
+            if(midi)return new MIDIRegion(midi, start)
+            else return null
+        },
+        // Load sample files
+        async function(start, buffer, type){
+            if(!["audio/mpeg","audio/ogg","audio/wav","audio/x-wav"].includes(type))return null
+            try{
+                let audioArrayBuffer = buffer
+                let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
+                let operableAudioBuffer = OperableAudioBuffer.make(audioBuffer);
+                return new SampleRegion(operableAudioBuffer, start)
+            }catch(e){
+                console.error(e)
+                return null
+            }
+        },
+    ]
+
+    /** Route Application. */
     private _app: App;
-    /**
-     * View of the editor.
-     */
+
+    /** View of the editor. */
     private _view: EditorView;
-    /**
-     * Timeout for the zoom to be rendered. Contains the callback of the final render for the waveforms.
-     */
+
+    /** Timeout for the zoom to be rendered. Contains the callback of the final render for the waveforms. */
     private _timeout: NodeJS.Timeout;
-    /**
-     * Pointer to the current zoom level.
-     */
+
+    /** Pointer to the current zoom level. */
     private _currentLevel = 5;
-    /**
-     * Last zoom level executed.
-     */
+
+    /** Last zoom level executed. */
     private _lastExecutedZoom = 0
 
-    /**
-     * Minimum ratio of pixels by milliseconds.
-     */
+    /** Minimum ratio of pixels by milliseconds. */
     private readonly MIN_RATIO = 1;
-    /**
-     * Maximum ratio of pixels by milliseconds.
-     */
+
+    /** Maximum ratio of pixels by milliseconds. */
     private readonly MAX_RATIO = 500;
-    /**
-     * Number of zoom steps.
-     */
+
+    /** Number of zoom steps. */
     private readonly ZOOM_STEPS = 12;
-    /**
-     * Last zoom level executed.
-     */
+
+    /** Last zoom level executed. */
     private readonly THROTTLE_TIME = 10;
 
     constructor(app: App) {
@@ -300,59 +329,33 @@ export default class EditorController {
      * @param clientY - y pos of the drop
      */
     private async importDraggedFiles(files: DataTransferItem[], clientX: number, clientY: number) {
-        let offsetLeft = this._view.canvasContainer.offsetLeft // offset x of the canvas
-        let offsetTop = this._view.canvasContainer.offsetTop // offset y of the canvas
+        // Get the track under the given position
+        const target = await this.getTrackAt(clientX, clientY, true)
+        if(!target)return
 
-        if ((clientX >= offsetLeft && clientX <= offsetLeft + this._view.width) &&
-            (clientY >= offsetTop && clientY <= offsetTop + this._view.height)) {
-
-
-            const audioFiles = files.filter(file => this.isAccepted(file))
-                .map(file => file.getAsFile() as File);
-
-            const start = (this._app.editorView.viewport.left + (clientX - offsetLeft)) * RATIO_MILLS_BY_PX;
-            let acc = 0;
-            this.showLoadingIcon(true);
-            for (let i = 0; i < audioFiles.length; i++) {
-                let file = audioFiles[i];
-
-                let waveform = this._view.getWaveformAtPos(clientY - offsetTop + acc);
-                console.log(this._view.waveforms,[...this._app.tracksController.tracks])
-
-                if (!waveform) {
-                    let track = await this._app.tracksController.createTrack();
-                    track.element.name=file.name
-
-                    track.element.progress
-                    track.element.progressDone();
-                    waveform = this._view.getWaveFormViewById(track.id);
-                    if (!waveform) {
-                        console.error("Can't fin a waveform with the given track id " + track.id);
-                        return;
-                    }
-                }
-                let track = this._app.tracksController.getTrackById(waveform.trackId)!;
-
-
-                let audioArrayBuffer = await file.arrayBuffer();
-                let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
-                let operableAudioBuffer = OperableAudioBuffer.make(audioBuffer);
-
-                this._app.regionsController.addRegion(track, new SampleRegion(operableAudioBuffer,start), waveform)
-                acc += HEIGHT_TRACK;
-            }
-            this.showLoadingIcon(false);
+        // Then import the loaded files
+        for(const file of files){
+            // Import the file
+            target.start=(await this.importFile(
+                async () => {
+                    const audioFile = file.getAsFile()
+                    if(!audioFile)return null
+                    console.log("Loading", file.type)
+                    return {buffer:await audioFile.arrayBuffer(), type: file.type}
+                },
+                target.track,
+                target.start
+            ))?.start ?? target.start
         }
-
     }
 
     private showLoadingIcon(show: boolean): void {
-        let loadingIcon = document.querySelector('#loading-icon') as HTMLElement; 
+        let loadingIcon = document.querySelector('#loading-icon') as HTMLElement;
         if (show) {
             if (!loadingIcon) {
                 loadingIcon = document.createElement('div') as HTMLElement;
                 loadingIcon.id = 'loading-icon';
-                loadingIcon.style.position = 'fixed'; 
+                loadingIcon.style.position = 'fixed';
                 loadingIcon.style.top = '0';
                 loadingIcon.style.left = '0';
                 loadingIcon.style.width = '100vw';
@@ -360,8 +363,8 @@ export default class EditorController {
                 loadingIcon.style.display = 'flex';
                 loadingIcon.style.alignItems = 'center';
                 loadingIcon.style.justifyContent = 'center';
-                loadingIcon.style.zIndex = '9999'; 
-                loadingIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'; 
+                loadingIcon.style.zIndex = '9999';
+                loadingIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
                 loadingIcon.innerHTML = `
                     <div class="spinner-border text-primary" role="status">
                         <span class="sr-only"></span>
@@ -373,61 +376,113 @@ export default class EditorController {
             if (loadingIcon) loadingIcon.remove();
         }
     }
-    
-    
+
+
 
     private async importDraggedAudioLoop(url: string, clientX: number, clientY: number) {
+        // Get the track under the given position
+        const target = await this.getTrackAt(clientX, clientY, true)
+        if(!target)return
+
+        // Then import the loaded file 
+        await this.importFile(
+            async () => {
+                console.log(url)
+                let file = await fetch(url);
+                console.log("nianianiania", url, file.type)
+                return {buffer:await file.arrayBuffer(), type: file.type}
+            },
+            target.track,
+            target.start
+        )
+    }
+
+    /**
+     * Get the track at the given position (or create it if doCreate is true).
+     * Return null if there is no track at the given position if doCreate is not set to true
+     * or if the track can't be created at the given position.
+     * @param clientX The x position
+     * @param clientY The y position
+     * @param doCreate If true, create a new track if no track is found at the given position
+     * @returns The track at the given position and the position of the given position in the track as duration in milliseconds.
+     */
+    private async getTrackAt(clientX: number, clientY: number, doCreate=false): Promise<{start:number, track:Track}|null>{
         let offsetLeft = this._view.canvasContainer.offsetLeft // offset x of the canvas
         let offsetTop = this._view.canvasContainer.offsetTop // offset y of the canvas
 
         if ((clientX >= offsetLeft && clientX <= offsetLeft + this._view.width) &&
             (clientY >= offsetTop && clientY <= offsetTop + this._view.height)) {
 
+            // Get the start location
             const start = (this._app.editorView.viewport.left + (clientX - offsetLeft)) * RATIO_MILLS_BY_PX;
-            this.showLoadingIcon(true);
-            // we have only one url
 
-            // Check if the drop is on an existing track or if we need to create a new on
+            // Check if the position is on an existing track
             let waveform = this._view.getWaveformAtPos(clientY - offsetTop);
-            if (!waveform) {
-                let track = await this._app.tracksController.createTrack();
-                track.element.name="NEW TRACK"
 
-                track.element.progressDone();
-                waveform = this._view.getWaveFormViewById(track.id);
-                if (!waveform) {
-                    console.error("Can't fin a waveform with the given track id " + track.id);
-                    return;
+            // Else create the track if asked to
+            if (!waveform) {
+                if(doCreate){
+                    const track = await this._app.tracksController.createTrack();
+                    track.element.name = "NEW TRACK"
+                    track.element.progressDone();
+                    return {start, track}
+                }
+                else return null
+            }
+            else{
+                const track = this._app.tracksController.getTrackById(waveform.trackId)!;
+                if(track)return {start, track}
+                else{
+                    crashOnDebug("A track should be associated to this waveform")
+                    return null
                 }
             }
-            let track = this._app.tracksController.getTrackById(waveform.trackId)!;
-
-            // get the audio file from the url
-            let file = await fetch(url);
-            // decode as array buffer
-            let audioArrayBuffer = await file.arrayBuffer();
-            // decode as audio buffer
-            let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
-            // create an operable audio buffer
-            let operableAudioBuffer = OperableAudioBuffer.make(audioBuffer);
-
-            this._app.regionsController.addRegion(track, new SampleRegion(operableAudioBuffer,start), waveform);
-            this.showLoadingIcon(false);
         }
+        return null
+    }
+
+    /**
+     * Import a file as a region in a track at a given position.
+     * @param bufferLoader The function that loads the file, returning the file content as an arraybuffer and the file type
+     * @param track The track to import the file in
+     * @param start The start position of the loaded region
+     */
+    private async importFile(bufferLoader: ()=>Promise<{buffer:ArrayBuffer, type:string}|null>, track: Track, start: number): Promise<RegionOf<any>|null>{
+        this.showLoadingIcon(true)
+        
+        // Fetch the file
+        const file = await bufferLoader()
+        if(!file){
+            this.showLoadingIcon(false)
+            return null
+        }
+
+        // Get the array buff
+        const {buffer,type} = file
+
+        // Decode the audio file as a node
+        let region: RegionOf<any>|null= null
+        for(const loader of EditorController.DRAG_LOADERS){
+            // Try each audio file loader until one can decode the file
+            let loaded_region = await loader(start, buffer, type)
+            if(loaded_region!==null){
+                region=loaded_region
+                this._app.regionsController.addRegion(track, loaded_region)
+                break
+            }
+        }
+        this.showLoadingIcon(false)
+        return region
     }
 
 
 
     private isAccepted(file: DataTransferItem) {
-        if (file.kind === "file" &&
-            (file.type === "audio/mpeg"
-                || file.type === "audio/ogg"
-                || file.type === "audio/wav"
-                || file.type === "audio/x-wav")) {
+        if (file.kind === "file") {
             return true;
         }
         else {
-            console.warn("the file provided is not an audio file");
+            console.warn("The dragged element is not a file.");
             return false;
 
         }

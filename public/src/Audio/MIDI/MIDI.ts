@@ -1,3 +1,4 @@
+import { parseSFMMidi } from "./MIDILoaders"
 
 /**
  * A note on a MIDI track with a frequency, a velocity, a channel and a duration.
@@ -81,14 +82,55 @@ export abstract class MIDIView{
     }
 
     /**
-     * Clone a section of the MIDI
-     * @param from The start time of the section to clone in milliseconds.
-     * @param to The end time of the section to clone in milliseconds.
+     * Clone the MIDI
      */
     clone(): MIDI {
         const cloned=new MIDI(this.instant_duration, this.duration)
         cloned.mergeFrom(this)
         return cloned
+    }
+
+    /**
+     * Create a new MIDI with the same notes but with a recalculated and optimized instant duration.
+     * @param retry The number of time to retry the optimization, to get a better result.
+     * @param variation A value by which the calculated instant_duration is multiplied.
+     */
+    optimized(retry: number=0): MIDI{
+        let correction=1
+        let from: MIDIView=this
+        for(let i=0; i<=retry; i++){
+            let min_start=Infinity
+            let max_start=-Infinity
+            let duration=0
+            let note_count=0
+            let previous_start=0
+            from.forEachNote((note,start)=>{
+                if(start<min_start)min_start=start
+                if(start>max_start)max_start=start
+                const new_duration= start+note.duration
+                if(new_duration>duration) duration=new_duration
+                previous_start=start
+                note_count++
+            })
+            let range=max_start-min_start
+
+            const optimized=new MIDI(range/note_count*correction, duration)
+            from.forEachNote((note,start) => optimized.putNote(note, start))
+
+            if(i==retry) return optimized
+            else{
+                let number_of_empty_cell=0
+                let number_of_full_cell=0
+                for(let ii=0; ii<optimized.instants.length; ii++){
+                    if(optimized.instants[0].length>1) number_of_full_cell++
+                    else if(optimized.instants[0].length==0) number_of_empty_cell++
+                }
+                if(number_of_empty_cell>number_of_full_cell) correction*=1.1
+                else if(number_of_full_cell>number_of_empty_cell) correction*=0.9
+                from=optimized
+            }
+        }
+        return this.clone()
     }
 
     /**
@@ -207,6 +249,7 @@ export class MIDI extends MIDIView{
         return ret
     }
 
+    /* Notes */
     static DO=60
         static DO_=61
     static RE=62
@@ -227,6 +270,8 @@ export class MIDI extends MIDIView{
     static ii=-2000
     static iii=-3000
     static iiii=-4000
+
+
 
     /* DURATION */
     private _duration:number=0
@@ -329,11 +374,15 @@ export class MIDI extends MIDIView{
      * Deserialize a MIDI track from a Blob.
      * //TODO Write something more memory efficient.
      */
-    static async load(blob: Blob){
-        const {instants,instant_duration,duration} = JSON.parse(await blob.text()) as {instants:MIDIInstant[], instant_duration:number, duration:number}
+    static async load(buffer: ArrayBuffer){
+        const {instants,instant_duration,duration} = JSON.parse(new TextDecoder().decode(buffer)) as {instants:MIDIInstant[], instant_duration:number, duration:number}
         const midi=new MIDI(instant_duration,duration)
         for(let i=0; i<instants.length; i++)midi.instantAt(i).push(...instants[i])
             return midi
+    }
+
+    static load2(buffer: ArrayBuffer): Promise<MIDI|null>{
+        return parseSFMMidi(buffer)
     }
 
 }
@@ -391,4 +440,75 @@ export class SubMIDI extends MIDIView{
     }
 
 
+}
+
+export class MIDIBuilder{
+    
+    private notes: {note:MIDINote, start:number}[]=[]
+    private duration =0
+
+    addNote(note: MIDINote, start: number){
+        this.notes.push({note, start})
+        if(start+note.duration>this.duration)this.duration=start+note.duration
+    }
+
+    build(): MIDI{
+        const ret=new MIDI(this.duration,this.duration)
+        for(const {note,start} of this.notes){
+            ret.putNote(note, start)
+        }
+        return ret.optimized()
+    }
+
+}
+
+/**
+ * A MIDI builder that can accumulate notes and build a MIDI track by calling noteOn and noteOff in sequence.
+ */
+export class MIDIAccumulator{
+
+    private closed_notes: {note:MIDINote, start:number}[]=[]
+    private open_notes: {[key:number]:{note:number, velocity:number, start:number}}=[]
+    private duration=0
+
+
+    /**
+     * Start a new note at a given time.
+     * @param note The note as MIDI note, an integer between 0 and 128.
+     * @param channel The MIDI channel, an integer between 0 and 16.
+     * @param velocity The note velocity, between 0 and 1.
+     * @param start The start time of the note in milliseconds.
+     */
+    noteOn(note: number, channel: number, velocity: number, start: number){
+        const id=note+channel*128
+        this.open_notes[id]={note,velocity,start}
+    }
+
+    /**
+     * Stop a new note at a given time.
+     * @param note The note as MIDI note, an integer between 0 and 128.
+     * @param channel The MIDI channel, an integer between 0 and 16.
+     * @param end The end time of the note in milliseconds.
+     */
+    noteOff(note: number, channel: number, end: number){
+        const id=note+channel*128
+        const open_note=this.open_notes[id]
+        if(open_note!==undefined){
+            if(end>this.duration)this.duration=end
+            this.closed_notes.push({note:new MIDINote(note, open_note.velocity, channel, end-open_note.start), start:open_note.start})
+            delete this.open_notes[id]
+        }
+    }
+
+    /**
+     * Return a new MIDI track with all the notes.
+     * @returns 
+     */
+    build(): MIDI{
+        const ret=new MIDI(this.duration, this.duration)
+        for(const {note,start} of this.closed_notes){
+            ret.putNote(note, start)
+        }
+        return ret.optimized()
+    }
 }

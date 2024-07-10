@@ -1,5 +1,5 @@
 import App from "../App";
-import { MIDI } from "../Audio/MIDI";
+import { MIDI } from "../Audio/MIDI/MIDI";
 import OperableAudioBuffer from "../Audio/OperableAudioBuffer";
 import { State } from "../Components/BPF";
 import MIDIRegion from "../Models/Region/MIDIRegion";
@@ -22,17 +22,17 @@ const compatible_version=[CURRENT_PROJECT_VERSION]
 /** Loaders to load regions. */
 const regionLoaders: {
     [key: RegionType<any>] : {
-        loader: (editor:Blob)=>Promise<RegionOf<any>>,
+        loader: (buffer:ArrayBuffer)=>Promise<RegionOf<any>>,
         extension: string,
     }
 } = {
     [MIDIRegion.TYPE]:{
-        loader: async blob => new MIDIRegion(await MIDI.load(blob),0),
+        loader: async buffer => new MIDIRegion(await MIDI.load(buffer),0),
         extension: "wamstudiomidi",
     },
     [SampleRegion.TYPE]:{
-        loader: async blob =>{
-            const audioBuffer = await audioCtx.decodeAudioData(await blob.arrayBuffer());
+        loader: async buffer =>{
+            const audioBuffer = await audioCtx.decodeAudioData(buffer);
             const opAudioBuffer = OperableAudioBuffer.make(audioBuffer);
             return new SampleRegion(opAudioBuffer,0)
         },
@@ -240,7 +240,7 @@ export default class Loader {
             if(!decoder)continue
 
             let xhr = contents(region.content_name)
-            xhr.responseType = 'blob'
+            xhr.responseType = "arraybuffer"
 
             // Loading
             xhr.onprogress = (event) => {
@@ -267,7 +267,7 @@ export default class Loader {
                 if (xhr.status == 200) {
                     loadedRegions++;
                         
-                    let audioArrayBuffer = xhr.response as Blob
+                    let audioArrayBuffer = xhr.response as ArrayBuffer
                     let newRegion = await decoder(audioArrayBuffer)
 
                     if (track.deleted) {

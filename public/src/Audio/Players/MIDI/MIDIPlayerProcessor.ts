@@ -1,5 +1,5 @@
 import type { AudioWorkletGlobalScope } from "@webaudiomodules/api"
-import type { MIDIInstant } from "../../MIDI"
+import type { MIDIInstant } from "../../MIDI/MIDI"
 import type { IBaseAudioPlayerProcessor } from "../BaseAudioPlayerProcessor"
 
 
@@ -85,10 +85,11 @@ export function getMIDIPlayerProcessor(moduleId:string){
                     /* MULTI CHANNEL SUPPORT  : Unactivated because of burns instruments not supporting them
                     this.current_channel++
                     if(this.current_channel>=16)this.current_channel=0*/
+                    // TODO I add a negative offset to the note end because icannot use channel because some WAM don't work if I do.
                     this.emitEvents(
                         { type: 'wam-midi', time: currentTime+start, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, note.velocity*100]) } },
-                        { type: 'wam-midi', time: currentTime+start+note.duration/1000, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, 0]) } },
-                        { type: 'wam-midi', time: currentTime+start+note.duration/1000, data: { bytes: new Uint8Array([0x80 | this.current_channel, note.note, note.velocity*100]) } },
+                        { type: 'wam-midi', time: currentTime+start+note.duration/1000-0.0001, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, 0]) } },
+                        { type: 'wam-midi', time: currentTime+start+note.duration/1000-0.0001, data: { bytes: new Uint8Array([0x80 | this.current_channel, note.note, note.velocity*100]) } },
                     );
                 }
             }
