@@ -212,19 +212,20 @@ export default class TracksController{
    */
   public async createTrackWithFile(file: File): Promise<Track | undefined> {
     if (["audio/ogg", "audio/wav", "audio/mpeg", "audio/x-wav"].includes(file.type)) {
-      let wamInstance = await WamEventDestination.createInstance(this._app.host.hostGroupId, audioCtx);
-      let node = wamInstance.audioNode as WamAudioWorkletNode;
+      // Create the track
+      let track = this.createEmptyTrack();
+      track.element.name = file.name;
+      track.element.progress(0,1)
 
+      // Load the file
       let audioArrayBuffer = await file.arrayBuffer();
       let audioBuffer = await audioCtx.decodeAudioData(audioArrayBuffer);
       let operableAudioBuffer = OperableAudioBuffer.make(audioBuffer);
       operableAudioBuffer = operableAudioBuffer.makeStereo();
-
-      node.setAudio(operableAudioBuffer.toArray());
-
-      let track = this.createEmptyTrack();
       this._app.regionsController.addRegion(track, new SampleRegion(operableAudioBuffer,0))
-      track.element.name = file.name;
+
+      // Finish the progress
+      track.element.progressDone();
       return track;
     } else {
       console.warn("File type not supported");
@@ -300,7 +301,6 @@ export default class TracksController{
 
     this._view.newTrackDiv.addEventListener("click", () => {
       const track=this._app.tracksController.createEmptyTrack()
-      track.element.progressDone()
     });
   }
 
@@ -520,11 +520,20 @@ export default class TracksController{
     }
   }
 
-  // ----- UNDO / REDO methods
-  updateUndoButtons() {
-    // to disable/enable undo/redo buttons if undo/redo is available
-    this._app.hostView.setUndoButtonState(this._app.undoManager.hasUndo());
-    this._app.hostView.setRedoButtonState(this._app.undoManager.hasRedo());
+  /**
+   * Get the track pos in the view.
+   * @param track 
+   * @returns 
+   */
+  public getTrackPos(track: Track): number {
+    return this.track_list.indexOf(track);
+  }
+
+  /**
+   * Get a track by its position in the view
+   */
+  public getTrackByPos(index: number){
+    return this.track_list[index]
   }
 
   async undoTrackRemove(

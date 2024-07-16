@@ -55,7 +55,6 @@ export default class HostController {
     this._timerIntervalPaused = false;
 
     this._view.host?.append(this._app.host.element)
-    this._app.host.element.progressDone()
     this._app.host.element.name="Master Track"
     this._app.tracksController.bindSoundProviderEvents(this._app.host)
 
@@ -212,10 +211,6 @@ export default class HostController {
         let file = target.files[i];
         if (file !== undefined) {
           this._app.tracksController.createTrackWithFile(file).then((track) => {
-            if (track !== undefined) {
-              this._app.tracksController.addTrack(track);
-              track.element.progressDone();
-            }
           });
         }
       }

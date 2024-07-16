@@ -39,7 +39,7 @@ export default class EditorController {
         },
         // Load MIDI files
         async function(start, buffer, type){
-            if(!["audio/mid"])return null
+            if(!["audio/mid"].includes(type))return null
             console.log("MIDI LOAD,", type)
             const midi= await MIDI.load2(buffer)
             if(midi)return new MIDIRegion(midi, start)
@@ -47,6 +47,7 @@ export default class EditorController {
         },
         // Load sample files
         async function(start, buffer, type){
+            console.log("SAMPLE TYPE",type)
             if(!["audio/mpeg","audio/ogg","audio/wav","audio/x-wav"].includes(type))return null
             try{
                 let audioArrayBuffer = buffer
@@ -334,19 +335,38 @@ export default class EditorController {
         if(!target)return
 
         // Then import the loaded files
+        let success=false
+        let needNewTrack=false
         for(const file of files){
+            // If need a new track, create a new track
+            if(needNewTrack){
+                let next_track=this._app.tracksController.getTrackByPos(this._app.tracksController.getTrackPos(target.track)+1)
+                if(next_track==null){
+                    next_track=await this._app.tracksController.createTrack()
+                }
+                target.track=next_track
+                needNewTrack=false
+            }
             // Import the file
-            target.start=(await this.importFile(
+            const result=await this.importFile(
                 async () => {
                     const audioFile = file.getAsFile()
                     if(!audioFile)return null
                     console.log("Loading", file.type)
+                    target.track.element.name=audioFile.name
                     return {buffer:await audioFile.arrayBuffer(), type: file.type}
                 },
                 target.track,
                 target.start
-            ))?.start ?? target.start
+            )
+            // If the file has been successfully imported, update the start position of the next file
+            // And set the success flag to true, so the track fetch is not cancelled
+            if(result){
+                success=true
+                needNewTrack=true
+            }
         }
+        if(!success)target.cancel()
     }
 
     private showLoadingIcon(show: boolean): void {
@@ -385,9 +405,9 @@ export default class EditorController {
         if(!target)return
 
         // Then import the loaded file 
-        await this.importFile(
+        const result=await this.importFile(
             async () => {
-                console.log(url)
+                console.log("")
                 let file = await fetch(url);
                 console.log("nianianiania", url, file.type)
                 return {buffer:await file.arrayBuffer(), type: file.type}
@@ -395,6 +415,7 @@ export default class EditorController {
             target.track,
             target.start
         )
+        if(!result)target.cancel()
     }
 
     /**
@@ -405,8 +426,9 @@ export default class EditorController {
      * @param clientY The y position
      * @param doCreate If true, create a new track if no track is found at the given position
      * @returns The track at the given position and the position of the given position in the track as duration in milliseconds.
+     * And a function you can call to cancel the creation of the track if a track has been created.
      */
-    private async getTrackAt(clientX: number, clientY: number, doCreate=false): Promise<{start:number, track:Track}|null>{
+    private async getTrackAt(clientX: number, clientY: number, doCreate=false): Promise<{start:number, track:Track, cancel:()=>void}|null>{
         let offsetLeft = this._view.canvasContainer.offsetLeft // offset x of the canvas
         let offsetTop = this._view.canvasContainer.offsetTop // offset y of the canvas
 
@@ -424,14 +446,13 @@ export default class EditorController {
                 if(doCreate){
                     const track = await this._app.tracksController.createTrack();
                     track.element.name = "NEW TRACK"
-                    track.element.progressDone();
-                    return {start, track}
+                    return {start, track, cancel:()=>this._app.tracksController.removeTrack(track)}
                 }
                 else return null
             }
             else{
                 const track = this._app.tracksController.getTrackById(waveform.trackId)!;
-                if(track)return {start, track}
+                if(track)return {start, track, cancel:()=>{}}
                 else{
                     crashOnDebug("A track should be associated to this waveform")
                     return null
@@ -449,6 +470,7 @@ export default class EditorController {
      */
     private async importFile(bufferLoader: ()=>Promise<{buffer:ArrayBuffer, type:string}|null>, track: Track, start: number): Promise<RegionOf<any>|null>{
         this.showLoadingIcon(true)
+        track.element.progress();
         
         // Fetch the file
         const file = await bufferLoader()
@@ -471,6 +493,7 @@ export default class EditorController {
                 break
             }
         }
+        track.element.progressDone();
         this.showLoadingIcon(false)
         return region
     }

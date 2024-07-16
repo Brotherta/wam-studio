@@ -82,7 +82,7 @@ img {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  height: 50%;
+  height: 54%;
   padding: 1rem;
   overflow-x: auto;
   overflow-y: hidden;
@@ -141,6 +141,16 @@ img {
   border-bottom-left-radius: 0.25rem;
   border-bottom-right-radius: 0.25rem;
   margin: 0;
+}
+#collapsePresets{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: black;
+}
+#collapsePresets>summary{
+  border: 1px solid var(--border-color, gray);
+  height: 5%;
 }
 /* */
 

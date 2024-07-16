@@ -375,11 +375,11 @@ export default class SoundProviderElement extends HTMLElement {
             this.name = "";
             
             this.defineTrackElementListeners();
-            this.shadowRoot.querySelectorAll(".track-volume, .track-balance, .track-controls").forEach((element) => {
-                element.classList.add("hidden");
-            });
-            this.isLoading = true;
             this.vuMeterDiv = this.shadowRoot.querySelector("#vu-meter-div") as HTMLDivElement;
+
+            this.shadowRoot.querySelectorAll("#progress-bar-text, #loading-container").forEach((element) => {
+                element.classList.add("hidden")
+            })
         }
         this.name="SoundProvider"
     }
@@ -399,39 +399,78 @@ export default class SoundProviderElement extends HTMLElement {
     getPeakMeterParentElement():HTMLDivElement {
         return this.vuMeterDiv;
     }
-    
-    // Progress method that accepts a percentage and updates the width of the loading bar
-    progress(percent: number, loaded: number, total: number) {
-        if (!this.isLoading) return;
-        if (this.shadowRoot === null) return;
 
-        const loadingBar = this.shadowRoot.getElementById("loading-bar");
-        const progressBarText = this.shadowRoot.getElementById("progress-bar-text");
-        if (loadingBar === null || progressBarText === null) return;
+    /**
+     * Hide every controls of the track and show a loading bar, setting its loading state.
+     * If the loading bar is already shown, the loading state is just modified.
+     * @param loaded The current loading advancement in Byte
+     * @param total The maximum loading advancement in Byte
+     * @returns 
+     */
+    progress(loaded: number, total:number):void;
+    /**
+     * Hide every controls of the track and show a loading bar, setting its loading state.
+     * If the loading bar is already shown, the loading state is just modified.
+     * The loading state is set to 0% with no "MB of MB" text.
+     * @returns 
+     */
+    progress():void;
+    progress(loaded?: number, total?: number): void{
+        const shadowRoot = this.shadowRoot;
+        if (shadowRoot === null) return;
 
-        loadingBar.style.width = `${percent}%`;
-        progressBarText.textContent = `${(loaded / (1024 * 1024)).toFixed(2)} MB of ${(total / (1024 * 1024)).toFixed(2)} MB`;
+        const progressBarText = shadowRoot.getElementById("progress-bar-text")!;
+        const loadingBar = shadowRoot.getElementById("loading-bar")!;
+        const loadingContainer = shadowRoot.getElementById("loading-container")!;
+
+        // Show the loading bar
+        if (!this.isLoading){
+            // Hide the controls.
+            shadowRoot.querySelectorAll(".slider, .control-line").forEach((element) => {
+
+                element.classList.add("hidden");
+            });
+            // Show the loading bar
+            [loadingContainer,progressBarText].forEach((element) => {
+                element.classList.remove("hidden")
+            })
+            this.isLoading = true;
+        }
+
+        // Set the loading state
+        if(loaded !==undefined && total!=undefined){
+            const percent=Math.floor((loaded / total) * 100);
+            loadingBar.style.width = `${percent}%`;
+            progressBarText.textContent = `${(loaded / (1024 * 1024)).toFixed(2)} MB of ${(total / (1024 * 1024)).toFixed(2)} MB`;
+        }
+        else{
+            loadingBar.style.width = "0%";
+            progressBarText.textContent = "";
+        }
     }
 
-    // Method to be called when progress is done
+    /**
+     * Hide the loading bar and show the controls of the track.
+     */
     progressDone() {
-        if (!this.isLoading) return;
-        if (this.shadowRoot === null) return;
+        const shadowRoot = this.shadowRoot;
+        if (shadowRoot === null) return;
 
-        const progressBarText = this.shadowRoot.getElementById("progress-bar-text");
-        const loadingBar = this.shadowRoot.getElementById("loading-container");
+        const progressBarText = shadowRoot.getElementById("progress-bar-text")!;
+        const loadingContainer = shadowRoot.getElementById("loading-container")!;
 
-        if (loadingBar === null || progressBarText === null) return;
-
-        loadingBar.remove();
-        progressBarText.remove();
-
-        // Show the other elements
-        this.shadowRoot.querySelectorAll(".track-volume, .track-balance, .track-controls").forEach((element) => {
-            element.classList.remove("hidden");
-        });
-
-        this.isLoading = false;
+        // Hide the loading bar
+        if (this.isLoading){
+            // Show the controls.
+            shadowRoot.querySelectorAll(".slider, .control-line").forEach((element) => {
+                element.classList.remove("hidden");
+            });
+            // Hide the loading bar
+            [loadingContainer,progressBarText].forEach((element) => {
+                element.classList.add("hidden")
+            })
+            this.isLoading = false;
+        }
     }
 
     select() { this.style.borderColor = "lightgray" }

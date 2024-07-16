@@ -251,14 +251,13 @@ export default class Loader {
                     totalLoaded += event.loaded;  // update loaded size
 
                     let totalSizeSum = Array.from(totalSize.values()).reduce((a, b) => a + b, 0);
-                    let percentComplete = (totalLoaded / totalSizeSum) * 100;
 
                     if (track.deleted) {
                         xhr.abort();
                         return;
                     }
 
-                    track.element.progress(percentComplete, totalLoaded, totalSizeSum);
+                    track.element.progress(totalLoaded, totalSizeSum);
                 }
             };
 
@@ -304,14 +303,13 @@ export default class Loader {
 
         xhr.onprogress = (event) => {
             if (event.lengthComputable) {
-                let percentComplete = event.loaded / event.total * 100;
                 // update progress bar on track element
                 // Stop the request if the track has been removed
                 if (track.deleted) {
                     xhr.abort();
                     return;
                 }
-                track.element.progress(percentComplete, event.loaded, event.total);
+                track.element.progress(event.loaded, event.total);
             }
         };
 
