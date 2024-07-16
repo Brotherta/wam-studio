@@ -9,15 +9,14 @@ import Track from "../Models/Track/Track";
 import { audioCtx } from "../index";
 
 
-// TODO A better way to check compatibility with the project version without having to add all the compatible versions in the array.
-/** The current project version */
-const CURRENT_PROJECT_VERSION="project-1.0"
-
 /**
- * The list of compatible versions of the project format.
- * Allow some backward compatibility.
+ * The current project version.
+ * A project with a greater version number is not compatible.
+ * A project with a different major version number is not compatible.
+ * Increment the major version number when the project format changes in a way that is not backward compatible.
+ * Increment the minor version number when the project format changes in a way that is backward but not forward compatible.
  */
-const compatible_version=[CURRENT_PROJECT_VERSION]
+const CURRENT_PROJECT_VERSION: [number,number]=[1,0]
 
 /** Loaders to load regions. */
 const regionLoaders: {
@@ -43,7 +42,7 @@ const regionLoaders: {
 
 /** The project data format. */
 export interface ProjectData {
-    version: string;
+    version: [major:number, minor:number];
     host: {
         playhead: number;
         volume: number;
@@ -173,10 +172,17 @@ export default class Loader {
         console.log("Load Project:", project)
 
         // Version check
-        let version = project.version;
-        if (!compatible_version.includes(version)){
-            alert(`Incompatible project version: ${version}. Expected: ${compatible_version.join(", ")}`);
-            return;
+        {
+            let error_message=null
+            let version = project.version;
+            if(!Array.isArray(version) || version.length!=2)error_message= `The project version(${version}) is invalid, the project incompatible`
+            if(version[0]<CURRENT_PROJECT_VERSION[0])error_message= `The project version(${version.join(".")}) is too old`
+            else if(version[0]>CURRENT_PROJECT_VERSION[0])error_message= `The project version(${version.join(".")}) is too recent. Use a more recent version WAMStudio`
+            else if(version[1]>CURRENT_PROJECT_VERSION[1])error_message= `The project version(${version.join(".")}) is too recent. Use a more recent version WAMStudio`
+            if(error_message!=null){
+                alert(`${error_message}. WAM Studio version: ${CURRENT_PROJECT_VERSION.join(".")}`)
+                return
+            }
         }
 
         let tracksJson = project.tracks;
