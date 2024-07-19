@@ -1,7 +1,5 @@
 import App, { crashOnDebug } from "../../../App";
 import OperableAudioBuffer from "../../../Audio/OperableAudioBuffer";
-import WamAudioWorkletNode from "../../../Audio/WAM/WamAudioWorkletNode";
-import WamEventDestination from "../../../Audio/WAM/WamEventDestination";
 import TrackElement from "../../../Components/Editor/TrackElement";
 import { RATIO_MILLS_BY_PX } from "../../../Env";
 import Plugin from "../../../Models/Plugin";
@@ -80,10 +78,12 @@ export default class TracksController{
    *
    * @param track - The track to be initialized.
    */
-  public addTrack(track: Track): void {
+  public async addTrack(track: Track) {
     // Check if already exists
     if(this.track_list.includes(track))crashOnDebug("TracksController - addTrack - Track already exists!")
     
+    await track.init()
+
     // Add the track to the list
     this.track_list.push(track)
 
@@ -134,11 +134,11 @@ export default class TracksController{
     const index=this.track_list.indexOf(track)
     if(index>=0){
       this.track_list.splice(index,1)
-      track.destroy()
       this._app.pluginsController.connectPlugin(track,null);
       this._view.removeTrack(track.element);
       this._app.automationView.removeAutomationBpf(track.id);
       this._app.waveformController.removeWaveformOfTrack(track);
+      track.destroy()
     }
     else crashOnDebug("TracksController - removeTrack - Track not found!")
   }
@@ -178,10 +178,10 @@ export default class TracksController{
    * @returns the created track
    * @private
    */
-  private createEmptyTrack(): Track {
+  private async createEmptyTrack(): Promise<Track> {
     let track = new Track(new TrackElement(),audioCtx,this._app.host.hostGroupId)
     track.element.name=`Track ${this.trackNameCounter++}`
-    this.addTrack(track)
+    await this.addTrack(track)
     return track;
   }
 
@@ -193,7 +193,7 @@ export default class TracksController{
    * @returns the created track
    */
   public async createTrack(url?: string): Promise<Track> {
-    let track = this.createEmptyTrack();
+    let track = await this.createEmptyTrack();
     if (url) {
       let urlSplit = url.split("/");
       track.element.name = urlSplit[urlSplit.length - 1];
@@ -213,7 +213,7 @@ export default class TracksController{
   public async createTrackWithFile(file: File): Promise<Track | undefined> {
     if (["audio/ogg", "audio/wav", "audio/mpeg", "audio/x-wav"].includes(file.type)) {
       // Create the track
-      let track = this.createEmptyTrack();
+      let track = await this.createEmptyTrack();
       track.element.name = file.name;
       track.element.progress(0,1)
 
@@ -234,12 +234,7 @@ export default class TracksController{
   }
 
   public async newTrackFromDeletedTrack(deletedTrack: Track) {
-    let wamInstance = await WamEventDestination.createInstance(
-      this._app.host.hostGroupId,
-      audioCtx
-    );
-    let node = wamInstance.audioNode as WamAudioWorkletNode;
-    let track = this.createEmptyTrack();
+    let track = await this.createEmptyTrack();
     //track.setAudioBuffer(deletedTrack.audioBuffer!);
     //track.element = deletedTrack.element;
     track.color = deletedTrack.color;
@@ -363,15 +358,6 @@ export default class TracksController{
         ()=> track.balance = oldB,
       );
     });
- 
-    // TRACK MONITOR
-    track.element.monitoringBtn.addEventListener("click", () => {
-      const oldValue=track.monitored
-      this._app.doIt(true,
-        ()=> track.monitored=!oldValue,
-        ()=> track.monitored=oldValue,
-      );
-    })
 
     // TRACK FX/PLUGINS
     track.element.fxBtn.addEventListener("click", () => {
@@ -427,6 +413,15 @@ export default class TracksController{
         ()=> this.setColor(track, newColor),
         ()=> this.setColor(track, oldColor),
       )
+    })
+
+    // TRACK MONITOR
+    track.element.monitoringBtn.addEventListener("click", () => {
+      const oldValue=track.monitored
+      this._app.doIt(true,
+        ()=> track.monitored=!oldValue,
+        ()=> track.monitored=oldValue,
+      );
     })
 
     

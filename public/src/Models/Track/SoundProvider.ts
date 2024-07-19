@@ -1,7 +1,8 @@
-import { WamNode } from "@webaudiomodules/api";
+import { WamNode, WebAudioModule } from "@webaudiomodules/api";
+import { crashOnDebug } from "../../App";
 import AudioGraph from "../../Audio/Graph/AudioGraph";
+import PassthroughWebAudioModule from "../../Audio/Node/PassthroughWebAudioModule";
 import SoundProviderElement from "../../Components/Editor/SoundProviderElement";
-import { audioCtx } from "../../index";
 import Automation from "../Automation";
 import Plugin, { PluginInstance } from "../Plugin";
 
@@ -9,26 +10,30 @@ import Plugin, { PluginInstance } from "../Plugin";
  * A sound output, controlled by a playhead, and with a volume and a balance.
  * You can also attach a plugin to it.
  * Tracks are sound providers.
+ * The host is a sound provider.
+ * 
+ * The internal audio graph of a sound provider is the following:
+ * Without any plugin attached: audioInputNode -> pannerNode -> gainNode -> outputNode
+ * With a plugin attached: audioInputNode -> pluginNode -> pannerNode -> gainNode -> outputNode
  */
 export default abstract class SoundProvider {
 
   /* -~- OUTPUT NODES -~- */
-  /* junctionNode -> pannerNode -> gainNode -> monitoredNode */
   /** The gain node associated to the track. It is used to control the volume of the track and is the outputNode of the track. **/
   protected gainNode: GainNode
 
   /** The panner node associated to the track. It is used to control the balance of the track. **/
   private pannerNode: StereoPannerNode
 
-  /** The monitored output node. It output the sound of the track only when it is monitored. */
-  private monitoredNode: GainNode
+  /** The WAM input : The input of the sound provider */
+  private inputWAM: WebAudioModule
 
   /* -~- TRACK PROPERTIES -~- */
   /** The unique id of the track. */
   public id: number
 
   /** The track element associated to the track. */
-  public _element: SoundProviderElement
+  private _element: SoundProviderElement
   public get element(){ return this._element }
 
   /** The automation associated to the track. */
@@ -46,13 +51,12 @@ export default abstract class SoundProvider {
    */
   public loopEnd: number;
 
-  constructor(element: SoundProviderElement, readonly groupId: string) {
+  constructor(element: SoundProviderElement, readonly groupId: string, readonly audioContext: BaseAudioContext) {
     // Audio Nodes
-    this.monitoredNode= audioCtx.createGain();
-    this.gainNode = audioCtx.createGain();
+    this.gainNode = audioContext.createGain();
     this.gainNode.gain.value = 0.5;
-    this.pannerNode = audioCtx.createStereoPanner();
-    this.pannerNode.connect(this.gainNode).connect(this.monitoredNode)
+    this.pannerNode = audioContext.createStereoPanner();
+    this.pannerNode.connect(this.gainNode)
 
     // Track properties
     this._element = element;
@@ -64,7 +68,6 @@ export default abstract class SoundProvider {
 
     // Recording controls.
     this.isMuted=false
-    this.monitored = false;
 
     // Loop controls.
     this.loopStart = 0;
@@ -74,13 +77,25 @@ export default abstract class SoundProvider {
 
   }
 
-  protected postInit(){
-    this._connect(this.pannerNode)
+
+  /** LIFTIME */
+  /** 
+   * Should be called at the sound provider creation.
+   * Initialize the input node of the sound provider.
+   **/
+  async init(){
+    this.inputWAM= await PassthroughWebAudioModule.createInstance(this.groupId, this.audioContext)
+    this.audioInputNode.connect(this.pannerNode)
+  }
+
+  /** Should be called at the sound provider destruction to clean up */
+  destroy(){
+    this.audioInputNode.destroy()
   }
 
 
-  /** VOLUME, MUTE and SOLO */
 
+  /** VOLUME, MUTE and SOLO */
   /** The volume of the track. */
   private _volume: number
 
@@ -88,6 +103,7 @@ export default abstract class SoundProvider {
     if(!this.isMuted)this.gainNode.gain.value=this._volume
     else this.gainNode.gain.value=0
   }
+
 
   /**
    * The volume of the track
@@ -102,6 +118,8 @@ export default abstract class SoundProvider {
 
   public get volume() { return this._volume }
 
+
+
   /**
    * Is the track muted, if a track is muted it emits no sound
    */
@@ -115,6 +133,7 @@ export default abstract class SoundProvider {
 
   private _muted: boolean=false
 
+
   /** The color of the track in HEX format (#FF00FF). It is used to display the waveform. */
   private _color: string
 
@@ -125,7 +144,6 @@ export default abstract class SoundProvider {
 
   public get color() { return this._color }
   
-
 
   /**
    * The balance of the track. The panning of the track.
@@ -157,6 +175,24 @@ export default abstract class SoundProvider {
 
 
 
+  /* ~ CONNECTIONS ~ */
+  /**
+   * The input node of the effect graph, any sound or event send into it will be treated
+   * by the plugin and the settings.
+   */
+  get audioInputNode(){
+    if(!this.inputWAM.initialized)crashOnDebug(`This sound provider${this.constructor.name} has not been initialized`)
+    return this.inputWAM.audioNode
+  }
+
+  /**
+   * The output node of the sound provider.
+   */
+  public get outputNode(): AudioNode { return this.gainNode }
+
+
+
+
   /** ~ PLUGINS ~ **/
   private _plugin: PluginInstance|null = null // The plugin associated to the track.
 
@@ -168,65 +204,37 @@ export default abstract class SoundProvider {
    */
   public async connectPlugin(plugin: Plugin|null){
     // Create the instance first
-    const pluginInstance = plugin ? await plugin.instantiate(audioCtx, this.groupId) : null
+    const pluginInstance = plugin ? await plugin.instantiate(this.audioContext, this.groupId) : null
 
     // Disconnect the previous plugin node if it exists.
     if(this.plugin){
       const wam=this.plugin.instance
       if(wam){
         wam.audioNode.disconnect(this.pannerNode)
-        this._disconnect(wam.audioNode)
-        this._disconnectEvents(wam.audioNode)
+        this.audioInputNode.disconnect(wam.audioNode)
+        this.audioInputNode.disconnectEvents(wam.audioNode.instanceId)
       }
       this.plugin.destroy()
       this._plugin=null
     }
     // Disconnect from panner node
     else {
-      this._disconnect(this.pannerNode)
+      this.audioInputNode.disconnect(this.pannerNode)
     }
 
     // Connect to a plugin node
     if(pluginInstance){
       this._plugin=pluginInstance
-      this._connect(pluginInstance.audioNode)
-      this._connectEvents(pluginInstance.audioNode)
+      this.audioInputNode.connect(pluginInstance.audioNode)
+      this.audioInputNode.connectEvents(pluginInstance.audioNode.instanceId)
       pluginInstance.audioNode.connect(this.pannerNode)
     }
     // Connect to panner node
     else{
-      this._connect(this.pannerNode)
+      this.audioInputNode.connect(this.pannerNode)
     }
   }
 
-  public abstract _connect(node: AudioNode): void
-
-  public abstract _disconnect(node: AudioNode): void
-
-  public abstract _connectEvents(node: WamNode): void
-
-  public abstract _disconnectEvents(node: WamNode): void
-
-  /**
-   * Set the track to be monitored or not.
-   * If the track is monitored, its output is connected, else it is not.
-   */
-  public set monitored(value: boolean){
-    this.monitoredNode.gain.value = value?1:0
-    this.element.isMonitoring=value
-  }
-
-  public get monitored(){
-    return this.monitoredNode.gain.value>0
-  }
-
-  public get outputNode(): AudioNode {
-    return this.gainNode
-  }
-
-  public get monitoredOutputNode(): AudioNode {
-    return this.monitoredNode
-  }
 
   public abstract play(): void
 
@@ -240,21 +248,14 @@ export default abstract class SoundProvider {
   /**
    * The modified state of the track. It is used to know if the track has been modified and should be updated.
    */
-  public set modified(value: boolean){
-    this._modified=value
-  }
-  public get modified(): boolean{
-    return this._modified || this._isModified()
-  }
+  public set modified(value: boolean){ this._modified=value }
+  public get modified(): boolean{ return this._modified || this._isModified() }
 
   /**
    * Override this method to add more conditions to the modified state.
    * @returns 
    */
-  protected _isModified():boolean{
-    return false
-  }
-
+  protected _isModified():boolean{ return false }
 
 
   /** Audio Graph Creation */

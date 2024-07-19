@@ -5,6 +5,7 @@ import { getBaseAudioPlayerProcessor } from "./BaseAudioPlayerProcessor"
 /**
  * Base class for all audio player nodes.
  * With default management of the playhead and isPlaying parameter.
+ * @author Samuel DEMONT
  */
 export default class BaseAudioPlayerNode extends WamNode{
 

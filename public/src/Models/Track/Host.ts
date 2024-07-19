@@ -1,11 +1,11 @@
 import { WamNode } from "@webaudiomodules/sdk";
 import { audioCtx } from "../..";
-import App from "../../App";
+import App, { crashOnDebug } from "../../App";
 import AudioPlayerNode from "../../Audio/AudioNode";
 import AudioGraph, { AudioGraphInstance } from "../../Audio/Graph/AudioGraph";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import SoundProviderElement from "../../Components/Editor/SoundProviderElement";
-import { BACKEND_URL, MAX_DURATION_SEC } from "../../Env";
+import { MAX_DURATION_SEC } from "../../Env";
 import SoundProvider, { SoundProviderGraphInstance } from "./SoundProvider";
 import Track, { TrackGraphInstance } from "./Track";
 /**
@@ -29,10 +29,6 @@ export default class Host extends SoundProvider {
      */
     private hostNode: AudioPlayerNode | undefined
 
-    /**
-     * WAM instance.
-     */
-    public pluginWAM: any
 
     /**
      * Boolean that indicates if the host is recording.
@@ -41,24 +37,21 @@ export default class Host extends SoundProvider {
 
     private looping: boolean
 
-    /**
-     * The node whom the children tracks outputNodes are connected.
-     */
-    public mainNode: GainNode
-
     metronome: any;
     metronomeOn: any;
     MetronomeElement: any;
     
     private tracks: Iterable<Track>
 
+    public inRecordingMode=false
+
     /**
      * Create a new host track, a compisite track composed of multiple tracks.
      * @param app The app
      * @param tracks Its children tracks
      */
-    constructor(app: App, tracks: Iterable<Track>) {
-        super(new SoundProviderElement(),"NO_GROUP_ID");
+    constructor(app: App, audioContext: BaseAudioContext, tracks: Iterable<Track>) {
+        super(new SoundProviderElement(),"NO_GROUP_ID", audioContext);
         this.tracks=tracks
         this.playhead = 0;
         this.latency = 0;
@@ -68,9 +61,7 @@ export default class Host extends SoundProvider {
         this.looping = false;
 
         this.volume=1;
-        this.mainNode = audioCtx.createGain();
         this.outputNode.connect(audioCtx.destination)
-        this.postInit()
     }
 
     /**
@@ -78,10 +69,6 @@ export default class Host extends SoundProvider {
      * It is asynchronous because it needs to load the WAM SDK and the AudioPlayerNode.
      */
     async initWAM() {
-        console.log("Loading WAM SDK",BACKEND_URL+"/src/index.js")
-        const {default: WAM} = await import(/* webpackIgnore: true */BACKEND_URL+"/src/index.js");
-        this.pluginWAM = WAM;
-
         const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
         const {default: AudioPlayerNode} = await import("../../Audio/AudioNode");
         await audioCtx.audioWorklet.addModule(new URL('../../Audio/HostProcessor.js', import.meta.url));
@@ -97,8 +84,8 @@ export default class Host extends SoundProvider {
         this.hostNode = new AudioPlayerNode(audioCtx, 2);
         this.hostNode.port.onmessage = (event) => {
             if(event.data.playhead){
-                const playhead = (event.data.playhead/audioCtx.sampleRate)*1000;
-                this.onPlayHeadMove?.(playhead)
+                const playhead = (event.data.playhead/audioCtx.sampleRate)*1000
+                this.onPlayHeadMove.forEach(it=>it(playhead))
                 this._playhead = playhead;
             }
             else if(event.data.volume){
@@ -114,9 +101,8 @@ export default class Host extends SoundProvider {
         // Cleanup
         for(const track of this.previousTracks){
             try{
-                track.outputNode.disconnect(this.mainNode)
-                track.monitoredOutputNode.disconnect(this.mainNode)
-            }catch(_){}
+                track.outputNode.disconnect(this.audioInputNode)
+            }catch(e){crashOnDebug("Failed to disconnect track",e)}
         }
         this.previousTracks=[]
 
@@ -128,28 +114,15 @@ export default class Host extends SoundProvider {
                 track.update(context, playhead)
                 track.modified=false
             }
-            if (this.inRecordingMode)track.monitoredOutputNode.connect(this.mainNode)
-            else track.outputNode.connect(this.mainNode)
+            track.outputNode.connect(this.audioInputNode)
         }
-    }
 
-    override _connect(node: AudioNode): void {
-        this.mainNode.connect(node)
-    }
-
-    override _disconnect(node: AudioNode): void {
-        this.mainNode.disconnect(node)
-    }
-
-    override _connectEvents(node: WamNode): void{
-    }
-
-    override _disconnectEvents(node: WamNode): void{
+        console.log("Updated on ", this.audioInputNode)
     }
 
     /* PLAYHEAD */
     /** Called when the playhead is moved, with the new position in milliseconds */
-    public onPlayHeadMove?: (position:number)=>void
+    public onPlayHeadMove= new Set<(position:number)=>void>()
 
     private _playhead: number
 
@@ -157,7 +130,7 @@ export default class Host extends SoundProvider {
     public override set playhead(value: number){
         this._playhead=value
         this.hostNode?.port.postMessage({playhead: value*audioCtx.sampleRate/1000});
-        this.onPlayHeadMove?.(value)
+        this.onPlayHeadMove.forEach(it=>it(value))
         for(const track of this.tracks) track.playhead=value
     }
 
@@ -207,15 +180,6 @@ export default class Host extends SoundProvider {
         this.hostNode?.pause()
         this._playing=false
     }
-
-    
-    /** MONITORING */
-    private _recordingMode=false
-    set inRecordingMode(value: boolean){
-        this._recordingMode=value
-        this.modified=true
-    }
-    get inRecordingMode(){return this._recordingMode}
 
 
     /** LOOP */
@@ -289,6 +253,7 @@ export class HostGraphInstance implements AudioGraphInstance{
     connectEvents(destination: WamNode): void { this.soundProvider.connectEvents(destination) }
     disconnect(destination?: AudioNode | undefined): void { this.soundProvider.disconnect(destination) }
     disconnectEvents(destination?: WamNode | undefined): void { this.soundProvider.disconnectEvents(destination) }
+    
     destroy(): void {
         this.soundProvider.destroy()
         for(const track of this.tracks) track.destroy()

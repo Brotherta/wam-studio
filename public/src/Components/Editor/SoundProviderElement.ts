@@ -52,6 +52,20 @@ template.innerHTML = /*html*/`
             filter: none;
         }
     /* */
+    /* NON LETTER ICON */
+    .icon:not(._letter)._red:not(:hover){
+        filter: brightness(40%) sepia(100%) hue-rotate(300deg) saturate(400%);
+    }
+    .icon:not(._letter)._yellow:not(:hover){
+        filter: brightness(80%) sepia(100%) hue-rotate(30deg) saturate(400%);
+    }
+    .icon:not(._letter)._blue:not(:hover){
+        filter: brightness(50%) sepia(100%) hue-rotate(200deg) saturate(400%);
+    }
+    .icon:not(._letter)._green:not(:hover){
+        filter: brightness(80%) sepia(100%) hue-rotate(80deg) saturate(400%);
+    }
+    /* */
 /* */
 
 /* CONTROLS: Togglables elements */
@@ -296,9 +310,6 @@ template.innerHTML = /*html*/`
         </div>
         <div class="control-line" id="track-controls1">
             <div id="mute-btn" class="icon _letter control">M</div>
-            <div id="monitoring" class="control" style="padding-top: 6px">
-                <i class="icon monitor-icon"></i>
-            </div>
             <div id="fx" class="control" style="padding-top: 6px">
                 <i class="fx-icon" style="width: 18px"></i>
             </div>
@@ -364,8 +375,6 @@ export default class SoundProviderElement extends HTMLElement {
 
     set color(value: string){ this.colorLine.style.backgroundColor=value }
     get color(){ return this.colorLine.style.backgroundColor }
-
-    set isMonitoring(value:boolean) { this.monitoringBtn.classList.toggle("_toggled",value)}
 
     constructor() {
         super()

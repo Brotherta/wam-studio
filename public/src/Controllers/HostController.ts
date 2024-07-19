@@ -1,7 +1,6 @@
 import songs from "../../static/songs.json";
 import App from "../App";
 import WebAudioPeakMeter from "../Audio/Utils/PeakMeter";
-import MetronomeComponent from "../Components/MetronomeComponent";
 import VuMeter from "../Components/VuMeterElement";
 import { SONGS_FILE_URL, TEMPO_DELTA, updateTempo } from "../Env";
 import DraggableWindow from "../Utils/DraggableWindow";
@@ -65,6 +64,10 @@ export default class HostController {
     this._app.host.metronomeOn = false;  // Metronome is off by default
     console.log("Initial Metronome State: " + (this._app.host.metronomeOn ? "On" : "Off"));
     this._view.updateMetronomeBtn(false);
+
+    this._app.host.onPlayHeadMove.add((playhead) => {
+      // TODO Move the metronome to the new playhead position
+    })
   }
 
   /**
@@ -93,9 +96,9 @@ export default class HostController {
 
       // Start the metronome if it's enabled
       if (host.metronomeOn){
-        (this._view.MetronomeElement as MetronomeComponent).startMetronome();
+        (this._view.MetronomeElement).startMetronome();
       }else{
-        (this._view.MetronomeElement as MetronomeComponent).pauseMetronome();
+        (this._view.MetronomeElement).pauseMetronome();
       }
 
     } else {
@@ -119,7 +122,7 @@ export default class HostController {
       }
       if (this._timerInterval) clearInterval(this._timerInterval);
       // Always stop the metronome when playback is stopped
-      (this._view.MetronomeElement as MetronomeComponent).pauseMetronome()
+      (this._view.MetronomeElement).pauseMetronome()
     }
     this._view.updatePlayButton(host.isPlaying, inRecordingMode)
   }
@@ -171,9 +174,9 @@ export default class HostController {
 
     // Start or stop the metronome based on both metronome state and whether playback is active
     if (metronomeOn && this._app.host.isPlaying) {
-      (this._view.MetronomeElement as MetronomeComponent).startMetronome();
+      (this._view.MetronomeElement).startMetronome();
     }else{
-      (this._view.MetronomeElement as MetronomeComponent).pauseMetronome();
+      (this._view.MetronomeElement).pauseMetronome();
     }
 
     // Update the icon to reflect the new state.

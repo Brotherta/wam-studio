@@ -2,6 +2,11 @@
 import { WebAudioModule } from "@webaudiomodules/sdk"
 import BaseAudioPlayerNode from "../BaseAudioPlayerNode"
 
+/**
+ * A player node for sample files.
+ * Can play sample files with the given audio.
+ * @author Samuel DEMONT
+ */
 export default class SamplePlayerNode extends BaseAudioPlayerNode{
 
     constructor(module: WebAudioModule<SamplePlayerNode>){

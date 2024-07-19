@@ -3,6 +3,11 @@ import { WebAudioModule } from "@webaudiomodules/sdk"
 import { MIDI } from "../../MIDI/MIDI"
 import BaseAudioPlayerNode from "../BaseAudioPlayerNode"
 
+/**
+ * A player node for MIDI files.
+ * Can play MIDI files with the given instants and instant_duration.
+ * @author Samuel DEMONT
+ */
 export default class MIDIPlayerNode extends BaseAudioPlayerNode{
 
     constructor(module: WebAudioModule<MIDIPlayerNode>){

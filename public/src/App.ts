@@ -6,6 +6,7 @@ import TracksController from "./Controllers/Editor/Track/TracksController";
 import HostController from "./Controllers/HostController";
 import HostView from "./Views/HostView";
 
+import { audioCtx } from ".";
 import AutomationController from "./Controllers/AutomationController";
 import EditorController from "./Controllers/Editor/EditorController";
 import LoopController from "./Controllers/Editor/LoopController";
@@ -87,7 +88,7 @@ export default class App {
         this.waveformController = new WaveformController(this);
         this.regionsController = new RegionController(this);
         this.tracksController = new TracksController(this);
-        this.host = new Host(this,this.tracksController.tracks);
+        this.host = new Host(this, audioCtx, this.tracksController.tracks);
         this.playheadController = new PlayheadController(this);
         this.hostController = new HostController(this);
         this.pluginsController = new PluginsController(this);
@@ -118,6 +119,7 @@ export default class App {
      */
     async initHost() {
         await this.host.initWAM()
+        await this.host.init()
         this.hostController.bindNodeListeners();
     }
 

@@ -4,6 +4,9 @@ import SoundProviderElement from "./SoundProviderElement";
 const controls_template = document.createElement("template")
 controls_template.innerHTML= /*html*/`
     <div id="solo-btn" class="icon _letter control">S</div>
+    <div id="monitoring" class="control" style="padding-top: 6px">
+        <i class="icon monitor-icon"></i>
+    </div>
 `
 
 const controls2_template = document.createElement("template")
@@ -65,7 +68,13 @@ export default class TrackElement extends SoundProviderElement {
         }
     }
 
-    set isArmed(value: boolean){ this.armBtn.classList.toggle("_toggled",value) }
+    set isArmed(value: boolean){ 
+        this.armBtn.classList.toggle("_toggled",value)
+    }
+
+    set isListening(value: boolean){
+        this.armBtn.children[0].classList.toggle("_green",value)
+    }
 
     set isLeft(value:boolean) { this.leftBtn.classList.toggle("active",value)}
 
@@ -88,6 +97,9 @@ export default class TrackElement extends SoundProviderElement {
     get closeBtn() { return this.shadowRoot?.getElementById("close-btn") as HTMLDivElement }
 
     get automationBtn() { return this.shadowRoot?.getElementById("automation") as HTMLDivElement }
+
+    set isMonitoring(value:boolean) { this.monitoringBtn.classList.toggle("_toggled",value)}
+
 
 }
 

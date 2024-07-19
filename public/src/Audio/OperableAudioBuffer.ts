@@ -1,6 +1,7 @@
 
 /**
- * A audio buffer decorator that add some operations to the AudioBuffer class.
+ * A audio buffer decorator that add some operations to manipulate audio buffers.
+ * 
  * @example
  * // You can operate on any AudioBuffer:
  * val buffer = OperableAudioBuffer.make(audioBuffer)
@@ -16,6 +17,8 @@
  * // You can also use the buffer as a normal AudioBuffer:
  * val buffer = OperableAudioBuffer.create({numberOfChannels: 2, length: 44100, sampleRate: 44100})
  * buffer.copyToChannel(new Float32Array(44100), 0)
+ * 
+ * @author Samuel DEMONT
  * 
  */
 export default abstract class OperableAudioBuffer implements AudioBuffer {
@@ -275,6 +278,7 @@ export default abstract class OperableAudioBuffer implements AudioBuffer {
         return newBuffer;
     }
 }
+
 
 class BufferOperableAudioBuffer extends OperableAudioBuffer {
 

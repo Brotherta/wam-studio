@@ -11,9 +11,6 @@ import SoundProvider, { SoundProviderGraphInstance } from "./SoundProvider";
 
 export default class Track extends SoundProvider {
 
-  /** The audio context. */
-  private audioCtx: AudioContext
-  
   /** The junction node to which all region type output are connected. */
   private junctionNode: GainNode
 
@@ -44,9 +41,9 @@ export default class Track extends SoundProvider {
     const new_merged_regions = new Map<RegionType<any>, [RegionOf<any>,RegionPlayer]>()
     for(const [type, regions] of regionMap){
       const merged=Region.mergeAll(regions,true)
-      const player=await merged.createPlayer(this.groupId, this.audioCtx)
+      const player=await merged.createPlayer(this.groupId, this.audioContext)
       player.connect(this.junctionNode)
-      for(const node of this._connectedWamNodes)player.connectEvents(node)
+      player.connectEvents(this.audioInputNode)
       new_merged_regions.set(type, [merged,player])
     }
 
@@ -70,7 +67,7 @@ export default class Track extends SoundProvider {
     this.merged_regions=new_merged_regions
     for(const [type,[region,player]] of old_merged_regions){
       player.disconnect(this.junctionNode)
-      for(const node of this._connectedWamNodes)player.disconnectEvents(node)
+      player.disconnectEvents(this.audioInputNode)
       player.destroy()
     }
 
@@ -80,23 +77,25 @@ export default class Track extends SoundProvider {
   }
   
 
-  constructor(element: TrackElement, audioCtx: AudioContext, groupId: string) {
-    super(element,groupId)
+  constructor(element: TrackElement, audioCtx: BaseAudioContext, groupId: string) {
+    super(element,groupId,audioCtx)
     this.junctionNode=audioCtx.createGain()
-    this.audioCtx=audioCtx
-    this.sampleRecorder=new SampleRecorder(this.element,groupId,audioCtx)
+    this.sampleRecorder=new SampleRecorder(this.element,groupId,this.audioContext)
     this.sampleRecorder.isMerged=false
     this.sampleRecorder.isStereo=true
     this.isSolo=false
     this.isArmed=false
-    this.postInit()
+  }
+
+  override async init(): Promise<void> {
+      await super.init()
+      this.junctionNode.connect(this.audioInputNode)
   }
 
   override get element(){return super.element as TrackElement}
 
   /**
    * Adds a region to the regions list.
-   *
    * @param region - The region to add.
    */
   public addRegion(region: Region): void {
@@ -159,27 +158,6 @@ export default class Track extends SoundProvider {
 
 
   /* CONNECTION */
-  public override _connect(node: AudioNode): void {
-    this.junctionNode.connect(node)
-  }
-
-  public override _disconnect(node: AudioNode): void {
-    this.junctionNode.disconnect(node)
-  }
-
-  private _connectedWamNodes = new Array<WamNode>()
-
-  override _connectEvents(node: WamNode): void{
-    this._connectedWamNodes.push(node)
-    for(const [_,[__,player]] of this.merged_regions){ player.connectEvents(node) }
-  }
-
-  override _disconnectEvents(node: WamNode): void{
-    this._connectedWamNodes.splice(this._connectedWamNodes.indexOf(node),1)
-    for(const [_,[__,player]] of this.merged_regions){ player.disconnectEvents(node) }
-  }
-
-
   public override set playhead(value: number){
     for(const [_,[__,player]] of this.merged_regions){ player.playhead=value }
   }
@@ -195,14 +173,14 @@ export default class Track extends SoundProvider {
   public deleted=false;
   
   /** Should be called when the track is deleted and no more used. */
-  public destroy(){
+  public override destroy(){
+    super.destroy()
     for(const [_,[__,player]] of this.merged_regions){
       player.disconnect(this.junctionNode)
-      for(const node of this._connectedWamNodes)player.disconnectEvents(node)
+      player.disconnectEvents(this.audioInputNode)
       player.destroy()
     }
     this.outputNode.disconnect()
-    this.monitoredOutputNode.disconnect()
     this.deleted=true
   }
 
@@ -279,6 +257,24 @@ export default class Track extends SoundProvider {
   get isArmed(){ return this._isArmed }
 
   private _isArmed: boolean = true
+
+  /**
+   * Is the track monitored.
+   * If a track is monitored, it play what is recorder on the track while it is recording.
+   */
+  public set monitored(value: boolean) {
+    if(this._monitored!=value){
+      if(value)this.sampleRecorder.recordingOutputNode.connect(this.audioInputNode)
+      else this.sampleRecorder.recordingOutputNode.disconnect(this.audioInputNode)
+    }
+    this._monitored=value
+    this.element.isMonitoring=value
+  }
+
+  public get monitored() { return this._monitored }
+
+  private _monitored: boolean=false
+
 }
 
 
@@ -330,7 +326,7 @@ class SampleRecorder{
   private mergerNode: ChannelMergerNode
   private element: TrackElement
   
-  constructor(element: TrackElement, groupId: string, audioContext: AudioContext){
+  constructor(element: TrackElement, groupId: string, audioContext: BaseAudioContext){
     this.element=element;
     this.sab=RingBuffer.getStorageForCapacity(audioContext.sampleRate*2, Float32Array);
     (async ()=>{
@@ -348,6 +344,8 @@ class SampleRecorder{
     try{
       this.splitterNode.disconnect(this.mergerNode)
     }catch(e){}
+
+    if(!this.isListening)return
 
     if(this.isStereo){
       if(this.isMerged){
@@ -392,6 +390,20 @@ class SampleRecorder{
   get isStereo(){ return this._stereo }
 
   private _stereo: boolean = true
+
+  /**
+   * Is the recorder listening to its input.
+   * If not, its output will be silent.
+   */
+  set isListening(value: boolean){
+    this._listening=value
+    this.element.isListening=value
+    this.linkNodes()
+  }
+
+  get isListening(){ return this._listening }
+
+  private _listening: boolean = true
 
   /**
    * The merge state of the track. It is used to know if the track is merged or not.
@@ -442,6 +454,5 @@ class SampleRecorder{
    * is recorded.
    */
   get recordingOutputNode(){ return this.mergerNode }
-  
   
 }

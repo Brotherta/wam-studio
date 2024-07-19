@@ -92,7 +92,9 @@ export default class RecorderController {
     startRecording(track: Track, playhead: number) {
         this.app.host.recording = true;
         const {sampleRecorder}=track
+
         sampleRecorder.recordingOutputNode.connect(sampleRecorder.recorder!);
+        sampleRecorder.isListening=true
 
         let region = new SampleRegion(OperableAudioBuffer.create({
             length: 1, 
@@ -127,7 +129,7 @@ export default class RecorderController {
                             left[i / 2] = pcm[i];
                             right[i / 2] = pcm[i + 1];
                         }
-                        const new_start=this.app.host.playhead-audioBuffer.length/audioBuffer.sampleRate*1000-this.app.host.latency
+                        const new_start=region.end //this.app.host.playhead-audioBuffer.length/audioBuffer.sampleRate*1000-this.app.host.latency
                         this.app.regionsController.updateTemporaryRegion(region, track, new SampleRegion(audioBuffer,new_start));
                     }
                     break;
@@ -150,7 +152,7 @@ export default class RecorderController {
                             left[i / 2] = pcm[i];
                             right[i / 2] = pcm[i + 1];
                         }
-                        const new_start=this.app.host.playhead-audioBuffer.length/audioBuffer.sampleRate*1000-this.app.host.latency
+                        const new_start=region.end //this.app.host.playhead-audioBuffer.length/audioBuffer.sampleRate*1000-this.app.host.latency
                         this.app.regionsController.updateTemporaryRegion(region, track, new SampleRegion(audioBuffer,new_start));
                         track.modified = true;
                     }
@@ -169,6 +171,7 @@ export default class RecorderController {
         const {sampleRecorder}=track
         sampleRecorder.worker?.postMessage({ command: "stopAndSendAsBuffer" });
         sampleRecorder.recorder?.port.postMessage({ "stopRecording": true });
+        sampleRecorder.isListening=false
         sampleRecorder.recordingOutputNode?.disconnect(sampleRecorder.recorder!);
     }
 
