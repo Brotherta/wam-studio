@@ -69,9 +69,6 @@ const moduleCode: InModuleFunction= function({module,moduleId}){
         }
     }
 
-    console.log(imports.WamProcessor.toString())
-    console.log(PassthroughWAMProcessor)
-
     try{ this.registerProcessor(moduleId, PassthroughWAMProcessor) }catch(e){ }
 
 }

@@ -7,6 +7,7 @@ import HostController from "./Controllers/HostController";
 import HostView from "./Views/HostView";
 
 import { audioCtx } from ".";
+import { RingBuffer } from "./Audio/Utils/Buffer/RingBuffer";
 import AutomationController from "./Controllers/AutomationController";
 import EditorController from "./Controllers/Editor/EditorController";
 import LoopController from "./Controllers/Editor/LoopController";
@@ -18,7 +19,7 @@ import KeyboardController from "./Controllers/KeyboardController";
 import LatencyController from "./Controllers/LatencyController";
 import PluginsController from "./Controllers/PluginsController";
 import ProjectController from "./Controllers/ProjectController";
-import RecorderController from "./Controllers/RecorderController";
+import RecorderController from "./Controllers/Recording/RecorderController";
 import SettingsController from "./Controllers/SettingsController";
 import Loader from "./Loader/Loader";
 import Host from "./Models/Track/Host";
@@ -112,6 +113,13 @@ export default class App {
             old(...args)
             console.trace()
         }*/
+
+        const buffer=new ArrayBuffer(256)
+        const array=new Float32Array(4)
+        const pipe=RingBuffer.make(buffer,Float32Array)
+        //@ts-ignore
+        window.pipe=pipe
+
     }
 
     /**

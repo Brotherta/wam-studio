@@ -222,6 +222,7 @@ class ParameterWriter {
  * bytes.
  */
 class ParameterReader {
+
   /**
    * @constructor
    * @param {RingBuffer} ringbuf A RingBuffer setup to hold Uint8.
@@ -233,6 +234,7 @@ class ParameterReader {
     this.array = new Uint8Array(this.mem);
     this.view = new DataView(this.mem);
   }
+  
   /**
    * Attempt to dequeue a single parameter change.
    * @param {Object} o An object with two attributes: `index` and `value`.

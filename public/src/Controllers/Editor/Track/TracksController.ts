@@ -15,6 +15,7 @@ import Track from "../../../Models/Track/Track";
 import { getRandomColor } from "../../../Utils/Color";
 import FriendlyIterable from "../../../Utils/FriendlyIterable";
 import { registerOnKeyDown } from "../../../Utils/keys";
+import RecorderController from "../../Recording/RecorderController";
 
 /**
  * Class that controls the tracks view. It creates, removes and manages the tracks. It also defines the listeners for the tracks.
@@ -233,24 +234,6 @@ export default class TracksController{
     }
   }
 
-  public async newTrackFromDeletedTrack(deletedTrack: Track) {
-    let track = await this.createEmptyTrack();
-    //track.setAudioBuffer(deletedTrack.audioBuffer!);
-    //track.element = deletedTrack.element;
-    track.color = deletedTrack.color;
-    track.isMuted = deletedTrack.isMuted;
-    track.isSolo = deletedTrack.isSolo;
-    track.isSoloMuted = deletedTrack.isSoloMuted;
-    /* TODO track.isMerged = deletedTrack.isMerged;
-    track.left = deletedTrack.left;
-    track.right = deletedTrack.right;
-    track.isStereo = deletedTrack.isStereo;*/
-    track.isArmed = deletedTrack.isArmed;
-    track.monitored = deletedTrack.monitored;
-    track.volume=deletedTrack.volume;
-    track.balance=deletedTrack.balance;
-    return track;
-  }
   /**
    * Jumps audio to the given position in px.
    *
@@ -426,47 +409,59 @@ export default class TracksController{
 
     
     // TRACK ARM
+    const {SAMPLE_RECORDER} = RecorderController
+    this._app.recorderController.getRecorder(track, SAMPLE_RECORDER)
     track.element.armBtn.addEventListener("click", () => {
-      let initialArm: boolean = track.isArmed;
+      const initialArm= this._app.recorderController.isArmed(track, SAMPLE_RECORDER)
       this._app.doIt(true,
-        ()=> this._app.recorderController.clickArm(track),
-        ()=> this._app.recorderController.clickArm(track),
+        ()=> {
+          this._app.recorderController.toggleArm(track, SAMPLE_RECORDER, !initialArm)
+          track.element.isArmed=!initialArm
+        },
+        ()=> {
+          this._app.recorderController.toggleArm(track, SAMPLE_RECORDER, initialArm)
+          track.element.isArmed=initialArm
+        }
       );
     })
 
     // TRACK MODE STEREO or (MONO to STEREO)
-    track.element.modeBtn.addEventListener("click", () => {
-      let initialStereo: boolean = track.sampleRecorder.isStereo
+    track.element.modeBtn.addEventListener("click", async () => {
+      const recorder= await this._app.recorderController.getRecorder(track, SAMPLE_RECORDER)
+      let initialStereo= recorder.isStereo
       this._app.doIt(true,
-        ()=> track.sampleRecorder.isStereo = !initialStereo,
-        ()=> track.sampleRecorder.isStereo = initialStereo,
+        ()=> recorder.isStereo = !initialStereo,
+        ()=> recorder.isStereo = initialStereo,
       )
     })
 
     // TRACK LEFT INPUT
-    track.element.leftBtn.addEventListener("click", () => {
-      let initialLeft: boolean = track.sampleRecorder.left
+    track.element.leftBtn.addEventListener("click", async () => {
+      const recorder= await this._app.recorderController.getRecorder(track, SAMPLE_RECORDER)
+      let initialLeft= recorder.left
       this._app.doIt(true,
-        ()=> track.sampleRecorder.left = !initialLeft,
-        ()=> track.sampleRecorder.left = initialLeft,
+        ()=> recorder.left = !initialLeft,
+        ()=> recorder.left = initialLeft,
       )
     })
 
     // TRACK RIGHT INPUT
-    track.element.rightBtn.addEventListener("click", () => {
-      let initialRight: boolean = track.sampleRecorder.right
+    track.element.rightBtn.addEventListener("click", async () => {
+      const recorder= await this._app.recorderController.getRecorder(track, SAMPLE_RECORDER)
+      let initialRight= recorder.right
       this._app.doIt(true,
-        ()=> track.sampleRecorder.right = !initialRight,
-        ()=> track.sampleRecorder.right = initialRight,
+        ()=> recorder.right = !initialRight,
+        ()=> recorder.right = initialRight,
       )
     })
 
     // TRACK MERGE LEFT/RIGHT
-    track.element.mergeBtn.addEventListener("click", () => {
-      let initialMerge: boolean = track.sampleRecorder.isMerged
+    track.element.mergeBtn.addEventListener("click", async () => {
+      const recorder= await this._app.recorderController.getRecorder(track, SAMPLE_RECORDER)
+      let initialMerge= recorder.isMerged
       this._app.doIt(true,
-        ()=> track.sampleRecorder.isMerged = !initialMerge,
-        ()=> track.sampleRecorder.isMerged = initialMerge,
+        ()=> recorder.isMerged = !initialMerge,
+        ()=> recorder.isMerged = initialMerge,
       )
     })
 

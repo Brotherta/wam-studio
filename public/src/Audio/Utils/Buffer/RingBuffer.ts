@@ -6,8 +6,12 @@ import { TypedArray, TypedArrayConstructor } from "@webaudiomodules/sdk";
  * A first-in-first-out buffer that can be used to communicate between a consumer and a producer.
  * The buffer is implemented as a ring buffer, with a fixed capacity.
  * The buffer can be create thread-safe, and can be used to communicate between a worker and the main thread.
+ * 
+ * It can be upload on the AudioWorklet alone because it depends on no non-type-erased imports.
+ * 
+ * @author Samuel DEMONT
  */
-class PipeBuffer<T extends TypedArrayConstructor> {
+export class RingBuffer<T extends TypedArrayConstructor> {
 
     /**  The internal buffer used to store everything*/
     private _buffer: ArrayBuffer
@@ -54,8 +58,8 @@ class PipeBuffer<T extends TypedArrayConstructor> {
      * @returns The new PipeBuffer
      */
     public static createShared<T extends TypedArrayConstructor>(capacity: number, type: T) {
-        return new PipeBuffer<T>(
-            new SharedArrayBuffer(PipeBuffer.getStorageForCapacity(capacity, type)),
+        return new RingBuffer<T>(
+            new SharedArrayBuffer(RingBuffer.getStorageForCapacity(capacity, type)),
             type
         )
     }
@@ -68,10 +72,23 @@ class PipeBuffer<T extends TypedArrayConstructor> {
      * @returns The new PipeBuffer
      */
     public static createLocal<T extends TypedArrayConstructor>(capacity: number, type: T) {
-        return new PipeBuffer<T>(
-            new ArrayBuffer(PipeBuffer.getStorageForCapacity(capacity, type)),
+        return new RingBuffer<T>(
+            new ArrayBuffer(RingBuffer.getStorageForCapacity(capacity, type)),
             type
         )
+    }
+
+    /**
+     * Wrap a given buffer in a PipeBuffer.
+     * Depending on the type of the buffer, it could be used to communicate between a worker and the main thread.
+     * @param buffer The buffer to wrap
+     * @param type The type of the elements stored in the buffer as a array constructor
+     * @throws If the buffer is not large enough to store the pointers and the elements
+     * @returns The new PipeBuffer
+     */
+    public static make<T extends TypedArrayConstructor>(buffer: ArrayBuffer, type: T) {
+        if(buffer.byteLength < RingBuffer.getStorageForCapacity(1, type))throw Error("The buffer is not large enough to store the pointers and the elements")
+        return new RingBuffer<T>(buffer, type)
     }
 
 
@@ -91,7 +108,7 @@ class PipeBuffer<T extends TypedArrayConstructor> {
      * If not passed, all elements in the input array are pushed.
      * @return the number of elements written to the queue.
      */
-    push(elements: InstanceType<T>, offset = 0, length = elements.length): number {
+    push(elements: InstanceType<T>, offset = 0, length = elements.length-offset): number {
         const rd = Atomics.load(this._read_ptr, 0);
         const wr = Atomics.load(this._write_ptr, 0);
 
@@ -101,8 +118,8 @@ class PipeBuffer<T extends TypedArrayConstructor> {
         const first_part = Math.min(this.capacity - wr, to_write);
         const second_part = to_write - first_part;
 
-        PipeBuffer._copy(elements, offset, this._storage, wr, first_part);
-        PipeBuffer._copy(elements, offset + first_part, this._storage, 0, second_part);
+        RingBuffer._copy(elements, offset, this._storage, wr, first_part);
+        RingBuffer._copy(elements, offset + first_part, this._storage, 0, second_part);
 
         // publish the enqueued data to the other side
         Atomics.store( this._write_ptr, 0, (wr + to_write) % this._capacity );
@@ -123,7 +140,7 @@ class PipeBuffer<T extends TypedArrayConstructor> {
      * not passed, up to elements.length are popped.
      * @return The number of elements read from the queue.
      */
-    pop(elements: InstanceType<T>, offset = 0, length = elements.length) {
+    pop(elements: InstanceType<T>, offset = 0, length = elements.length-offset) {
         const rd = Atomics.load(this._read_ptr, 0);
         const wr = Atomics.load(this._write_ptr, 0);
 
@@ -135,8 +152,8 @@ class PipeBuffer<T extends TypedArrayConstructor> {
         const first_part = Math.min(this._capacity - rd, to_read);
         const second_part = to_read - first_part;
 
-        PipeBuffer._copy(this._storage, rd, elements, offset, first_part);
-        PipeBuffer._copy(this._storage, 0, elements, offset + first_part, second_part);
+        RingBuffer._copy(this._storage, rd, elements, offset, first_part);
+        RingBuffer._copy(this._storage, 0, elements, offset + first_part, second_part);
 
         Atomics.store(this._read_ptr, 0, (rd + to_read) % this._capacity);
 

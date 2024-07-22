@@ -78,7 +78,7 @@ const getProcessor = (moduleId: string) => {
       parameters: Record<string, Float32Array>
     ) {
       super.process(inputs, outputs, parameters);
-
+      if(Math.random()<0.001)console.log("Process ", this._audioWriter, this.sab, this.recording)
       if (this.recording) {
         if (inputs[0].length === 0) return true;
         if (inputs[0]) {

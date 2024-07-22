@@ -25,7 +25,5 @@
         "allowJs": true
     },
     // Folder for your code
-    "include": [
-        "./src/**/*"
-, "static/libs"    ]
+    "include": [ "./src/**/*", "static/libs" ]
 }

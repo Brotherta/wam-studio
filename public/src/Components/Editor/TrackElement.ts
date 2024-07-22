@@ -14,10 +14,10 @@ controls2_template.innerHTML = /*html*/`
     <div id="arm" class="control" style="padding-top: 1px">
         <i class="icon mic-icon" style="width: 15px"></i>
     </div>
-    <div id="mode" class="toggle-control active">mono ⇉ stereo</div>
-    <div id="left" class="toggle-control active">L</div>
-    <div id="right" class="toggle-control">R</div>
-    <div id="merge" class="toggle-control active">merge L / R</div>
+    <div id="mode" class="toggle-control active hidden">mono ⇉ stereo</div>
+    <div id="left" class="toggle-control active hidden">L</div>
+    <div id="right" class="toggle-control hidden">R</div>
+    <div id="merge" class="toggle-control active hidden">merge L / R</div>
 `
 
 const close_template = document.createElement("template")
@@ -50,6 +50,10 @@ export default class TrackElement extends SoundProviderElement {
         }
     }
 
+    set isSampleRecordVisible(value: boolean){
+        this.shadowRoot?.querySelectorAll("#right, #left, #merge, #mode").forEach(it => it.classList.toggle("hidden",!value))
+    }
+
     set isSolo(value: boolean){ ["_green","_toggled"].forEach(it=>this.soloBtn.classList.toggle(it,value)) }
 
     set isStereoMode(value:boolean) {
@@ -72,7 +76,7 @@ export default class TrackElement extends SoundProviderElement {
         this.armBtn.classList.toggle("_toggled",value)
     }
 
-    set isListening(value: boolean){
+    set isRecording(value: boolean){
         this.armBtn.children[0].classList.toggle("_green",value)
     }
 

@@ -498,16 +498,4 @@ export default class EditorController {
         return region
     }
 
-
-
-    private isAccepted(file: DataTransferItem) {
-        if (file.kind === "file") {
-            return true;
-        }
-        else {
-            console.warn("The dragged element is not a file.");
-            return false;
-
-        }
-    }
 }

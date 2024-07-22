@@ -74,6 +74,8 @@ export default class SettingsController {
                 autoGainControl: false
             }
         }
+
+        this.changeInputDevice(this._selectedInputDevice.deviceId)
     }
 
     /**
@@ -132,6 +134,10 @@ export default class SettingsController {
      * @private
      */
     private async changeInputDevice(deviceId: string): Promise<void> {
+        // Disconnect old one
+        this._soundInputNode?.disconnect()
+
+        // Create new one
         this.constraints = {
             audio: {
                 deviceId: deviceId ? {exact: deviceId} : undefined,
@@ -140,17 +146,13 @@ export default class SettingsController {
                 autoGainControl: false
             }
         }
-
-        for (let track of this._app.tracksController.tracks) {
-            const {sampleRecorder} = track
-            if (sampleRecorder.micRecNode) {
-                let stream = await navigator.mediaDevices.getUserMedia(this.constraints);
-                sampleRecorder.micRecNode.disconnect();
-                sampleRecorder.micRecNode = audioCtx.createMediaStreamSource(stream);
-                sampleRecorder.micRecNode.connect(sampleRecorder.recordingInputNode);
-            }
-        }
+        let stream = await navigator.mediaDevices.getUserMedia(this.constraints)
+        this._soundInputNode = audioCtx.createMediaStreamSource(stream)
+        this._soundInputNode.connect(this.soundInputNode)
     }
+
+    private _soundInputNode?: AudioNode
+    public soundInputNode: AudioNode = audioCtx.createGain()
 
     /**
      * Changes the output device of the host.
