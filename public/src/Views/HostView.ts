@@ -77,7 +77,7 @@ export default class HostView {
         this.MetronomeDiv.appendChild(this.MetronomeElement);
     }
     toggleAudioLoopBrowser = this.soundLoopBtn.addEventListener("click", () => {
-        this.audioLoopBrowserDiv.style.display = this.audioLoopBrowserDiv.style.display === "none" ? "flex" : "none";
+        this.audioLoopBrowserDiv.style.display = this.audioLoopBrowserDiv.style.display !== "flex" ? "flex" : "none";
     });
     
     

@@ -19,13 +19,10 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
 
     public recorder: WamAudioWorkletNode;
 
-    public micRecNode: MediaStreamAudioSourceNode;
-
     public app: App
 
     @observed({
         set(this: SampleRegionRecorder, value?: TrackElement) {
-            console.log("setted",value)
             if(value){
                 value.isStereoMode=this.isStereo
                 value.isMerge=this.isMerged
@@ -75,9 +72,7 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
             if(["audioBufferCurrentUpdated","audioBufferFinal"].includes(e.data.command)){
 
                 // Get the buffer
-                console.log(e.data.command)
                 const pcm = new Float32Array(e.data.buffer);
-                console.log(pcm.length)
                 let audioBuffer
                 if(pcm.length>=2){
                     audioBuffer= OperableAudioBuffer.create({ length: pcm.length / 2, sampleRate: audioContext.sampleRate, numberOfChannels: NUM_CHANNELS})
@@ -91,13 +86,11 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
                 else audioBuffer= null
                 
                 // Send message
-                console.log("Switch",e.data.command)
                 switch(e.data.command){
                     case "audioBufferCurrentUpdated":
                         if(audioBuffer)recorder.on_recording_update(new SampleRegion(audioBuffer,0))
                         break
                     case "audioBufferFinal":{
-                        console.log("On audio buffer final")
                         if(audioBuffer)recorder.on_recording_stop(new SampleRegion(OperableAudioBuffer.create({length:1, sampleRate:audioContext.sampleRate, numberOfChannels: NUM_CHANNELS}),0))
                         recorder.isRecording=false
                         recorder._stop_resolver?.()
@@ -136,7 +129,6 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
         if(old_resolver) new_promise.then(()=>old_resolver())
 
         // Stop the worker
-        console.log("stop")
         this.worker.postMessage({ command: "stopAndSendAsBuffer" });
         this.recorder.port.postMessage({ "stopRecording": true });
 
@@ -149,7 +141,9 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
 
     destroy(): void {
         this.app.settingsController.soundInputNode.disconnect(this.splitterNode)
-        throw new Error("Method not implemented.");
+        this.recorder.port.postMessage({ "stopRecording": true });
+        this.worker.terminate()
+        this.recorder.destroy()
     }
 
 
@@ -207,7 +201,6 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
      * If not, its output will be silent.
      */
     private set isRecording(value: boolean) {
-        console.log("setted",value)
         this._is_recording = value
         if(this.trackElement)this.trackElement.isRecording=value
         this.linkNodes()

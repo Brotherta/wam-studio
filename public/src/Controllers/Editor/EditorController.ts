@@ -32,7 +32,6 @@ export default class EditorController {
     static DRAG_LOADERS: ((start:number, file:ArrayBuffer, type: string)=>Promise<RegionOf<any>|null>)[]= [
         // Load MIDI files through note list
         async function(start, buffer, type){
-            console.log("NOTE LIST LOAD,", type)
             const midi= await parseNoteList(buffer)
             if(midi)return new MIDIRegion(midi, start)
             else return null
@@ -40,14 +39,12 @@ export default class EditorController {
         // Load MIDI files
         async function(start, buffer, type){
             if(!["audio/mid"].includes(type))return null
-            console.log("MIDI LOAD,", type)
             const midi= await MIDI.load2(buffer)
             if(midi)return new MIDIRegion(midi, start)
             else return null
         },
         // Load sample files
         async function(start, buffer, type){
-            console.log("SAMPLE TYPE",type)
             if(!["audio/mpeg","audio/ogg","audio/wav","audio/x-wav"].includes(type))return null
             try{
                 let audioArrayBuffer = buffer
@@ -159,10 +156,8 @@ export default class EditorController {
         } else { // Button pressed - Find nearest step and adjust to that step
             this._currentLevel = this.getNearestZoomLevel();
             let level = this._currentLevel;
-            //console.log("level", level)
 
             this._currentLevel = Math.min(this.ZOOM_STEPS - 1, this._currentLevel + 1);
-            //console.log("_currentLevel", this._currentLevel)
 
             if (this._currentLevel === this.ZOOM_STEPS - 1) {
                 this._app.hostView.zoomOutBtn.classList.remove("zoom-enabled");
@@ -222,9 +217,7 @@ export default class EditorController {
 
             if (e.dataTransfer?.getData("audioFileURL")) {
                 // LEt's fetch the audio file and create a new region (drag'n'drop from audio loop browser)
-                console.log("DRAGEGD FILE FROM AUDIO LOOP BROWSER")
                 let audioFileURL = e.dataTransfer?.getData("audioFileURL");
-                console.log("audio file url : " + audioFileURL);
                 this.importDraggedAudioLoop(audioFileURL, e.clientX, e.clientY);
             } else {
                 // check if dragged data is one or several files (drag'n'drop from desktop)
@@ -329,7 +322,12 @@ export default class EditorController {
      * @param clientX - x pos of the drop
      * @param clientY - y pos of the drop
      */
-    private async importDraggedFiles(files: DataTransferItem[], clientX: number, clientY: number) {
+    private async importDraggedFiles(_items: DataTransferItem[], clientX: number, clientY: number) {
+        // /!\ The file have to be getted before the first "await" /!\
+        // The DataTransferItem is emptied, once out of the event listener, if a listener of drop event
+        // call this function, you have to get the files before the first await.
+        const items= _items.map(f => ({type:f.type, file:f.getAsFile()}))
+
         // Get the track under the given position
         const target = await this.getTrackAt(clientX, clientY, true)
         if(!target)return
@@ -337,7 +335,7 @@ export default class EditorController {
         // Then import the loaded files
         let success=false
         let needNewTrack=false
-        for(const file of files){
+        for(const item of items){
             // If need a new track, create a new track
             if(needNewTrack){
                 let next_track=this._app.tracksController.getTrackByPos(this._app.tracksController.getTrackPos(target.track)+1)
@@ -350,11 +348,10 @@ export default class EditorController {
             // Import the file
             const result=await this.importFile(
                 async () => {
-                    const audioFile = file.getAsFile()
+                    const audioFile = item.file
                     if(!audioFile)return null
-                    console.log("Loading", file.type)
                     target.track.element.name=audioFile.name
-                    return {buffer:await audioFile.arrayBuffer(), type: file.type}
+                    return {buffer:await audioFile.arrayBuffer(), type: item.type}
                 },
                 target.track,
                 target.start
@@ -407,9 +404,7 @@ export default class EditorController {
         // Then import the loaded file 
         const result=await this.importFile(
             async () => {
-                console.log("")
                 let file = await fetch(url);
-                console.log("nianianiania", url, file.type)
                 return {buffer:await file.arrayBuffer(), type: file.type}
             },
             target.track,
@@ -476,6 +471,7 @@ export default class EditorController {
         const file = await bufferLoader()
         if(!file){
             this.showLoadingIcon(false)
+            console.error("File could not be loaded")
             return null
         }
 
