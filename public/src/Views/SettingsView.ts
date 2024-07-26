@@ -38,7 +38,6 @@ export default class SettingsView extends DraggableWindow {
         const that=this
         // @ts-ignore
         function onMidiMessage(e: MIDIMessageEvent){
-            console.log("MIDI Message", e)
             that.on_midi_message.forEach((callback)=>callback(e))
         }
 

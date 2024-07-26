@@ -257,7 +257,7 @@ export default class EditorController {
         let offsetPlayhead = this._view.playhead.position.x;
 
         this._view.resizeCanvas();
-        this._view.loop.updatePositionFromTime(this._app.host.loopStart, this._app.host.loopEnd);
+        this._view.loop.updatePositionFromTime(...this._app.hostController.loopRange);
         this._app.automationController.updateBPFWidth();
 
         // let's scroll the viewport + recompute size and pos of the horizontal scrollbar
@@ -338,7 +338,8 @@ export default class EditorController {
         for(const item of items){
             // If need a new track, create a new track
             if(needNewTrack){
-                let next_track=this._app.tracksController.getTrackByPos(this._app.tracksController.getTrackPos(target.track)+1)
+                const tracks=this._app.tracksController.tracks
+                let next_track=tracks.get(tracks.indexOf(target.track)+1)
                 if(next_track==null){
                     next_track=await this._app.tracksController.createTrack()
                 }

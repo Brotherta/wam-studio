@@ -63,8 +63,9 @@ class MIDIRegionPlayer implements RegionPlayer{
     public node
     public wam
 
-    setLoop(start: number|false, end: number): void{
-        this.node.setLoop(start!==false?start:undefined,end)
+    setLoop(range: [number,number]|null): void{
+        console.log("Setting loop",range)
+        this.node.setLoop(range)
     }
 
     connect(node: WamNode): void {
@@ -76,7 +77,6 @@ class MIDIRegionPlayer implements RegionPlayer{
     }
 
     connectEvents(node: WamNode): void {
-        console.log("PROCESSOR, connectEvents")
         this.node.connectEvents(node.instanceId)
     }
 

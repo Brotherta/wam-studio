@@ -23,7 +23,6 @@ function onUp(event: KeyboardEvent){
 document.addEventListener('keyup', onUp)
 
 function onBlur(){
-    console.log('blur')
     for(const key in keyMap){
         delete keyMap[key]
         for(const i in onKeyUpMap) onKeyUpMap[i](key)

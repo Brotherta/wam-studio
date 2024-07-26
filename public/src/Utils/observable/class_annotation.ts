@@ -1,8 +1,10 @@
 
 
+
+
 export interface ObservedOptions<THIS,T>{
     get?(this: THIS, value: T): void
-    set?(this: THIS, value: T): void
+    set?(this: THIS, value: T, oldvalue: T): void
 }
 
 /**
@@ -21,7 +23,7 @@ export function observed<THIS>(options: ObservedOptions<THIS,any>){
 
         // Setter
         let setter: (this:any, value:any)=>void
-        if(set) setter=function(value){ set.call(this,value); this[hidden]=value}
+        if(set) setter=function(value){ set.call(this,value,this[hidden]); this[hidden]=value}
         else setter=function(value){this[hidden]=value}
 
         // Set prototype

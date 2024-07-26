@@ -1,5 +1,6 @@
+import { WamEvent, WamMidiData } from "@webaudiomodules/api";
 import { WamNode, WamProcessor, WebAudioModule } from "@webaudiomodules/sdk";
-import { doInModule, InModuleFunction } from "../Utils/AudioModule/import";
+import { runToModule, WorkletUploadingContextFn } from "../Utils/AudioModule/import";
 
 /**
  * A simple passthrough WebAudioModule.
@@ -40,9 +41,9 @@ class PassthroughWAMNode extends WamNode {
         )
     }
 
-    static override async addModules(audioCtx: BaseAudioContext, moduleId: any) {
-        await super.addModules(audioCtx, moduleId)
-        await doInModule(audioCtx.audioWorklet, moduleId, moduleCode)
+    static override async addModules(audioContext: BaseAudioContext, moduleId: any) {
+        await super.addModules(audioContext, moduleId)
+        await runToModule({audioContext, moduleId}, moduleCode)
     }
 }
 
@@ -50,9 +51,9 @@ class PassthroughWAMNode extends WamNode {
  * @see PassthroughWebAudioModule
  * @author Samuel DEMONT
  */
-const moduleCode: InModuleFunction= function({module,moduleId}){
+const moduleCode: WorkletUploadingContextFn= function({context,moduleId}){
 
-    const imports=module as {WamProcessor: typeof WamProcessor}
+    const imports=context as {WamProcessor: typeof WamProcessor}
 
     class PassthroughWAMProcessor extends imports.WamProcessor {
 
@@ -67,8 +68,13 @@ const moduleCode: InModuleFunction= function({module,moduleId}){
                 }
             }
         }
+        
+        override _processEvent(event: WamEvent): void {
+            this.emitEvents(event)
+        }
+
+        override _onMidi(midiData: WamMidiData): void { }
     }
 
     try{ this.registerProcessor(moduleId, PassthroughWAMProcessor) }catch(e){ }
-
 }

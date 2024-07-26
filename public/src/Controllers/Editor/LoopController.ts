@@ -56,7 +56,7 @@ export default class LoopController {
     this._movingHandle = false;
     this.offsetX = 0;
 
-    this.updateLoopTime(this._view.leftHandle.x, this._view.rightHandle.x);
+    this.setLoopPx([this._view.leftHandle.x, this._view.rightHandle.x]);
     this.bindEvents();
   }
 
@@ -179,7 +179,7 @@ export default class LoopController {
     this._MOVING_HANDLE = MovingHandleEnum.NONE;
     document.body.style.cursor = "default";
 
-    this.updateLoopTime(this._view.leftHandle.x, this._view.rightHandle.x);
+    this.setLoopPx([this._view.leftHandle.x, this._view.rightHandle.x]);
   }
 
   private handleHover(type: MovingHandleEnum): void {
@@ -477,14 +477,12 @@ export default class LoopController {
   /**
    * Updates the loop time in the host
    *
-   * @param leftPos - left handle position in pixels.
-   * @param rightPos - right handle position in pixels.
+   * @param range - left and right handle position in pixels.
    * @private
    */
-  private updateLoopTime(leftPos: number, rightPos: number): void {
-    const leftTime = leftPos * RATIO_MILLS_BY_PX;
-    const rightTime =
-      (rightPos + this._view.rightHandle.width) * RATIO_MILLS_BY_PX;
-    this._app.hostController.updateLoopValue(leftTime, rightTime);
+  private setLoopPx(range: [number,number]): void {
+    const leftTime = range[0] * RATIO_MILLS_BY_PX;
+    const rightTime = (range[1] + this._view.rightHandle.width) * RATIO_MILLS_BY_PX;
+    this._app.hostController.setLoop([leftTime, rightTime]);
   }
 }

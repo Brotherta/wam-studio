@@ -102,7 +102,6 @@ export default class PlayheadView extends Container {
         // left pos of the viewport
         
         this._editor.viewport.moveCenter(this._editor.viewport.left + 0, this._editor.viewport.center.y);
-        console.log("this._editor.viewport.center.x =" + this._editor.viewport.center.y)
 
     }
     /**

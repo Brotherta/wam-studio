@@ -1,11 +1,12 @@
 import { WamNode } from "@webaudiomodules/sdk";
 import { audioCtx } from "../..";
-import App, { crashOnDebug } from "../../App";
+import App from "../../App";
 import AudioPlayerNode from "../../Audio/AudioNode";
 import AudioGraph, { AudioGraphInstance } from "../../Audio/Graph/AudioGraph";
 import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
 import SoundProviderElement from "../../Components/Editor/SoundProviderElement";
 import { MAX_DURATION_SEC } from "../../Env";
+import { ReadOnlyObservableArray } from "../../Utils/observable/observables";
 import SoundProvider, { SoundProviderGraphInstance } from "./SoundProvider";
 import Track, { TrackGraphInstance } from "./Track";
 /**
@@ -35,13 +36,11 @@ export default class Host extends SoundProvider {
      */
     public recording: boolean
 
-    private looping: boolean
-
     metronome: any;
     metronomeOn: any;
     MetronomeElement: any;
     
-    private tracks: Iterable<Track>
+    private tracks: ReadOnlyObservableArray<Track>
 
     public inRecordingMode=false
 
@@ -50,15 +49,20 @@ export default class Host extends SoundProvider {
      * @param app The app
      * @param tracks Its children tracks
      */
-    constructor(app: App, audioContext: BaseAudioContext, tracks: Iterable<Track>) {
+    constructor(app: App, audioContext: BaseAudioContext, tracks: ReadOnlyObservableArray<Track>) {
         super(new SoundProviderElement(),"NO_GROUP_ID", audioContext);
         this.tracks=tracks
+        this.tracks_listener_remove= this.onTrackRemove.bind(this)
+        this.tracks_listener_add= this.onTrackAdd.bind(this)
+        this.tracks.addListener("remove",this.tracks_listener_remove)
+        this.tracks.addListener("add",this.tracks_listener_add)
+        this.tracks.forEach(it=>this.onTrackAdd(it))
+
         this.playhead = 0;
         this.latency = 0;
         this.hostGroupId = "";
 
         this.recording = false;
-        this.looping = false;
 
         this.volume=1;
         this.outputNode.connect(audioCtx.destination)
@@ -96,28 +100,14 @@ export default class Host extends SoundProvider {
         this.outputNode.connect(this.hostNode);
     }
 
-    private previousTracks: SoundProvider[]=[]
     public override update(context: AudioContext, playhead: number): void {
-        // Cleanup
-        for(const track of this.previousTracks){
-            try{
-                track.outputNode.disconnect(this.audioInputNode)
-            }catch(e){crashOnDebug("Failed to disconnect track",e)}
-        }
-        this.previousTracks=[]
-
-        // Connection
         for(const track of this.tracks){
-            this.previousTracks.push(track)
             track.playhead=this.playhead
             if (track.modified){
                 track.update(context, playhead)
                 track.modified=false
             }
-            track.outputNode.connect(this.audioInputNode)
         }
-
-        console.log("Updated on ", this.audioInputNode)
     }
 
     /* PLAYHEAD */
@@ -142,25 +132,14 @@ export default class Host extends SoundProvider {
     /* PLAY AND PAUSE */
     private _playing: boolean=false
 
+
     public get isPlaying(){
         return this._playing
     }
 
     public override play(): void {
-        // Setup children tracks
-        for(const track of this.tracks){
-            track.loop(this.looping)
-            track.updateLoopTime(this.leftTime, this.rightTime)
-        }
-
-        // Setup host node for playhead movement, loop, volume display
-        if(this.hostNode){
-            this.hostNode?.loop(this.looping)
-            this.hostNode.port.postMessage({
-                loopStart: Math.floor(this.leftTime / 1000 * audioCtx.sampleRate),
-                loopEnd: Math.floor(this.rightTime / 1000 * audioCtx.sampleRate),
-            })
-        }
+        // Update loop time
+        this.setLoop(this.loopRange)
 
         // Play
         for(const track of this.tracks) track.play()
@@ -182,31 +161,35 @@ export default class Host extends SoundProvider {
     }
 
 
+    /** ON CHANGE */
+    private tracks_listener_remove: (removed:Track)=>void
+    private tracks_listener_add: (added:Track)=>void
+
+    private onTrackAdd(track: Track){
+        track.outputNode.connect(this.audioInputNode)
+        track.setLoop(this.loopRange)
+        track.playhead=this.playhead
+        if(this._playing) track.play()
+        else track.pause()
+    }
+
+    private onTrackRemove(track: Track){
+        track.outputNode.disconnect(this.audioInputNode)
+    }
+
+
     /** LOOP */
-    public override loop(value: boolean): void {
-        this.looping=value
-        this.hostNode?.loop(value)
-        for(const track of this.tracks) track.loop(value)
-    }
-
-    private leftTime: number=0
-    private rightTime: number=10
-    public override updateLoopTime(leftTime: number, rightTime: number): void {
-        super.updateLoopTime(leftTime, rightTime)
-        this.leftTime=leftTime
-        this.rightTime=rightTime
-        this.hostNode?.port.postMessage({
-            loopStart: Math.floor(this.leftTime / 1000 * audioCtx.sampleRate),
-            loopEnd: Math.floor(this.rightTime / 1000 * audioCtx.sampleRate),
-        })
-        for(const track of this.tracks) track.updateLoopTime(leftTime, rightTime)
-    }
-
-    /**
-     * Is the host looping?
-     */
-    public get doLoop(){ 
-        return this.looping
+    override setLoop(range: [number, number] | null): void {
+        super.setLoop(range)
+        if(this.loopRange){
+            this.hostNode?.loop(true)
+            this.hostNode?.port.postMessage({
+                loopStart: Math.floor(this.loopRange[0] / 1000 * audioCtx.sampleRate),
+                loopEnd: Math.floor(this.loopRange[1] / 1000 * audioCtx.sampleRate),
+            })
+        }
+        else this.hostNode?.loop(false)
+        for(const track of this.tracks) track.setLoop(this.loopRange)
     }
 
     protected override _isModified(): boolean {
@@ -214,6 +197,12 @@ export default class Host extends SoundProvider {
             if (track.modified) return true
         }
         return false
+    }
+
+    onDestroy(){
+        for(const track of this.tracks) this.onTrackRemove(track)
+        this.tracks.removeListener("remove",this.tracks_listener_remove)
+        this.tracks.removeListener("add",this.tracks_listener_add)
     }
 
     /** Audio Graph Creation */

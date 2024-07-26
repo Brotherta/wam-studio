@@ -63,8 +63,8 @@ class SampleRegionPlayer implements RegionPlayer{
 
     public node: SamplePlayerNode
 
-    setLoop(start: number|false, end: number): void{
-        this.node.setLoop(start!==false?start:undefined,end)
+    setLoop(range:[number,number]|null): void{
+        this.node.setLoop(range)
     }
 
     connect(node: AudioNode): void {

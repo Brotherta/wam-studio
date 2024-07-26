@@ -48,7 +48,7 @@ export default interface RegionPlayer{
     /**
      * Set the loop mode.
      */
-    setLoop(start: number|false, end?: number): void
+    setLoop(range: [number,number]|null): void
 
     /**
      * Clear the region player.

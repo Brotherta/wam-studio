@@ -183,7 +183,6 @@ export default class TempoSelectorElement extends HTMLElement {
 
     this.tempoInput.onchange = (event: any) => {
       event.stopPropagation();
-      console.log(event.target.validity)
       if (!event.target?.validity.valid) return;
 
       this.updateTempo(event.target.value);

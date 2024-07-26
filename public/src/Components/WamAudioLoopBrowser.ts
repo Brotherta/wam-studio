@@ -417,7 +417,6 @@ export default class WamAudioLoopBrowser extends HTMLElement {
 
     attachDragListeners() {
         this.shadowRoot.querySelectorAll(".audio-file-item").forEach((audioLoopDiv) => {
-            console.log("audioLoopDiv");
             audioLoopDiv.addEventListener("dragstart", this.dragHandler);
         });
     }
@@ -437,7 +436,6 @@ export default class WamAudioLoopBrowser extends HTMLElement {
 
                     if (audio) {
                         const audioId = audio.id;
-                        console.log("audioId: " + audioId);
                         this.setAudioPriorityAndPlay(audioId);
                     }
                 }
@@ -494,7 +492,6 @@ export default class WamAudioLoopBrowser extends HTMLElement {
                 item = document.createElement("div");
                 item.innerHTML = this.createAudioPlayer(element);
                 item.querySelectorAll(".audio-file-item").forEach((audioLoopDiv) => {
-                    console.log("audioLoopDiv");
                     audioLoopDiv.addEventListener("dragstart", this.dragHandler);
                 });
 

@@ -1,17 +1,27 @@
 import App from "../../App";
 import { RegionOf } from "../../Models/Region/Region";
 import Track from "../../Models/Track/Track";
+import { MIDIRegionRecorder } from "./Recorders/midi/MIDIRegionRecorder";
 import { RegionRecorder } from "./Recorders/RegionRecorder";
+import { RecorderFactory } from "./Recorders/RegionRecorderManager";
 import { SampleRegionRecorder } from "./Recorders/SampleRegionRecorder";
 
 
-export type RecorderFactory<T extends RegionRecorder<any>> = (app: App, track: Track) => Promise<T>
+
+export type CRecorderFactory<T extends RegionRecorder<any>> = RecorderFactory<{app:App,track:Track},T>
 
 export default class RecorderController {
 
-    static SAMPLE_RECORDER:RecorderFactory<SampleRegionRecorder>= async (app,track) =>{
+    /* -~- RECORDERS -~- */
+    static SAMPLE_RECORDER:CRecorderFactory<SampleRegionRecorder>= async ({app,track}) =>{
         const recorder= await SampleRegionRecorder.create(app, track.audioContext, track.groupId)
         recorder.trackElement= track.element
+        return recorder
+    }
+
+    static MIDI_RECORDER:CRecorderFactory<MIDIRegionRecorder>= async ({app,track}) => {
+        const recorder= await MIDIRegionRecorder.create(app)
+        recorder.element=track.element
         return recorder
     }
 
@@ -22,7 +32,7 @@ export default class RecorderController {
     }
 
     /** Starts monitoring on the given track. */
-    startMonitoring(track: Track) { if(track._recording_recorder.size>0) track.monitored= true }
+    startMonitoring(track: Track) { if(track.recorders.armeds.size>0) track.monitored= true }
 
     /** Stops monitoring on the given track. */
     stopMonitoring(track: Track) { track.monitored = false }
@@ -35,36 +45,36 @@ export default class RecorderController {
     }
 
     /** Activate a recorder on the given track. */
-    armRecorder(track: Track, recorder: RecorderFactory<any>) {
-        if(!track._recording_recorder.has(recorder)){
-            track._recording_recorder.add(recorder)
+    armRecorder(track: Track, recorder: CRecorderFactory<any>) {
+        if(!track.recorders.isArmed(recorder)){
+            track.recorders.arm(recorder)
             if(this.app.host.recording) this.startRecordingWith(track,recorder)
         }
     }
 
     /** Deactivate a recorder on the given track. */
-    disarmRecorder(track: Track, recorder: RecorderFactory<any>) {
-        if(track._recording_recorder.delete(recorder)){
-            if(track._recording_recorder.size==0) track.monitored=false
+    disarmRecorder(track: Track, recorder: CRecorderFactory<any>) {
+        if(track.recorders.disarm(recorder)){
+            if(track.recorders.armeds.size==0) track.monitored=false
             if(this.app.host.recording) this.stopRecordingWith(track,recorder)
         }
     }
 
     /** Toggle the armed status of the given recorder on the given track. */
-    toggleArm(track: Track, recorder: RecorderFactory<any>, force?: boolean) {
+    toggleArm(track: Track, recorder: CRecorderFactory<any>, force?: boolean) {
         if(force!==undefined){
             if(force) this.armRecorder(track,recorder)
             else this.disarmRecorder(track,recorder)
         }
         else{
-            if(track._recording_recorder.has(recorder)) this.disarmRecorder(track,recorder)
+            if(track.recorders.isArmed(recorder)) this.disarmRecorder(track,recorder)
             else this.armRecorder(track,recorder)
         }
     }
 
     /** Check if the given recorder is armed on the given track. */
-    isArmed(track: Track, recorder: RecorderFactory<any>) {
-        return track._recording_recorder.has(recorder)
+    isArmed(track: Track, recorder: CRecorderFactory<any>) {
+        return track.recorders.isArmed(recorder)
     }
 
     /**
@@ -76,7 +86,7 @@ export default class RecorderController {
         this.app.host.recording = true;
 
         // Start the recorders
-        const promises= [...track._recording_recorder.values()].map(recorder=>this.startRecordingWith(track,recorder))
+        const promises= [...track.recorders.armeds].map(recorder=>this.startRecordingWith(track,recorder))
         
         // Wait till they are all started
         await Promise.all(promises)
@@ -90,20 +100,10 @@ export default class RecorderController {
         this.app.host.recording = false;
 
         // Stop the recorders
-        const promises= [...track._recording_recorder.values()].map(recorder=>this.stopRecordingWith(track,recorder))
+        const promises= [...track.recorders.armeds].map(recorder=>this.stopRecordingWith(track,recorder))
         
         // Wait till they are all stopped
         await Promise.all(promises)
-    }
-
-    /** Get a recorder of a track, creating it if it does not exist. */
-    async getRecorder<T extends RegionRecorder<any>>(track: Track, recorder: RecorderFactory<T>): Promise<T> {
-        let rec=track.recorders.get(recorder) as T
-        if(!rec){
-            rec= await recorder(this.app,track)
-            track.addRecorder(recorder,rec)
-        }
-        return rec
     }
 
     /**
@@ -111,8 +111,8 @@ export default class RecorderController {
      * @param track The track to record on
      * @param recorderType The type of recorder to use
      */
-    private async startRecordingWith(track:Track, recorderType:RecorderFactory<RegionRecorder<any>>){
-        const recorder= await this.getRecorder(track,recorderType)
+    private async startRecordingWith(track:Track, recorderType:CRecorderFactory<RegionRecorder<any>>){
+        const recorder= await track.recorders.get(recorderType)
 
         // Start the recording
         const playhead=this.app.host.playhead
@@ -141,8 +141,8 @@ export default class RecorderController {
         )
     }
 
-    private async stopRecordingWith(track:Track, recorderType:RecorderFactory<any>){
-        let recorder= track.recorders.get(recorderType)
+    private async stopRecordingWith(track:Track, recorderType:CRecorderFactory<any>){
+        let recorder= await track.recorders.get(recorderType)
         if(!recorder)return
         await recorder.stop()
     }
@@ -152,7 +152,7 @@ export default class RecorderController {
         const recording = !this.app.host.recording;
         this.app.host.recording = recording;
         if (recording) {
-            let firstArmed = this.app.tracksController.tracks.find((e) => e._recording_recorder.size>0);
+            let firstArmed = this.app.tracksController.tracks.find((e) => e.recorders.armeds.size>0);
 
             // Start the recorders
             for (let track of this.app.tracksController.tracks) {

@@ -13,9 +13,10 @@ import SampleRegion from "../../../Models/Region/SampleRegion";
 import SoundProvider from "../../../Models/Track/SoundProvider";
 import Track from "../../../Models/Track/Track";
 import { getRandomColor } from "../../../Utils/Color";
-import FriendlyIterable from "../../../Utils/FriendlyIterable";
 import { registerOnKeyDown } from "../../../Utils/keys";
-import RecorderController from "../../Recording/RecorderController";
+import { ObservableArray, ReadOnlyObservableArray } from "../../../Utils/observable/observables";
+import RecorderController, { CRecorderFactory } from "../../Recording/RecorderController";
+import RegionRecorderManager from "../../Recording/Recorders/RegionRecorderManager";
 
 /**
  * Class that controls the tracks view. It creates, removes and manages the tracks. It also defines the listeners for the tracks.
@@ -35,8 +36,11 @@ export default class TracksController{
   private _oldVolume: number = 0.5;
   private _oldBalance = 1;
 
-  /** The tracks */
-  private readonly track_list: Track[]= []
+  private readonly track_list= new ObservableArray<Track>()
+
+  /** The currents tracks ordered by their position in the editor */
+  public get tracks(): ReadOnlyObservableArray<Track> { return this.track_list}
+
 
   constructor(app: App) {
     this._app = app
@@ -116,6 +120,8 @@ export default class TracksController{
         clearInterval(id);
       }
     }, 100);
+    track.recorders=new RegionRecorderManager({app:this._app,track})
+    track.recorders.connect(track.audioInputNode)
     this.bindTrackEvents(track);
     this.setColor(track,getRandomColor())
     
@@ -156,10 +162,6 @@ export default class TracksController{
     return undefined
   }
 
-  /**
-   * An iterator for iterating over all tracks of all track lists
-   */
-  public readonly tracks=new FriendlyIterable(()=>this.track_list[Symbol.iterator]())
 
   /**
    * Clears all tracks.
@@ -406,28 +408,50 @@ export default class TracksController{
         ()=> track.monitored=oldValue,
       );
     })
-
     
-    // TRACK ARM
-    const {SAMPLE_RECORDER} = RecorderController
+    // TRACK 
+    const that=this
+    /** HELPER METHOD TO REGISTER ARM BUTTON */
+    function linkArmButton(recorder: CRecorderFactory<any>, button: Element, setter: (track:TrackElement,value:boolean)=>void){
+      track.recorders.get(recorder)
+      button.addEventListener("click", () => {
+        const initialArm= that._app.recorderController.isArmed(track, recorder)
+        that._app.doIt(true,
+          ()=> {
+            that._app.recorderController.toggleArm(track, recorder, !initialArm)
+            setter(track.element,!initialArm)
+          },
+          ()=> {
+            that._app.recorderController.toggleArm(track, recorder, initialArm)
+            setter(track.element,initialArm)
+          }
+        );
+      })
+    }
+
+    linkArmButton(RecorderController.SAMPLE_RECORDER, track.element.armBtn, (t,v)=>t.isSampleArmed=v)
+    linkArmButton(RecorderController.MIDI_RECORDER, track.element.midiBtn, (t,v)=>t.isMidiArmed=v)
+
+    /*const {SAMPLE_RECORDER} = RecorderController
     this._app.recorderController.getRecorder(track, SAMPLE_RECORDER)
     track.element.armBtn.addEventListener("click", () => {
       const initialArm= this._app.recorderController.isArmed(track, SAMPLE_RECORDER)
       this._app.doIt(true,
         ()=> {
           this._app.recorderController.toggleArm(track, SAMPLE_RECORDER, !initialArm)
-          track.element.isArmed=!initialArm
+          track.element.isSampleArmed=!initialArm
         },
         ()=> {
           this._app.recorderController.toggleArm(track, SAMPLE_RECORDER, initialArm)
-          track.element.isArmed=initialArm
+          track.element.isSampleArmed=initialArm
         }
       );
-    })
+    })*/
 
     // TRACK MODE STEREO or (MONO to STEREO)
+    const {SAMPLE_RECORDER}=RecorderController
     track.element.modeBtn.addEventListener("click", async () => {
-      const recorder= await this._app.recorderController.getRecorder(track, SAMPLE_RECORDER)
+      const recorder= await track.recorders.get(SAMPLE_RECORDER)
       let initialStereo= recorder.isStereo
       this._app.doIt(true,
         ()=> recorder.isStereo = !initialStereo,
@@ -437,7 +461,7 @@ export default class TracksController{
 
     // TRACK LEFT INPUT
     track.element.leftBtn.addEventListener("click", async () => {
-      const recorder= await this._app.recorderController.getRecorder(track, SAMPLE_RECORDER)
+      const recorder= await track.recorders.get(SAMPLE_RECORDER)
       let initialLeft= recorder.left
       this._app.doIt(true,
         ()=> recorder.left = !initialLeft,
@@ -447,7 +471,7 @@ export default class TracksController{
 
     // TRACK RIGHT INPUT
     track.element.rightBtn.addEventListener("click", async () => {
-      const recorder= await this._app.recorderController.getRecorder(track, SAMPLE_RECORDER)
+      const recorder= await track.recorders.get(SAMPLE_RECORDER)
       let initialRight= recorder.right
       this._app.doIt(true,
         ()=> recorder.right = !initialRight,
@@ -457,7 +481,7 @@ export default class TracksController{
 
     // TRACK MERGE LEFT/RIGHT
     track.element.mergeBtn.addEventListener("click", async () => {
-      const recorder= await this._app.recorderController.getRecorder(track, SAMPLE_RECORDER)
+      const recorder= await track.recorders.get(SAMPLE_RECORDER)
       let initialMerge= recorder.isMerged
       this._app.doIt(true,
         ()=> recorder.isMerged = !initialMerge,
@@ -508,22 +532,6 @@ export default class TracksController{
       if(!soloedTrack)this.tracks.forEach(it=>it.isSoloMuted=false)
       if(soloedTrack)track.isSoloMuted=true
     }
-  }
-
-  /**
-   * Get the track pos in the view.
-   * @param track 
-   * @returns 
-   */
-  public getTrackPos(track: Track): number {
-    return this.track_list.indexOf(track);
-  }
-
-  /**
-   * Get a track by its position in the view
-   */
-  public getTrackByPos(index: number){
-    return this.track_list[index]
   }
 
   async undoTrackRemove(

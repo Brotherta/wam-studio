@@ -300,7 +300,6 @@ export default class PlayheadController {
       let pos = e.data.global.x + this._app.editorView.viewport.left;
       if (pos < 0){
         pos = 0;
-        console.log("pos", pos);
       }
       
       document.body.style.cursor = "grab";

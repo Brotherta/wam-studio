@@ -147,16 +147,6 @@ export default class HostController {
   }
 
   /**
-   * Handles the loop button. It loops the song or not.
-   */
-  public loop(): void {
-    const looping = !this._app.host.doLoop;
-    this._app.host.loop(looping);
-    this._view.updateLoopButton(looping);
-    this._app.editorView.loop.updateActive(looping);
-  }
-
-  /**
    * Handles the mute button. It mutes or unmutes the audio.
    */
   public mute(): void {
@@ -191,15 +181,26 @@ export default class HostController {
     this._view.updateSnapButton(snapping);
   }
 
+   /** Handles the loop button. It loops the song or not. */
+  public loop(): void {
+    const looping = !this._app.host.loopRange
+    this._view.updateLoopButton(looping)
+    this._app.editorView.loop.updateActive(looping)
+    if(looping)this._app.host.setLoop(this._loopRange)
+    else this._app.host.setLoop(null)
+  }
+
   /**
    * Updates the loop value of the host. It is called when the user changes the loop value.
    *
-   * @param leftTime - Time of the left loop in milliseconds.
-   * @param rightTime - Time of the right loop in milliseconds.
+   * @param range - Time of the left and right of the loop in milliseconds.
    */
-  public updateLoopValue(leftTime: number, rightTime: number): void {
-    this._app.host.updateLoopTime(leftTime, rightTime);
+  public setLoop(range: [number,number]): void {
+    this._loopRange=range
+    if(this._app.host.loopRange)this._app.host.setLoop(range)
   }
+  private _loopRange: [number,number] = [0,0]
+  get loopRange(): [number,number]{ return this._loopRange }
 
   /**
    * Handles the import of files by the browser. It creates a new track for each file.

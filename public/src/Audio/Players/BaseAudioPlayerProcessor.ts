@@ -73,6 +73,11 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
     
             // Play the note
             this.play(this.previousPlayhead, this.playhead, msRate, inputs, outputs, parameters)
+            
+            // Loop
+            if(this.loopStart>=0 && this.previousPlayhead<this.loopEnd && this.playhead>this.loopEnd){
+                this.playhead= this.loopStart
+            }
     
             // Move the playhead in the node
             this.port.postMessage({playhead: this.playhead})

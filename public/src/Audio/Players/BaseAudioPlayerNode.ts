@@ -55,10 +55,10 @@ export default class BaseAudioPlayerNode extends WamNode{
      * @param start in sample
      * @param end in sample
      */
-    setLoop(start?:number, end?:number){
+    setLoop(range: [number,number]|null): void{
         this.port.postMessage({
-            loopStart: start ?? -1,
-            loopEnd: end  ?? start ?? -1,
+            loopStart: range?.[0] ?? -1,
+            loopEnd: range?.[1] ?? -1,
         });
     }
 

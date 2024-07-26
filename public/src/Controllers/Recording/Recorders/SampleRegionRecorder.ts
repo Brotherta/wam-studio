@@ -3,12 +3,12 @@ import App from "../../../App";
 import OperableAudioBuffer from "../../../Audio/OperableAudioBuffer";
 import { RingBuffer } from "../../../Audio/Utils/Ringbuffer";
 import { URLFromFiles } from "../../../Audio/Utils/UrlFiles";
-import WamAudioWorkletNode from "../../../Audio/WAM/WamAudioWorkletNode";
-import WamEventDestination from "../../../Audio/WAM/WamEventDestination";
+import SampleRecorderNode from "../../../Audio/WAM/SampleRecorderNode";
+import SampleRecorderWAM from "../../../Audio/WAM/SampleRecorderWAM";
 import TrackElement from "../../../Components/Editor/TrackElement";
 import { NUM_CHANNELS } from "../../../Env";
 import SampleRegion from "../../../Models/Region/SampleRegion";
-import { observed } from "../../../Utils/class_decorators";
+import { observed } from "../../../Utils/observable/class_annotation";
 import { RegionRecorder } from "./RegionRecorder";
 
 export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
@@ -17,7 +17,7 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
 
     public sab: SharedArrayBuffer;
 
-    public recorder: WamAudioWorkletNode;
+    public recorder: SampleRecorderNode;
 
     public app: App
 
@@ -28,15 +28,17 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
                 value.isMerge=this.isMerged
                 value.isLeft=this.left
                 value.isRight=this.right
-                value.isRecording=this.isRecording
+                value.isSampleRecording=this.isRecording
                 value.isSampleRecordVisible=true
             }
         },
     })
     public trackElement?: TrackElement
 
+    private constructor(){}
     static async create(app: App, audioContext: BaseAudioContext, groupId: string): Promise<SampleRegionRecorder> {
-        let recorder = new SampleRegionRecorder();
+        const recorder = new this()
+
         recorder.app=app
 
         // Build the worker file
@@ -50,7 +52,7 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
         // Create the nodes
         recorder.splitterNode= audioContext.createChannelSplitter(NUM_CHANNELS)
         recorder.mergerNode= audioContext.createChannelMerger(NUM_CHANNELS)
-        recorder.recorder= (await WamEventDestination.createInstance(groupId,audioContext,{})).audioNode as WamAudioWorkletNode
+        recorder.recorder= (await SampleRecorderWAM.createInstance(groupId,audioContext,{})).audioNode as SampleRecorderNode
         recorder.linkNodes()
         recorder.mergerNode.connect(recorder.recorder)
         app.settingsController.updateMediaDevices()
@@ -158,8 +160,6 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
             this.splitterNode.disconnect()
         } catch (e) { }
 
-        if(!this.isRecording)return
-
         if (this.isStereo) {
             if (this.isMerged) {
                 this.splitterNode.connect(this.mergerNode, 0, 0);
@@ -202,8 +202,7 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
      */
     private set isRecording(value: boolean) {
         this._is_recording = value
-        if(this.trackElement)this.trackElement.isRecording=value
-        this.linkNodes()
+        if(this.trackElement)this.trackElement.isSampleRecording=value
     }
     get isRecording() { return this._is_recording; }
 

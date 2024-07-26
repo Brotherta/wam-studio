@@ -91,6 +91,20 @@ export abstract class MIDIView{
     }
 
     /**
+     * Create a new MIDI with the start and end of a note at a note each.
+     * The start of a note have a duration of 0.
+     * The end of a note have a duration of 1.
+     */
+    asEvent(): MIDI{
+        const midi=new MIDI(this.instant_duration, this.duration)
+        this.forEachNote((note,start)=>{
+            midi.putNote(new MIDINote(note.note, note.velocity, note.channel, 0), start)
+            midi.putNote(new MIDINote(note.note, note.velocity, note.channel, 1), start+note.duration-1)
+        })
+        return midi
+    }
+
+    /**
      * Create a new MIDI with the same notes but with a recalculated and optimized instant duration.
      * @param retry The number of time to retry the optimization, to get a better result.
      * @param variation A value by which the calculated instant_duration is multiplied.
@@ -113,6 +127,7 @@ export abstract class MIDIView{
                 note_count++
             })
             let range=max_start-min_start
+            if(range==0)range=duration
 
             const optimized=new MIDI(range/note_count*correction, duration)
             from.forEachNote((note,start) => optimized.putNote(note, start))
@@ -501,7 +516,26 @@ export class MIDIAccumulator{
     }
 
     /**
+     * The number of closed notes, the number of notes with a defined end.
+     * @returns The number of closed notes.
+     */
+    get closedCount(){
+        return this.closed_notes.length
+    }
+
+    /**
+     * The number of open notes, the number of notes without a defined end.
+     * @returns The number of open notes.
+     */
+    get openCount(){
+        return Object.keys(this.open_notes).length
+    }
+
+
+
+    /**
      * Return a new MIDI track with all the notes.
+     * Only the notes with a defined end are kept.
      * @returns 
      */
     build(): MIDI{
@@ -510,5 +544,12 @@ export class MIDIAccumulator{
             ret.putNote(note, start)
         }
         return ret.optimized()
+    }
+
+    /**
+     * Remove all the closed notes, the notes with a defined end.
+     */
+    clearClosed(){
+        this.open_notes={}
     }
 }

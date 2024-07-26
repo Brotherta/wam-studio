@@ -1,8 +1,8 @@
 import { WamNode } from "@webaudiomodules/api";
+import App from "../../App";
 import AudioGraph, { AudioGraphInstance } from "../../Audio/Graph/AudioGraph";
 import TrackElement from "../../Components/Editor/TrackElement";
-import { RecorderFactory } from "../../Controllers/Recording/RecorderController";
-import { RegionRecorder } from "../../Controllers/Recording/Recorders/RegionRecorder";
+import RegionRecorderManager from "../../Controllers/Recording/Recorders/RegionRecorderManager";
 import Region, { RegionOf, RegionType } from "../Region/Region";
 import RegionPlayer from "../Region/RegionPlayer";
 import SoundProvider, { SoundProviderGraphInstance } from "./SoundProvider";
@@ -58,36 +58,27 @@ export default class Track extends SoundProvider {
     this.updateMergedRegions()
   }
 
-
-
   /* PLAY */
-  private updatePlayState(){
-    for(const [_,[__,player]] of this.merged_regions){
-      player.isPlaying=this._playing
-      if(!this._doLoop)player.setLoop(false)
-      else player.setLoop(this.loopStart, this.loopEnd)
-    }
+  override setLoop(range: [number, number] | null): void {
+    super.setLoop(range)
+    for(const [_,[__,player]] of this.merged_regions){ player.setLoop(range) }
   }
 
   private _playing=false
   public override play(): void{
     this._playing=true
-    this.updatePlayState()
+    for(const [_,[__,player]] of this.merged_regions){ player.isPlaying=true }
   }
 
   public override pause(): void{
     this._playing=false
-    this.updatePlayState()
-  }
-
-  private _doLoop=false
-  public override loop(value:boolean): void{
-    this.updatePlayState()
+    for(const [_,[__,player]] of this.merged_regions){ player.isPlaying=false }
   }
 
 
   /* CONNECTION */
   public override set playhead(value: number){
+    console.log("playhead at",value)
     for(const [_,[__,player]] of this.merged_regions){ player.playhead=value }
   }
   public override get playhead(): number{
@@ -143,6 +134,7 @@ export default class Track extends SoundProvider {
     for(const [_,[__,player]] of new_merged_regions){
       player.isPlaying=playstate
       player.playhead=playhead
+      player.setLoop(this.loopRange)
     }
 
     // Clear regions
@@ -153,9 +145,6 @@ export default class Track extends SoundProvider {
       player.disconnectEvents(this.audioInputNode)
       player.destroy()
     }
-
-    this.updatePlayState()
-    
   }
 
 
@@ -173,8 +162,7 @@ export default class Track extends SoundProvider {
       player.destroy()
     }
     this.outputNode.disconnect()
-    for(const recorder of this.recorders.values())recorder.destroy()
-    this._recorders.clear()
+    this.recorders.destroy()
     this.deleted=true
   }
 
@@ -242,35 +230,20 @@ export default class Track extends SoundProvider {
 
 
   /* -~- RECORDING -~- */
-  private _recorders= new Map<RecorderFactory<any>,RegionRecorder<RegionOf<any>>>()
-
-  /** The recorders of the track */
-  public get recorders(): Omit<Track['_recorders'], 'set'|'delete'|'clear'>{ return this._recorders }
-
-  /** The recorder that is recording */
-  public _recording_recorder=new Set<RecorderFactory<any>>()
-
-  /** Add a recorder */
-  addRecorder<T extends RegionRecorder<any>>(type: RecorderFactory<T>, recorder: T){
-    this._recorders.set(type,recorder)
-    if(this.monitored)recorder.connect(this.audioInputNode)
-  }
+  public recorders: RegionRecorderManager<{app:App,track:Track}>
 
   /**
    * Is the track monitored.
    * If a track is monitored, it play what is recorder on the track while it is recording.
    */
   public set monitored(value: boolean) {
-    if(this._monitored!=value){
-      if(value) this.recorders.forEach(rec=>rec.connect(this.audioInputNode))
-      else this.recorders.forEach(rec=>rec.disconnect(this.audioInputNode))
+    if(this.recorders){
+      this.recorders.isMonitoring=value
+      this.element.isMonitoring=value
     }
-    this._monitored=value
-    this.element.isMonitoring=value
   }
 
-  public get monitored() { return this._monitored }
-  private _monitored: boolean=false
+  public get monitored() { return this.recorders.isMonitoring }
 
 }
 

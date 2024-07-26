@@ -70,8 +70,8 @@ template.innerHTML = /*html*/`
 
 /* CONTROLS: Togglables elements */
     .control {
-        padding-left: 5px;
-        padding-right: 5px;
+        padding-left: 3px;
+        padding-right: 3px;
     }
 
     .control:not(._toggled){

@@ -41,16 +41,6 @@ export default abstract class SoundProvider {
 
   private _modified: boolean
 
-  /**
-   * Position of the loop start in milliseconds.
-   */
-  public loopStart: number;
-  
-  /**
-   * Position of the loop end in milliseconds.
-   */
-  public loopEnd: number;
-
   constructor(element: SoundProviderElement, readonly groupId: string, readonly audioContext: BaseAudioContext) {
     // Audio Nodes
     this.gainNode = audioContext.createGain();
@@ -68,10 +58,6 @@ export default abstract class SoundProvider {
 
     // Recording controls.
     this.isMuted=false
-
-    // Loop controls.
-    this.loopStart = 0;
-    this.loopEnd = 0;
 
     this.modified=true
 
@@ -154,17 +140,6 @@ export default abstract class SoundProvider {
   }
 
   public get balance() { return this.pannerNode.pan.value }
-  
-  /**
-   * Sets the start and end of the loop.
-   *
-   * @param leftTime - Start of the loop in milliseconds.
-   * @param rightTime - End of the loop in milliseconds.
-   */
-  public updateLoopTime(loopStart: number, loopEnd: number): void {
-    this.loopStart = loopStart;
-    this.loopEnd = loopEnd;
-  }
 
   /**
    * Updates the track cached data when his content has been modified.
@@ -240,7 +215,14 @@ export default abstract class SoundProvider {
 
   public abstract pause(): void
 
-  public abstract loop(value:boolean): void
+
+  /** LOOP */
+  private _loop_range: [number,number]|null = null
+  get loopRange(): [number,number]|null{ return this._loop_range==null ? null : [...this._loop_range]}
+
+  setLoop(range: [number,number]|null){
+    this._loop_range=range
+  }
 
   /** The playhead positions of the track in milliseconds. */
   public abstract playhead: number

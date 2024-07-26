@@ -1,5 +1,6 @@
 import { WamNode } from "@webaudiomodules/api";
 import { RegionOf } from "../../../Models/Region/Region";
+import type RecorderController from "../RecorderController";
 
 
 
@@ -7,6 +8,15 @@ import { RegionOf } from "../../../Models/Region/Region";
 /**
  * A region recorder is responsible of recording. It create a region and record the data in it.
  * Its output can be connected to a node for monitoring.
+ * 
+ * To add a new region recorder, you need to: 
+ * - Implement this interface
+ * - Create a new RecorderFactory in the RecorderController
+ * 
+ * Then you can:
+ * - Arm the recorder using {@link RecorderController#armRecorder}
+ * - You can disarm it using {@link RecorderController#disarmRecorder}
+ * - Check if it is armed using {@link RecorderController#toggleArm}
  */
 export interface RegionRecorder<T extends RegionOf<T>> {
 
@@ -15,7 +25,8 @@ export interface RegionRecorder<T extends RegionOf<T>> {
 
     /**
      * Connect the recorder directly to a node.
-     * Its output will be connected to the node direclty.
+     * Its output will be connected to the node directly.
+     * Used for the monitoring.
      * @param node 
      */
     connect(node: WamNode): void

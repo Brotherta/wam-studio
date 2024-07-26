@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { AudioWorkletGlobalScope } from "@webaudiomodules/sdk";
 
-const getProcessor = (moduleId: string) => {
+const getSampleRecorderProcessor = (moduleId: string) => {
   // @ts-ignore
   const audioWorkletGlobalScope: AudioWorkletGlobalScope = globalThis;
   const { registerProcessor } = audioWorkletGlobalScope;
@@ -11,7 +11,7 @@ const getProcessor = (moduleId: string) => {
 
   const { WamProcessor } = ModuleScope;
 
-  class MyWamProcessor extends WamProcessor {
+  class SampleRecorderProcessor extends WamProcessor {
     audio: Float32Array[][] | undefined;
     playhead: number = 0;
     loopStart: number = 0;
@@ -560,7 +560,6 @@ const getProcessor = (moduleId: string) => {
     let out_idx = 0;
     // let start = chan !== undefined ? chan : 0;
     // let end = chan !== undefined ? chan+1 : input.length;
-    // console.log("CHAN ", start, end)
     for (let i = 0; i < 128; i++) {
       for (let channel = 0; channel < input.length; channel++) {
         // let chanNum = chan !== undefined ? chan : channel;
@@ -572,11 +571,11 @@ const getProcessor = (moduleId: string) => {
 
   try {
     // @ts-ignore
-    registerProcessor(moduleId, MyWamProcessor);
+    registerProcessor(moduleId, SampleRecorderProcessor);
   } catch (error) {
     //console.warn(error);
   }
-  return MyWamProcessor;
+  return SampleRecorderProcessor;
 };
 
-export default getProcessor;
+export default getSampleRecorderProcessor;

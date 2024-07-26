@@ -1,13 +1,13 @@
 import { WebAudioModule } from "@webaudiomodules/sdk";
 import { audioCtx } from "../../index";
-import WamAudioWorkletNode from "./WamAudioWorkletNode";
+import SampleRecorderNode from "./SampleRecorderNode";
 
-export default class WamEventDestination extends WebAudioModule {
+export default class SampleRecorderWAM extends WebAudioModule {
 
     // @ts-ignore
     override async createAudioNode(initialState) {
-        await WamAudioWorkletNode.addModules(audioCtx, this.moduleId);
-        const node: WamAudioWorkletNode = new WamAudioWorkletNode(this);
+        await SampleRecorderNode.addModules(audioCtx, this.moduleId);
+        const node: SampleRecorderNode = new SampleRecorderNode(this);
         // Initialize the node audio node. Register the processor in the audio context and the WAM group.
         node._initialize();
         return node;

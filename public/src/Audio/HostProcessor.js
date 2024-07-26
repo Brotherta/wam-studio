@@ -28,12 +28,12 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
     }
     
     audio = [];
+    previousPlayhead = 0;
     playhead = 0;
     playheadCount = 0;
     blockCount = 0;
     loopStart = 0;
     loopEnd = 0;
-    wasBeforeLoop = false;
 
     
     constructor(options) {
@@ -42,8 +42,8 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
         this.port.onmessage = (e) => {
             if (e.data.audio) this.audio = e.data.audio;
             if (e.data.playhead!==undefined){
-                this.wasBeforeLoop=false;
                 this.playhead = e.data.playhead;
+                this.previousPlayhead = this.playhead;
             }
             if (e.data.loopStart!==undefined)this.loopStart = e.data.loopStart;
             if (e.data.loopEnd!==undefined)this.loopEnd = e.data.loopEnd;
@@ -57,23 +57,20 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
         const bufferSize = outputs[0][0].length;
 
         for (let i = 0; i < bufferSize; i++) {
+            // Playstate
             const playing = !!(i < parameters.playing.length ? parameters.playing[i] : parameters.playing[0]);
-            const loop = !!(i < parameters.loop.length ? parameters.loop[i] : parameters.loop[0]);
             if (!playing) continue; // Not playing
             const audioLength = this.audio[0].length;
-
-            if (loop) {
-                if(this.playhead<this.loopEnd){
-                    this.wasBeforeLoop=true;
-                }
-                if(this.playhead>this.loopEnd && this.wasBeforeLoop){
-                    this.playhead = this.loopStart;
-                }
-            }
-            else this.wasBeforeLoop=false;
-
             this.playhead++;
+
+            // Do loop
+            const loop = !!(i < parameters.loop.length ? parameters.loop[i] : parameters.loop[0]);
+            if(loop && this.previousPlayhead<this.loopEnd && this.playhead>this.loopEnd){
+                this.playhead = this.loopStart
+            }
         }
+
+        
 
         this.playheadCount++;
         if (this.playheadCount >= PLAYHEAD_COUNT_MAX) {
@@ -81,6 +78,8 @@ class AudioPlayerProcessor extends AudioWorkletProcessor {
             this.playheadCount = 0;
         }
         this.calculateMax(inputs[0][0])
+
+        this.previousPlayhead= this.playhead
         return true;
     }
 

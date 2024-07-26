@@ -52,14 +52,13 @@ export function getMIDIPlayerProcessor(moduleId:string){
                 for(const {offset,note} of instant){
                     if(localFrom<=offset && offset<localTo){
                         selectedNote=note.note
-                        /* MIDI BIP BOUP for(let c=0; c<outputs[0].length; c++){
-                            for(let i=0; i<outputs[0][c].length; i++){
-                                outputs[0][c][i] += Math.sin((currentFrame+i)/(selectedNote-200)*20)*0.2;
-                            }
-                        }*/
-                        /* MULTI CHANNEL SUPPORT  : Unactivated because of burns instruments not supporting them
-                        this.current_channel++
-                        if(this.current_channel>=16)this.current_channel=0*/
+                        /*const freq= note.note
+                        const velo= note.velocity*100
+                        const chan= note.channel
+                        const type= note.duration==0 ? 0x90 : 0x80
+                        this.emitEvents(
+                            { type: 'wam-midi', time: currentTime, data: { bytes: new Uint8Array([type | chan, freq, velo]) } },
+                        );*/
                         this.emitEvents(
                             { type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, note.velocity*100]) } },
                             { type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000+note.duration/1000, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, 0]) } },

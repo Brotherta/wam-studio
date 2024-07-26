@@ -1,12 +1,12 @@
 import { addFunctionModule, WamNode, WebAudioModule } from "@webaudiomodules/sdk";
-import getProcessor from "./WamProcessor";
+import getSampleRecorderProcessor from "./SampleRecorderProcessor";
 
-export default class WamAudioWorkletNode extends WamNode {
+export default class SampleRecorderNode extends WamNode {
 
     static override async addModules(audioCtx: AudioContext, moduleId: any) {
         const {audioWorklet} = audioCtx;
         await super.addModules(audioCtx, moduleId);
-        await addFunctionModule(audioWorklet, getProcessor, moduleId);
+        await addFunctionModule(audioWorklet, getSampleRecorderProcessor, moduleId);
     }
 
     constructor(module: WebAudioModule) {
