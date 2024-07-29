@@ -60,9 +60,9 @@ export function getMIDIPlayerProcessor(moduleId:string){
                             { type: 'wam-midi', time: currentTime, data: { bytes: new Uint8Array([type | chan, freq, velo]) } },
                         );*/
                         this.emitEvents(
-                            { type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, note.velocity*100]) } },
-                            { type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000+note.duration/1000, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, 0]) } },
-                            { type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000+note.duration/1000, data: { bytes: new Uint8Array([0x80 | this.current_channel, note.note, note.velocity*100]) } },
+                            { type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, note.velocity*127]) } },
+                            //{ type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000+note.duration/1000, data: { bytes: new Uint8Array([0x90 | this.current_channel, note.note, 0]) } },
+                            { type: 'wam-midi', time: currentTime+ANTI_LATENCY/1000+note.duration/1000, data: { bytes: new Uint8Array([0x80 | this.current_channel, note.note, note.velocity*127]) } },
                         );
                     }
                 }
