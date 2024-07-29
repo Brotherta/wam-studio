@@ -11,11 +11,12 @@ import { runToModule, WorkletUploadingContextFn } from "../Utils/AudioModule/imp
  * You can override it connect it to an audio graph and override its connect method to make a composite node.
  * @author Samuel DEMONT
  */
-export default class PassthroughWebAudioModule extends WebAudioModule<PassthroughWAMNode>{
+export default class PassthroughWAM extends WebAudioModule<PassthroughWAMNode>{
 
     options: ConstructorParameters<typeof PassthroughWAMNode>[1]= {channelCount: 2, numberOfInputOutput: 1}
 
     override async createAudioNode(initialState?: any): Promise<PassthroughWAMNode> {
+        this.descriptor.identifier="WamStudio."+PassthroughWAM.name
         await PassthroughWAMNode.addModules(this.audioContext, this.moduleId)
         const node=new PassthroughWAMNode(this, this.options)
         await node._initialize()
@@ -24,7 +25,7 @@ export default class PassthroughWebAudioModule extends WebAudioModule<Passthroug
 }
 
 /**
- * @see PassthroughWebAudioModule
+ * @see PassthroughWAM
  * @author Samuel DEMONT
  **/
 class PassthroughWAMNode extends WamNode {
@@ -48,7 +49,7 @@ class PassthroughWAMNode extends WamNode {
 }
 
 /**
- * @see PassthroughWebAudioModule
+ * @see PassthroughWAM
  * @author Samuel DEMONT
  */
 const moduleCode: WorkletUploadingContextFn= function({context,moduleId}){

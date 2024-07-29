@@ -49,7 +49,6 @@ const getSampleRecorderProcessor = (moduleId: string) => {
 
     async _onMessage(e: any) {
       await super._onMessage(e)
-
       if ("audio" in e.data) this.audio = e.data.audio
       else if ("playhead" in e.data) this.playhead = Math.round(e.data.playhead)
       else if ("removeAudio" in e.data) this.audio = undefined
@@ -69,7 +68,7 @@ const getSampleRecorderProcessor = (moduleId: string) => {
       this.emitEvents(event);
     }
 
-    _process() {}
+    _process() { }
 
     // @ts-ignore
     process(
@@ -568,6 +567,7 @@ const getSampleRecorderProcessor = (moduleId: string) => {
       }
     }
   }
+
 
   try {
     // @ts-ignore

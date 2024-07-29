@@ -103,7 +103,7 @@ class SampleRegionPlayer implements RegionPlayer{
         return this.node.playhead
     }
 
-    destroy(): void {
+    dispose(): void {
         this.node.disconnectEvents()
         this.node.disconnect()
         this.node.destroy()

@@ -101,6 +101,6 @@ export function getMIDIPlayerProcessor(moduleId:string){
     
     }
 
-    
+    console.log("moduleId",moduleId)
     try{ registerProcessor(moduleId, MIDIPlayerProcessor) } catch(e){}
 }

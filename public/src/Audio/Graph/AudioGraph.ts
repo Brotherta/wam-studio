@@ -45,5 +45,5 @@ export interface AudioGraphInstance{
     /**
      * Destroy the audio graph, making it unusable but freeing resources.
      */
-    destroy():void
+    dispose():void
 }

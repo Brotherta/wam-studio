@@ -43,5 +43,6 @@ export function getSamplePlayerProcessor(moduleId:string){
         }
     
     }
+    console.log("moduleId",moduleId)
     try{ registerProcessor(moduleId, SamplePlayerProcessor) } catch(e){}
 }

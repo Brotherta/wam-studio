@@ -1,7 +1,7 @@
 import { WamNode, WebAudioModule } from "@webaudiomodules/api";
 import { crashOnDebug } from "../../App";
 import AudioGraph from "../../Audio/Graph/AudioGraph";
-import PassthroughWebAudioModule from "../../Audio/Node/PassthroughWebAudioModule";
+import PassthroughWAM from "../../Audio/Node/PassthroughWAM";
 import SoundProviderElement from "../../Components/Editor/SoundProviderElement";
 import Automation from "../Automation";
 import Plugin, { PluginInstance } from "../Plugin";
@@ -70,12 +70,12 @@ export default abstract class SoundProvider {
    * Initialize the input node of the sound provider.
    **/
   async init(){
-    this.inputWAM= await PassthroughWebAudioModule.createInstance(this.groupId, this.audioContext)
+    this.inputWAM= await PassthroughWAM.createInstance(this.groupId, this.audioContext)
     this.audioInputNode.connect(this.pannerNode)
   }
 
   /** Should be called at the sound provider destruction to clean up */
-  destroy(){
+  dispose(){
     this.audioInputNode.destroy()
   }
 
@@ -189,7 +189,7 @@ export default abstract class SoundProvider {
         this.audioInputNode.disconnect(wam.audioNode)
         this.audioInputNode.disconnectEvents(wam.audioNode.instanceId)
       }
-      this.plugin.destroy()
+      this.plugin.dispose()
       this._plugin=null
     }
     // Disconnect from panner node
@@ -288,10 +288,10 @@ export class SoundProviderGraphInstance{
     }
   }
 
-  destroy(): void {
+  dispose(): void {
     this.gainNode.disconnect()
     this.pannerNode.disconnect()
-    this.plugin?.destroy()
+    this.plugin?.dispose()
   }
 
   get inputNode() { return this.plugin ? this.plugin.audioNode : this.pannerNode }

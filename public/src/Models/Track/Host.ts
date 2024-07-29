@@ -243,9 +243,9 @@ export class HostGraphInstance implements AudioGraphInstance{
     disconnect(destination?: AudioNode | undefined): void { this.soundProvider.disconnect(destination) }
     disconnectEvents(destination?: WamNode | undefined): void { this.soundProvider.disconnectEvents(destination) }
     
-    destroy(): void {
-        this.soundProvider.destroy()
-        for(const track of this.tracks) track.destroy()
+    dispose(): void {
+        this.soundProvider.dispose()
+        for(const track of this.tracks) track.dispose()
     }
 
     set playhead(value: number){

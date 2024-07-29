@@ -75,6 +75,7 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
 
                 // Get the buffer
                 const pcm = new Float32Array(e.data.buffer);
+                console.log(pcm.length)
                 let audioBuffer
                 if(pcm.length>=2){
                     audioBuffer= OperableAudioBuffer.create({ length: pcm.length / 2, sampleRate: audioContext.sampleRate, numberOfChannels: NUM_CHANNELS})
@@ -88,6 +89,7 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
                 else audioBuffer= null
                 
                 // Send message
+                console.log(e.data.command, audioBuffer?.length)
                 switch(e.data.command){
                     case "audioBufferCurrentUpdated":
                         if(audioBuffer)recorder.on_recording_update(new SampleRegion(audioBuffer,0))
@@ -120,6 +122,7 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
         this.on_recording_stop=on_stop
         this.worker.postMessage({ command: "startWorker" });
         this.recorder.port.postMessage({ "startRecording": true });
+        console.log("start recording")
     }
 
     stop(): Promise<void> {
@@ -141,7 +144,7 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
 
     private _stop_resolver?: ()=>void
 
-    destroy(): void {
+    dispose(): void {
         this.app.settingsController.soundInputNode.disconnect(this.splitterNode)
         this.recorder.port.postMessage({ "stopRecording": true });
         this.worker.terminate()

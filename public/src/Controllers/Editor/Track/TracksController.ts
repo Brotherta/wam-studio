@@ -145,7 +145,7 @@ export default class TracksController{
       this._view.removeTrack(track.element);
       this._app.automationView.removeAutomationBpf(track.id);
       this._app.waveformController.removeWaveformOfTrack(track);
-      track.destroy()
+      track.dispose()
     }
     else crashOnDebug("TracksController - removeTrack - Track not found!")
   }
@@ -261,7 +261,7 @@ export default class TracksController{
           graph.isPlaying=true
           setTimeout(()=>{
             graph.isPlaying=false
-            graph.destroy()
+            graph.dispose()
           },5000)
         })()
       }

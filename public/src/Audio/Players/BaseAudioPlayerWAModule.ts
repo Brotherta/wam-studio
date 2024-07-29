@@ -14,6 +14,7 @@ export default abstract class BaseAudioPlayerWAModule<T extends BaseAudioPlayerN
 
     ){
         super(groupId,audioContext)
+        this.descriptor.identifier="WamStudio."+this.constructor.name
     }
 
     override async createAudioNode() {

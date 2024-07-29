@@ -40,7 +40,7 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
                 const channel= message.data[0] & 0x0f
                 const note = message.data[1]
                 const velocity = message.data[2]/127
-                const time= Date.now() - this.startTime
+                const time= message.timeStamp - this.startTime
                 console.log("startTime",this.startTime,"date.now",Date.now(),"time",time)
                 console.log("MIDI", noteState, channel, note, velocity, time)
                 if(noteState === 0x90) this.accumulator.noteOn(note, channel, velocity, time)
@@ -50,7 +50,7 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
                     const region = new MIDIRegion(midi,0)
                     this.on_part(region)
                     this.accumulator = new MIDIAccumulator()
-                    this.startTime = Date.now()
+                    this.startTime = message.timeStamp
                 }
             }
             else if(this.on_stop){
@@ -84,7 +84,7 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
         this.on_part= on_part
         this.on_stop= on_stop
         this.accumulator= new MIDIAccumulator()
-        this.startTime= Date.now()
+        this.startTime= performance.now()
     }
 
     stop(): Promise<void> {
@@ -94,7 +94,7 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
         })
     }
 
-    destroy(): void {
+    dispose(): void {
         this.app.settingsView.on_midi_message.delete(this.midi_listener)
     }
 

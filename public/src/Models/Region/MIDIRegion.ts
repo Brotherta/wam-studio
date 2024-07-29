@@ -104,7 +104,7 @@ class MIDIRegionPlayer implements RegionPlayer{
         return this.node.playhead
     }
 
-    destroy(): void {
+    dispose(): void {
         this.node.disconnect()
         this.node.disconnectEvents()
         this.node.destroy()

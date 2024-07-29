@@ -125,9 +125,9 @@ export default class RegionRecorderManager<CONTEXT>{
      * Destroy the record manager and all its recorders.
      * Disconnect all the connected nodes.
      */
-    destroy(){
+    dispose(){
         if(this.isMonitoring)for(let recorder of this._recording_recorders)for(let node of this.connecteds)recorder.disconnect(node)
-        for(let recorder of this._recorders.values())recorder.destroy()
+        for(let recorder of this._recorders.values())recorder.dispose()
         this._recorders.clear()
         this._recording_recorders.clear()
         this._recording_recorders_keys.clear()

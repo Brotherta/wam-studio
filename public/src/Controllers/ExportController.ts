@@ -85,7 +85,7 @@ export default class ExporterController {
         let renderedBuffer = await offlineCtx.startRendering();
         
         // Clean up everything.
-        await graph.destroy()
+        await graph.dispose()
 
         return renderedBuffer
 
@@ -149,7 +149,7 @@ export default class ExporterController {
         let renderedBuffer = await offlineCtx.startRendering();
 
         // Clean up everything.
-        await graph.destroy()
+        await graph.dispose()
 
         this.exportTrackBuffer(renderedBuffer, `${name}_master.wav`);
     }

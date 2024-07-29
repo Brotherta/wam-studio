@@ -55,6 +55,7 @@ export default class Track extends SoundProvider {
    * @param playhead - The playhead position in buffer samples.
    */
   public update(context: AudioContext, playhead: number): void{
+    console.log("Mergeds")
     this.updateMergedRegions()
   }
 
@@ -143,7 +144,7 @@ export default class Track extends SoundProvider {
     for(const [type,[region,player]] of old_merged_regions){
       player.disconnect(this.junctionNode)
       player.disconnectEvents(this.audioInputNode)
-      player.destroy()
+      player.dispose()
     }
   }
 
@@ -154,15 +155,15 @@ export default class Track extends SoundProvider {
   public deleted=false;
   
   /** Should be called when the track is deleted and no more used. */
-  public override destroy(){
-    super.destroy()
+  public override dispose(){
+    super.dispose()
     for(const [_,[__,player]] of this.merged_regions){
       player.disconnect(this.junctionNode)
       player.disconnectEvents(this.audioInputNode)
-      player.destroy()
+      player.dispose()
     }
     this.outputNode.disconnect()
-    this.recorders.destroy()
+    this.recorders.dispose()
     this.deleted=true
   }
 
@@ -260,9 +261,9 @@ export class TrackGraphInstance implements AudioGraphInstance{
   disconnect(destination?: AudioNode | undefined) { this.soundProvider.disconnect(destination) }
   connectEvents(destination: WamNode) { this.soundProvider.connectEvents(destination) }
   disconnectEvents(destination?: WamNode | undefined) { this.soundProvider.disconnectEvents(destination) }
-  destroy(): void {
-    this.soundProvider.destroy()
-    for(const player of this.players)player.destroy()
+  dispose(): void {
+    this.soundProvider.dispose()
+    for(const player of this.players)player.dispose()
   }
 
   set playhead(value: number){

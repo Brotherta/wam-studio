@@ -55,6 +55,6 @@ export interface RegionRecorder<T extends RegionOf<T>> {
 
 
     /* ~ LIFE TIME ~ */
-    /** Destroy the recorder and free its ressources */
-    destroy(): void
+    /** Free the recorders ressources */
+    dispose(): void
 }

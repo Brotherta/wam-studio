@@ -6,6 +6,7 @@ export default class SampleRecorderWAM extends WebAudioModule {
 
     // @ts-ignore
     override async createAudioNode(initialState) {
+        this.descriptor.identifier="WamStudio."+SampleRecorderWAM.name
         await SampleRecorderNode.addModules(audioCtx, this.moduleId);
         const node: SampleRecorderNode = new SampleRecorderNode(this);
         // Initialize the node audio node. Register the processor in the audio context and the WAM group.

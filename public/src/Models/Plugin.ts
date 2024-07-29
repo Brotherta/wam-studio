@@ -75,7 +75,7 @@ export class PluginInstance {
     /**
      * Destroy the plugin instance and remove the GUI.
      */
-    destroy() {
+    dispose() {
         this.instance.audioNode.destroy()
         if(this.isHeadless) this.gui.remove()
         else this.instance.destroyGui(this.gui)
