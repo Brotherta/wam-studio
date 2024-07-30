@@ -371,21 +371,18 @@ export default class HostController {
       this._app.editorView.grid.updateTimeSignature(numerator,denominator)
     })
 
-    this._view.tempoSelector.addEventListener("tempochanged", (event: any) => {
-      // sent by the tempoSelector Web Component (custom event has its data in event.detail)
-      const newTempo = event.detail.tempo;
-
-      if (newTempo < 5 || newTempo > 600) return;
-
-      updateTempo(newTempo);
-
+    this._view.tempoSelector.on_change.add((newTempo)=>{
+      if(newTempo < 5 || newTempo > 600){
+        this._view.tempoSelector.tempo=Math.max(5,Math.min(600,newTempo))
+        return
+      }
+      updateTempo(newTempo)
       this._app.playheadController.moveTo(this._app.host.playhead,false)
 
       // redraw all tracks according to new tempo
       this._app.tracksController.tracks.forEach((track) => {
         // redraw all regions taking into account the new tempo
         // RATIO_MILLS_BY_PX has been updated by updateTemponew(Tempo)
-
         // for all track regions, update their start properties
         for (const region of track.regions) {
           // TEMPO_DELTA (that represents the ration newTempo/oldTempo) has been updated
@@ -399,7 +396,7 @@ export default class HostController {
 
         this._app.editorView.drawRegions(track);
       });
-    });
+    })
 
     // MENU BUTTONS
     this._view.exportProject.addEventListener("click", () => {

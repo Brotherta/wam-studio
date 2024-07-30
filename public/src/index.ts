@@ -7,7 +7,6 @@ import LoadProjectElement from "./Components/Project/LoadProjectElement";
 import LoginElement from "./Components/Project/LoginElement";
 import SaveProjectElement from "./Components/Project/SaveProjectElement";
 import ScrollBarElement from "./Components/ScrollBarElement";
-import TempoSelectorElement from './Components/TempoSelectorElement';
 import ConfirmElement from "./Components/Utils/ConfirmElement";
 import DialogElement from "./Components/Utils/DialogElement";
 import PlaceholderElement from "./Components/Utils/PlaceholderElement";
@@ -48,12 +47,6 @@ customElements.define(
     "export-project-element",
     ExportProjectElement
 );
-
-customElements.define(
-    "tempo-selector-element",
-    TempoSelectorElement
-);
-
 
 
 window.addEventListener('beforeunload', (e) => {

@@ -1,5 +1,5 @@
 import { default as Metronome, default as MetronomeComponent } from "../Components/MetronomeComponent";
-import TempoSelectorElement from "../Components/TempoSelectorElement";
+import TempoElement from "../Components/TempoElement";
 import TimeSignatureElement from "../Components/TimeSignatureElement";
 import AudioLoopBrowser from "../Components/WamAudioLoopBrowser";
 import { RATIO_MILLS_BY_PX } from "../Env";
@@ -24,7 +24,7 @@ export default class HostView {
     timer = document.getElementById("timer") as HTMLDivElement;
 
     tempoDiv = document.getElementById("tempo-selector") as HTMLDivElement;
-    tempoSelector = new TempoSelectorElement() as HTMLElement;
+    tempoSelector = new TempoElement()
 
     audioLoopBrowserDiv = document.getElementById("audio-loop-browser") as HTMLDivElement;
     audioLoopBrowserElement = new AudioLoopBrowser() as HTMLElement;

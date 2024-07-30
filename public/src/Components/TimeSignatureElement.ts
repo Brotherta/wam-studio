@@ -42,6 +42,9 @@ const template = doc/*html*/`
       &:hover{
         font-weight: bold;
       }
+      &:invalid {
+        color:red;
+      }
     }
     #label {
       color: lightgrey;
@@ -51,10 +54,7 @@ const template = doc/*html*/`
       padding: 0;
       border: 0;
     }
-    :host:invalid {
-      color:red;
-    }
-  </style>
+=  </style>
   <div class="time-signature-section">
     <input id="input" value="4/4" id="time-signature" pattern="^([1-9][0-9]*/[1-9][0-9]*)$" maxlength=5> 
     <span id="label">sig</span> 
@@ -73,7 +73,7 @@ export default class TimeSignatureElement extends HTMLElement {
 
   connectedCallback() {
     if (this.shadowRoot !== null) {
-      this.shadowRoot.replaceChildren(template)
+      this.shadowRoot.replaceChildren(template.cloneNode(true))
       this.defineListeners();
     }
   }
@@ -86,15 +86,12 @@ export default class TimeSignatureElement extends HTMLElement {
    */
   get timeSignature(): [number,number] {
     const splitted= this.input.value.split("/")
-    try{
-      return [parseInt(splitted[0]), parseInt(splitted[1])]
-    }catch(e){
-      return [1,1]
-    }
+    return [parseInt(splitted[0])??4, parseInt(splitted[1])??4]
   }
 
   set timeSignature(value: [number,number]) {
-    this.input.value = Math.max(1,value[0]) + "/" + Math.max(1,value[1])
+    this.input.value = Math.max(1,value[0]??1) + "/" + Math.max(1,value[1]??1)
+    this.on_change.forEach(f=>f(this.timeSignature))
   }
 
 
