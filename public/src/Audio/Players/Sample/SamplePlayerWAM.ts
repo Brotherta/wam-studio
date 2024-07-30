@@ -1,9 +1,9 @@
-import BaseAudioPlayerWAModule from "../BaseAudioPlayerWAModule";
+import BaseAudioPlayerWAM from "../BaseAudioPlayerWAM";
 import SamplePlayerNode from "./SamplePlayerNode";
 import { getSamplePlayerProcessor } from "./SamplePlayerProcessor";
 
 
-export default abstract class SamplePlayerWAM extends BaseAudioPlayerWAModule<SamplePlayerNode> {
+export default abstract class SamplePlayerWAM extends BaseAudioPlayerWAM<SamplePlayerNode> {
 
     constructor(groupId: string, audioContext: AudioContext){
         super(

@@ -1,8 +1,10 @@
 import { WamNode } from "@webaudiomodules/api";
 import App from "../../App";
 import AudioGraph, { AudioGraphInstance } from "../../Audio/Graph/AudioGraph";
+import VoidPlayerWAM from "../../Audio/Players/Void/VoidPlayerWAM";
 import TrackElement from "../../Components/Editor/TrackElement";
 import RegionRecorderManager from "../../Controllers/Recording/Recorders/RegionRecorderManager";
+import { observed } from "../../Utils/observable/class_annotation";
 import Region, { RegionOf, RegionType } from "../Region/Region";
 import RegionPlayer from "../Region/RegionPlayer";
 import SoundProvider, { SoundProviderGraphInstance } from "./SoundProvider";
@@ -19,6 +21,8 @@ export default class Track extends SoundProvider {
   override async init(): Promise<void> {
       await super.init()
       this.junctionNode.connect(this.audioInputNode)
+      this._playhead_player=await VoidPlayerWAM.createInstance(this.groupId, this.audioContext) as VoidPlayerWAM
+      this._playhead_player.audioNode.connect(this.junctionNode)
   }
 
   override get element(){return super.element as TrackElement}
@@ -62,17 +66,18 @@ export default class Track extends SoundProvider {
   /* PLAY */
   override setLoop(range: [number, number] | null): void {
     super.setLoop(range)
+    this._playhead_player.audioNode.setLoop(range)
     for(const [_,[__,player]] of this.merged_regions){ player.setLoop(range) }
   }
 
   private _playing=false
   public override play(): void{
-    this._playing=true
+    this._playhead_player.audioNode.isPlaying=true
     for(const [_,[__,player]] of this.merged_regions){ player.isPlaying=true }
   }
 
   public override pause(): void{
-    this._playing=false
+    this._playhead_player.audioNode.isPlaying=false
     for(const [_,[__,player]] of this.merged_regions){ player.isPlaying=false }
   }
 
@@ -80,11 +85,11 @@ export default class Track extends SoundProvider {
   /* CONNECTION */
   public override set playhead(value: number){
     console.log("playhead at",value)
+    this._playhead_player.audioNode.playhead=value
     for(const [_,[__,player]] of this.merged_regions){ player.playhead=value }
   }
   public override get playhead(): number{
-    for(const [_,[__,player]] of this.merged_regions){ return player.playhead }
-    return 0
+    return this._playhead_player.audioNode.playhead
   }
 
 
@@ -98,6 +103,8 @@ export default class Track extends SoundProvider {
 
   /** The merger regions, for each type of region there is big merger region. */
   public merged_regions = new Map<RegionType<any>, [RegionOf<any>,RegionPlayer]>()
+
+  private _playhead_player: VoidPlayerWAM
 
   /** Merge all regions into big merged regions. */
   private async updateMergedRegions(){
@@ -114,6 +121,7 @@ export default class Track extends SoundProvider {
 
     // Merge regions
     const new_merged_regions = new Map<RegionType<any>, [RegionOf<any>,RegionPlayer]>()
+    
     for(const [type, regions] of regionMap){
       const merged=Region.mergeAll(regions,true)
       const player=await merged.createPlayer(this.groupId, this.audioContext)
@@ -122,19 +130,10 @@ export default class Track extends SoundProvider {
       new_merged_regions.set(type, [merged,player])
     }
 
-    // Get playstate
-    let playstate=false
-    let playhead=0
-    for(const [_,[__,player]] of this.merged_regions){
-      playstate=player.isPlaying
-      playhead=player.playhead
-      break
-    }
-
     // Change playstate
     for(const [_,[__,player]] of new_merged_regions){
-      player.isPlaying=playstate
-      player.playhead=playhead
+      player.isPlaying=this._playhead_player.audioNode.isPlaying
+      player.playhead=this._playhead_player.audioNode.playhead
       player.setLoop(this.loopRange)
     }
 
@@ -164,6 +163,7 @@ export default class Track extends SoundProvider {
     }
     this.outputNode.disconnect()
     this.recorders.dispose()
+    this._playhead_player.audioNode.destroy()
     this.deleted=true
   }
 
@@ -201,33 +201,30 @@ export default class Track extends SoundProvider {
   /**
    * Is the track muted by the solo mode of other tracks, if a track is muted it emits no sound
    */
-  public set isSoloMuted(value: boolean) {
-    this._solo_muted=value
-    this.element.isSoloMuted=value
-    this.updateVolume()
-  }
-
-  public get isSoloMuted() { return this._solo_muted }
-
-  private _solo_muted: boolean=false
+  @observed({
+    set(this:Track, value:boolean) {
+      this.element.isSoloMuted=value
+      this.updateVolume()
+    },
+  })
+  public isSoloMuted: boolean=false
   
   /**
    * Is the track soloed, if at least one track is soloed, only soloed tracks emit sound
    * [WARNING] Don't set isSolo directly, use {@link TracksController#setSolo} instead.
    */
-  public set isSolo(value: boolean){
-    if(value){
-      this.isMuted=false
-      this.isSoloMuted=false
-    }
-    this._solo=value
-    this.updateVolume()
-    this.element.isSolo=value
-  }
-
-  public get isSolo() { return this._solo }
-
-  private _solo: boolean=false
+  @observed({
+    set(this:Track, value:boolean) {
+      if(value){
+        this.isMuted=false
+        this.isSoloMuted=false
+        this.element.isSolo=value
+      }
+      this.element.isSoloMuted=value
+      this.updateVolume()
+    },
+  })
+  public isSolo: boolean=false
 
 
   /* -~- RECORDING -~- */

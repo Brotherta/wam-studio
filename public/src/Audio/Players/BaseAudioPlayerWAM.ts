@@ -4,12 +4,12 @@ import BaseAudioPlayerNode from "./BaseAudioPlayerNode";
 /**
  * A base WAM for every audio players.
  */
-export default abstract class BaseAudioPlayerWAModule<T extends BaseAudioPlayerNode> extends WebAudioModule<T> {
+export default abstract class BaseAudioPlayerWAM<T extends BaseAudioPlayerNode> extends WebAudioModule<T> {
 
     constructor(
         groupId: string,
         audioContext: AudioContext,
-        private factory: (wam:BaseAudioPlayerWAModule<T>)=>T,
+        private factory: (wam:BaseAudioPlayerWAM<T>)=>T,
         private processorFn: any
 
     ){
