@@ -1,6 +1,7 @@
 import { WamNode } from "@webaudiomodules/api"
+import Playable from "../General/Playable"
 
-export default interface RegionPlayer{
+export default interface RegionPlayer extends Playable{
     
     /**
      * Connects the player to a node
@@ -27,28 +28,11 @@ export default interface RegionPlayer{
     disconnectEvents(node: WamNode): void
 
     /**
-     * Is the region playing?
-     */
-    set isPlaying(value: boolean)
-    get isPlaying(): boolean
-
-    /**
      * Start playing the audio region with the playhead at the start position and for the duration.
      * @param start Start position in milliseconds
      * @param duration Duration in milliseconds
      */
     playEfficiently(start: number, duration: number): Promise<void>
-
-    /**
-     * The region cursor playhead position in milliseconds.
-     */
-    set playhead(value: number)
-    get playhead(): number
-
-    /**
-     * Set the loop mode.
-     */
-    setLoop(range: [number,number]|null): void
 
     /**
      * Clear the region player.

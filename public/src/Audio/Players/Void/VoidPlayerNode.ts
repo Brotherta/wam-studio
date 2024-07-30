@@ -3,8 +3,8 @@ import { WebAudioModule } from "@webaudiomodules/sdk"
 import BaseAudioPlayerNode from "../BaseAudioPlayerNode"
 
 /**
- * A player node for MIDI files.
- * Can play MIDI files with the given instants and instant_duration.
+ * A player playing nothing.
+ * It just update its playhead depending on the start, stop, and its loop state.
  * @author Samuel DEMONT
  */
 export default class VoidPlayerNode extends BaseAudioPlayerNode{

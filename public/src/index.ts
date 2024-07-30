@@ -8,7 +8,6 @@ import LoginElement from "./Components/Project/LoginElement";
 import SaveProjectElement from "./Components/Project/SaveProjectElement";
 import ScrollBarElement from "./Components/ScrollBarElement";
 import TempoSelectorElement from './Components/TempoSelectorElement';
-import TimeSignatureSelectorElement from './Components/TimeSignatureSelectorElement';
 import ConfirmElement from "./Components/Utils/ConfirmElement";
 import DialogElement from "./Components/Utils/DialogElement";
 import PlaceholderElement from "./Components/Utils/PlaceholderElement";
@@ -55,10 +54,6 @@ customElements.define(
     TempoSelectorElement
 );
 
-customElements.define(
-    "time-signature-selector-element",
-    TimeSignatureSelectorElement
-);
 
 
 window.addEventListener('beforeunload', (e) => {

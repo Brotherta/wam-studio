@@ -367,16 +367,9 @@ export default class HostController {
     });
 
     // Tempo and Time Signature selectors
-    this._view.timeSignatureSelector.addEventListener(
-      "timeSignatureChanged",
-      (event: any) => {
-        // update grid
-        this._app.editorView.grid.updateTimeSignature(
-          event.detail.nbStepsPerBar,
-          event.detail.nbStepsPerBeat
-        );
-      }
-    );
+    this._view.timeSignatureSelector.on_change.add(([numerator,denominator])=>{
+      this._app.editorView.grid.updateTimeSignature(numerator,denominator)
+    })
 
     this._view.tempoSelector.addEventListener("tempochanged", (event: any) => {
       // sent by the tempoSelector Web Component (custom event has its data in event.detail)

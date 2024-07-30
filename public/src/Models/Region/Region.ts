@@ -5,7 +5,7 @@ import RegionPlayer from "./RegionPlayer";
 /**
  * A region on a Track.
  * You can add new region types by extending this class. You should also:
- * - Create a new RegionPlayer clas for the new region type.
+ * - Create a new RegionPlayer class for the new region type.
  * - Write a valid mergeWith method. If not, the regions will make no sound.
  * - Create a new RegionView class for the new region type.
  * - Make sure regionType is unique for each region type.

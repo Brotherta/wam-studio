@@ -33,7 +33,7 @@ export default class Track extends SoundProvider {
    */
   public addRegion(region: Region): void {
     region.trackId=this.id
-    this.regions.push(region);
+    this.regions.push(region)
   }
 
   /**

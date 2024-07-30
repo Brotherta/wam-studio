@@ -1,4 +1,5 @@
 import { BACKEND_URL } from "../Env";
+import TimeSignatureElement from "./TimeSignatureElement";
 
 export default class MetronomeComponent extends HTMLElement {
     private isPlaying: boolean = false;
@@ -14,7 +15,7 @@ export default class MetronomeComponent extends HTMLElement {
     private click2: HTMLAudioElement;
     private metronomeInterval: number | undefined;
     private tempoSelector: HTMLElement;
-    private timeSignatureSelector: HTMLElement;
+    private timeSignatureSelector
     private recordBtn: HTMLDivElement;
     private metroBtn: HTMLDivElement;
     override shadowRoot: ShadowRoot;
@@ -22,7 +23,7 @@ export default class MetronomeComponent extends HTMLElement {
     playBtn: HTMLDivElement;
     metroBtnArrow: HTMLDivElement;
 
-    constructor(tempoSelector: HTMLElement, timeSignatureSelector: HTMLElement) {
+    constructor(tempoSelector: HTMLElement, timeSignatureSelector: TimeSignatureElement) {
         super();
         this.audioContext = new window.AudioContext();
         this.URL_SERVER = BACKEND_URL;
@@ -99,11 +100,9 @@ export default class MetronomeComponent extends HTMLElement {
         });
 
         // Listening to time signature updates
-        this.timeSignatureSelector.addEventListener('timeSignatureChanged', (event: any) => {
-            const newNumerator = event.detail.nbStepsPerBar.toString();
-            const newDenominator = event.detail.nbStepsPerBeat.toString();
-            this.updateTimeSignature(newNumerator, newDenominator);
-        });
+        this.timeSignatureSelector.on_change.add(([numerator,denominator])=>{
+            this.updateTimeSignature(numerator.toString(), denominator.toString())
+        })
 
         this.metroBtnArrow.addEventListener('click', () => {
             const metronomeContainer = this.shadowRoot?.querySelector('.metronome-container') as HTMLDivElement;
