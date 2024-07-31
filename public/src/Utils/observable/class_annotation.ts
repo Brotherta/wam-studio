@@ -34,6 +34,16 @@ export function observed<THIS>(options: ObservedOptions<THIS,any>){
     }
 }
 
+/** @see observed */
+observed.set= function<THIS>(set: (this:THIS, value:any, oldvalue:any)=>void){
+    return observed({set})
+}
+
+/** @see observed */
+observed.get= function<THIS>(get: (this:THIS, value:any)=>void){
+    return observed({get})
+}
+
 export interface MappedOptions<THIS,T>{
     get?(this: THIS, value: T): T
     set?(this: THIS, value: T): T
@@ -64,4 +74,14 @@ export function mapped<THIS,T>(options: MappedOptions<THIS,T>){
             get: getter
         })
     }
+}
+
+/** @see mapped */
+mapped.set= function<THIS,T>(set: (this:THIS, value:T)=>T){
+    return mapped({set})
+}
+
+/** @see mapped */
+mapped.get= function<THIS,T>(get: (this:THIS, value:T)=>T){
+    return mapped({get})
 }

@@ -1,4 +1,4 @@
-import { default as Metronome, default as MetronomeComponent } from "../Components/MetronomeComponent";
+import { default as MetronomeComponent } from "../Components/MetronomeComponent";
 import TempoElement from "../Components/TempoElement";
 import TimeSignatureElement from "../Components/TimeSignatureElement";
 import AudioLoopBrowser from "../Components/WamAudioLoopBrowser";
@@ -33,7 +33,7 @@ export default class HostView {
     timeSignatureSelector = new TimeSignatureElement()
 
     MetronomeDiv = document.getElementById("metronome") as HTMLDivElement;
-    MetronomeElement = new Metronome(this.tempoSelector,this.timeSignatureSelector) as MetronomeComponent;
+    MetronomeElement = new MetronomeComponent();
 
     zoomInBtn = document.getElementById("zoom-in-btn") as HTMLDivElement;
     zoomOutBtn = document.getElementById("zoom-out-btn") as HTMLDivElement;

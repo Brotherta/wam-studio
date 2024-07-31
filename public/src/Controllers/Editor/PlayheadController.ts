@@ -143,7 +143,8 @@ export default class PlayheadController {
 
     this._app.tracksController.jumpTo(pixelPos)
     this._view.moveTo(pixelPos)
-    this._app.hostView.updateTimerByPixelsPos(pixelPos);
+    this._app.hostView.updateTimerByPixelsPos(pixelPos)
+    this._app.hostView.MetronomeElement.playhead= pos
   }
 
   /**

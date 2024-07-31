@@ -95,11 +95,7 @@ export default class HostController {
       this.launchTimerInterval();
 
       // Start the metronome if it's enabled
-      if (host.metronomeOn){
-        (this._view.MetronomeElement).startMetronome();
-      }else{
-        (this._view.MetronomeElement).pauseMetronome();
-      }
+      if (host.metronomeOn) this._view.MetronomeElement.start(host.playhead);
 
     } else {
       // enable zoom buttons when playing is stopped
@@ -122,7 +118,7 @@ export default class HostController {
       }
       if (this._timerInterval) clearInterval(this._timerInterval);
       // Always stop the metronome when playback is stopped
-      (this._view.MetronomeElement).pauseMetronome()
+      this._view.MetronomeElement.stop();
     }
     this._view.updatePlayButton(host.isPlaying, inRecordingMode)
   }
@@ -163,10 +159,9 @@ export default class HostController {
     console.log(`Metronome ${metronomeOn ? "started" : "stopped"}`);
 
     // Start or stop the metronome based on both metronome state and whether playback is active
-    if (metronomeOn && this._app.host.isPlaying) {
-      (this._view.MetronomeElement).startMetronome();
-    }else{
-      (this._view.MetronomeElement).pauseMetronome();
+    if (this._app.host.isPlaying){
+      if(metronomeOn)this._view.MetronomeElement.start(this._app.host.playhead);
+      else this._view.MetronomeElement.stop();
     }
 
     // Update the icon to reflect the new state.
@@ -369,6 +364,7 @@ export default class HostController {
     // Tempo and Time Signature selectors
     this._view.timeSignatureSelector.on_change.add(([numerator,denominator])=>{
       this._app.editorView.grid.updateTimeSignature(numerator,denominator)
+      this._app.hostView.MetronomeElement.timeSignature= [numerator,denominator]
     })
 
     this._view.tempoSelector.on_change.add((newTempo)=>{
@@ -376,6 +372,7 @@ export default class HostController {
         this._view.tempoSelector.tempo=Math.max(5,Math.min(600,newTempo))
         return
       }
+      this._app.hostView.MetronomeElement.tempo= newTempo
       updateTempo(newTempo)
       this._app.playheadController.moveTo(this._app.host.playhead,false)
 
