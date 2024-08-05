@@ -24,7 +24,7 @@ h1{
     padding: 0.5em;
 }
 
-/* WAM SELECTTOR {#f83} */
+/* WAM SELECTOR {#f83} */
 #selector{
     display: flex;
     flex-direction: row;
@@ -33,7 +33,7 @@ h1{
     overflow-x: scroll;
     border-bottom: 0.1rem solid var(--color-front);
 
-    height: 7rem;
+    height: 8rem;
 
     /* A object in the selector */
     >*{
@@ -57,6 +57,34 @@ h1{
         &:hover{ scale: 1.1;}
     }
 }
+
+
+/* MENU */
+.pannel{
+    display: flex;
+    flex-direction: row;
+    ._button{
+        padding: 0.5em;
+        border-right: 0.1rem solid var(--color-front);
+        flex-grow: 1;
+        text-align: center;
+        &._selected{
+            background-color: var(--color-front);
+            color: var(--color-back);
+        }
+        &:not(._selected){
+            cursor: pointer;
+            &:hover{
+                background-color: var(--color-mid);
+            }
+        }
+    }
+    border-bottom: 0.1rem solid var(--color-front);
+}
+.hidden{
+    display: none !important;
+}
+
 
 
 /* WAM CHAIN {#48e} */
@@ -122,6 +150,7 @@ h1{
     ._content{
         margin-top: 2em;
         width: fit-content;
+        min-height: 50%;
     }
     ._loading{
         position: relative;
@@ -178,4 +207,71 @@ h1{
     0%{ transform: rotate(0deg);}
     100%{ transform: rotate(360deg);}
     
+}
+
+
+
+/* REPOSITORY */
+.repository{
+    display: flex;
+    flex-direction: row;
+    height: 8rem;
+    border-bottom: 0.1rem solid var(--color-front);
+    >*{
+        flex-grow: 1;
+        width: 0;
+    }
+    >ul._directories, >ul._files{
+        display: flex;
+        flex-direction: column;
+        list-style: none;
+        padding: 0.1em;
+        padding-left: 0.5em;
+        overflow-y: scroll;
+
+        >li{
+            border-bottom: 0.1rem solid var(--color-front);
+            margin-bottom: 0.1em;
+            padding: 0.1em;
+            &._default::before{
+                content: "📒 ";
+            }
+            &._selected{
+                background-color: var(--color-front);
+                color: var(--color-back);
+                padding-left: 1em;
+            }
+            &:not(._selected){
+                cursor: pointer;
+                &:hover{
+                    background-color: var(--color-mid);
+                }
+            }
+        }
+    }
+    >._content{
+        overflow-y: scroll;
+        padding: 0.5em;
+        >h2{
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        >a{
+            display: block;
+            margin: 0.2em;
+            padding: 0.2em;
+            border: 0.1rem solid var(--color-front);
+            text-align: center;
+            text-decoration: none;
+            color: var(--color-front);
+            cursor: pointer;
+            &:hover{
+                background-color: var(--color-mid);
+            }
+        }
+        >p{
+            margin: 0.1em;
+        }
+    }
 }

@@ -22,6 +22,8 @@ export async function importPedalboard2Library(url, version, id) {
         throw new Pedalboard2Error("bad_version", "The library descriptor at " + url + " does not have a valid version number.");
     if (!validate(json.plugins, Test.EVERY("string")))
         throw new Pedalboard2Error("bad_plugins", "The library descriptor at " + url + " does not have a valid plugins list.");
+    if (json.presets && !validate(json.presets, Test.EVERY_ENTRIES("string", { description: "string", category: "string", state: Test.ANY })))
+        throw new Pedalboard2Error("bad_presets", "The library descriptor at " + url + " have an invalid presets list.");
     if (!validate(json.includes, Test.EVERY({ url: "string", version: VERSION_VALIDATOR, id: ID_VALIDATOR })))
         throw new Pedalboard2Error("bad_includes", "The library descriptor at " + url + " does not have a valid include list.");
     if (id && json.id != id)
@@ -41,7 +43,7 @@ export async function importPedalboard2Library(url, version, id) {
  * @returns
  */
 export async function resolvePedalboard2Library(libDesc, ignored = []) {
-    const ret = { descriptor: libDesc, plugins: {} };
+    const ret = { descriptor: libDesc, plugins: {}, presets: {} };
     ignored.push(libDesc.id);
     // Load the plugins
     for (const pluginUrl of libDesc.plugins) {
@@ -55,6 +57,12 @@ export async function resolvePedalboard2Library(libDesc, ignored = []) {
         descriptor.identifier ??= descriptor.vendor + "." + descriptor.name;
         ret.plugins[descriptor.identifier] = { descriptor, classURL };
     }
+    // Load the presets
+    const preset = ret.presets;
+    for (const [name, presetDesc] of Object.entries(libDesc.presets ?? {})) {
+        preset[presetDesc.category] ??= {};
+        preset[presetDesc.category][name] = presetDesc;
+    }
     // Load the included libraries
     for (const include of libDesc.includes) {
         if (ignored.includes(include.id))
@@ -64,6 +72,11 @@ export async function resolvePedalboard2Library(libDesc, ignored = []) {
         const lib = await resolvePedalboard2Library(subdescriptor, ignored);
         for (const [id, plugin] of Object.entries(lib.plugins))
             ret.plugins[id] = plugin;
+        for (const [category, categoryPresets] of Object.entries(lib.presets ?? {})) {
+            preset[category] ??= {};
+            for (const [name, presetDesc] of Object.entries(categoryPresets))
+                preset[category][name] = presetDesc;
+        }
     }
     return ret;
 }

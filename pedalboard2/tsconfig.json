@@ -10,6 +10,8 @@
         "allowJs": true,
         "noImplicitAny": false,
         "strict": true,
+        "declaration": true,
+        "stripInternal": true,
         "forceConsistentCasingInFileNames": true
     }
 }

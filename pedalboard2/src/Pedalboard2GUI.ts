@@ -8,7 +8,36 @@ import { ArrayLinkId, LinkId } from "./Utils/observable.js";
 const template= doc/*html*/`
     <link rel="stylesheet" href="${import.meta.resolve("./style.css")}">
     <h1>Pedalboard 2</h1>
+    <div class="pannel">
+        <div class="_button" --data-target="selector">Plugins</div>
+        <div class="_button _selected" --data-target="presets">Presets</div>
+        <div class="_button">Macros</div>
+        <div class="_button">Settings</div>
+    </div>
     <div id="selector">
+    </div>
+    <div id="presets" class="repository">
+        <ul class="_directories">
+            <li class="_selected">All</li>
+            <li>Favorites</li>
+            <li>Recent</li>
+            <li>User</li>
+            <li>User</li>
+            <li>User</li>
+            <li>User</li>
+            <li>User</li>
+        </ul>
+        <ul class="_files">
+            <li class="_selected">Preset 1</li>
+            <li>Preset 2</li>
+            <li>Preset 3</li>
+            <li class="_default">Preset 4 </li>
+        </ul>
+        <div class="_content">
+            <a>Load</a>
+            <h2>Tarte</h2>
+            <p>Les tartes sont des gâteaux plats, cuits au four, composés d'une pâte et d'une garniture sucrée ou salée. Les tartes salées sont souvent servies en entrée ou en plat principal, tandis que les tartes sucrées sont servies en dessert.</p>
+        </div>
     </div>
     <div id="modules">
         <div class="_wall">
@@ -17,7 +46,7 @@ const template= doc/*html*/`
         </div>
         <div class="_wall">
             <i class="_connection _input _audio"></i>
-            <i class="_connection _input _midi"></i>
+            <!-- <i class="_connection _input _midi"></i> -->
         </div>
     </div>
 `
@@ -49,6 +78,8 @@ export default class Pedalboard2GUI extends HTMLElement{
     connectedCallback(){
         this.attachShadow({mode:"open"})
         this.shadowRoot?.replaceChildren(template.cloneNode(true)) 
+
+        // Register update handlers
         this.wam_chain_link= this.node.childs.link(
             this.initWAM.bind(this),
             this.closeWAM.bind(this),
@@ -57,6 +88,32 @@ export default class Pedalboard2GUI extends HTMLElement{
             library => this.initLibrary(library),
             library => this.closeLibrary(library)
         )
+
+        // Handle pannel selectors
+        const pannels= this.shadowRoot?.querySelectorAll(".pannel") ?? []
+        for(const pannel of pannels){
+            // Get buttons
+            const buttons= pannel.querySelectorAll(":scope>._button")
+            for(const button of buttons){
+                // Get target
+                const target= this.shadowRoot?.getElementById(button.getAttribute("--data-target")??"__nothing__")
+
+                // Set button
+                button.addEventListener("click", ()=>{
+                    for(const b of buttons){
+                        const tohide= this.shadowRoot?.getElementById(b.getAttribute("--data-target")??"__nothing__")
+                        b.classList.remove("_selected")
+                        if(tohide) tohide.classList.add("hidden")
+                    }
+                    button.classList.add("_selected")
+                    if(target) target.classList.remove("hidden")
+                })
+
+                // Hide by default
+                if(target && !button.classList.contains("_selected")) target.classList.add("hidden")
+            }
+        }
+
     }
 
     disconnectedCallback(){
@@ -97,8 +154,9 @@ export default class Pedalboard2GUI extends HTMLElement{
                 window.appendChild(adoc/*html*/`<i class="_connection _output _audio"></i>`)
             if(wam.descriptor.hasMidiInput)
                 window.appendChild(adoc/*html*/`<i class="_connection _input _midi"></i>`)
-            if(wam.descriptor.hasMidiOutput)
-                window.appendChild(adoc/*html*/`<i class="_connection _output _midi"></i>`)
+            
+            //if(wam.descriptor.hasMidiOutput)
+            //    window.appendChild(adoc/*html*/`<i class="_connection _output _midi"></i>`)
 
             // Remove button
             window.querySelector("._remove")!.addEventListener("click", ()=>{
@@ -164,10 +222,23 @@ export default class Pedalboard2GUI extends HTMLElement{
     protected initLibrary(library: Pedalboard2Library|null){
         this._wait_for_library= this._wait_for_library.then(async()=>{
             console.log("aa",library)
+
+            // Setup
+            const selector= this.shadowRoot?.getElementById("selector")!
+            const preset_repo= this.shadowRoot?.getElementById("presets")!
+            const preset_dir = preset_repo.querySelector(":scope>._directories")!
+            const preset_file= preset_repo.querySelector(":scope>._files")!
+            const preset_desc= preset_repo.querySelector(":scope>._content")!
+
+            // Cleanup
+            selector.replaceChildren()
+            preset_dir.replaceChildren()
+            preset_file.replaceChildren()
+            preset_desc.replaceChildren()
+
             if(!library)return
 
-            const selector= this.shadowRoot?.getElementById("selector")!
-
+            // Plugin Selector
             for(const {descriptor,classURL} of Object.values(library.plugins)){
                 // Get thumbnail
                 const src= await (async()=>{
@@ -199,6 +270,39 @@ export default class Pedalboard2GUI extends HTMLElement{
                     const wam=await this.node.createChildWAM(descriptor.identifier)
                     if(wam==null) return
                     this.node.addChild(wam)
+                })
+            }
+
+            // Presets Directory
+            // Create categories
+            for(const [key,presets] of Object.entries(library.presets)){
+                const category= adoc`<li>${key}</li>`
+                preset_dir.appendChild(category)
+                category.addEventListener("click", ()=>{
+                    for(const it of preset_dir.children) it.classList.remove("_selected")
+                    category.classList.add("_selected")
+                    preset_desc.replaceChildren()
+
+                    // Create presets
+                    preset_file.replaceChildren()
+                    for(const [name,desc] of Object.entries(presets)){
+                        const file= adoc`<li>${name}</li>`
+                        preset_file.appendChild(file)
+                        file.addEventListener("click", ()=>{
+                            for(const it of preset_file.children) it.classList.remove("_selected")
+                            file.classList.add("_selected")
+
+                            // Set description
+                            preset_desc.replaceChildren()
+                            preset_desc.appendChild(adoc/*html*/`<a>Load</a>`)
+                                .addEventListener("click", ()=>{
+                                    this._wait_for_library= this._wait_for_library.then(async()=>await this.node.setState(desc.state))
+                                })
+                            preset_desc.appendChild(adoc`<h2>${name}</h2>`)
+                            preset_desc.appendChild(adoc`<p>${desc.description}</p>`)
+                        })
+                    }
+                    
                 })
             }
         })        

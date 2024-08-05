@@ -22,14 +22,15 @@ console.log(WAM)
 const pedalboard=await WAM.createInstance(groupId,context) as Pedalboard2WAM
 pedalboard.audioNode.connect(context.destination)
 
+// Create GUI
+const gui= await pedalboard.createGui()
+document.getElementById("pedalboard")?.replaceWith(gui)
+
 // Load library
 const descriptor= await importPedalboard2Library(import.meta.resolve("./library.json"))
 const library= await resolvePedalboard2Library(descriptor)
 pedalboard.audioNode.library.value=library
-
-// Create GUI
-const gui= await pedalboard.createGui()
-document.getElementById("pedalboard")?.replaceWith(gui)
+console.log(descriptor,library)
 
 // Create and connect piano WAM
 let piano: WebAudioModule<WamNode>
@@ -45,3 +46,10 @@ let piano: WebAudioModule<WamNode>
 // Connect player
 const player= document.getElementById("player") as HTMLAudioElement
 context.createMediaElementSource(player).connect(pedalboard.audioNode)
+
+document.addEventListener("keypress",async e=>{
+    console.log(e.key)
+    if(e.key==="a"){
+        console.log(await JSON.stringify(await pedalboard.audioNode.getState()))
+    }
+})

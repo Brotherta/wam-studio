@@ -10,7 +10,8 @@
   "scripts": {
     "host": "node server/server.js",
     "watch": "tsc -w",
-    "start": ".\\server\\node_modules\\.bin\\concurrently -n watch,host -c red,blue npm:watch npm:host"
+    "start": ".\\server\\node_modules\\.bin\\concurrently -n watch,host -c red,blue npm:watch npm:host",
+    "generate_schema": "cd server && npx ts-json-schema-generator --path \"../src/Pedalboard2Library.ts\" --type \"Pedalboard2LibraryDescriptor\" --no-type-check --tsconfig \"../tsconfig.json\" > \"../static/library_schema.json\""
   },
   "keywords": [
     "pedalboard",

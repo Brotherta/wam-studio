@@ -1,3 +1,4 @@
+import { Pedalboard2NodeState } from "./Pedalboard2Node"
 import { Test, validate } from "./Utils/validate.js"
 import { WamDescriptor } from "./webaudiomodules/api/index.js"
 
@@ -6,7 +7,7 @@ export interface Pedalboard2LibraryDescriptor{
     /** The name of the library */
     name: string
 
-    /** A unique identifier for the library */
+    /** A unique identifier for the library **/
     id: string
 
     /** The url of the library, should not be provided by the json */
@@ -21,6 +22,15 @@ export interface Pedalboard2LibraryDescriptor{
 
     /** A list of urls to the main js file of WAMs, relative to the descriptor url */
     plugins: string[]
+
+    /** A list of builtin presets */
+    presets?: {
+        [preset_name:string]:{
+            description: string,
+            category: string,
+            state: Pedalboard2NodeState
+        }
+    }
 
     /** 
      * A list of urls to other Pedalboard2 Libraries this library include with their compatible version and their id.
@@ -42,6 +52,14 @@ export interface Pedalboard2Library{
             classURL:string
         }
     },
+    presets: {
+        [category_name:string]:{
+            [preset_name:string]:{
+                description: string,
+                state: Pedalboard2NodeState
+            }
+        }
+    }
 }
 
 export class Pedalboard2Error extends Error{
@@ -49,7 +67,7 @@ export class Pedalboard2Error extends Error{
         readonly type: "bad_name" | "bad_id" | "bad_version"
         | "bad_plugins" | "bad_includes" | "incompatible_id"
         | "incompatible_version" | "missing_default" | "not_a_wam"
-        | "missing_descriptor",
+        | "missing_descriptor" | "bad_presets",
         message: string,
     ){
         super(message)
@@ -83,6 +101,10 @@ export async function importPedalboard2Library(url: string, version?: [number,nu
     )throw new Pedalboard2Error("bad_plugins", "The library descriptor at "+url+" does not have a valid plugins list.")
 
     if(
+        json.presets && !validate(json.presets, Test.EVERY_ENTRIES("string",{description:"string", category:"string", state:Test.ANY}))
+    )throw new Pedalboard2Error("bad_presets", "The library descriptor at "+url+" have an invalid presets list.")
+
+    if(
         !validate(json.includes, Test.EVERY({url:"string", version:VERSION_VALIDATOR, id:ID_VALIDATOR}))
     )throw new Pedalboard2Error("bad_includes", "The library descriptor at "+url+" does not have a valid include list.")
 
@@ -107,7 +129,7 @@ export async function importPedalboard2Library(url: string, version?: [number,nu
  * @returns 
  */
 export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescriptor, ignored:string[]=[]): Promise<Pedalboard2Library>{
-    const ret: Pedalboard2Library={descriptor: libDesc, plugins:{}}
+    const ret: Pedalboard2Library={descriptor: libDesc, plugins:{}, presets:{}}
     ignored.push(libDesc.id)
 
     // Load the plugins
@@ -125,6 +147,13 @@ export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescr
         ret.plugins[descriptor.identifier]={descriptor, classURL}
     }
 
+    // Load the presets
+    const preset = ret.presets
+    for(const [name, presetDesc] of Object.entries(libDesc.presets??{})){
+        preset[presetDesc.category]??={}
+        preset[presetDesc.category][name]=presetDesc
+    }
+
     // Load the included libraries
     for(const include of libDesc.includes){
         if(ignored.includes(include.id))continue
@@ -132,6 +161,10 @@ export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescr
         const subdescriptor=await importPedalboard2Library(fetchUrl, include.version, include.id)
         const lib=await resolvePedalboard2Library(subdescriptor, ignored)
         for(const [id,plugin] of Object.entries(lib.plugins))ret.plugins[id]=plugin
+        for(const [category,categoryPresets] of Object.entries(lib.presets??{})){
+            preset[category]??={}
+            for(const [name, presetDesc] of Object.entries(categoryPresets))preset[category][name]=presetDesc
+        }
     }
 
     return ret

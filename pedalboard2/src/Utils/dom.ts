@@ -9,6 +9,7 @@ function escapeHtml(unsafe: String)
         .replace(/'/g, "&#039;");
 }
 
+
 /**
  * Create a document fragment from a template string.
  * Support for nodes and iterable values.

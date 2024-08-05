@@ -342,6 +342,16 @@ export class Pedalboard2Node extends WamNode {
 			this.port.postMessage({ id, request, content });
 		});
     }
+
+
+
+    //// -~- SETTINGS -~- ////
+    /**
+     * Do the pedalboard should broadcast the events to all the plugins ?
+     * If not, the events are passed to the first plugin, and propagated normally through the graph.
+     * TODO: Add this parameter
+     */
+    /* readonly doBroadcastEvents = new Observable<boolean>(true)*/
 }
 
 export type Pedalboard2NodeState= {

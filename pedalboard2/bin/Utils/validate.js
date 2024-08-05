@@ -54,6 +54,13 @@ export const Test = {
     NEGATIVE: value => typeof value == "number" && value <= 0,
     /** Test if this is an array of any size with all value matching the validator */
     EVERY(validator) { return value => Array.isArray(value) && value.every(it => validate(it, validator)); },
+    /** Test if this is an object with all entries matching the validator */
+    EVERY_ENTRIES(key, validator) {
+        return value => {
+            return typeof value == "object" && Object.entries(value).every(([k, v]) => validate(k, key) && validate(v, validator));
+        };
+    },
+    ANY: value => true,
     /** Test if the value is undefined or matching the validator */
     OPTIONAL(validator) { return value => value === undefined || validate(value, validator); }
 };
