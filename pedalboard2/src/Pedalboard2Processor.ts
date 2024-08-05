@@ -35,10 +35,15 @@ export function getPedalboard2Processor(moduleId: string){
         // Do nothing to the audio
         // Just copy the input to the output
         _process(startSample: number, endSample: number, inputs: Float32Array[][], outputs: Float32Array[][], parameters: Record<string, Float32Array>): void {
-            for(let c=0; c<outputs.length; c++){
-                for(let i=0; i<outputs[c].length; i++){
-                    outputs[c][i].set(inputs[c][i])
-                }
+            // For only first input and output
+            const input= inputs[0]
+            const output= outputs[0]
+            // For each channel
+            for(let c=0; c<input.length; c++){
+                const inChannel= input[c]
+                const outChannel= output[c]
+                // Copy samples of the provided range
+                outChannel.set(inChannel.subarray(startSample, endSample), startSample)
             }
         }
 

@@ -30,7 +30,7 @@ export class Pedalboard2Node extends WamNode {
             outputChannelCount: [2],
         });
         console.log("Pedalboard2Node constructor");
-        this.connect(this._outputNode);
+        super.connect(this._outputNode);
     }
     async _initialize() {
         await super._initialize();
@@ -53,6 +53,10 @@ export class Pedalboard2Node extends WamNode {
      * @param onConnectEvent The callback to call for each call to {@link WamNode.connectEvents}
      */
     calculateConnections(onConnect, onConnectEvent) {
+        // Bypass overload of connect, disconnect, etc...
+        const overloads = Object.getPrototypeOf(this);
+        const originals = Object.getPrototypeOf(overloads);
+        Object.setPrototypeOf(this, originals);
         let audioToConnect = [this]; // WamNodes waiting for a to node to connect their audio to
         for (let [{ audioNode }, descriptor] of this._childs) {
             // An audio input is found, connect all the waiting nodes to it
@@ -67,6 +71,7 @@ export class Pedalboard2Node extends WamNode {
         }
         // Remaining nodes are connected to the output
         audioToConnect.forEach(from => onConnect(from, this._outputNode));
+        Object.setPrototypeOf(this, overloads);
     }
     /** Build the graph depending on the structure defined by {@link calculateConnections} */
     async build() {
