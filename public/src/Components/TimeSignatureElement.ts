@@ -96,7 +96,13 @@ export default class TimeSignatureElement extends HTMLElement {
 
 
   private defineListeners() {
-    this.input.addEventListener("change", (event)=> this.on_change.forEach(f=>f(this.timeSignature)))
+    this.input.addEventListener("change", (event)=> {
+      if(!this.input.validity.valid){
+        this.input.value="4/4"
+      }
+      console.log("change", this.timeSignature)
+      this.on_change.forEach(f=>f(this.timeSignature))
+    })
   }
 
   readonly on_change= new Set<(newTimeSignature:[number,number])=>void>()

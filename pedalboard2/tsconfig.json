@@ -1,0 +1,15 @@
+{
+    "include": ["src/**/*.ts"],
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ES2022",
+        "moduleResolution": "Node",
+        "esModuleInterop": true,
+        "outDir": "./bin",
+        "rootDir": "./src",
+        "allowJs": true,
+        "noImplicitAny": false,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true
+    }
+}

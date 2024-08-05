@@ -1,0 +1,17 @@
+{
+  "name": "pedalboard2",
+  "version": "1.0.0",
+  "description": "A pedalboard able to combine multiples WAMs as one WAM.",
+  "main": "index.js",
+  "keywords": [
+    "pedalboard"
+  ],
+  "author": "Jempasam",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "express": "^4.19.2",
+    "pedalboard2": "file:",
+    "typescript": "^5.5.4"
+  }
+}

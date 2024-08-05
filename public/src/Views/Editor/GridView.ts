@@ -13,7 +13,7 @@ export default class GridView extends Container {
   public grid: Graphics;
   private listOfTextElements: Text[] = [];
   private nbStepsPerBar: number = 4;
-  private nbStepsPerBeat: number = 4;
+  private stepNote: number = 4;
   private bpm:number = 120;
   // useful for snapping in EditorView
   public cellSize:number = 100;
@@ -29,9 +29,9 @@ export default class GridView extends Container {
     this.draw();
   }
 
-  updateTimeSignature(nbStepsPerBar:number, nbStepsPerBeat:number) {
+  updateTimeSignature(nbStepsPerBar:number, stepNote:number) {
     this.nbStepsPerBar = nbStepsPerBar;
-    this.nbStepsPerBeat = nbStepsPerBeat;
+    this.stepNote = stepNote;
     this.updateGrid();
   }
 
@@ -61,7 +61,7 @@ export default class GridView extends Container {
     */
     // MB test. Just compute width of grid for tempo = 120, adjust by multiplying by zoom level.
     // For 4/4 time signature, 4 steps per bar, 4 beats per bar, 1 beat per step
-    let barWidth = (2000/DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM) * ZOOM_LEVEL;
+    let barWidth = (2000/DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM) * ZOOM_LEVEL * 4 / this.stepNote;
     let stepWidth = barWidth / 4;
     this.cellSize = stepWidth;
 

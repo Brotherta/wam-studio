@@ -1,0 +1,44 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "WAM Library Schema",
+    "type": "object",
+    "properties": {
+        "name":{
+            "description": "The name of the library",
+            "type":"string"
+        },
+        "id":{
+            "description": "The unique id of the library",
+            "type":"string"
+        },
+        "version":{
+            "description": "The version of the library",
+            "type":"array", "items": [{"type":"number", "description": "Major"},{"type":"number", "description": "Minor"}]
+        },
+        "plugins":{
+            "description": "A list of URLs to the index.js of the plugins in the library",
+            "type":"array", "items": {"type":"string"}
+        },
+        "includes":{
+            "description": "A list of library whose plugins are included in this library, with validation information",
+            "type":"array",
+            "items": {
+                "type":"object",
+                "properties": {
+                    "url":{
+                        "description": "The URL of the library json",
+                        "type":"string"
+                    },
+                    "id":{
+                        "description": "The expected unique id of the library",
+                        "type":"string"
+                    },
+                    "version":{
+                        "description": "The expected version of the library",
+                        "type":"array", "items": [{"type":"number", "description": "Major"},{"type":"number", "description": "Minor"}]
+                    }
+                }
+            }
+        }
+    }
+}

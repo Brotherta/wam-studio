@@ -95,7 +95,7 @@ export default class HostController {
       this.launchTimerInterval();
 
       // Start the metronome if it's enabled
-      if (host.metronomeOn) this._view.MetronomeElement.start(host.playhead);
+      if (host.metronomeOn) this._view.metronome.start(host.playhead);
 
     } else {
       // enable zoom buttons when playing is stopped
@@ -118,7 +118,7 @@ export default class HostController {
       }
       if (this._timerInterval) clearInterval(this._timerInterval);
       // Always stop the metronome when playback is stopped
-      this._view.MetronomeElement.stop();
+      this._view.metronome.stop();
     }
     this._view.updatePlayButton(host.isPlaying, inRecordingMode)
   }
@@ -160,8 +160,8 @@ export default class HostController {
 
     // Start or stop the metronome based on both metronome state and whether playback is active
     if (this._app.host.isPlaying){
-      if(metronomeOn)this._view.MetronomeElement.start(this._app.host.playhead);
-      else this._view.MetronomeElement.stop();
+      if(metronomeOn)this._view.metronome.start(this._app.host.playhead);
+      else this._view.metronome.stop();
     }
 
     // Update the icon to reflect the new state.
@@ -313,6 +313,11 @@ export default class HostController {
       this.snapOnOff();
     });
 
+    this._view.metronomeContainer.hidden=true
+    this._view.metronomeArrow?.addEventListener("click",()=>{
+      this._view.metronomeContainer.hidden=!this._view.metronomeContainer.hidden
+    })
+
     this._view.splitBtn.addEventListener("click", () => {
       this._app.regionsController.splitSelectedRegion();
     });
@@ -364,7 +369,8 @@ export default class HostController {
     // Tempo and Time Signature selectors
     this._view.timeSignatureSelector.on_change.add(([numerator,denominator])=>{
       this._app.editorView.grid.updateTimeSignature(numerator,denominator)
-      this._app.hostView.MetronomeElement.timeSignature= [numerator,denominator]
+      this._app.hostView.metronome.timeSignature= [numerator,denominator]
+      this._app.hostView.metronome.playhead=this._app.host.playhead
     })
 
     this._view.tempoSelector.on_change.add((newTempo)=>{
@@ -372,7 +378,7 @@ export default class HostController {
         this._view.tempoSelector.tempo=Math.max(5,Math.min(600,newTempo))
         return
       }
-      this._app.hostView.MetronomeElement.tempo= newTempo
+      this._app.hostView.metronome.tempo= newTempo
       updateTempo(newTempo)
       this._app.playheadController.moveTo(this._app.host.playhead,false)
 

@@ -32,8 +32,9 @@ export default class HostView {
     timeSignatureDiv = document.getElementById("time-signature-selector") as HTMLDivElement;
     timeSignatureSelector = new TimeSignatureElement()
 
-    MetronomeDiv = document.getElementById("metronome") as HTMLDivElement;
-    MetronomeElement = new MetronomeComponent();
+    metronomeContainer = document.getElementById("metronome") as HTMLDivElement;
+    metronomeArrow = document.getElementById("metro-btn-arrow");
+    metronome = new MetronomeComponent();
 
     zoomInBtn = document.getElementById("zoom-in-btn") as HTMLDivElement;
     zoomOutBtn = document.getElementById("zoom-out-btn") as HTMLDivElement;
@@ -74,7 +75,7 @@ export default class HostView {
 
         // audio loop browser
         this.audioLoopBrowserDiv.appendChild(this.audioLoopBrowserElement);
-        this.MetronomeDiv.appendChild(this.MetronomeElement);
+        this.metronomeContainer.appendChild(this.metronome);
     }
     toggleAudioLoopBrowser = this.soundLoopBtn.addEventListener("click", () => {
         this.audioLoopBrowserDiv.style.display = this.audioLoopBrowserDiv.style.display !== "flex" ? "flex" : "none";
@@ -86,7 +87,8 @@ export default class HostView {
         if(metronomeOn){
             this.metroBtn.style.backgroundColor = "black";
             tooltip.textContent = "Metronome On";
-        }else{
+        }
+        else{
             this.metroBtn.style.backgroundColor = "";
             tooltip.textContent = "Metronome Off";
         }

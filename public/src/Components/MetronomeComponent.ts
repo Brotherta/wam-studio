@@ -1,10 +1,10 @@
 import { BACKEND_URL } from "../Env";
 import { doc } from "../Utils/dom";
-import { observed } from "../Utils/observable/class_annotation";
+import { observed as observe } from "../Utils/observable/class_annotation";
 
 const template=doc/*html*/`
     <style>
-        .metronome-container {
+        :host {
             background: #413e3e;
 
             color:white;
@@ -18,7 +18,7 @@ const template=doc/*html*/`
             flex-direction: column;
             align-items: center;
             position: absolute;
-            top: 10%;
+            top: 20%;
             left: 47%;
             transform: translate(-50%, -10%);
             z-index: 1000;
@@ -33,17 +33,14 @@ const template=doc/*html*/`
             border: 1px solid #ccc;
         }
     </style>
-
-    <div class="metronome-container" style="display: none;">
-        <h2>Metronome Settings</h2>
-        <!-- Measures Section -->
-        <label for="precount">Precount:</label>
-        <select id="precount">
-            <option value="0" selected>0 measures</option>
-            <option value="1">1 measure</option>
-            <option value="2">2 measures</option>
-        </select>
-    </div>
+    <h2>Metronome Settings</h2>
+    <!-- Measures Section -->
+    <label for="precount">Precount:</label>
+    <select id="precount">
+        <option value="0" selected>0 measures</option>
+        <option value="1">1 measure</option>
+        <option value="2">2 measures</option>
+    </select>
 `
 
 export default class MetronomeComponent extends HTMLElement {
@@ -76,23 +73,21 @@ export default class MetronomeComponent extends HTMLElement {
     }
 
     /** The tempo of the metronome in BPM */
-    @observed.set(MetronomeComponent.prototype.updateInterval)
+    @observe.set(MetronomeComponent.prototype.updateInterval)
     public tempo= 120
 
     /** The time signature of the metronome, with [x,y] being x/y */
-    @observed.set(MetronomeComponent.prototype.updateInterval)
+    @observe.set(MetronomeComponent.prototype.updateInterval)
     public timeSignature: [number,number]= [4,4]
 
     /** Start the metronome with the given time position in ms */
     start(start: number){
-        console.log("start metronome",start)
         this.isStarted= true
         this.playhead= start
     }
 
     /** Stop the metronome */
     stop(){
-        console.log("stop metronome")
         this.isStarted= false
         this.updateInterval()
     }
@@ -130,7 +125,7 @@ export default class MetronomeComponent extends HTMLElement {
 
         if(this.isStarted){
             // Start the next interval handler
-            const interval= 60_000/this.tempo/(4/this.timeSignature[1])
+            const interval= 60_000/this.tempo/(this.timeSignature[1]/4)
             console.log(this.tempo, this.timeSignature, interval)
             const byMeasure= this.timeSignature[0]
 

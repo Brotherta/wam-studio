@@ -1,0 +1,30 @@
+{
+    "$schema": "./library_schema.json",
+    "name": "Pedalboard2 Example Library",
+    "id": "wamstudio.pedalboard2.example",
+    "version": [0,0],
+    "plugins": [
+        "https://mainline.i3s.unice.fr/PedalEditor/Back-End/functional-pedals/published/untitled1/index.js",
+        "https://mainline.i3s.unice.fr/wam2/packages/faustPingPongDelay/plugin/index.js",
+        "https://mainline.i3s.unice.fr/wam2/packages/obxd/index.js",
+        "https://mainline.i3s.unice.fr/wam2/packages/pingpongdelay/dist/index.js",
+        "https://mainline.i3s.unice.fr/wam2/packages/quadrafuzz/dist/index.js",
+        "https://mainline.i3s.unice.fr/WamSampler/src/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/distortion/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/drumsampler/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/envmod/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/jx3p_editor/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/modal/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/soundfont/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/synth101/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/BigMuff/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/blipper/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/csoundPitchShifter/dist/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/deathgate/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/DualPitchShifter/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/greyhole/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/GuitarAmpSim60s/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/kbverb/index.js"
+    ],
+    "includes": []
+}

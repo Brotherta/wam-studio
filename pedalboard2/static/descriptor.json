@@ -1,0 +1,33 @@
+{
+    "name": "Pedalboard2",
+    "vendor": "wamstudio",
+    "version": "1.0",
+    "identifier": "wamstudio.pedalboard2",
+    "description": "A pedalboard for WebAudioModules",
+    "keywords": ["pedalboard"],
+    "website":"",
+    "apiVersion": "2.0",
+
+    "thumbnail": "thumbnail.png",
+
+    "isInstrument": true,
+
+
+    "hasAudioInput": true,
+    "hasAudioOutput": true,
+
+    "hasMidiInput": true,
+    "hasMidiOutput": false,
+
+    "hasMpeInput": true,
+    "hasMpeOutput": false,
+
+    "hasOscInput": true,
+    "hasOscOutput": false,
+
+    "hasSysexInput": true,
+    "hasSysexOutput": false,
+
+    "hasAutomationInput": true,
+    "hasAutomationOutput": false
+}

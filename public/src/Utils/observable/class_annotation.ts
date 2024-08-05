@@ -23,7 +23,7 @@ export function observed<THIS>(options: ObservedOptions<THIS,any>){
 
         // Setter
         let setter: (this:any, value:any)=>void
-        if(set) setter=function(value){ set.call(this,value,this[hidden]); this[hidden]=value}
+        if(set) setter=function(value){ const oldvalue=value; this[hidden]=value; set.call(this,oldvalue,value)}
         else setter=function(value){this[hidden]=value}
 
         // Set prototype

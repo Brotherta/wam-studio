@@ -1,0 +1,24 @@
+{
+  "name": "pedalboard2",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "A WAM that can combine multiple WAMs.",
+  "main": "index.js",
+  "bin": {
+    "pedalboard2": "bin/main.js"
+  },
+  "scripts": {
+    "host": "node server/server.js",
+    "watch": "tsc -w",
+    "start": ".\\server\\node_modules\\.bin\\concurrently -n watch,host -c red,blue npm:watch npm:host"
+  },
+  "keywords": [
+    "pedalboard",
+    "wam"
+  ],
+  "author": "Jempasam",
+  "license": "ISC",
+  "dependencies": {
+    "pedalboard2": "file:"
+  }
+}

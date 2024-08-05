@@ -1,44 +1,44 @@
-const template = document.createElement("template");
-template.innerHTML = `
+import { doc } from "../Utils/dom";
+
+const template = doc/*html*/`
 <style>
-:host {
-  display: block;
-  position: relative;
-  height: 100%;
-  width: 100%;
-  background-color: #333;
-}
+  :host {
+    display: block;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    background-color: #333;
+  }
 
-#track {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #333; /* Changed color to a lighter gray */
-  margin: 1px;
-  padding: 1px;
-}
+  #track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #333; /* Changed color to a lighter gray */
+    margin: 1px;
+    padding: 1px;
+  }
 
-#handle {
-  position: absolute;
-  background-color: #666; /* Changed color to a darker gray */
-  border-radius: 10px; /* Add rounded corners */
-  width: 8px; /* If the scrollbar is vertical */
-  height: 8px; /* If the scrollbar is horizontal */
-  transition: background-color 0.2s ease-in-out;
-}
+  #handle {
+    position: absolute;
+    background-color: #666; /* Changed color to a darker gray */
+    border-radius: 10px; /* Add rounded corners */
+    width: 8px; /* If the scrollbar is vertical */
+    height: 8px; /* If the scrollbar is horizontal */
+    transition: background-color 0.2s ease-in-out;
+  }
 
-#handle:hover {
-    background-color: #888; /* Add a dark-grey color on hover */
-}
-
+  #handle:hover {
+      background-color: #888; /* Add a dark-grey color on hover */
+  }
 </style>
 
 <div id="track">
     <div id="handle"></div>
 </div>
-`;
+`
 
 /**
  * Custom scrollbar element that can be used to scroll a viewport. It is designed to be used with
@@ -64,7 +64,7 @@ export default class ScrollBarElement extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
-    this.shadowRoot!.appendChild(template.content.cloneNode(true));
+    this.shadowRoot!.replaceChildren(template.cloneNode(true));
   }
 
   connectedCallback() {
