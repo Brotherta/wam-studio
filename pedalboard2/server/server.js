@@ -18,3 +18,5 @@ app.listen(7009,()=>{
         console.log('Server still running on http://localhost:7009')
     }, 1000)
 })
+
+app.use('/wam_api_library.json', require('./wam_api_library.js').handler)

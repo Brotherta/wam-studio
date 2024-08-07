@@ -6,7 +6,7 @@ export interface Pedalboard2LibraryDescriptor {
     name: string;
     /** A unique identifier for the library **/
     id: string;
-    /** The url of the library, should not be provided by the json */
+    /** The url of the library, should not be provided by the json. */
     url: string;
     /**
      * The version of the library as [major,minor].
@@ -16,6 +16,8 @@ export interface Pedalboard2LibraryDescriptor {
     version: [number, number];
     /** A list of urls to the main js file of WAMs, relative to the descriptor url */
     plugins: string[];
+    /** Default: false ; If true, the library can be loaded if a plugin is missing, or if a included library cannot be loaded. */
+    permissive?: boolean;
     /** A list of builtin presets */
     presets?: {
         [preset_name: string]: {

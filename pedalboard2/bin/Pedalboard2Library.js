@@ -50,12 +50,20 @@ export async function resolvePedalboard2Library(libDesc, ignored = []) {
         const classURL = new URL(pluginUrl, libDesc.url).href;
         const descriptorURL = new URL("descriptor.json", classURL).href;
         console.log(descriptorURL);
-        //@ts-ignore
-        const descriptor = await fetch(descriptorURL).then(response => response.json()).catch(err => { throw new Pedalboard2Error("missing_descriptor", `Could not fetch the descriptor at ${descriptorURL}`); });
+        // Load a plugin
+        try {
+            const descriptor = await fetch(descriptorURL).then(response => response.json());
+            descriptor.identifier ??= descriptor.vendor + "." + descriptor.name;
+            if (descriptor.isInstrument)
+                descriptor.keywords.push("instrument");
+            ret.plugins[descriptor.identifier] = { descriptor, classURL };
+        }
+        catch (e) {
+            if (libDesc.permissive !== true)
+                throw new Pedalboard2Error("missing_descriptor", `Could not fetch the descriptor at ${descriptorURL}`);
+        }
         //if(!plugin.default) throw new Pedalboard2Error("missing_default", `Missing default export for the plugin at ${fetchUrl}`)
         //if(!plugin?.isWebAudioModuleConstructor) throw new Pedalboard2Error("not_a_wam", `The plugin at ${fetchUrl} is not a WebAudioModule class`)
-        descriptor.identifier ??= descriptor.vendor + "." + descriptor.name;
-        ret.plugins[descriptor.identifier] = { descriptor, classURL };
     }
     // Load the presets
     const preset = ret.presets;
@@ -68,14 +76,20 @@ export async function resolvePedalboard2Library(libDesc, ignored = []) {
         if (ignored.includes(include.id))
             continue;
         const fetchUrl = new URL(include.url, libDesc.url).href;
-        const subdescriptor = await importPedalboard2Library(fetchUrl, include.version, include.id);
-        const lib = await resolvePedalboard2Library(subdescriptor, ignored);
-        for (const [id, plugin] of Object.entries(lib.plugins))
-            ret.plugins[id] = plugin;
-        for (const [category, categoryPresets] of Object.entries(lib.presets ?? {})) {
-            preset[category] ??= {};
-            for (const [name, presetDesc] of Object.entries(categoryPresets))
-                preset[category][name] = presetDesc;
+        try {
+            const subdescriptor = await importPedalboard2Library(fetchUrl, include.version, include.id);
+            const lib = await resolvePedalboard2Library(subdescriptor, ignored);
+            for (const [id, plugin] of Object.entries(lib.plugins))
+                ret.plugins[id] = plugin;
+            for (const [category, categoryPresets] of Object.entries(lib.presets ?? {})) {
+                preset[category] ??= {};
+                for (const [name, presetDesc] of Object.entries(categoryPresets))
+                    preset[category][name] = presetDesc;
+            }
+        }
+        catch (e) {
+            if (libDesc.permissive !== true)
+                throw e;
         }
     }
     return ret;

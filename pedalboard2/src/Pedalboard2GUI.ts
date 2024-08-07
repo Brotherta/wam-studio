@@ -1,20 +1,23 @@
-import { Pedalboard2Library } from "./Pedalboard2Library.js";
+import { importPedalboard2Library, Pedalboard2Library, resolvePedalboard2Library } from "./Pedalboard2Library.js";
 import { Pedalboard2Node, Pedalboard2NodeChild } from "./Pedalboard2Node.js";
 import Pedalboard2WAM from "./Pedalboard2WAM.js";
 import { adoc, doc } from "./Utils/dom.js";
-import { ArrayLinkId, LinkId } from "./Utils/observable.js";
+import { selectWithClass, setupPannelMenus } from "./Utils/gui.js";
+import { ArrayLinkId, LinkId, Observable } from "./Utils/observable.js";
 
 
 const template= doc/*html*/`
     <link rel="stylesheet" href="${import.meta.resolve("./style.css")}">
     <h1>Pedalboard 2</h1>
     <div class="pannel">
-        <div class="_button" --data-target="selector">Plugins</div>
-        <div class="_button _selected" --data-target="presets">Presets</div>
-        <div class="_button">Macros</div>
-        <div class="_button">Settings</div>
+        <div class="_button _selected" --data-target="plugin_selector">Plugins</div>
+        <div class="_button" --data-target="presets">Presets</div>
+        <div class="_button" --data-target="settings">Settings</div>
     </div>
-    <div id="selector">
+    <div id="plugin_selector">
+        <select id="category_selector">
+        </select>
+        <div id="selector"></div>
     </div>
     <div id="presets" class="repository">
         <ul class="_directories">
@@ -38,6 +41,11 @@ const template= doc/*html*/`
             <h2>Tarte</h2>
             <p>Les tartes sont des gâteaux plats, cuits au four, composés d'une pâte et d'une garniture sucrée ou salée. Les tartes salées sont souvent servies en entrée ou en plat principal, tandis que les tartes sucrées sont servies en dessert.</p>
         </div>
+    </div>
+    <div id="settings">
+        <label>Library URL</label>
+        <input id="library-input" type="text"/>
+        <input id="library-input-output" type="text" disabled="disabled"/>
     </div>
     <div id="modules">
         <div class="_wall">
@@ -66,9 +74,11 @@ const dropMarkerTemplate= adoc/*html*/`
 export default class Pedalboard2GUI extends HTMLElement{
 
     private node: Pedalboard2Node
+    private library_input!: HTMLInputElement
 
     private wam_chain_link?: ArrayLinkId<Pedalboard2NodeChild>
     private library_link?: LinkId<Pedalboard2Library|null>
+    private category_link?: any
 
     constructor(private module: Pedalboard2WAM){
         super()
@@ -90,49 +100,73 @@ export default class Pedalboard2GUI extends HTMLElement{
         )
 
         // Handle pannel selectors
-        const pannels= this.shadowRoot?.querySelectorAll(".pannel") ?? []
-        for(const pannel of pannels){
-            // Get buttons
-            const buttons= pannel.querySelectorAll(":scope>._button")
-            for(const button of buttons){
-                // Get target
-                const target= this.shadowRoot?.getElementById(button.getAttribute("--data-target")??"__nothing__")
+        if(this.shadowRoot)setupPannelMenus(this.shadowRoot)
 
-                // Set button
-                button.addEventListener("click", ()=>{
-                    for(const b of buttons){
-                        const tohide= this.shadowRoot?.getElementById(b.getAttribute("--data-target")??"__nothing__")
-                        b.classList.remove("_selected")
-                        if(tohide) tohide.classList.add("hidden")
-                    }
-                    button.classList.add("_selected")
-                    if(target) target.classList.remove("hidden")
-                })
+        // Drag n drop on first wall
+        const wall= this.shadowRoot?.querySelector("._wall")! as HTMLElement
+        wall.addEventListener("dragenter", (event)=> wall.after(dropMarkerTemplate.cloneNode(true)) )
+        wall.addEventListener("dragleave", (event)=> wall.nextElementSibling?.remove() )
+        wall.addEventListener("dragover", (event)=> event.preventDefault() )
+        wall.addEventListener("drop", (event)=>{
+            wall.nextElementSibling?.remove()
+            // Get child
+            const dropInstanceID=event.dataTransfer?.getData("text/plain")
+            if(!dropInstanceID)return
+            const dropChild= this.node.childs.find(it=>it[0].instanceId==dropInstanceID)
+            if(!dropChild)return
+            // Remove
+            this.node.removeChild(dropChild)
+            // Add
+            this.node.addChild(dropChild,0)
+        })
 
-                // Hide by default
-                if(target && !button.classList.contains("_selected")) target.classList.add("hidden")
+        // Handle library input
+        this.library_input= this.shadowRoot?.getElementById("library-input")! as HTMLInputElement
+        this.library_input.addEventListener("change", async()=>{
+            console.log("Loading library", this.library_input.value)
+            const error= this.shadowRoot?.getElementById("library-input-output")! as HTMLInputElement
+            error.value="Loading..."
+            error.className=""
+            this.library_input.disabled= true
+            try{
+                const descriptor= await importPedalboard2Library(this.library_input.value)
+                const library= await resolvePedalboard2Library(descriptor)
+                this.node.library.value= library
+
+                error.value="Loaded!"
+                error.className="success"
+            }catch(err:any){
+                error.value= err.message
+                error.className="error"
             }
-        }
+            this.library_input.disabled= false
+        })
 
+        // Handle category selector
+        const category_selector= this.shadowRoot?.getElementById("category_selector") as HTMLSelectElement
+        category_selector.addEventListener("change", ()=>{
+            if(category_selector.value=="") this.plugin_category.value= null
+            else this.plugin_category.value= category_selector.value
+        })
+
+        this.category_link= this.plugin_category.on_set.add(category=> this.initSelector(category))
     }
 
     disconnectedCallback(){
         if(this.wam_chain_link)this.node.childs.unlink(this.wam_chain_link)
         if(this.library_link)this.node.library.unlink(this.library_link)
+        if(this.category_link)this.plugin_category.on_set.delete(this.category_link)
     }
 
 
 
     //// WAM CHAINS : the inner WAMs GUIs ////
-    /** Promise resolved after guis are created */
-    private _wait_for_guis = Promise.resolve()
-
     /** Associate the wams to their guis */
     private _child_to_gui = new Map<Pedalboard2NodeChild, [Element,Element]>()
 
     /** Called for each wam in the wam chain for initialization */
     protected initWAM(child: Pedalboard2NodeChild, index: number){
-        this._wait_for_guis= this._wait_for_guis.then((async()=>{
+        this.executePromise(async()=>{
             const [wam,descriptor]= child
             
             // Add window
@@ -170,15 +204,9 @@ export default class Pedalboard2GUI extends HTMLElement{
             })
 
             // Drag enter -> over -> leave -> drop
-            window.addEventListener("dragenter", (event)=>{
-                window.after(dropMarkerTemplate.cloneNode(true))
-            })
-            window.addEventListener("dragleave", (event)=>{
-                window.nextElementSibling?.remove()
-            })
-            window.addEventListener("dragover", (event)=>{
-                event.preventDefault()
-            })
+            window.addEventListener("dragenter", (event)=> window.after(dropMarkerTemplate.cloneNode(true)) )
+            window.addEventListener("dragleave", (event)=> window.nextElementSibling?.remove() )
+            window.addEventListener("dragover", (event)=> event.preventDefault() )
             window.addEventListener("drop", (event)=>{
                 window.nextElementSibling?.remove()
 
@@ -186,7 +214,7 @@ export default class Pedalboard2GUI extends HTMLElement{
                 const dropInstanceID=event.dataTransfer?.getData("text/plain")
                 if(!dropInstanceID)return
                 const dropChild= this.node.childs.find(it=>it[0].instanceId==dropInstanceID)
-                if(!dropChild)return
+                if(!dropChild || dropChild===child)return
 
                 // Remove
                 this.node.removeChild(dropChild)
@@ -197,49 +225,111 @@ export default class Pedalboard2GUI extends HTMLElement{
             })
             
             this._child_to_gui.set(child, [window,gui])
-        }))
+        })
     }
 
     /** Called for each wam in the wam chain for destruction */
-    protected async closeWAM(child: Pedalboard2NodeChild, index: number){
+    protected closeWAM(child: Pedalboard2NodeChild, index: number){
         // Wait for guis to be intialized
-        await this._wait_for_guis
+        this.executePromise(async()=>{
+            const elements= this._child_to_gui.get(child)
+            if(!elements)return
+            const [window,gui]= elements
 
-        const elements= this._child_to_gui.get(child)
-        if(!elements)return
-        const [window,gui]= elements
-
-        const [wam,descriptor]= child
-        window.remove()
-        wam.destroyGui(gui)
+            const [wam,descriptor]= child
+            window.remove()
+            wam.destroyGui(gui)
+        })
     }
 
 
 
     //// WAM LIBRARY : the list of available WAMs ////
-    private _wait_for_library= Promise.resolve()
-
     protected initLibrary(library: Pedalboard2Library|null){
-        this._wait_for_library= this._wait_for_library.then(async()=>{
+        this.executePromise(async()=>{
             console.log("aa",library)
+            this.library_input.value= library?.descriptor?.url ?? ""
 
             // Setup
-            const selector= this.shadowRoot?.getElementById("selector")!
             const preset_repo= this.shadowRoot?.getElementById("presets")!
             const preset_dir = preset_repo.querySelector(":scope>._directories")!
             const preset_file= preset_repo.querySelector(":scope>._files")!
             const preset_desc= preset_repo.querySelector(":scope>._content")!
 
             // Cleanup
-            selector.replaceChildren()
             preset_dir.replaceChildren()
             preset_file.replaceChildren()
             preset_desc.replaceChildren()
 
             if(!library)return
 
+            // Category selector
+            {
+                // Fetch categories
+                const categories= new Set<string>()
+                for(const {descriptor} of Object.values(library.plugins)){
+                    for(const keyword of descriptor.keywords){
+                        categories.add(keyword)
+                    }
+                }
+                const category_selector= this.shadowRoot?.getElementById("category_selector") as HTMLSelectElement
+                category_selector.replaceChildren()
+                category_selector.appendChild(adoc`<option value="">All</option>`)
+                for(const category of categories){
+                    const option= adoc`<option value="${category}">${category}</option>`
+                    category_selector.appendChild(option)
+                }
+            }
+
+            this.plugin_category.value= null
+
+            // Presets Directory
+            // Create categories
+            for(const [key,presets] of Object.entries(library.presets)){
+                const category= adoc`<li>${key}</li>`
+                preset_dir.appendChild(category)
+                category.addEventListener("click", ()=>{
+                    selectWithClass(category, "_selected")
+                    preset_desc.replaceChildren()
+
+                    // Create presets
+                    preset_file.replaceChildren()
+                    for(const [name,desc] of Object.entries(presets)){
+                        const file= adoc`<li>${name}</li>`
+                        preset_file.appendChild(file)
+                        file.addEventListener("click", ()=>{
+                            selectWithClass(file, "_selected")
+
+                            // Set description
+                            preset_desc.replaceChildren()
+                            preset_desc.appendChild(adoc/*html*/`<a>Load</a>`)
+                                .addEventListener("click", ()=>{
+                                    this.executePromise(async()=>await this.node.setState(desc.state))
+                                })
+                            preset_desc.appendChild(adoc`<h2>${name}</h2>`)
+                            preset_desc.appendChild(adoc`<p>${desc.description}</p>`)
+                        })
+                    }
+                    
+                })
+            }
+        })
+    }
+
+
+
+    //// PLUGINS : the list of available WAMs ////
+    readonly plugin_category= new Observable<string|null>(null)
+
+    initSelector(category: string|null){
+        this.executePromise(async()=>{
+            const selector= this.shadowRoot?.getElementById("selector")!
+            selector.replaceChildren()
+
             // Plugin Selector
-            for(const {descriptor,classURL} of Object.values(library.plugins)){
+            for(const {descriptor,classURL} of Object.values(this.node.library.value?.plugins??{})){
+                if(category && !descriptor.keywords.includes(category))continue
+
                 // Get thumbnail
                 const src= await (async()=>{
                     let src= descriptor.thumbnail
@@ -272,47 +362,20 @@ export default class Pedalboard2GUI extends HTMLElement{
                     this.node.addChild(wam)
                 })
             }
-
-            // Presets Directory
-            // Create categories
-            for(const [key,presets] of Object.entries(library.presets)){
-                const category= adoc`<li>${key}</li>`
-                preset_dir.appendChild(category)
-                category.addEventListener("click", ()=>{
-                    for(const it of preset_dir.children) it.classList.remove("_selected")
-                    category.classList.add("_selected")
-                    preset_desc.replaceChildren()
-
-                    // Create presets
-                    preset_file.replaceChildren()
-                    for(const [name,desc] of Object.entries(presets)){
-                        const file= adoc`<li>${name}</li>`
-                        preset_file.appendChild(file)
-                        file.addEventListener("click", ()=>{
-                            for(const it of preset_file.children) it.classList.remove("_selected")
-                            file.classList.add("_selected")
-
-                            // Set description
-                            preset_desc.replaceChildren()
-                            preset_desc.appendChild(adoc/*html*/`<a>Load</a>`)
-                                .addEventListener("click", ()=>{
-                                    this._wait_for_library= this._wait_for_library.then(async()=>await this.node.setState(desc.state))
-                                })
-                            preset_desc.appendChild(adoc`<h2>${name}</h2>`)
-                            preset_desc.appendChild(adoc`<p>${desc.description}</p>`)
-                        })
-                    }
-                    
-                })
-            }
-        })        
+        })
     }
 
     protected async closeLibrary(library: Pedalboard2Library|null){
-        this._wait_for_library= this._wait_for_library.then(()=>{
+        this.executePromise(async()=>{
             const selector= this.shadowRoot?.getElementById("selector")!
             selector.replaceChildren()
         })
+    }
+
+    private promiseChain: Promise<unknown>= Promise.resolve()
+
+    private executePromise(promise: (...args:any)=>Promise<unknown>){
+        this.promiseChain= this.promiseChain.then(promise)
     }
 }
 

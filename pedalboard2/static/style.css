@@ -19,21 +19,42 @@
 h1{
     align-self: stretch; 
     text-align: center;
-    border-bottom: 0.1rem solid var(--color-front);
     margin: 0;
     padding: 0.5em;
 }
 
+#plugin_selector, #settings, .repository{
+    height: 9rem;
+    border-bottom: 0.1rem solid var(--color-front);
+}
+
 /* WAM SELECTOR {#f83} */
+#category_selector{
+    display: block;
+    text-align: center;
+
+    background-color: var(--color-back);
+    color: var(--color-front);
+    font-variant-caps: all-small-caps;
+    font-size: 1.2em;
+
+    border-bottom: 0.1rem solid var(--color-front);
+
+    cursor: pointer;
+    &:hover{
+        background-color: var(--color-mid);
+    }
+}
+#plugin_selector{
+    display: flex;
+    flex-direction: column;
+}
 #selector{
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
     overflow-x: scroll;
-    border-bottom: 0.1rem solid var(--color-front);
-
-    height: 8rem;
 
     /* A object in the selector */
     >*{
@@ -215,8 +236,6 @@ h1{
 .repository{
     display: flex;
     flex-direction: row;
-    height: 8rem;
-    border-bottom: 0.1rem solid var(--color-front);
     >*{
         flex-grow: 1;
         width: 0;
@@ -273,5 +292,39 @@ h1{
         >p{
             margin: 0.1em;
         }
+    }
+}
+
+
+
+/* SETTINGS */
+#settings{
+    width: 100%;
+    padding-left: 5em;
+    padding-right: 5em;
+}
+label{
+    display: block;
+    margin: 0.5em;
+    margin-bottom: 0;
+    &~*{
+        margin-top: 0;
+    }
+}
+input[type="text"]{
+    width: 80%;
+    padding: 0.5em;
+    border: 0.1rem solid var(--color-front);
+    background-color: var(--color-back);
+    color: var(--color-front);
+    font-size: 1em;
+    margin: 0.5em;
+
+    &#library-input-output{
+        border-top: none;
+        border-right: none;
+        border-bottom: none;
+        &.error{ color: red; }
+        &.success{ color: green; }
     }
 }

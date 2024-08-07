@@ -12,6 +12,7 @@
         "strict": true,
         "declaration": true,
         "stripInternal": true,
+        "sourceMap": false,
         "forceConsistentCasingInFileNames": true
     }
 }
