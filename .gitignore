@@ -9,3 +9,5 @@ storage/*
 *.pem
 /bank/storage/
 /bank/loops
+
+/pedalboard2/bin/
