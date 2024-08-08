@@ -13,8 +13,10 @@
     border: 0.3em solid var(--color-front);
 
     overflow: auto;
-    resize: horizontal;
+    resize: both;
     min-width: 30em;
+    min-height: 30em;
+    width: 60em;
 }
 h1{
     align-self: stretch; 
@@ -112,7 +114,8 @@ h1{
 #modules{
     display: flex;
     flex-direction: row;
-    height: 25em;
+    height: 100%;
+    min-height: 10em;
     padding: 0.4em;
     &>*{
         margin: 1rem;

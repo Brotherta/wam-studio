@@ -1,4 +1,4 @@
-/** @typedef {import('../../api').AudioWorkletGlobalScope} AudioWorkletGlobalScope */
+/** @typedef {import('../api').AudioWorkletGlobalScope} AudioWorkletGlobalScope */
 /** @typedef {typeof import('./types').RingBuffer} RingBufferConstructor */
 /** @typedef {import('./types').RingBuffer} RingBuffer */
 /** @typedef {import('./types').TypedArray} TypedArray */

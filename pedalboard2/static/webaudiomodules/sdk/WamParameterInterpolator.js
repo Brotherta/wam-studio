@@ -1,5 +1,5 @@
-/** @typedef {import('../../api').WamParameterInfo} WamParameterInfo */
-/** @typedef {import('../../api').AudioWorkletGlobalScope} AudioWorkletGlobalScope */
+/** @typedef {import('../api').WamParameterInfo} WamParameterInfo */
+/** @typedef {import('../api').AudioWorkletGlobalScope} AudioWorkletGlobalScope */
 /** @typedef {import('./types').WamParameterInterpolator} IWamParameterInterpolator */
 /** @typedef {typeof import('./types').WamParameterInterpolator} WamParameterInterpolatorConstructor */
 /** @typedef {import('./types').WamSDKBaseModuleScope} WamSDKBaseModuleScope */

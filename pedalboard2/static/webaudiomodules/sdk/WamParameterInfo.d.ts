@@ -1,4 +1,4 @@
-import { WamParameterInfo } from '../../api';
+import { WamParameterInfo } from '../api';
 
 declare const getWamParameterInfo: (moduleId?: string) => typeof WamParameterInfo;
 

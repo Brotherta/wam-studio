@@ -149,7 +149,7 @@ export default class Pedalboard2GUI extends HTMLElement{
             else this.plugin_category.value= category_selector.value
         })
 
-        this.category_link= this.plugin_category.on_set.add(category=> this.initSelector(category))
+        this.category_link= this.plugin_category.on_set.add(category=> this.initPluginSelector(category))
     }
 
     disconnectedCallback(){
@@ -266,12 +266,14 @@ export default class Pedalboard2GUI extends HTMLElement{
             // Category selector
             {
                 // Fetch categories
-                const categories= new Set<string>()
+                const categories_set= new Set<string>()
                 for(const {descriptor} of Object.values(library.plugins)){
                     for(const keyword of descriptor.keywords){
-                        categories.add(keyword)
+                        categories_set.add(keyword)
                     }
                 }
+                const categories= [...categories_set].sort()
+
                 const category_selector= this.shadowRoot?.getElementById("category_selector") as HTMLSelectElement
                 category_selector.replaceChildren()
                 category_selector.appendChild(adoc`<option value="">All</option>`)
@@ -321,7 +323,7 @@ export default class Pedalboard2GUI extends HTMLElement{
     //// PLUGINS : the list of available WAMs ////
     readonly plugin_category= new Observable<string|null>(null)
 
-    initSelector(category: string|null){
+    initPluginSelector(category: string|null){
         this.executePromise(async()=>{
             const selector= this.shadowRoot?.getElementById("selector")!
             selector.replaceChildren()

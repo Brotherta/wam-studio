@@ -17,17 +17,21 @@ const [groupId,groupKey]=await initializeWamHost(context)
 
 // Create WAM
 /** @ts-ignore */
+console.log("> Importing WAM")
 const WAM= (await import("./index.js")).default as typeof Pedalboard2WAM
 console.log(WAM)
 const pedalboard=await WAM.createInstance(groupId,context) as Pedalboard2WAM
 pedalboard.audioNode.connect(context.destination)
 
 // Create GUI
+console.log("> Create GUI")
 const gui= await pedalboard.createGui()
 document.getElementById("pedalboard")?.replaceWith(gui)
 
 // Load library
+console.log("> Importing Descriptor")
 const descriptor= await importPedalboard2Library(import.meta.resolve("./library.json"))
+console.log("> Resovle descriptor")
 const library= await resolvePedalboard2Library(descriptor)
 pedalboard.audioNode.library.value=library
 console.log(descriptor,library)

@@ -1,4 +1,4 @@
-/** @typedef {import('../../api').AudioWorkletGlobalScope} AudioWorkletGlobalScope */
+/** @typedef {import('../api').AudioWorkletGlobalScope} AudioWorkletGlobalScope */
 /** @typedef {import('./types').WamSDKBaseModuleScope} WamSDKBaseModuleScope */
 /** @typedef {import('./types').TypedArrayConstructor} TypedArrayConstructor */
 /** @typedef {import('./types').TypedArray} TypedArray */

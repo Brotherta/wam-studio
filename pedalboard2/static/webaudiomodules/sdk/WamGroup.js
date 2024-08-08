@@ -1,6 +1,6 @@
-/** @typedef {import('../../api').WamProcessor} IWamProcessor */
-/** @typedef {import('../../api').AudioWorkletGlobalScope} AudioWorkletGlobalScope */
-/** @typedef {import('../../api').WamEvent} WamEvent */
+/** @typedef {import('../api').WamProcessor} IWamProcessor */
+/** @typedef {import('../api').AudioWorkletGlobalScope} AudioWorkletGlobalScope */
+/** @typedef {import('../api').WamEvent} WamEvent */
 /** @typedef {import('./types').WamGroup} IWamGroup */
 
 /**

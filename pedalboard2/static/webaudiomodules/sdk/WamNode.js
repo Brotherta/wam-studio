@@ -1,9 +1,9 @@
-/** @typedef {import('../../api').WamNode} IWamNode */
-/** @typedef {import('../../api').WebAudioModule} WebAudioModule */
-/** @typedef {import('../../api').WamParameterInfoMap} WamParameterInfoMap */
-/** @typedef {import('../../api').WamParameterDataMap} WamParameterDataMap */
-/** @typedef {import('../../api').WamEvent} WamEvent */
-/** @typedef {import('../../api').WamEventType} WamEventType */
+/** @typedef {import('../api/index.js').WamNode} IWamNode */
+/** @typedef {import('../api/index.js').WebAudioModule} WebAudioModule */
+/** @typedef {import('../api/index.js').WamParameterInfoMap} WamParameterInfoMap */
+/** @typedef {import('../api/index.js').WamParameterDataMap} WamParameterDataMap */
+/** @typedef {import('../api/index.js').WamEvent} WamEvent */
+/** @typedef {import('../api/index.js').WamEventType} WamEventType */
 /** @typedef {import('./types').WamEventRingBuffer} WamEventRingBuffer */
 
 import addFunctionModule from './addFunctionModule.js';

@@ -25,9 +25,10 @@ export default class PluginsController {
      * Only one root plugin can be associated to a Track.
      * A root plugin can himself manage multiple WAM.
      **/
-    readonly WAM_LIST: {[name: string]:string}={
-        "Pedalboard": BACKEND_URL+"/src/index.js",
-        "Disto Machine": BACKEND_URL+"/plugins/disto_machine/src/index.js"
+    readonly WAM_LIST: {[name: string]:{url:string,state?:any}}={
+        "Pedalboard": { url: BACKEND_URL+"/src/index.js" },
+        "Pedalboard2": { url: "http://localhost:7002/index.js", state:{plugins:[],library:"http://localhost:7002/wam_api_library.json"} },
+        "Disto Machine": { url: BACKEND_URL+"/plugins/disto_machine/src/index.js" },
     }
 
     /** The default WAM to load */
@@ -67,16 +68,19 @@ export default class PluginsController {
      * Get a wam registred in the wam list if it exists else return null.
      * @param wam_name The name of the wam to fetch in {@link WAM_LIST} 
      */
-    private async fetchWAM(wam_name: string): Promise<typeof WebAudioModule|null>{
+    private async fetchWAM(wam_name: string): Promise<PluginsController['WAM_LIST']['_']&{wam:typeof WebAudioModule}|null>{
+        const infos=this.WAM_LIST[wam_name]
+        if(!infos)return null
+
         let fetched=this.wam_list_fetcheds[wam_name]
         if(!fetched){
-            const link=this.WAM_LIST[wam_name]
-            if(!link){
+            if(!infos){
                 crashOnDebug(`No such WAM Plugin as '${wam_name}' `)
                 return null
             }
+            const {url}=infos
             try{
-                const {default: WAM} = await import(/* webpackIgnore: true */link) as {default:typeof WebAudioModule};
+                const {default: WAM} = await import(/* webpackIgnore: true */url) as {default:typeof WebAudioModule};
                 fetched={factory:WAM}
                 this.wam_list_fetcheds[wam_name]=fetched
             }
@@ -85,7 +89,7 @@ export default class PluginsController {
                 return null
             }
         }
-        return fetched.factory
+        return {...infos, wam:fetched.factory}
     }
 
     /**
@@ -93,8 +97,8 @@ export default class PluginsController {
      * @param wam_name The name of the wam to fetch in {@link WAM_LIST} 
      */
     public async fetchPlugin(wam_name: string): Promise<Plugin|null>{
-        const wam=await this.fetchWAM(wam_name)
-        if(wam) return await new Plugin(wam_name, wam)
+        const fetched=await this.fetchWAM(wam_name)
+        if(fetched) return await new Plugin(wam_name, fetched.wam, fetched.state)
         else return null
     }
 

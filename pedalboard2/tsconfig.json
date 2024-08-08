@@ -1,18 +1,19 @@
 {
     "include": ["src/**/*.ts"],
+    "exclude": ["bin/"],
     "compilerOptions": {
         "target": "ES2022",
         "module": "ES2022",
         "moduleResolution": "Node",
         "esModuleInterop": true,
         "outDir": "./bin",
-        "rootDir": "./src",
+        "rootDirs": ["src", "static"],
         "allowJs": true,
         "noImplicitAny": false,
         "strict": true,
         "declaration": true,
         "stripInternal": true,
         "sourceMap": false,
-        "forceConsistentCasingInFileNames": true
-    }
+        "forceConsistentCasingInFileNames": true,
+    },
 }

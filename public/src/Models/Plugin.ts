@@ -6,10 +6,12 @@ import { WebAudioModule } from "@webaudiomodules/sdk";
  */
 export default class Plugin{
 
-    constructor(readonly name: string, readonly wam_type: typeof WebAudioModule){}
+    constructor(readonly name: string, readonly wam_type: typeof WebAudioModule, readonly default_state?:any){}
 
     public async instantiate(audioCtx: BaseAudioContext, groupId: string, isHeadless: boolean = false){
-        return PluginInstance.create(this.name, this, audioCtx, groupId, isHeadless)
+        const instance= await PluginInstance.create(this.name, this, audioCtx, groupId, isHeadless)
+        if(this.default_state)await instance.setState(this.default_state)
+        return instance
     }
 }
 

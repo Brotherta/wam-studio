@@ -1,6 +1,6 @@
 import { Pedalboard2SharedData } from "./Pedalboard2Node"
 import type { AudioWorkletGlobalScope, WamEvent } from "./webaudiomodules/api"
-import type { WamGroup, WamProcessor } from "./webaudiomodules/sdk"
+import { WamGroup, WamProcessor } from "./webaudiomodules/sdk"
 
 
 export function getPedalboard2Processor(moduleId: string){

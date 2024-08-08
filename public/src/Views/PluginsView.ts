@@ -55,8 +55,8 @@ export default class PluginsView extends DraggableWindow {
      * @param track - The track whom plugin will be mounted or null for no plugin.
      */
     setPluginView(element: Element | null) {
-        this.mount.innerHTML = '';
-        if (element != null) this.mount.appendChild(element);
+        if(this.mount.children[0]===element)return
+        this.mount.replaceChildren(...element ? [element] : []);
     }
 
     /** Show the new plugin buttons. */

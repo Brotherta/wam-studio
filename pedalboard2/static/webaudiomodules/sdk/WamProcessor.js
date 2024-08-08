@@ -1,15 +1,15 @@
-/** @typedef {import('../../api').WamProcessor} IWamProcessor */
-/** @typedef {typeof import('../../api').WamProcessor} WamProcessorConstructor */
-/** @typedef {import('../../api').WamParameter} WamParameter */
-/** @typedef {import('../../api').WamParameterInfoMap} WamParameterInfoMap */
-/** @typedef {import('../../api').WamParameterDataMap} WamParameterDataMap */
-/** @typedef {import('../../api').WamParameterData} WamParameterData */
-/** @typedef {import('../../api').WamParameterMap} WamParameterMap */
-/** @typedef {import('../../api').WamEvent} WamEvent */
-/** @typedef {import('../../api').WamTransportData} WamTransportData */
-/** @typedef {import('../../api').WamMidiData} WamMidiData */
-/** @typedef {import('../../api').WamBinaryData} WamBinaryData */
-/** @typedef {import('../../api').AudioWorkletGlobalScope} AudioWorkletGlobalScope */
+/** @typedef {import('../api').WamProcessor} IWamProcessor */
+/** @typedef {typeof import('../api').WamProcessor} WamProcessorConstructor */
+/** @typedef {import('../api').WamParameter} WamParameter */
+/** @typedef {import('../api').WamParameterInfoMap} WamParameterInfoMap */
+/** @typedef {import('../api').WamParameterDataMap} WamParameterDataMap */
+/** @typedef {import('../api').WamParameterData} WamParameterData */
+/** @typedef {import('../api').WamParameterMap} WamParameterMap */
+/** @typedef {import('../api').WamEvent} WamEvent */
+/** @typedef {import('../api').WamTransportData} WamTransportData */
+/** @typedef {import('../api').WamMidiData} WamMidiData */
+/** @typedef {import('../api').WamBinaryData} WamBinaryData */
+/** @typedef {import('../api').AudioWorkletGlobalScope} AudioWorkletGlobalScope */
 /** @typedef {import('./types').PendingWamEvent} PendingWamEvent */
 /** @typedef {import('./types').ProcessingSlice} ProcessingSlice */
 /** @typedef {import('./types').WamParameterInterpolatorMap} WamParameterInterpolatorMap */

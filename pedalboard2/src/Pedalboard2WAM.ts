@@ -9,6 +9,8 @@ import { WebAudioModule } from "./webaudiomodules/sdk/index.js";
  */
 export default class Pedalboard2WAM extends WebAudioModule<Pedalboard2Node>{
 
+    _descriptorUrl = import.meta.resolve("./descriptor.json")
+
     override async initialize(state?: Pedalboard2NodeState){
         await this._loadDescriptor()
         return await super.initialize(state)
