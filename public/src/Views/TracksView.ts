@@ -10,15 +10,16 @@ export default class TracksView {
     newTrackDiv: HTMLDivElement = document.getElementById("new-track") as HTMLDivElement;
 
     /**
-     * Adds a track to the track view.
+     * Adds a TrackElement to the track view.
      * @param trackElement
+     * @param position - The position to add the track at. Default is the end of the track view.
      */
-    public addTrack(trackElement: TrackElement): void {
-        this.trackContainerDiv.insertBefore(trackElement, this.newTrackDiv);
+    public addTrack(trackElement: TrackElement, position:number=this.trackContainerDiv.children.length-3): void {
+        console.log("Adding track at position: " + position);
+        this.trackContainerDiv.children[position+1].before(trackElement);
     }
-
     /**
-     * Removes a track from the track view.
+     * Removes a TrackElement from the track view.
      * @param el - The track to remove.
      */
     public removeTrack(el: TrackElement): void {

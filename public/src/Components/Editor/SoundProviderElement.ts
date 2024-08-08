@@ -364,6 +364,8 @@ export default class SoundProviderElement extends HTMLElement {
         this.updateMuted()
     }
 
+    set hasPlugin(value: boolean) { this.fxBtn.classList.toggle("_toggled", value) }
+
     set name(value:string){ this.trackNameInput.value=value }
     get name(){ return this.trackNameInput.value ?? "" }
 

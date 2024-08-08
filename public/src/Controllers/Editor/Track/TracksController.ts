@@ -2,8 +2,6 @@ import App, { crashOnDebug } from "../../../App";
 import OperableAudioBuffer from "../../../Audio/OperableAudioBuffer";
 import TrackElement from "../../../Components/Editor/TrackElement";
 import { RATIO_MILLS_BY_PX } from "../../../Env";
-import Plugin from "../../../Models/Plugin";
-import WaveformView from "../../../Views/Editor/WaveformView";
 import TracksView from "../../../Views/TracksView";
 import { audioCtx } from "../../../index";
 
@@ -365,13 +363,7 @@ export default class TracksController{
 
     // REMOVE TRACK
     track.element.closeBtn.addEventListener("click", () => {
-      let oldTrack = track;
-      let oldWaveform = this._app.editorView.getWaveformById(oldTrack.id);
-      let oldTrackElement = track.element;
-      let oldPlugin = track.plugin;
-
-      // Remove the track when the close button is clicked.
-      this.removeTrack(track);
+      this.removeTrack(track)
     });
 
     // TRACK AUTOMATION
@@ -532,49 +524,5 @@ export default class TracksController{
       if(!soloedTrack)this.tracks.forEach(it=>it.isSoloMuted=false)
       if(soloedTrack)track.isSoloMuted=true
     }
-  }
-
-  async undoTrackRemove(
-    oldTrack: Track,
-    element: TrackElement,
-    oldTrackWaveform: WaveformView | undefined,
-    oldPlugin: Plugin
-  ) {/*
-    
-    // restore track element with old track element state
-    const track=this.createEmptyTrack()
-    let elementState = element.getState();
-    track.element.setState(elementState);
-    // to show the hidden buttons...
-    track.element.progressDone();
-
-    track.color = oldTrack.color;
-    // get regionView of track
-    let waveformView = this._app.editorView.getWaveformById(track.id);
-    if(waveformView) waveformView.color = oldTrack.color;
-
-    // restore waveformView with old waveformView state
-    
-    oldTrack.regions.forEach(region => {
-        region.trackId = track.id;
-        track.regions.push(region);
-        //TODO const regionView = waveformView!.createRegionView(region);
-        //TODO this._app.regionsController.bindRegionEvents(region, regionView);
-      });
-
-      // restore plugin controller  with old plugin controller state
-      // connect oldPlugin to the track and audio graph
-      // TODO
-
-      track.plugin = oldPlugin;
-      track.plugin.initialized = true;
-      // reconnect it to the track
-      this._app.pluginsController.connectPedalBoard(track);
-
-      this._app.pluginsController.selectTrack(track);
-
-      track.modified = true;
-      
-    return;*/
   }
 }

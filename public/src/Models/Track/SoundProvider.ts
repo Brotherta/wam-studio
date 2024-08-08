@@ -208,6 +208,8 @@ export default abstract class SoundProvider {
     else{
       this.audioInputNode.connect(this.pannerNode)
     }
+
+    this.element.hasPlugin= !!this._plugin // !!value = Convert value to boolean
   }
 
 
