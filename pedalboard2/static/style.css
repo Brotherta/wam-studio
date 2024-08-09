@@ -220,7 +220,6 @@ h1{
 ._wall{
     position: relative;
     display: block;
-    height: 90%;
     width: 2em;
     border: 0.1em solid var(--color-front);
     &:first-child{ border-left: none;}
@@ -242,6 +241,9 @@ h1{
     >*{
         flex-grow: 1;
         width: 0;
+        &:not(:last-child){
+            border-right: 0.1rem solid var(--color-front);
+        }
     }
     >ul._directories, >ul._files{
         display: flex;

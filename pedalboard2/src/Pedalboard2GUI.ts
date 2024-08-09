@@ -4,6 +4,8 @@ import Pedalboard2WAM from "./Pedalboard2WAM.js";
 import { adoc, doc } from "./Utils/dom.js";
 import { selectWithClass, setupPannelMenus } from "./Utils/gui.js";
 import { ArrayLinkId, LinkId, Observable } from "./Utils/observable.js";
+import { prettyfy, standardize } from "./Utils/strings.js";
+
 
 
 const template= doc/*html*/`
@@ -20,27 +22,9 @@ const template= doc/*html*/`
         <div id="selector"></div>
     </div>
     <div id="presets" class="repository">
-        <ul class="_directories">
-            <li class="_selected">All</li>
-            <li>Favorites</li>
-            <li>Recent</li>
-            <li>User</li>
-            <li>User</li>
-            <li>User</li>
-            <li>User</li>
-            <li>User</li>
-        </ul>
-        <ul class="_files">
-            <li class="_selected">Preset 1</li>
-            <li>Preset 2</li>
-            <li>Preset 3</li>
-            <li class="_default">Preset 4 </li>
-        </ul>
-        <div class="_content">
-            <a>Load</a>
-            <h2>Tarte</h2>
-            <p>Les tartes sont des gâteaux plats, cuits au four, composés d'une pâte et d'une garniture sucrée ou salée. Les tartes salées sont souvent servies en entrée ou en plat principal, tandis que les tartes sucrées sont servies en dessert.</p>
-        </div>
+        <ul class="_directories"></ul>
+        <ul class="_files"></ul>
+        <div class="_content"></div>
     </div>
     <div id="settings">
         <label>Library URL</label>
@@ -266,19 +250,25 @@ export default class Pedalboard2GUI extends HTMLElement{
             // Category selector
             {
                 // Fetch categories
-                const categories_set= new Set<string>()
+                const categories_map: {[normalized:string]:{count:number,name:string,id:string}}={}
                 for(const {descriptor} of Object.values(library.plugins)){
                     for(const keyword of descriptor.keywords){
-                        categories_set.add(keyword)
+                        const normalized= standardize(keyword)
+                        const name= prettyfy(keyword)
+                        if(categories_map[normalized]===undefined) categories_map[normalized]={count:0, name, id:keyword}
+                        categories_map[normalized].count++
                     }
                 }
-                const categories= [...categories_set].sort()
+                const categories= Object.entries(categories_map)
+                    .filter(it=>it[1].count>1)
+                    .map(it=>it[1])
+                    .sort((a,b)=>a.name.localeCompare(b.name))
 
                 const category_selector= this.shadowRoot?.getElementById("category_selector") as HTMLSelectElement
                 category_selector.replaceChildren()
                 category_selector.appendChild(adoc`<option value="">All</option>`)
                 for(const category of categories){
-                    const option= adoc`<option value="${category}">${category}</option>`
+                    const option= adoc`<option value="${category.id}">${category.name}</option>`
                     category_selector.appendChild(option)
                 }
             }
