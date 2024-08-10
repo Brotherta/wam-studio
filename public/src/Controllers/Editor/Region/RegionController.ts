@@ -12,6 +12,7 @@ import MIDIRegionView from "../../../Views/Editor/Region/MIDIRegionView";
 import RegionView from "../../../Views/Editor/Region/RegionView";
 import SampleRegionView from "../../../Views/Editor/Region/SampleRegionView";
 import WaveformView from "../../../Views/Editor/WaveformView.js";
+import { SelectionManager } from "../Track/SelectionManager";
 
 
 /**
@@ -37,9 +38,6 @@ export default class RegionController {
 
   /** Editor's Application of PIXI.JS. */
   protected _editorView: EditorView;
-
-  /** The selected region and its view */
-  protected _selectedRegion: {region:RegionOf<any>,view:RegionView<any>}|undefined=undefined
 
   /**
    * The offset on X axis when a region is moved.
@@ -73,13 +71,51 @@ export default class RegionController {
   doIt
 
   constructor(app: App) {
-    this._app = app;
-    this._editorView = app.editorView;
-    this.regionIdCounter = 0;
+    this._app = app
+    this._editorView = app.editorView
+    this.regionIdCounter = 0
     this.doIt=app.doIt.bind(app)
 
-    this.bindEvents();
+    this.bindEvents()
+    this.initSelection()
   }
+
+
+
+  //// UTILS ////
+  public getView<T extends RegionOf<T>>(region: T, callback?: (view:RegionView<T>)=>void): RegionView<T>
+  public getView<T extends RegionOf<T>>(region: T|undefined|null, callback?: (view:RegionView<T>)=>void): RegionView<T>|undefined
+  public getView<T extends RegionOf<T>>(region: T|undefined|null, callback?: (view:RegionView<T>)=>void): RegionView<T>|undefined{
+    if(!region)return undefined
+    const waveform= this._editorView.getWaveFormViewById(region.trackId)
+    const view= waveform?.getRegionViewById(region.id)
+    if(view && callback)callback(view)
+    return view
+  }
+
+
+
+  //// SELECTION ////
+
+  /** The region selection manager */
+  readonly selection= new SelectionManager<RegionOf<any>>()
+
+  private initSelection(){
+    this.selection.onPrimaryChange.add((previous,selected)=>{
+      this.getView( previous, it=>it.isSelected=false )
+      this.getView( selected, it=>it.isSelected=true )
+    })
+
+    this.selection.onSecondaryAdd.add(region=>{
+      this.getView( region, it=>it.isSubSelected=true )
+    })
+
+    this.selection.onSecondaryRemove.add(region=>{
+      this.getView( region, it=>it.isSubSelected=false )
+    })
+  }
+
+
 
   get tracks(){ return this._app.tracksController.tracks }
 
@@ -138,7 +174,7 @@ export default class RegionController {
     // Move the region from the old track to the new track
     if(region.trackId!==newTrack.id){
       // Keep selection
-      const selected = this._selectedRegion?.region===region
+      const selected = this.selection.isSelected(region)
 
       // Remove the region view in the old track
       this.removeRegion(region);
@@ -146,7 +182,7 @@ export default class RegionController {
       // Create a new region view of the same region in the new track
       const newview=this.addRegion(newTrack,region)
 
-      if(selected)this.selectRegion(newview)
+      if(selected)this.selection.add(region)
     }
 
   }
@@ -221,7 +257,7 @@ export default class RegionController {
     registerOnKeyDown(key => {
       switch(key){
         case "Escape":
-          this.selectRegion(null);
+          this.selection.set(null)
           break;
 
         case "Delete":
@@ -324,35 +360,24 @@ export default class RegionController {
     this.viewportAnimationLoopId = requestAnimationFrame(
       this.viewportAnimationLoop.bind(this)
     );
-    this.selectRegion(regionView);
-    if (this._selectedRegion) {
+    const region = this._app.tracksController.getTrackById(regionView.trackId)?.getRegionById(regionView.id) as RegionOf<any>
+    if(region){
+      this.selection.toggle(region,isKeyPressed("Shift"))
+    }
+
+    const toMove= this.selection.primary
+    const view= this.getView(this.selection.primary)
+    if (view && toMove) {
+      
       // useful for avoiding scrolling with large regions
       this.selectedRegionEndOutsideViewport =
-        this._selectedRegion.view.position.x + this._selectedRegion.view.width > this._editorView.viewport.right
+        view.position.x + view.width > this._editorView.viewport.right
 
       this.selectedRegionStartOutsideViewport =
-        this._selectedRegion.view.position.x < this._editorView.viewport.left;
+        view.position.x < this._editorView.viewport.left;
 
       // Useful for undo/redo
-      this.draggedRegionState = {...this._selectedRegion, initialPos: this._selectedRegion.region.pos, initialTrackId: this._selectedRegion.region.trackId};
-    }
-  }
-
-  /**
-   * Select a region view or nothing and unselect the previous one if there is one.
-   * @param region - The region to select or null to just unselect the current one.
-   * @private
-   */
-  private selectRegion(view: RegionView<any>|null){
-    if (this._selectedRegion !== undefined) {
-      this._selectedRegion.view.deselect();
-      this._selectedRegion = undefined;
-    }
-    if (view) {
-      const region=this._app.tracksController.getTrackById(view.trackId) ?.getRegionById(view.id)! as RegionOf<any>
-      console.assert(region!==undefined)
-      this._selectedRegion = {view, region};
-      this._selectedRegion.view.select();
+      this.draggedRegionState = {region:toMove, initialPos: toMove.pos, initialTrackId: toMove.trackId};
     }
   }
 
@@ -371,7 +396,7 @@ export default class RegionController {
         const view=waveform.getRegionViewById(region.id)!
         console.assert(view !== undefined)
         waveform.removeRegionView(view)
-        if(this._selectedRegion?.region===region)this.selectRegion(null)
+        this.selection.remove(region)
       },
       ()=>{
         this.addRegion(track,region)
@@ -385,8 +410,16 @@ export default class RegionController {
    * @private
    */
   private deleteSelectedRegion(undoable:boolean): void {
-    if ( !this._selectedRegion || this.draggedRegionState )return;
-    this.removeRegion(this._selectedRegion.region,undoable)
+    if ( this.draggedRegionState )return;
+    const toRemove= this.selection.selecteds.map(it=>({region:it, track:it.trackId}))
+    this.doIt(undoable,
+      ()=>{
+        toRemove.forEach(it=>this.removeRegion(it.region))
+      },
+      ()=>{
+        toRemove.forEach(it=>this.addRegion(this._app.tracksController.getTrackById(it.track)!,it.region))
+      }
+    )
   }
 
   /**
@@ -428,11 +461,11 @@ export default class RegionController {
   }
 
   private cutSelectedRegion() {
-    if (this._selectedRegion) this.cutRegion(this._selectedRegion.region, true);
+    if (this.selection.primary) this.cutRegion(this.selection.primary, true);
   }
 
   private copySelectedRegion() {
-    if (this._selectedRegion) this.copyRegion(this._selectedRegion.region, true);
+    if (this.selection.primary) this.copyRegion(this.selection.primary, true);
   }
 
   private pasteRegion(undoable: boolean=false) {
@@ -478,10 +511,10 @@ export default class RegionController {
    * the second is selected and the playhead does not move.
    */
   splitSelectedRegion() {
-    if (!this._selectedRegion) return;
+    if (!this.selection.primary) return
     if (!this.isPlayheadOnSelectedRegion()) return
 
-    let originalRegion = this._selectedRegion.region;
+    let originalRegion = this.selection.primary
 
     // Get the split position relative to the region start
     const splitPosition = this._app.editorView.playhead.position.x - originalRegion.pos
@@ -499,7 +532,7 @@ export default class RegionController {
     const firstRegionView= this.addRegion(track,firstRegion)
     const secondRegionView= this.addRegion(track,secondRegion)
     this.removeRegion(originalRegion)
-    this.selectRegion(secondRegionView);
+    this.selection.set(secondRegion);
 
     this._app.undoManager.add({
       undo: ()=> {
@@ -522,37 +555,33 @@ export default class RegionController {
    * 
    */
   mergeSelectedRegion() {
-    if (!this._selectedRegion) return;
+    if (!this.selection.primary || this.selection.secondaryCount<=0) return;
 
-    let rightRegion = this._selectedRegion.region;
-    let track=this._app.tracksController.getTrackById(rightRegion.trackId)!
+    let mainRegion= this.selection.primary;
+    let otherRegions= [...this.selection.secondaries]
+    let track= this._app.tracksController.getTrackById(mainRegion.trackId)!
 
-    // Find the previous region
-    let leftRegion: RegionOf<any>|null = null
-    let leftRegionEnd = -1
-    for(const candidate of track.regions){
-      if(rightRegion.isCompatibleWith(candidate) && candidate.end<=rightRegion.end && candidate.end>leftRegionEnd && candidate.id!=rightRegion.id){
-        leftRegion=candidate
-        leftRegionEnd=candidate.end
-      }
-    }
-    if(!leftRegion)return
-
-    // Merge the two regions into a new region
-    const newRegion=leftRegion.clone()
-    newRegion.mergeWith(rightRegion)
+    // Merge the regions into a new region
+    const newRegion= mainRegion.clone()
+    otherRegions.forEach(it=>newRegion.mergeWith(it))
 
     this.doIt(true,
       ()=>{
-        const view=this.addRegion(track,newRegion)
-        if(this._selectedRegion?.region===rightRegion)this.selectRegion(view)
-        this.removeRegion(leftRegion!)
-        this.removeRegion(rightRegion)
+        this.addRegion(track,newRegion)
+        if(this.selection.primary===mainRegion)this.selection.set(newRegion)
+
+        this.removeRegion(mainRegion)
+        otherRegions.forEach(it=>this.removeRegion(it))
       },
       ()=>{
-        this.addRegion(track,leftRegion!)
-        const view=this.addRegion(track,rightRegion)
-        if(this._selectedRegion?.region===newRegion)this.selectRegion(view)
+        const isSelected= this.selection.primary===newRegion
+        if(isSelected) this.selection.set(null)
+        otherRegions.forEach(it=>{
+          this.addRegion(track,it)
+          if(isSelected) this.selection.add(it)
+        })
+        this.addRegion(track,mainRegion)
+        if(isSelected)this.selection.add(mainRegion)
         this.removeRegion(newRegion)
       }
     )
@@ -560,12 +589,13 @@ export default class RegionController {
   }
 
   isPlayheadOnSelectedRegion() {
-    if (!this._selectedRegion) return;
+    if (!this.selection.primary) return;
 
     // check if playhead is on the selected region
-    const playHeadPosX = this._app.editorView.playhead.position.x;
-    const selectedRegionPosX = this._selectedRegion.view!.position.x;
-    const selectedRegionWidth = this._selectedRegion.region.width
+    const view = this.getView(this.selection.primary)
+    const playHeadPosX = this._app.editorView.playhead.position.x
+    const selectedRegionPosX = view.position.x
+    const selectedRegionWidth = this.selection.primary.width
 
     return (
       playHeadPosX >= selectedRegionPosX &&
@@ -580,8 +610,7 @@ export default class RegionController {
    * @private
    */
   private handlePointerMove(e: FederatedPointerEvent): void {
-    if (!this._selectedRegion || !this._offsetX)
-      return;
+    if (!this.selection.primary || !this._offsetX) return;
 
     // compute delta since last move. If delta is 0, do nothing
     const delta = e.data.global.x - this.previousMouseXPos;
@@ -595,7 +624,8 @@ export default class RegionController {
     newX = Math.max(0, Math.min(newX, this._editorView.worldWidth));
 
     // If reaching end of world, do nothing
-    const regionEndPos = newX + this._selectedRegion.view.width;
+    const view = this.getView(this.selection.primary)
+    const regionEndPos = newX + view.width;
 
     if (regionEndPos >= this._editorView.worldWidth || newX <= 0) {
       return;
@@ -613,12 +643,12 @@ export default class RegionController {
       newX = Math.round(newX / cellSize) * cellSize;
     }
 
-    let parentWaveform = this._selectedRegion.view.parent as WaveformView;
+    let parentWaveform = view.parent as WaveformView;
     let parentTop = parentWaveform.y;
     let parentBottom = parentTop + parentWaveform.height;
 
     // Check if the region is moved out of its current track
-    let targetTrackId=this._selectedRegion.region.trackId
+    let targetTrackId= this.selection.primary.trackId
     if(y>parentBottom && !this._app.waveformController.isLast(parentWaveform)){
       targetTrackId = this._app.waveformController.getNextWaveform(parentWaveform)?.trackId ?? targetTrackId
     }
@@ -628,7 +658,7 @@ export default class RegionController {
 
     // Move the region
     const newTrack=this._app.tracksController.getTrackById(targetTrackId)!
-    this.moveRegion(this._selectedRegion.region,newTrack,newX)
+    this.moveRegion(this.selection.primary, newTrack, newX)
 
     this.checkIfScrollingNeeded(e.data.global.x);
   }
@@ -638,8 +668,10 @@ export default class RegionController {
    * @private
    */
   checkIfScrollingNeeded(mousePosX: number) {
-    if (!this._selectedRegion || !this._offsetX)
-      return;
+    if (!this.selection.primary || !this._offsetX) return
+
+    const view= this.getView(this.selection.primary)
+
     // scroll viewport if the right end of the moving  region is close
     // to the right or left edge of the viewport, or left edge of the region close to left edge of viewxport
     // (and not 0 or end of viewport)
@@ -654,10 +686,9 @@ export default class RegionController {
     const MIN_SCROLL_SPEED = 1;
     const MAX_SCROLL_SPEED = 10;
 
-    const regionEndPos =
-      this._selectedRegion.region.pos + this._selectedRegion.view.width;
+    const regionEndPos = this.selection.primary.pos + view.width;
 
-    const regionStartPos = this._selectedRegion.region.pos;
+    const regionStartPos = this.selection.primary.pos;
     let viewport = this._editorView.viewport;
     const viewportWidth = viewport.right - viewport.left;
 
@@ -713,9 +744,11 @@ export default class RegionController {
   ) {
     return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
   }
+
   viewportAnimationLoop() {
-    if (!this._selectedRegion || !this._offsetX)
-      return;
+    if (!this.selection.primary || !this._offsetX) return
+
+    const view= this.getView(this.selection.primary)
 
     let viewScrollSpeed = 0;
     if (this.scrollingRight) {
@@ -732,11 +765,11 @@ export default class RegionController {
 
       viewport.left += viewScrollSpeed;
       // move also region and region view
-      if (this._selectedRegion.view.position.x + viewScrollSpeed < 0) return;
+      if (view.position.x + viewScrollSpeed < 0) return;
 
       // adjust region start
-      this._selectedRegion.region.start += viewScrollSpeed * RATIO_MILLS_BY_PX;
-      this._selectedRegion.view.position.x += viewScrollSpeed;;
+      this.selection.primary.start += viewScrollSpeed * RATIO_MILLS_BY_PX;
+      view.position.x += viewScrollSpeed;;
 
       // adjust horizontal scrollbar so that it corresponds to the current viewport position
       // scrollbar pos depends on the left position of the viewport.

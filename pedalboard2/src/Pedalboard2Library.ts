@@ -145,7 +145,6 @@ export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescr
         try{
             const descriptor=await fetch(descriptorURL).then(response=>response.json()) as WamDescriptor
             descriptor.identifier ??= descriptor.vendor+"."+descriptor.name
-            if(descriptor.isInstrument)descriptor.keywords.push("instrument")
             ret.plugins[descriptor.identifier]={descriptor, classURL}
         }
         catch(e){

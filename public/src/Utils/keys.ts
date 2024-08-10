@@ -42,7 +42,7 @@ const onKeyUpMap: {[key:string]:(key:string)=>void} = {}
  * @returns 
  */
 export function isKeyPressed(key: string): boolean{
-    return keyMap[key] && true
+    return !!keyMap[key]
 }
 
 /**

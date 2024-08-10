@@ -29,7 +29,13 @@ export default class MIDIRegion extends RegionOf<MIDIRegion>{
     }
 
     override mergeWith(other: MIDIRegion): void {
-        this.midi=this.midi.merge(other.midi, other.start-this.start)
+        const offset= other.start-this.start
+        if(offset>0) this.midi= this.midi.merge(other.midi, offset)
+        else{
+            this.start= other.start
+            this.midi= other.midi.merge(this.midi, -offset)
+        }
+        
     }
 
     override save(): Blob {

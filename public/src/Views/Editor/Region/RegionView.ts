@@ -27,8 +27,7 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
     /** The contained region  */
     private region_width: number;
     
-    /** Boolean to know if the region is selected or not. Use to draw the current border of the background. */
-    private _selected: boolean;
+
 
     constructor(editor: EditorView, region: REGION) {
         super();
@@ -37,7 +36,6 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
         this._editorView = editor;
         this.trackId = region.trackId;
         this.id = region.id;
-        this._selected = false;
 
         this._background = new Graphics();
         this._wave = new Graphics();
@@ -68,17 +66,30 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
         this.drawContent(this._wave, color, region)
     }
 
-    /** Draws the background of the region to be selected. (White border) */
-    public select(): void {
-        this._selected = true;
+
+    /** Is the region selected or not. Use to draw the current border of the background. */
+    public set isSelected(value: boolean) {
+        this._isSelected = value
+        if(value)this._isSubSelected = false
         this.drawBackground();
     }
 
-    /** Draws the background of the region to be deselected. (No border) */
-    public deselect():void {
-        this._selected = false;
-        this.drawBackground();
+    public get isSelected(){ return this._isSelected }
+
+    private _isSelected=false
+
+
+    /** Is the region secondary selected or not. Use to draw the current border of the background. */
+    public set isSubSelected(value: boolean) {
+        this._isSubSelected = value
+        if(value)this._isSelected = false
+        this.drawBackground()
     }
+
+    public get isSubSelected(){ return this._isSubSelected }
+
+    private _isSubSelected=false
+    
 
     /**
      * Scales the region given the new duration and the current ratio of pixels by milliseconds.
@@ -96,7 +107,10 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
 
     /** Draws the background of the region. It will check if the region is selected or not to draw the border. */
     private drawBackground(): void {
-        let color = this._selected ? 0xffffff : 0x000000
+        let color
+        if(this.isSelected) color = 0xffffff
+        else if(this.isSubSelected) color = 0xffaa00
+        else color = 0x000000
         this._background.clear();
         this._background.beginFill(0xffffff, 0.3);
         this._background.lineStyle({width: 1, color: color});

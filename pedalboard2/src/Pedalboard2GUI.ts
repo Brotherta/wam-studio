@@ -229,6 +229,9 @@ export default class Pedalboard2GUI extends HTMLElement{
 
 
     //// WAM LIBRARY : the list of available WAMs ////
+
+    private category_to_plugins: {[normalized:string]:string[]}={}
+
     protected initLibrary(library: Pedalboard2Library|null){
         this.executePromise(async()=>{
             console.log("aa",library)
@@ -250,25 +253,34 @@ export default class Pedalboard2GUI extends HTMLElement{
             // Category selector
             {
                 // Fetch categories
-                const categories_map: {[normalized:string]:{count:number,name:string,id:string}}={}
+                const categories_map: {[normalized:string]:{count:number,name:string}}={}
+                this.category_to_plugins={}
                 for(const {descriptor} of Object.values(library.plugins)){
-                    for(const keyword of descriptor.keywords){
+                    const keywords=[...descriptor.keywords]
+                    // Additional keywords
+                    if(descriptor.keywords) keywords.push(descriptor.vendor)
+                    if(descriptor.isInstrument) keywords.push("instrument")
+
+                    for(const keyword of keywords){
                         const normalized= standardize(keyword)
                         const name= prettyfy(keyword)
-                        if(categories_map[normalized]===undefined) categories_map[normalized]={count:0, name, id:keyword}
+                        if(categories_map[normalized]===undefined) categories_map[normalized]={count:0, name}
                         categories_map[normalized].count++
+                        
+                        if(!this.category_to_plugins[normalized])this.category_to_plugins[normalized]=[]
+                        this.category_to_plugins[normalized].push(descriptor.identifier)
                     }
                 }
                 const categories= Object.entries(categories_map)
                     .filter(it=>it[1].count>1)
-                    .map(it=>it[1])
+                    .map(it=>({...it[1], normalized:it[0]}))
                     .sort((a,b)=>a.name.localeCompare(b.name))
 
                 const category_selector= this.shadowRoot?.getElementById("category_selector") as HTMLSelectElement
                 category_selector.replaceChildren()
                 category_selector.appendChild(adoc`<option value="">All</option>`)
                 for(const category of categories){
-                    const option= adoc`<option value="${category.id}">${category.name}</option>`
+                    const option= adoc`<option value="${category.normalized}">${category.name}</option>`
                     category_selector.appendChild(option)
                 }
             }
@@ -319,8 +331,12 @@ export default class Pedalboard2GUI extends HTMLElement{
             selector.replaceChildren()
 
             // Plugin Selector
-            for(const {descriptor,classURL} of Object.values(this.node.library.value?.plugins??{})){
-                if(category && !descriptor.keywords.includes(category))continue
+            const ids= category ? this.category_to_plugins[category] : Object.keys(this.node.library.value?.plugins??{})
+            for(const identifier of ids){
+                const pluginInfo=this.node.library.value?.plugins[identifier]
+                if(!pluginInfo)continue
+
+                const {descriptor, classURL}= pluginInfo
 
                 // Get thumbnail
                 const src= await (async()=>{
