@@ -1,8 +1,9 @@
+import { PresetManager } from "./Gui/PresetManager.js";
 import { importPedalboard2Library, Pedalboard2Library, resolvePedalboard2Library } from "./Pedalboard2Library.js";
 import { Pedalboard2Node, Pedalboard2NodeChild } from "./Pedalboard2Node.js";
 import Pedalboard2WAM from "./Pedalboard2WAM.js";
-import { adoc, doc } from "./Utils/dom.js";
-import { selectWithClass, setupPannelMenus } from "./Utils/gui.js";
+import { adoc, doc, replaceInTemplate } from "./Utils/dom.js";
+import { setupPannelMenus } from "./Utils/gui.js";
 import { ArrayLinkId, LinkId, Observable } from "./Utils/observable.js";
 import { prettyfy, standardize } from "./Utils/strings.js";
 
@@ -23,11 +24,7 @@ const template= doc/*html*/`
         </select>
         <div id="selector"></div>
     </div>
-    <div id="presets" class="repository">
-        <ul class="_directories"></ul>
-        <ul class="_files"></ul>
-        <div class="_content"></div>
-    </div>
+    <div id="presets" class="repository"></div>
     <div id="settings">
         <label>Library URL</label>
         <input id="library-input" type="text"/>
@@ -65,15 +62,21 @@ export default class Pedalboard2GUI extends HTMLElement{
     private wam_chain_link?: ArrayLinkId<Pedalboard2NodeChild>
     private library_link?: LinkId<Pedalboard2Library|null>
     private category_link?: any
+    
+    private preset_manager!: PresetManager
 
     constructor(private module: Pedalboard2WAM){
         super()
         this.node= module.audioNode
+        this.preset_manager= new PresetManager(this.module.audioNode, promise=>this.executePromise(promise))
     }
 
     connectedCallback(){
         this.attachShadow({mode:"open"})
         this.shadowRoot?.replaceChildren(template.cloneNode(true)) 
+
+        // Sub elements
+        replaceInTemplate(this.shadowRoot!.getElementById("presets")!, this.preset_manager)
 
         // Register update handlers
         this.wam_chain_link= this.node.childs.link(
@@ -181,7 +184,7 @@ export default class Pedalboard2GUI extends HTMLElement{
 
             // Remove button
             window.querySelector("._remove")!.addEventListener("click", ()=>{
-                this.node.removeChild(child)
+                this.node.destroyChild(child)
             })
 
             // Start dragging
@@ -226,6 +229,7 @@ export default class Pedalboard2GUI extends HTMLElement{
             const [wam,descriptor]= child
             window.remove()
             wam.destroyGui(gui)
+            this.preset_manager.destroy()
         })
     }
 
@@ -238,18 +242,6 @@ export default class Pedalboard2GUI extends HTMLElement{
     protected initLibrary(library: Pedalboard2Library|null){
         this.executePromise(async()=>{
             this.library_input.value= library?.descriptor?.url ?? ""
-
-            // Setup
-            const preset_repo= this.shadowRoot?.getElementById("presets")!
-            const preset_dir = preset_repo.querySelector(":scope>._directories")!
-            const preset_file= preset_repo.querySelector(":scope>._files")!
-            const preset_desc= preset_repo.querySelector(":scope>._content")!
-
-            // Cleanup
-            preset_dir.replaceChildren()
-            preset_file.replaceChildren()
-            preset_desc.replaceChildren()
-
             if(!library)return
 
             // Category selector
@@ -289,36 +281,6 @@ export default class Pedalboard2GUI extends HTMLElement{
 
             this.plugin_category.value= null
 
-            // Presets Directory
-            // Create categories
-            for(const [key,presets] of Object.entries(library.presets)){
-                const category= adoc`<li>${key}</li>`
-                preset_dir.appendChild(category)
-                category.addEventListener("click", ()=>{
-                    selectWithClass(category, "_selected")
-                    preset_desc.replaceChildren()
-
-                    // Create presets
-                    preset_file.replaceChildren()
-                    for(const [name,desc] of Object.entries(presets)){
-                        const file= adoc`<li>${name}</li>`
-                        preset_file.appendChild(file)
-                        file.addEventListener("click", ()=>{
-                            selectWithClass(file, "_selected")
-
-                            // Set description
-                            preset_desc.replaceChildren()
-                            preset_desc.appendChild(adoc/*html*/`<a>Load</a>`)
-                                .addEventListener("click", ()=>{
-                                    this.executePromise(async()=>await this.node.setState(desc.state))
-                                })
-                            preset_desc.appendChild(adoc`<h2>${name}</h2>`)
-                            preset_desc.appendChild(adoc`<p>${desc.description}</p>`)
-                        })
-                    }
-                    
-                })
-            }
         })
     }
 
@@ -384,7 +346,7 @@ export default class Pedalboard2GUI extends HTMLElement{
 
     private promiseChain: Promise<unknown>= Promise.resolve()
 
-    private executePromise(promise: (...args:any)=>Promise<unknown>){
+    private executePromise(promise: ()=>Promise<unknown>){
         const loading_state=this.shadowRoot!.getElementById("loading-state")!
         const loading_message=this.shadowRoot!.getElementById("loading-message")!
         this.promiseChain= this.promiseChain.then(async()=>{

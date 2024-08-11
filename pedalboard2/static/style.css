@@ -209,20 +209,21 @@ h1{
 
 ._connection{
     display: block;
-    height: 1em;
-    width: .5em;
+    height: 1rem;
+    width: .5rem;
     position: absolute;
 
-    &._output{ right:-.5em; }
-    &._input{ left:-.5em; }
-    &._audio{ top: 20%; background-color: red; }
-    &._midi{ top: 40%; background-color: blue; }
+    &._output{ right:-.5rem; }
+    &._input{ left:-.5rem; }
+    &._audio{ top: 2rem; background-color: red; }
+    &._midi{ top: 4rem; background-color: blue; }
 }
 
 ._wall{
     position: relative;
     display: block;
     width: 2em;
+    min-width: 2em;
     border: 0.1em solid var(--color-front);
     &:first-child{ border-left: none;}
     &:last-child{ border-right: none;}	
@@ -256,6 +257,8 @@ h1{
         overflow-y: scroll;
 
         >li{
+            display: flex;
+            flex-direction: row;
             border-bottom: 0.1rem solid var(--color-front);
             margin-bottom: 0.1em;
             padding: 0.1em;
@@ -272,6 +275,38 @@ h1{
                 &:hover{
                     background-color: var(--color-mid);
                 }
+            }
+            >a{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 1em;
+                height: 1em;
+                cursor: pointer;
+                &:first-of-type{
+                    margin-left: auto;
+                }
+                &:last-child{
+                    margin-right: 1em;
+                }
+                &:hover{
+                    scale: 1.2;
+                    font-weight: bold;
+                }
+            }
+        }
+        >input{
+            outline: none;
+            border: 0.1rem solid var(--color-front);
+            background-color: var(--color-back);
+            color: var(--color-front);
+            margin-top: 0.5em;
+            margin-left: 1em;
+            &:focus{
+                background-color: var(--color-mid);
+            }
+            &::placeholder{
+                color: var(--color-mid);
             }
         }
     }

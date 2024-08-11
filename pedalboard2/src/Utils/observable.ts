@@ -168,4 +168,5 @@ export class Observable<T> extends ReadonlyObservable<T> {
 
     get value(): T { return this._value }
 
+    get readonly(): ReadonlyObservable<T> {return this }
 }

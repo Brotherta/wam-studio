@@ -149,6 +149,11 @@ export class Pedalboard2Node extends WamNode {
         await this.build()
     }
 
+    public async destroyChild(node: Pedalboard2NodeChild){
+        this.removeChild(node)
+        node[0].audioNode.destroy()
+    }
+
     /** The number of child nodes */
     public get childCount(){ return this._childs.length }
 

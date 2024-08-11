@@ -55,3 +55,49 @@ export function doc(strings: TemplateStringsArray, ...values:any[] ): DocumentFr
 export function adoc(strings: TemplateStringsArray, ...values:any[] ): Element{
     return doc(strings, ...values).firstElementChild as Element
 }
+
+export function replaceInTemplate(target: Element, replacement: Element){
+    replacement.className= target.className
+    replacement.id= target.id
+    target.replaceWith(replacement)
+}
+
+/**
+ * Type safe CSS selector class.
+ * Work with the selector Tagger Template Function, so strings can be escaped correctly.
+ */
+export class Selector{
+
+    /** @deprecated Use {@link selector} instead */
+    constructor(readonly raw: string){}
+
+    query(node: Element){
+        return node.querySelector(this.raw)
+    }
+
+    queryAll(node: Element){
+        return node.querySelectorAll(this.raw)
+    }
+}
+
+export function selector(strings: TemplateStringsArray, ...values:any[] ): Selector{
+    let result= ""
+
+    // Built the inner html and fetch the nodes
+    function addValue(value: any){
+        if(value===null || value===undefined) {}
+        else if(value instanceof Selector) result+= value.raw
+        else if(typeof value==="string") result+= escapeHtml(value)
+        else if(typeof value[Symbol.iterator]==="function"){
+            for(const v of value)addValue(v)
+        }
+        else result+=escapeHtml(""+value)
+    }
+    for(let i=0; i<values.length; i++){
+        result+=strings[i]
+        addValue(values[i])
+    }
+    result+=strings[strings.length-1]
+
+    return new Selector(result) 
+}
