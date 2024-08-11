@@ -19,8 +19,8 @@ export default class MIDIRegion extends RegionOf<MIDIRegion>{
     override get duration(): number { return this.midi.duration; }
 
     override split(cut:number): [MIDIRegion, MIDIRegion] {
-        const first=this.midi.view(0,cut).clone()
-        const second=this.midi.view(cut).clone()
+        const first=this.midi.view(0,cut-1).clone()
+        const second=this.midi.view(cut-1).clone()
         return [new MIDIRegion(first, this.start), new MIDIRegion(second, this.start+cut)]
     }
 

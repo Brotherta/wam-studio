@@ -107,6 +107,10 @@ export type RegionType<T extends RegionOf<T>> = string
 
 export abstract class RegionOf<THIS extends RegionOf<THIS>> extends Region {
 
+    /**
+     * Split the region into two region
+     * @param cut The position in milliseconds relative to the region start
+     */
     abstract override split(cut:number): [THIS, THIS]
 
     abstract override emptyAlike(start: number, duration: number): THIS

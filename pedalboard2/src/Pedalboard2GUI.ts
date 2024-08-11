@@ -11,6 +11,8 @@ import { prettyfy, standardize } from "./Utils/strings.js";
 const template= doc/*html*/`
     <link rel="stylesheet" href="${import.meta.resolve("./style.css")}">
     <h1>Pedalboard 2</h1>
+    <div id="loading-state"></div>
+    <div id="loading-message">Loading</div>
     <div class="pannel">
         <div class="_button _selected" --data-target="plugin_selector">Plugins</div>
         <div class="_button" --data-target="presets">Presets</div>
@@ -106,8 +108,7 @@ export default class Pedalboard2GUI extends HTMLElement{
 
         // Handle library input
         this.library_input= this.shadowRoot?.getElementById("library-input")! as HTMLInputElement
-        this.library_input.addEventListener("change", async()=>{
-            console.log("Loading library", this.library_input.value)
+        this.library_input.addEventListener("change", ()=>this.executePromise(async()=>{
             const error= this.shadowRoot?.getElementById("library-input-output")! as HTMLInputElement
             error.value="Loading..."
             error.className=""
@@ -122,9 +123,11 @@ export default class Pedalboard2GUI extends HTMLElement{
             }catch(err:any){
                 error.value= err.message
                 error.className="error"
+                throw err
+            }finally{
+                this.library_input.disabled= false
             }
-            this.library_input.disabled= false
-        })
+        }))
 
         // Handle category selector
         const category_selector= this.shadowRoot?.getElementById("category_selector") as HTMLSelectElement
@@ -152,7 +155,7 @@ export default class Pedalboard2GUI extends HTMLElement{
     protected initWAM(child: Pedalboard2NodeChild, index: number){
         this.executePromise(async()=>{
             const [wam,descriptor]= child
-            
+
             // Add window
             const modules= this.shadowRoot?.getElementById("modules")!
             const window= moduleTemplate.cloneNode(true) as HTMLElement
@@ -234,7 +237,6 @@ export default class Pedalboard2GUI extends HTMLElement{
 
     protected initLibrary(library: Pedalboard2Library|null){
         this.executePromise(async()=>{
-            console.log("aa",library)
             this.library_input.value= library?.descriptor?.url ?? ""
 
             // Setup
@@ -364,11 +366,11 @@ export default class Pedalboard2GUI extends HTMLElement{
                 selector.appendChild(thumbnail)
 
                 // Add wam
-                thumbnail.addEventListener("click", async()=>{
+                thumbnail.addEventListener("click", ()=> this.executePromise(async()=>{
                     const wam=await this.node.createChildWAM(descriptor.identifier)
-                    if(wam==null) return
+                    if(wam==null) throw Error("Failed to create WAM")
                     this.node.addChild(wam)
-                })
+                }))
             }
         })
     }
@@ -383,7 +385,25 @@ export default class Pedalboard2GUI extends HTMLElement{
     private promiseChain: Promise<unknown>= Promise.resolve()
 
     private executePromise(promise: (...args:any)=>Promise<unknown>){
-        this.promiseChain= this.promiseChain.then(promise)
+        const loading_state=this.shadowRoot!.getElementById("loading-state")!
+        const loading_message=this.shadowRoot!.getElementById("loading-message")!
+        this.promiseChain= this.promiseChain.then(async()=>{
+            loading_state.className="loading"
+            loading_state.title="Loading..."
+            loading_message.textContent= "Loading..."
+            try{
+                const ret=await promise()
+                loading_state.className="ok"
+                loading_state.title="Success!"
+                loading_message.textContent= "Success!"
+                return ret
+            }catch(e: any){
+                loading_state.className="error"
+                loading_state.title=e.message ?? "An error occured"
+                loading_message.textContent= e.message ?? "An error occured"
+                return Promise.resolve()
+            }
+        })
     }
 }
 

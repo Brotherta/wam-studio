@@ -17,6 +17,8 @@
     min-width: 30em;
     min-height: 30em;
     width: 60em;
+
+    position: relative;
 }
 h1{
     align-self: stretch; 
@@ -332,4 +334,60 @@ input[type="text"]{
         &.error{ color: red; }
         &.success{ color: green; }
     }
+}
+
+
+
+/* LOADING STATE */
+#loading-state{
+    display: block;
+    width: 1em;
+    height: 1em;
+
+    position: absolute;
+    top: 0.5em;
+    left: 0.5em;
+
+    cursor: help;
+
+    &:not(:hover)~#loading-message{
+        display: none;
+    }
+
+    &.error{
+        &::before, &::after{
+            position: absolute;
+            content: "";
+            display: block;
+            height: 100%;
+            width: 30%;
+            margin-left: 30%;
+            background-color: red;
+        }
+        &::before{ rotate: 45deg; }
+        &::after{ rotate: -45deg; }
+    }
+
+    &.ok{
+        background-color: green;
+        border-radius: 1em;
+    }
+
+    &.loading{
+        border: var(--color-front) 0.2em solid;
+        border-left: transparent 0.2em solid;
+        border-radius: 1em;
+        animation: loading-state-loading 1s linear infinite;
+    }
+}
+
+#loading-message{
+    position: absolute;
+    top: 0.5em;
+    left: 2em;
+}
+
+@keyframes loading-state-loading {
+    0%{ transform: rotate(0deg);}
+    100%{ transform: rotate(360deg);}
 }
