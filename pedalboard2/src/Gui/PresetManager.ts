@@ -44,6 +44,7 @@ export class PresetManager extends HTMLElement{
 
     /** Called when start using a library */
     initLibrary(library: Pedalboard2Library|null){
+        console.log("Change library in presets")
         this.refreshPresets()
     }
 
@@ -65,6 +66,8 @@ export class PresetManager extends HTMLElement{
 
         // Create groups
         groupGUIs.replaceChildren()
+        presetGUIs.replaceChildren()
+        presetDesc.replaceChildren()
         for(const [groupName,{isBuiltin,content}] of Object.entries(repository).sort((a,b)=>a[0].localeCompare(b[0]))){
             // Group name
             const groupGUI= adoc`<li value="${groupName}">${groupName}</li>`

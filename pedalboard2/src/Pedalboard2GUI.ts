@@ -168,53 +168,59 @@ export default class Pedalboard2GUI extends HTMLElement{
             window.querySelector("._name")!.textContent= descriptor.name
             
             // Set content
-            const gui= await wam.createGui()
-            window.querySelector("._content")!.replaceChildren(gui)
+            try{
+                const gui= await wam.createGui()
+                window.querySelector("._content")!.replaceChildren(gui)
 
-            // Set Inputs / Outputs
-            if(wam.descriptor.hasAudioInput && wam.audioNode.numberOfInputs>0)
-                window.appendChild(adoc/*html*/`<i class="_connection _input _audio"></i>`)
-            if(wam.descriptor.hasAudioOutput && wam.audioNode.numberOfOutputs>0)
-                window.appendChild(adoc/*html*/`<i class="_connection _output _audio"></i>`)
-            if(wam.descriptor.hasMidiInput)
-                window.appendChild(adoc/*html*/`<i class="_connection _input _midi"></i>`)
-            
-            //if(wam.descriptor.hasMidiOutput)
-            //    window.appendChild(adoc/*html*/`<i class="_connection _output _midi"></i>`)
+                // Set Inputs / Outputs
+                if(wam.descriptor.hasAudioInput && wam.audioNode.numberOfInputs>0)
+                    window.appendChild(adoc/*html*/`<i class="_connection _input _audio"></i>`)
+                if(wam.descriptor.hasAudioOutput && wam.audioNode.numberOfOutputs>0)
+                    window.appendChild(adoc/*html*/`<i class="_connection _output _audio"></i>`)
+                if(wam.descriptor.hasMidiInput)
+                    window.appendChild(adoc/*html*/`<i class="_connection _input _midi"></i>`)
+                
+                //if(wam.descriptor.hasMidiOutput)
+                //    window.appendChild(adoc/*html*/`<i class="_connection _output _midi"></i>`)
 
-            // Remove button
-            window.querySelector("._remove")!.addEventListener("click", ()=>{
+                // Remove button
+                window.querySelector("._remove")!.addEventListener("click", ()=>{
+                    this.node.destroyChild(child)
+                })
+
+                // Start dragging
+                window.addEventListener("dragstart", (event)=>{
+                    event.dataTransfer?.setDragImage(window, 0, 0)
+                    event.dataTransfer?.setData("text/plain", child[0].instanceId)
+                })
+
+                // Drag enter -> over -> leave -> drop
+                window.addEventListener("dragenter", (event)=> window.after(dropMarkerTemplate.cloneNode(true)) )
+                window.addEventListener("dragleave", (event)=> window.nextElementSibling?.remove() )
+                window.addEventListener("dragover", (event)=> event.preventDefault() )
+                window.addEventListener("drop", (event)=>{
+                    window.nextElementSibling?.remove()
+
+                    // Get child
+                    const dropInstanceID=event.dataTransfer?.getData("text/plain")
+                    if(!dropInstanceID)return
+                    const dropChild= this.node.childs.find(it=>it[0].instanceId==dropInstanceID)
+                    if(!dropChild || dropChild===child)return
+
+                    // Remove
+                    this.node.removeChild(dropChild)
+
+                    // Add
+                    const index= this.node.childs.indexOf(child)+1
+                    this.node.addChild(dropChild,index)
+                })
+                
+                this._child_to_gui.set(child, [window,gui])
+            }catch(err:any){
+                window.remove()
                 this.node.destroyChild(child)
-            })
-
-            // Start dragging
-            window.addEventListener("dragstart", (event)=>{
-                event.dataTransfer?.setDragImage(window, 0, 0)
-                event.dataTransfer?.setData("text/plain", child[0].instanceId)
-            })
-
-            // Drag enter -> over -> leave -> drop
-            window.addEventListener("dragenter", (event)=> window.after(dropMarkerTemplate.cloneNode(true)) )
-            window.addEventListener("dragleave", (event)=> window.nextElementSibling?.remove() )
-            window.addEventListener("dragover", (event)=> event.preventDefault() )
-            window.addEventListener("drop", (event)=>{
-                window.nextElementSibling?.remove()
-
-                // Get child
-                const dropInstanceID=event.dataTransfer?.getData("text/plain")
-                if(!dropInstanceID)return
-                const dropChild= this.node.childs.find(it=>it[0].instanceId==dropInstanceID)
-                if(!dropChild || dropChild===child)return
-
-                // Remove
-                this.node.removeChild(dropChild)
-
-                // Add
-                const index= this.node.childs.indexOf(child)+1
-                this.node.addChild(dropChild,index)
-            })
-            
-            this._child_to_gui.set(child, [window,gui])
+                throw err
+            }
         })
     }
 

@@ -70,7 +70,6 @@ export default class Track extends SoundProvider {
     for(const [_,[__,player]] of this.merged_regions){ player.setLoop(range) }
   }
 
-  private _playing=false
   public override play(): void{
     this._playhead_player.audioNode.isPlaying=true
     for(const [_,[__,player]] of this.merged_regions){ player.isPlaying=true }

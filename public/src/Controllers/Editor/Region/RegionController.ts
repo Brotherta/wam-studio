@@ -362,7 +362,8 @@ export default class RegionController {
     );
     const region = this._app.tracksController.getTrackById(regionView.trackId)?.getRegionById(regionView.id) as RegionOf<any>
     if(region){
-      this.selection.toggle(region,isKeyPressed("Shift"))
+      if(isKeyPressed("Control")) this.selection.toggle(region,true)
+      else this.selection.set(region)
     }
 
     const toMove= this.selection.primary
