@@ -496,6 +496,7 @@ export default class RegionController {
     this.doIt(undoable,
       ()=>{
         this.addRegion(track!,newRegion)
+        this.selection.set(newRegion)
 
         // move playhead at the end of the newly pasted region
         this._app.host.playhead=newRegion.end
