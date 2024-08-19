@@ -8,7 +8,7 @@ export function prettyfy(str: string){
     // Exemple:                               stereoEnhancer  plugin
 
     // Add Spaces Before UpperCase            stereo Enhancer  plugin
-    str = str.replace(/([A-Z])/g, ' $1');
+    str = str.replace(/^([A-Z ])([A-Z]])/g, '$1 $2');
 
     // UpperCase First Letter                 Stereo Enhancer  Plugin
     str = str.charAt(0).toUpperCase() + str.slice(1);

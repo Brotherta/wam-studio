@@ -83,7 +83,8 @@ export class Pedalboard2Error extends Error{
  * @throws {Error} If the library is not compatible with the version or the id is not the same, or if the library is not valid.
  **/
 export async function importPedalboard2Library(url: string, version?: [number,number], id?: string): Promise<Pedalboard2LibraryDescriptor>{
-    const json=await fetch(url).then(response=>response.json()).catch(err=>{throw new Error("Could not fetch the library descriptor at "+url)})
+    const completeUrl= new URL(url,window.location.href).href
+    const json=await fetch(completeUrl).then(response=>response.json()).catch(err=>{throw new Error("Could not fetch the library descriptor at "+url)})
     
     if(
         !validate(json.name, "string")
@@ -117,7 +118,7 @@ export async function importPedalboard2Library(url: string, version?: [number,nu
     if(version && (json.version[0]!=version[0] || json.version[1]>version[1]))
         throw new Pedalboard2Error("incompatible_version", `The version of the library at ${url} (${json.version}) is not compatible with the required version ${version}.`)
 
-    json.url=url
+    json.url=completeUrl
 
     return json
 }

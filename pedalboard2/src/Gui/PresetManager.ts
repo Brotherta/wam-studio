@@ -115,7 +115,11 @@ export class PresetManager extends HTMLElement{
                         // Set description
                         presetDesc.replaceChildren()
                         presetDesc.appendChild(adoc`<a>Load</a>`)
-                            .addEventListener("click", ()=>this.executer(()=>this.node.setState(desc.state)))
+                            .addEventListener("click", ()=>this.executer(async()=>{
+                                const ret= await this.node.setState(desc.state)
+                                if(this.node.libraryError==null)return ret
+                                else throw this.node.libraryError
+                            }))
                         presetDesc.appendChild(adoc`<h2>${name}</h2>`)
                         presetDesc.appendChild(adoc`<p>${desc.description}</p>`)
                     })

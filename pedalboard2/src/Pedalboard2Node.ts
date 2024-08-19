@@ -156,7 +156,7 @@ export class Pedalboard2Node extends WamNode {
         this._childs.splice(this._childs.indexOf(node),1)
         this._id_to_child.delete(node.id)
         await this.build()
-        this.idcounter= Math.max(...[...this._childs].map(({id})=>id))+1
+        this.idcounter= Math.max(-1, ...[...this._childs].map(({id})=>id))+1
     }
 
     public async destroyChild(node: Pedalboard2NodeChild){
@@ -237,6 +237,7 @@ export class Pedalboard2Node extends WamNode {
     // Expose the parameter info of the child nodes with a new exposed name
     async getParameterInfo(...parameterIdQuery: string[]): Promise<WamParameterInfoMap> {
         const query= this.convertQuery(parameterIdQuery)
+        console.log(query)
         const ret: WamParameterInfoMap= {}
         for(let [child, params] of query.entries()){
             const infos= await child.wam.audioNode.getParameterInfo(...params)
@@ -292,8 +293,10 @@ export class Pedalboard2Node extends WamNode {
     // Set the total state of all nodes
     async setState(state: Pedalboard2NodeState): Promise<void> {
         this.unbuild()
+        this.libraryError=null
         try{
             if(state.library){
+                console.log(state)
                 const descriptor= await importPedalboard2Library(state.library)
                 if(descriptor)this.library.value= await resolvePedalboard2Library(descriptor)
                 else this.library.value= null

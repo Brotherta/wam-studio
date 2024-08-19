@@ -81,7 +81,7 @@ document.addEventListener("keypress",async e=>{
             setParam.onclick= ()=>{
                 pedalboard.audioNode.scheduleEvents({
                     type: "wam-automation",
-                    time: context.currentTime+1,
+                    time: context.currentTime,
                     data:{
                         id: param.id,
                         normalized: true,
