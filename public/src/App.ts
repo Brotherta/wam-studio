@@ -126,7 +126,6 @@ export default class App {
      * Initialize the master track for the host.
      */
     async initHost() {
-        await this.host.initWAM()
         await this.host.init()
         this.hostController.bindNodeListeners();
     }

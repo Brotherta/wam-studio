@@ -1,11 +1,10 @@
 import { WamNode } from "@webaudiomodules/sdk";
 import { audioCtx } from "../..";
 import App from "../../App";
-import AudioPlayerNode from "../../Audio/AudioNode";
 import AudioGraph, { AudioGraphInstance } from "../../Audio/Graph/AudioGraph";
-import OperableAudioBuffer from "../../Audio/OperableAudioBuffer";
+import ObservePlayerNode from "../../Audio/Players/Observer/ObservePlayerNode";
+import ObservePlayerWAM from "../../Audio/Players/Observer/ObservePlayerWAM";
 import SoundProviderElement from "../../Components/Editor/SoundProviderElement";
-import { MAX_DURATION_SEC } from "../../Env";
 import { ReadOnlyObservableArray } from "../../Utils/observable/observables";
 import SoundProvider, { SoundProviderGraphInstance } from "./SoundProvider";
 import Track, { TrackGraphInstance } from "./Track";
@@ -28,7 +27,7 @@ export default class Host extends SoundProvider {
     /**
      * Host node.
      */
-    private hostNode: AudioPlayerNode | undefined
+    private hostNode: ObservePlayerNode
 
 
     /**
@@ -58,23 +57,20 @@ export default class Host extends SoundProvider {
         this.tracks.addListener("add",this.tracks_listener_add)
         this.tracks.forEach(it=>this.onTrackAdd(it))
 
-        this.playhead = 0;
         this.latency = 0;
         this.hostGroupId = "";
 
         this.recording = false;
 
         this.volume=1;
-        this.outputNode.connect(audioCtx.destination)
     }
 
     /**
      * Initialize the host node. It is used to control the global volume and the playhead.
      * It is asynchronous because it needs to load the WAM SDK and the AudioPlayerNode.
      */
-    async initWAM() {
+    override async init() {
         const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
-        const {default: AudioPlayerNode} = await import("../../Audio/AudioNode");
         await audioCtx.audioWorklet.addModule(new URL('../../Audio/HostProcessor.js', import.meta.url));
 
         const [hostGroupId] = await initializeWamHost(audioCtx);
@@ -82,22 +78,18 @@ export default class Host extends SoundProvider {
         // @ts-ignore
         this.groupId = hostGroupId
 
-        let audio = audioCtx.createBuffer(2, MAX_DURATION_SEC * audioCtx.sampleRate, audioCtx.sampleRate)
-        const operableAudioBuffer = OperableAudioBuffer.make(audio);
+        await super.init()
+
         
-        this.hostNode = new AudioPlayerNode(audioCtx, 2);
-        this.hostNode.port.onmessage = (event) => {
-            if(event.data.playhead){
-                const playhead = (event.data.playhead/audioCtx.sampleRate)*1000
-                this.onPlayHeadMove.forEach(it=>it(playhead))
-                this._playhead = playhead;
-            }
-            else if(event.data.volume){
-                this.current_volume = event.data.volume;
-            }
-        }
-        this.hostNode.setAudio(operableAudioBuffer.toArray());
-        this.outputNode.connect(this.hostNode);
+        this.hostNode = (await ObservePlayerWAM.createInstance(hostGroupId,audioCtx)).audioNode as ObservePlayerNode
+        this.hostNode.on_update.add(playhead=>{
+            this.onPlayHeadMove.forEach(it=>it(playhead))
+            this._playhead = playhead
+        })
+        this.hostNode.connect(this.audioInputNode)
+        this.outputNode.connect(audioCtx.destination)
+
+        this.playhead = 0;
     }
 
     public override update(context: AudioContext, playhead: number): void {
@@ -119,14 +111,10 @@ export default class Host extends SoundProvider {
     public override get playhead(){ return this._playhead }
     public override set playhead(value: number){
         this._playhead=value
-        this.hostNode?.port.postMessage({playhead: value*audioCtx.sampleRate/1000});
+        this.hostNode.playhead=value
         this.onPlayHeadMove.forEach(it=>it(value))
         for(const track of this.tracks) track.playhead=value
     }
-
-
-    /* ANALYSIS */
-    public current_volume=0
 
 
     /* PLAY AND PAUSE */
@@ -143,7 +131,7 @@ export default class Host extends SoundProvider {
 
         // Play
         for(const track of this.tracks) track.play()
-        this.hostNode?.play()
+        this.hostNode.isPlaying=true
         this._playing=true
 
         // Check for updates while playing
@@ -156,7 +144,7 @@ export default class Host extends SoundProvider {
 
     public override pause(): void {
         for(const track of this.tracks) track.pause()
-        this.hostNode?.pause()
+        this.hostNode.isPlaying=false
         this._playing=false
     }
 
@@ -181,14 +169,7 @@ export default class Host extends SoundProvider {
     /** LOOP */
     override setLoop(range: [number, number] | null): void {
         super.setLoop(range)
-        if(this.loopRange){
-            this.hostNode?.loop(true)
-            this.hostNode?.port.postMessage({
-                loopStart: Math.floor(this.loopRange[0] / 1000 * audioCtx.sampleRate),
-                loopEnd: Math.floor(this.loopRange[1] / 1000 * audioCtx.sampleRate),
-            })
-        }
-        else this.hostNode?.loop(false)
+        this.hostNode.setLoop(range)
         for(const track of this.tracks) track.setLoop(this.loopRange)
     }
 
