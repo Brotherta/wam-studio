@@ -5,17 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedalboard2 Host</title>
     <script type="module" src="host.js"></script>
+    <style>
+        .control-list{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            >*{ margin: 1rem; }
+        }
+    </style>
 </head>
 <body>
     <h1>Pedalboard2 Host</h1>
     <i id="pedalboard"></i>
-    <audio
+    <div class="control-list">
+        <audio
             id="player"
             src="https://mainline.i3s.unice.fr/WebAudioPluginBank/BasketCaseGreendayriffDI.mp3"
             controls
             loop
             crossorigin="anonymous"
-    ></audio>
+        ></audio>
+        <input id="param-get" type="button" value="Get Params"/>
+        <select id="param-list"></select>
+        <input id="param-value" type="range" step="0.01" value="0" min="0" max="1"/>
+        <input id="param-set" type="button" value="Automate"/>
+        <span id="param-info" style="border: red 1px solid;">INFOS</span>
+    </div>
     <div id="piano"></div>
 </body>
 </html>

@@ -54,7 +54,10 @@ export default class TrackElement extends SoundProviderElement {
         this.shadowRoot?.querySelectorAll("#right, #left, #merge, #mode").forEach(it => it.classList.toggle("hidden",!value))
     }
 
-    set isSolo(value: boolean){ ["_green","_toggled"].forEach(it=>this.soloBtn.classList.toggle(it,value)) }
+    set isSolo(value: boolean){
+        console.log("setIsSolor",value)
+        ;["_green","_toggled"].forEach(it=>this.soloBtn.classList.toggle(it,value))
+    }
 
     set isStereoMode(value:boolean) {
         if(!this.modeBtn)return

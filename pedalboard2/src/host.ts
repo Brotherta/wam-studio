@@ -1,5 +1,6 @@
 import { importPedalboard2Library, resolvePedalboard2Library } from "./Pedalboard2Library.js";
 import Pedalboard2WAM from "./Pedalboard2WAM.js";
+import { doc } from "./Utils/dom.js";
 import { WamNode, WebAudioModule } from "./webaudiomodules/api";
 import { initializeWamHost } from "./webaudiomodules/sdk/index.js";
 
@@ -28,14 +29,6 @@ console.log("> Create GUI")
 const gui= await pedalboard.createGui()
 document.getElementById("pedalboard")?.replaceWith(gui)
 
-// Load library
-console.log("> Importing Descriptor")
-const descriptor= await importPedalboard2Library(import.meta.resolve("./library.json"))
-console.log("> Resovle descriptor")
-const library= await resolvePedalboard2Library(descriptor)
-pedalboard.audioNode.library.value=library
-console.log(descriptor,library)
-
 // Create and connect piano WAM
 let piano: WebAudioModule<WamNode>
 {
@@ -57,3 +50,54 @@ document.addEventListener("keypress",async e=>{
         console.log(await JSON.stringify(await pedalboard.audioNode.getState()))
     }
 })
+
+// Automate
+{
+    const getParam= document.getElementById("param-get") as HTMLInputElement
+    const paramList= document.getElementById("param-list") as HTMLSelectElement
+    const paramValue= document.getElementById("param-value") as HTMLInputElement
+    const setParam= document.getElementById("param-set") as HTMLInputElement
+    const paramInfo= document.getElementById("param-info") as HTMLDivElement
+
+    getParam.onclick= async()=>{
+        const params= await pedalboard.audioNode.getParameterInfo()
+        paramList.replaceChildren()
+        console.log(params)
+        paramList.appendChild(doc`<option value="_DEFAULT_">~ Select Param ~</option>`)
+        for(const [id,infos] of Object.entries(params))paramList.appendChild(doc`<option value="${id}">${infos.label}</option>`)
+        paramInfo.textContent=""
+    }
+
+    paramList.onchange= async()=>{
+        const id= paramList.value
+        setParam.onclick=null
+        if(id==="_DEFAULT_"){
+            paramInfo.textContent=""
+        }
+        else{
+            const params= await pedalboard.audioNode.getParameterInfo(id)
+            const param= params[id]
+            paramInfo.textContent=`[${param.id}] ${param.label} (en ${param.units})`
+            setParam.onclick= ()=>{
+                pedalboard.audioNode.scheduleEvents({
+                    type: "wam-automation",
+                    time: context.currentTime+1,
+                    data:{
+                        id: param.id,
+                        normalized: true,
+                        value: parseFloat(paramValue.value)
+                    }
+                })
+            }
+        }
+    }
+
+}
+
+// Load library
+console.log("> Importing Descriptor")
+const descriptor= await importPedalboard2Library(import.meta.resolve("./library.json"))
+console.log("> Resovle descriptor")
+const library= await resolvePedalboard2Library(descriptor)
+pedalboard.audioNode.library.value=library
+console.log(descriptor,library)

@@ -157,7 +157,7 @@ export default class Pedalboard2GUI extends HTMLElement{
     /** Called for each wam in the wam chain for initialization */
     protected initWAM(child: Pedalboard2NodeChild, index: number){
         this.executePromise(async()=>{
-            const [wam,descriptor]= child
+            const {wam,descriptor}= child
 
             // Add window
             const modules= this.shadowRoot?.getElementById("modules")!
@@ -232,7 +232,7 @@ export default class Pedalboard2GUI extends HTMLElement{
             if(!elements)return
             const [window,gui]= elements
 
-            const [wam,descriptor]= child
+            const {wam,descriptor}= child
             window.remove()
             wam.destroyGui(gui)
             this.preset_manager.destroy()
@@ -369,6 +369,7 @@ export default class Pedalboard2GUI extends HTMLElement{
                 loading_state.className="error"
                 loading_state.title=e.message ?? "An error occured"
                 loading_message.textContent= e.message ?? "An error occured"
+                if("stack" in e)console.error(e.stack)
                 return Promise.resolve()
             }
         })

@@ -1,10 +1,11 @@
 {
-  "name": "pedalboard2",
+  "name": "pedalboard2_server",
   "version": "1.0.0",
-  "description": "A pedalboard able to combine multiples WAMs as one WAM.",
+  "description": "A pedalboard2 test server with additional entry points",
   "main": "index.js",
   "keywords": [
-    "pedalboard"
+    "pedalboard",
+    "server"
   ],
   "author": "Jempasam",
   "license": "ISC",

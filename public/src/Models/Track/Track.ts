@@ -217,9 +217,8 @@ export default class Track extends SoundProvider {
       if(value){
         this.isMuted=false
         this.isSoloMuted=false
-        this.element.isSolo=value
       }
-      this.element.isSoloMuted=value
+      this.element.isSolo=value
       this.updateVolume()
     },
   })

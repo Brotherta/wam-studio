@@ -1,4 +1,4 @@
-import { Pedalboard2SharedData } from "./Pedalboard2Node"
+import type { ParameterUtils as ParameterUtilsType, Pedalboard2SharedData } from "./Pedalboard2Node"
 import type { AudioWorkletGlobalScope, WamEvent } from "./webaudiomodules/api"
 import { WamGroup, WamProcessor } from "./webaudiomodules/sdk"
 
@@ -6,7 +6,9 @@ import { WamGroup, WamProcessor } from "./webaudiomodules/sdk"
 export function getPedalboard2Processor(moduleId: string){
     
     const context = globalThis as unknown as AudioWorkletGlobalScope
-    const module = context.webAudioModules.getModuleScope(moduleId) as {WamProcessor: typeof WamProcessor}
+    const module = context.webAudioModules.getModuleScope(moduleId) as {WamProcessor: typeof WamProcessor, ParameterUtils: typeof ParameterUtilsType}
+
+    const {ParameterUtils}=module
 
     /**
      * The processor class for the Pedalboard2 Node.
@@ -51,22 +53,17 @@ export function getPedalboard2Processor(moduleId: string){
 
         /** -~- UTILS -~- */
         /** Get a wamprocessor and a parameter inernal name from an exposed parameter name  */
-        private getInternalName(name: string): [WamProcessor, string]|null{
+        private getInternalName(name: string): [WamProcessor, string]|null{            
             if(!this.shared || !this.group)return null
 
-            const splitted= name.split(" -> ")
-            if(splitted.length!=2)return null
-            const paramName= splitted[1]
-    
-            const splitted2= splitted[0].split(/ (?=[0-9]*^)/)
-            if(splitted2.length <= 1)return null
-            const index= parseInt(splitted2[splitted2.length-1])-1
-            if(isNaN(index))return null
+            const internal= ParameterUtils.internal_id(name)
+            if(!internal)return null
 
-            const processor= this.group.processors.get(this.shared.childs[index].instanceId) as WamProcessor
+            const instanceId= this.shared.childs[internal.id].instanceId
+            const processor= this.group.processors.get(instanceId) as WamProcessor
             if(!processor)return null
     
-            return [processor, paramName]
+            return [processor, internal.parameter]
         }
 
 
@@ -76,9 +73,11 @@ export function getPedalboard2Processor(moduleId: string){
         scheduleEventDown(event: WamEvent): void{
             if(event.type=="wam-automation"){
                 const target= this.getInternalName(event.data.id)
+                console.log("Try send", event, target)
                 if(target){
                     const [processor, paramName]= target
-                    processor.scheduleEvents({type: "wam-automation", data: {id: paramName, value: event.data.value, normalized: event.data.normalized}})
+                    console.log("Send to", target, {id: paramName, time:event.time, value: event.data.value, normalized: event.data.normalized})
+                    processor.scheduleEvents({type: "wam-automation", time:event.time, data: {id: paramName, value: event.data.value, normalized: event.data.normalized}})
                 }
             }
             else{

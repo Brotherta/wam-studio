@@ -1,4 +1,4 @@
-import { Pedalboard2NodeState } from "./Pedalboard2Node"
+import { Pedalboard2NodeState } from "./Pedalboard2Node.js"
 import { Test, validate } from "./Utils/validate.js"
 import { WamDescriptor } from "./webaudiomodules/api/index.js"
 

@@ -1,17 +1,17 @@
 import { importPedalboard2Library, Pedalboard2Library, resolvePedalboard2Library } from "./Pedalboard2Library.js";
 import { getPedalboard2Processor } from "./Pedalboard2Processor.js";
 import { Observable, ObservableArray, ReadonlyObservableArray } from "./Utils/observable.js";
-import { WamDescriptor, WamParameterDataMap, WamParameterInfoMap } from "./webaudiomodules/api/index.js";
+import type { WamDescriptor, WamParameterDataMap, WamParameterInfo, WamParameterInfoMap } from "./webaudiomodules/api/index.js";
 import { addFunctionModule, initializeWamHost, WamNode, WebAudioModule } from "./webaudiomodules/sdk/index.js";
 
 
-
-export type Pedalboard2NodeChild= [WebAudioModule<WamNode>, WamDescriptor]
+export type Pedalboard2NodeChild= {wam: WebAudioModule<WamNode>, descriptor: WamDescriptor, id:number}
 
 export type Pedalboard2NodeFetcher= (wamId:string, groupId:string, groupKey:string)=>Promise<Pedalboard2NodeChild>
 
 export type Pedalboard2SharedData = {
-    childs: {instanceId:string, name:string}[],
+    child_order: number[],
+    childs: {[id:number]:{instanceId:string, name:string}}
     innerGroupId: string,
     innerGroupKey: string,
 }
@@ -58,6 +58,7 @@ export class Pedalboard2Node extends WamNode {
 
     static async addModules(audioContext: BaseAudioContext, moduleId: string){
         await super.addModules(audioContext, moduleId)
+        await addFunctionModule(audioContext.audioWorklet, Function("moduleId",`globalThis.webAudioModules.getModuleScope(moduleId).ParameterUtils=${ParameterUtils.toString()}`) as (any)=>any,moduleId)
         await addFunctionModule(audioContext.audioWorklet, getPedalboard2Processor, moduleId)
     }
 
@@ -80,7 +81,7 @@ export class Pedalboard2Node extends WamNode {
         Object.setPrototypeOf(this, originals)
         
         let audioToConnect: WamNode[]= [this] // WamNodes waiting for a to node to connect their audio to
-        for(let [{audioNode},descriptor] of this._childs){
+        for(let {wam:{audioNode},descriptor,id} of this._childs){
             // An audio input is found, connect all the waiting nodes to it
             if(descriptor.hasAudioInput && audioNode.numberOfInputs>0){
                 audioToConnect.forEach(from=>onConnect(from, audioNode))
@@ -108,11 +109,15 @@ export class Pedalboard2Node extends WamNode {
         
         // Update the shared data
         const content: Pedalboard2SharedData = {
-            childs:[],
+            child_order:[],
+            childs:{},
             innerGroupId: this.innerGroupId,
             innerGroupKey: this.innerGroupKey
         }
-        for(let [node,desc] of this._childs) content.childs.push({instanceId: node.instanceId, name: desc.name})
+        for(let {wam:{audioNode:{instanceId}},descriptor:{name},id} of this._childs){
+            content.child_order.push(id)
+            content.childs[id]={instanceId, name}
+        }
 
         const id = this._generateMessageId();!
         await this.post("set/shared",content)
@@ -131,6 +136,8 @@ export class Pedalboard2Node extends WamNode {
     //// -~- CHILD NODE MANAGEMENT AND CONNECTIONS -~- ////
     private _childs = new ObservableArray<Pedalboard2NodeChild>()
 
+    private _id_to_child= new Map<number, Pedalboard2NodeChild>()
+
     readonly childs: ReadonlyObservableArray<Pedalboard2NodeChild> = this._childs
     
     /** Add a new child node at the given position */
@@ -138,6 +145,7 @@ export class Pedalboard2Node extends WamNode {
         if(this._childs.includes(node))return
         this.unbuild()
         this._childs.splice(index,0,node)
+        this._id_to_child.set(node.id, node)
         await this.build()
     }
 
@@ -146,12 +154,14 @@ export class Pedalboard2Node extends WamNode {
         if(!this._childs.includes(node))return
         this.unbuild()
         this._childs.splice(this._childs.indexOf(node),1)
+        this._id_to_child.delete(node.id)
         await this.build()
+        this.idcounter= Math.max(...[...this._childs].map(({id})=>id))+1
     }
 
     public async destroyChild(node: Pedalboard2NodeChild){
         this.removeChild(node)
-        node[0].audioNode.destroy()
+        node.wam.audioNode.destroy()
     }
 
     /** The number of child nodes */
@@ -175,7 +185,7 @@ export class Pedalboard2Node extends WamNode {
     public libraryError: any|null = null
 
     /** Create a WAM from his type id */
-    public async createChildWAM(wamId: string): Promise<Pedalboard2NodeChild|null>{
+    public async createChildWAM(wamId: string, forced_id?:number): Promise<Pedalboard2NodeChild|null>{
         if(!this.library) return null
         const wam= this.library.value?.plugins[wamId]
         if(!wam) return null
@@ -183,8 +193,12 @@ export class Pedalboard2Node extends WamNode {
         if(!constructor?.isWebAudioModuleConstructor)return null
         console.log(this.innerGroupId, this.innerGroupKey)
         const instance= await constructor.createInstance(this.innerGroupId, this.context)
-        return [instance as WebAudioModule<WamNode>, instance.descriptor] 
+        const id= forced_id ?? this.idcounter
+        this.idcounter=Math.max(this.idcounter, id+1)
+        return {wam: instance as WebAudioModule<WamNode>, descriptor: instance.descriptor, id} 
     }
+
+    private idcounter=0
 
     /** Get a WAM type ID from from a WAM descriptor */
     public getWAMId(descriptor: WamDescriptor): string{
@@ -194,35 +208,6 @@ export class Pedalboard2Node extends WamNode {
 
 
     //// -~- COMPOSITE METHODS OVERLOADS -~- ////
-    /** Get the exposed name of a parameter */
-    private getExposedName(child: Pedalboard2NodeChild, index: number, name: string){
-        return child[1].name+" "+(index+1)+" -> "+name
-    }
-
-    /** Get a real parameter name and its associated child node from an exposed parameter name */
-    private getInternalName(name: string): [Pedalboard2NodeChild, string]|null{
-        const splitted= name.split(" -> ")
-        if(splitted.length!=2)return null
-        const paramName= splitted[1]
-
-        const splitted2= splitted[0].split(/ (?=[0-9]*^)/)
-        if(splitted2.length <= 1)return null
-        const index= parseInt(splitted2[splitted2.length-1])-1
-        if(isNaN(index))return null
-
-        return [this._childs[index], paramName]
-    }
-
-    // Overload the parameters getter to expose the parameters of the child nodes with a new public name
-    get parameters(): AudioParamMap {
-        const ret: AudioParamMap&Map<string, AudioParam>= new Map()
-        for(let [index,child] of this._childs.entries()){
-            for(let [name,param] of child[0].audioNode.parameters){
-                ret.set(this.getExposedName(child,index,name), param)
-            }
-        }
-        return ret
-    }
 
     /** Convert a parameter query to a map of child nodes and their respective queries */
     private convertQuery(query: string[]): Map<Pedalboard2NodeChild, string[]>{
@@ -234,8 +219,13 @@ export class Pedalboard2Node extends WamNode {
         }
         // Get according to the query
         else{
-            // Get a list of nodes and queries
-            const internalQuery= query.map(name=>this.getInternalName(name)).filter(n=>n!=null) as [Pedalboard2NodeChild, string][]
+            // From a list of external parameter id => Get a list of child + internal parameter id
+            const internalQuery= query
+                .map(name=>ParameterUtils.internal_id(name))
+                .filter(n=>n!=null)
+                .map(({id,parameter}) => [this._id_to_child.get(id), parameter] as [Pedalboard2NodeChild, string])
+                .filter(([child,parameter]) => child!=undefined)
+
             for(let [child, paramName] of internalQuery){
                 if(!ret.has(child)) ret.set(child, [])
                 ret.get(child)!.push(paramName)
@@ -249,9 +239,15 @@ export class Pedalboard2Node extends WamNode {
         const query= this.convertQuery(parameterIdQuery)
         const ret: WamParameterInfoMap= {}
         for(let [child, params] of query.entries()){
-            const infos= await child[0].audioNode.getParameterInfo(...params)
-            for(let [name,info] of Object.entries(infos)){
-                ret[this.getExposedName(child, this._childs.indexOf(child), name)]=info
+            const infos= await child.wam.audioNode.getParameterInfo(...params)
+            for(let [id,info] of Object.entries(infos)){
+                const exposed_id= ParameterUtils.exposed_id(child.id, id)
+                const exposed: WamParameterInfo={
+                    ...info,
+                    label: ParameterUtils.exposed_name(child.id, child.descriptor.name, info.label),
+                    id: exposed_id
+                }
+                ret[exposed_id]=exposed
             }
         }
         return ret
@@ -262,9 +258,9 @@ export class Pedalboard2Node extends WamNode {
         const query= this.convertQuery(parameterIdQuery)
         const ret: WamParameterDataMap= {}
         for(let [child, params] of query.entries()){
-            const infos= await child[0].audioNode.getParameterValues(normalized, ...params)
-            for(let [name,value] of Object.entries(infos)){
-                ret[this.getExposedName(child, this._childs.indexOf(child), name)]=value
+            const infos= await child.wam.audioNode.getParameterValues(normalized, ...params)
+            for(let [id,value] of Object.entries(infos)){
+                ret[ParameterUtils.exposed_id(child.id,id)]=value
             }
         }
         return ret
@@ -273,19 +269,22 @@ export class Pedalboard2Node extends WamNode {
     // Set the parameter values of the child nodes with a new exposed name
     async setParameterValues(parameterValues: WamParameterDataMap): Promise<void> {
         for(const [name,value] of Object.entries(parameterValues)){
-            const internal= this.getInternalName(name)
-            if(internal!=null){
-                const [child, paramName]= internal
-                await child[0].audioNode.setParameterValues({[paramName]: value})
-            }
+            const internal= ParameterUtils.internal_id(name)
+            if(internal==null)continue
+
+            const {id:childId, parameter}= internal
+            const child= this._id_to_child.get(childId)
+            if(!child)continue
+
+            await child.wam.audioNode.setParameterValues({[parameter]: value})
         }
     }
 
     // Get the total state of all nodes
     async getState(): Promise<Pedalboard2NodeState> {
         const ret: Pedalboard2NodeState = {plugins:[], library: this.library?.value?.descriptor?.url}
-        for(let [wam,descriptor] of this._childs){
-            ret.plugins.push({id: this.getWAMId(descriptor), state: await wam.audioNode.getState()})
+        for(let {wam,descriptor,id} of this._childs){
+            ret.plugins.push({id, wam_id: this.getWAMId(descriptor), state: await wam.audioNode.getState()})
         }
         return ret
     }
@@ -304,12 +303,12 @@ export class Pedalboard2Node extends WamNode {
             this.libraryError=e
             return
         }
-        this._childs.splice(0,this._childs.length)
-        for(let {id, state: nodeState} of state.plugins){
-            const new_child=await this.createChildWAM(id)
+        for(let child of [...this._childs])this.destroyChild(child)
+        for(let {id, wam_id, state: nodeState} of state.plugins){
+            const new_child=await this.createChildWAM(wam_id,id)
             if(new_child==null)continue
             await new_child[0].audioNode.setState(nodeState)
-            this._childs.push(new_child)
+            await this.addChild(new_child)
         }
         await this.build()
     }
@@ -318,7 +317,7 @@ export class Pedalboard2Node extends WamNode {
     destroy(): void {
         this.unbuild()
         // TODO Destroy host
-        this._childs.forEach(([{audioNode}])=>audioNode.destroy())
+        this._childs.forEach(({wam:{audioNode}})=>audioNode.destroy())
     }
 
 
@@ -360,6 +359,29 @@ export class Pedalboard2Node extends WamNode {
 }
 
 export type Pedalboard2NodeState= {
-    plugins: {id:string, state:any}[],
+    plugins: {id:number, wam_id:string, state:any}[],
     library?: string,
+}
+
+export const ParameterUtils= class{
+
+    /** Get the id of a parameter as exposed outside the pedalboard2 */
+    static exposed_id(id: number, parameter: string): string{
+        return `${id}<|:pdb2:|>${parameter}`
+    }
+
+    /** Get the id of the child pedalboard and the parameter id from the exposed id */
+    static internal_id(child: string):{id:number, parameter:string}|null{
+        const splitted= child.split("<|:pdb2:|>")
+        if(splitted.length!=2)return null
+        const id= parseInt(splitted[0])
+        if(Number.isNaN(id))return null
+        return {id, parameter: splitted[1]}
+    }
+
+    /** Get the name of a parameter as exposed outside the pedalboard2 */
+    static exposed_name(child_index: number, child_name: string, parameter_name: string): string{
+        return `${child_name} n°${child_index+1} -> ${parameter_name}`
+    }
+
 }
