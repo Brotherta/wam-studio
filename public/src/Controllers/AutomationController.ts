@@ -72,7 +72,7 @@ export default class AutomationController {
                     active = true;
                 }
                 this._view.createItem(
-                    param,
+                    params[param].label,
                     // @ts-ignore
                     params[param].nodeId,
                     () => {
