@@ -189,6 +189,7 @@ export class Pedalboard2Node extends WamNode {
         if(!this.library) return null
         const wam= this.library.value?.plugins[wamId]
         if(!wam) return null
+        console.log("Loading:"+wam.classURL)
         const constructor= (await import(wam.classURL))?.default
         if(!constructor?.isWebAudioModuleConstructor)return null
         console.log(this.innerGroupId, this.innerGroupKey)

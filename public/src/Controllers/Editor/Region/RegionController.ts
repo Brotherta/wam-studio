@@ -275,15 +275,15 @@ export default class RegionController {
           break;
 
         case "x":
-          if(isKeyPressed("Control"))this.cutSelectedRegion();
+          if(isKeyPressed("Control","Meta"))this.cutSelectedRegion();
           break;
 
         case "c":
-          if(isKeyPressed("Control"))this.copySelectedRegion();
+          if(isKeyPressed("Control","Meta"))this.copySelectedRegion();
           break;
 
         case "v":
-          if(isKeyPressed("Control"))this.pasteRegion(true);
+          if(isKeyPressed("Control","Meta"))this.pasteRegion(true);
           break;
 
         case "m":
@@ -362,7 +362,7 @@ export default class RegionController {
     );
     const region = this._app.tracksController.getTrackById(regionView.trackId)?.getRegionById(regionView.id) as RegionOf<any>
     if(region){
-      if(isKeyPressed("Control")) this.selection.toggle(region,true)
+      if(isKeyPressed("Control","Meta")) this.selection.toggle(region,true)
       else this.selection.set(region)
     }
 

@@ -41,8 +41,8 @@ const onKeyUpMap: {[key:string]:(key:string)=>void} = {}
  * @param key The key to check, same as the event.key
  * @returns 
  */
-export function isKeyPressed(key: string): boolean{
-    return !!keyMap[key]
+export function isKeyPressed(...key: string[]): boolean{
+    return key.some(k => !!keyMap[k])
 }
 
 /**

@@ -369,7 +369,10 @@ export default class Pedalboard2GUI extends HTMLElement{
                 loading_state.className="error"
                 loading_state.title=e.message ?? "An error occured"
                 loading_message.textContent= e.message ?? "An error occured"
-                if("stack" in e)console.error(e.stack)
+                if("stack" in e){
+                    console.error(e.message)
+                    console.error(e.stack)
+                }
                 return Promise.resolve()
             }
         })
