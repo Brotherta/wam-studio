@@ -127,15 +127,20 @@ export default class PluginsController {
             const plugin= await this.fetchPlugin(this.DEFAULT_WAM)
             if(!plugin)return
             await this.connectPlugin(track,plugin)
+            this.showPlugin()
         }
-
-        // Show or hide the plugin
-        if (this._view.windowOpened) this.hidePlugin()
-        else this.showPlugin()
+        else{
+            // Show or hide the plugin
+            if (this.isPluginShown) this.hidePlugin()
+            else this.showPlugin()
+        }
     }
+
+    private isPluginShown=false
 
     private showPlugin(){
         this._view.showFloatingWindow(true);
+        this.isPluginShown=true
         this._view.setShowPlugin(null);
         this._view.setHidePlugin(this.selected?.plugin?.name ?? "NO PLUGIN")
         this._app.hostController.focus(this._view);
@@ -143,6 +148,7 @@ export default class PluginsController {
 
     private hidePlugin(){
         this._view.showFloatingWindow(false)
+        this.isPluginShown=false
         this._view.setHidePlugin(null)
         this._view.setShowPlugin(this.selected?.plugin?.name ?? "NO PLUGIN")
     }
@@ -203,7 +209,7 @@ export default class PluginsController {
 
         if(!this.selected){ 
             // No sound provider is selected => an empty plugin window
-            this._view.showFloatingWindow(true)
+            this._view.showFloatingWindow(false)
             this._view.setPluginView(null)
         }
         else{
@@ -218,6 +224,7 @@ export default class PluginsController {
                 this._view.setRemovePlugin(this.selected.plugin.name)
                 if(this._view.windowOpened)this._view.setHidePlugin(this.selected.plugin.name)
                 else this._view.setShowPlugin(this.selected.plugin.name)
+                if(this.isPluginShown)this._view.showFloatingWindow(true)
                 this._view.setPluginView(this.selected.plugin.gui)
             }
         }

@@ -72,8 +72,10 @@ export default class Pedalboard2GUI extends HTMLElement{
     }
 
     connectedCallback(){
+        if(this.shadowRoot)return
+
         this.attachShadow({mode:"open"})
-        this.shadowRoot?.replaceChildren(template.cloneNode(true)) 
+        this.shadowRoot!.replaceChildren(template.cloneNode(true)) 
 
         // Sub elements
         replaceInTemplate(this.shadowRoot!.getElementById("presets")!, this.preset_manager)
@@ -92,7 +94,7 @@ export default class Pedalboard2GUI extends HTMLElement{
         if(this.shadowRoot)setupPannelMenus(this.shadowRoot)
 
         // Drag n drop on first wall
-        const wall= this.shadowRoot?.querySelector("._wall")! as HTMLElement
+        const wall= this.shadowRoot!.querySelector("._wall")! as HTMLElement
         wall.addEventListener("dragenter", (event)=> wall.after(dropMarkerTemplate.cloneNode(true)) )
         wall.addEventListener("dragleave", (event)=> wall.nextElementSibling?.remove() )
         wall.addEventListener("dragover", (event)=> event.preventDefault() )
@@ -110,7 +112,7 @@ export default class Pedalboard2GUI extends HTMLElement{
         })
 
         // Handle library input
-        this.library_input= this.shadowRoot?.getElementById("library-input")! as HTMLInputElement
+        this.library_input= this.shadowRoot!.getElementById("library-input")! as HTMLInputElement
         this.library_input.addEventListener("change", ()=>this.executePromise(async()=>{
             const error= this.shadowRoot?.getElementById("library-input-output")! as HTMLInputElement
             error.value="Loading..."
@@ -133,7 +135,7 @@ export default class Pedalboard2GUI extends HTMLElement{
         }))
 
         // Handle category selector
-        const category_selector= this.shadowRoot?.getElementById("category_selector") as HTMLSelectElement
+        const category_selector= this.shadowRoot!.getElementById("category_selector") as HTMLSelectElement
         category_selector.addEventListener("change", ()=>{
             if(category_selector.value=="") this.plugin_category.value= null
             else this.plugin_category.value= category_selector.value
