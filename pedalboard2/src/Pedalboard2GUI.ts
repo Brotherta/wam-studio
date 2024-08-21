@@ -196,7 +196,7 @@ export default class Pedalboard2GUI extends HTMLElement{
                 // Start dragging
                 window.addEventListener("dragstart", (event)=>{
                     event.dataTransfer?.setDragImage(window, 0, 0)
-                    event.dataTransfer?.setData("text/plain", child[0].instanceId)
+                    event.dataTransfer?.setData("text/plain", child.wam.instanceId)
                 })
 
                 // Drag enter -> over -> leave -> drop
