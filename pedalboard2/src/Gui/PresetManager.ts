@@ -37,7 +37,7 @@ export class PresetManager extends HTMLElement{
     //// INIT DESTROY ////
     private _library_link
 
-    destroy(){
+    dispose(){
         this.node.library.unlink(this._library_link)
     }
 

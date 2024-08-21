@@ -68,14 +68,12 @@ export default class Pedalboard2GUI extends HTMLElement{
     constructor(private module: Pedalboard2WAM){
         super()
         this.node= module.audioNode
-        this.preset_manager= new PresetManager(this.module.audioNode, promise=>this.executePromise(promise))
-    }
-
-    connectedCallback(){
-        if(this.shadowRoot)return
 
         this.attachShadow({mode:"open"})
         this.shadowRoot!.replaceChildren(template.cloneNode(true)) 
+
+        // Subelements
+        this.preset_manager= new PresetManager(this.module.audioNode, promise=>this.executePromise(promise))
 
         // Sub elements
         replaceInTemplate(this.shadowRoot!.getElementById("presets")!, this.preset_manager)
@@ -144,10 +142,15 @@ export default class Pedalboard2GUI extends HTMLElement{
         this.category_link= this.plugin_category.on_set.add(category=> this.initPluginSelector(category))
     }
 
-    disconnectedCallback(){
+    connectedCallback(){ }
+
+    disconnectedCallback(){ }
+
+    dispose(){
         if(this.wam_chain_link)this.node.childs.unlink(this.wam_chain_link)
         if(this.library_link)this.node.library.unlink(this.library_link)
         if(this.category_link)this.plugin_category.on_set.delete(this.category_link)
+        this.preset_manager.dispose()
     }
 
 
@@ -237,7 +240,6 @@ export default class Pedalboard2GUI extends HTMLElement{
             const {wam,descriptor}= child
             window.remove()
             wam.destroyGui(gui)
-            this.preset_manager.destroy()
         })
     }
 

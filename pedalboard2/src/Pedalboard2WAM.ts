@@ -20,6 +20,10 @@ export default class Pedalboard2WAM extends WebAudioModule<Pedalboard2Node>{
         return new Pedalboard2GUI(this)
     }
 
+    destroyGui(gui: Element): void {
+        (gui as Pedalboard2GUI).dispose()
+    }
+
     override async createAudioNode(initialState?: any): Promise<Pedalboard2Node> {
         await Pedalboard2Node.addModules(this.audioContext, this.moduleId)
         const ret=new Pedalboard2Node(this)

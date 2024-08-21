@@ -95,7 +95,8 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
                         if(audioBuffer)recorder.on_recording_update(new SampleRegion(audioBuffer,0))
                         break
                     case "audioBufferFinal":{
-                        if(audioBuffer)recorder.on_recording_stop(new SampleRegion(OperableAudioBuffer.create({length:1, sampleRate:audioContext.sampleRate, numberOfChannels: NUM_CHANNELS}),0))
+                        if(audioBuffer) recorder.on_recording_stop(new SampleRegion(audioBuffer,0))
+                        else recorder.on_recording_stop(new SampleRegion(OperableAudioBuffer.create({length:1, sampleRate:audioContext.sampleRate, numberOfChannels: NUM_CHANNELS}),0))
                         recorder.isRecording=false
                         recorder._stop_resolver?.()
                         break
