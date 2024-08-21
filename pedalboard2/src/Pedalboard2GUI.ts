@@ -101,7 +101,7 @@ export default class Pedalboard2GUI extends HTMLElement{
             // Get child
             const dropInstanceID=event.dataTransfer?.getData("text/plain")
             if(!dropInstanceID)return
-            const dropChild= this.node.childs.find(it=>it[0].instanceId==dropInstanceID)
+            const dropChild= this.node.childs.find(it=>it.wam.instanceId==dropInstanceID)
             if(!dropChild)return
             // Remove
             this.node.removeChild(dropChild)
@@ -209,7 +209,7 @@ export default class Pedalboard2GUI extends HTMLElement{
                     // Get child
                     const dropInstanceID=event.dataTransfer?.getData("text/plain")
                     if(!dropInstanceID)return
-                    const dropChild= this.node.childs.find(it=>it[0].instanceId==dropInstanceID)
+                    const dropChild= this.node.childs.find(it=>it.wam.instanceId==dropInstanceID)
                     if(!dropChild || dropChild===child)return
 
                     // Remove
