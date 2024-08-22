@@ -405,8 +405,8 @@ export default class EditorController {
         // Then import the loaded file 
         const result=await this.importFile(
             async () => {
-                let file = await fetch(url);
-                return {buffer:await file.arrayBuffer(), type: file.type}
+                let file = await fetch(url,{mode:"cors"});
+                return {buffer:await file.arrayBuffer(), type: file.headers.get("content-type")||""}
             },
             target.track,
             target.start

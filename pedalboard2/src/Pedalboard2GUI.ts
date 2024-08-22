@@ -279,7 +279,6 @@ export default class Pedalboard2GUI extends HTMLElement{
                     .filter(it=>it[1].count>1)
                     .map(it=>({...it[1], normalized:it[0]}))
                     .sort((a,b)=>a.name.localeCompare(b.name))
-
                 const category_selector= this.shadowRoot?.getElementById("category_selector") as HTMLSelectElement
                 category_selector.replaceChildren()
                 category_selector.appendChild(adoc`<option value="">All</option>`)
