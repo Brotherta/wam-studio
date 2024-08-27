@@ -43,6 +43,10 @@
           "description": "The name of the library",
           "type": "string"
         },
+        "permissive": {
+          "description": "Default: false ; If true, the library can be loaded if a plugin is missing, or if a included library cannot be loaded.",
+          "type": "boolean"
+        },
         "plugins": {
           "description": "A list of urls to the main js file of WAMs, relative to the descriptor url",
           "items": {
@@ -75,7 +79,7 @@
           "type": "object"
         },
         "url": {
-          "description": "The url of the library, should not be provided by the json",
+          "description": "The url of the library, should not be provided by the json.",
           "type": "string"
         },
         "version": {
@@ -109,12 +113,15 @@
             "additionalProperties": false,
             "properties": {
               "id": {
-                "type": "string"
+                "type": "number"
               },
-              "state": {}
+              "state": {},
+              "wam_id": {
+                "type": "string"
+              }
             },
             "required": [
-              "id",
+              "wam_id",
               "state"
             ],
             "type": "object"

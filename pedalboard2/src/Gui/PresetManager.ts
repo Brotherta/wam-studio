@@ -138,7 +138,7 @@ export class PresetManager extends HTMLElement{
                                 state,
                                 description: `
                                 Using \"${library_name}\"
-                                , a chain of ${[...this.node.childs].map(node=>node[1].name).join(" -> ")}
+                                , a chain of ${[...this.node.childs].map(node=>node.descriptor.name).join(" -> ")}
                                 `
                             }
                         })

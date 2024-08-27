@@ -33,8 +33,8 @@
             "category": "instrument",
             "state": {
                 "plugins":[
-                    {"id":"com.sequencerParty.soundfont", "state":{"instrument":"acoustic_grand_piano"}},
-                    {"id":"Shihong Ren.Faust PingPongDelay", "state":{"/PingPongDelayFaust/bypass":0,"/PingPongDelayFaust/mix":0.5,"/PingPongDelayFaust/time":0.10000000149011612,"/PingPongDelayFaust/feedback":0.30000001192092896}}
+                    {"wam_id":"com.sequencerParty.soundfont", "state":{"instrument":"acoustic_grand_piano"}},
+                    {"wam_id":"Shihong Ren.Faust PingPongDelay", "state":{"/PingPongDelayFaust/bypass":0,"/PingPongDelayFaust/mix":0.5,"/PingPongDelayFaust/time":0.10000000149011612,"/PingPongDelayFaust/feedback":0.30000001192092896}}
                 ]
             }
         },

@@ -43,8 +43,13 @@ export default class PlayheadController {
     this._movingPlayhead = false;
 
     this.bindEvents();
-    this._app.host.onPlayHeadMove.add((pos) => {
+    this._app.host.onPlayHeadMove.add((pos,movedByPlaying) => {
       this._app.editorView.playhead.moveTo(pos/RATIO_MILLS_BY_PX)
+      // Scroll
+      if(movedByPlaying){
+        this.checkIfScrollingNeeded(pos/RATIO_MILLS_BY_PX)
+        this.viewportAnimationLoopId = requestAnimationFrame(this.viewportAnimationLoop.bind(this));
+      }
       this._app
     })
   }
@@ -149,9 +154,8 @@ export default class PlayheadController {
 
   /**
    * Check if scrolling is needed when moving a region.
-   * @private
    */
-  checkIfScrollingNeeded(playHeadPos: number) {
+  private checkIfScrollingNeeded(playHeadPos: number) {
     // scroll viewport if the right end of the moving  region is close
     // to the right or left edge of the viewport, or left edge of the region close to left edge of viewxport
     // (and not 0 or end of viewport)

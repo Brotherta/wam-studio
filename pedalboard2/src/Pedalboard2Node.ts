@@ -293,7 +293,6 @@ export class Pedalboard2Node extends WamNode {
 
     // Set the total state of all nodes
     async setState(state: Pedalboard2NodeState): Promise<void> {
-        this.unbuild()
         this.libraryError=null
         try{
             if(state.library){
@@ -311,17 +310,14 @@ export class Pedalboard2Node extends WamNode {
         for(let {id, wam_id, state: nodeState} of state.plugins){
             const new_child=await this.createChildWAM(wam_id,id)
             if(new_child==null)continue
-            await new_child[0].audioNode.setState(nodeState)
+            await new_child.wam.audioNode.setState(nodeState)
             await this.addChild(new_child)
         }
-        await this.build()
     }
 
     // Destroy inner nodes
     destroy(): void {
-        this.unbuild()
-        // TODO Destroy host
-        this._childs.forEach(({wam:{audioNode}})=>audioNode.destroy())
+        for(let child of [...this._childs])this.destroyChild(child)
     }
 
 
@@ -363,7 +359,7 @@ export class Pedalboard2Node extends WamNode {
 }
 
 export type Pedalboard2NodeState= {
-    plugins: {id:number, wam_id:string, state:any}[],
+    plugins: {id?:number, wam_id:string, state:any}[],
     library?: string,
 }
 
