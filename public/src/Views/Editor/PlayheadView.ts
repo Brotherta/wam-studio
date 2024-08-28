@@ -178,4 +178,6 @@ export default class PlayheadView extends Container {
     
     get viewportLeft(){ return this._editor.viewport.left}
 
+    get viewportWidth(){ return this._editor.viewport.right - this._editor.viewport.left }
+
 }

@@ -230,18 +230,18 @@ export default class PlayheadController {
     // When hand moved
     else{
       // If it has just overpassed the right of the viewport, move the viewport
-      if(playheadX>viewport.right) this.moveRight()
-      if(playheadX<viewport.left) this.moveLeft()
+      if(playheadX>viewport.right) this.scrollRight()
+      if(playheadX<viewport.left) this.scrollLeft()
     }
 
   }
 
-  private moveRight= keptOnInterval(25, 400, ()=>{
+  readonly scrollRight= keptOnInterval(25, 300, ()=>{
     const viewport= this._app.editorView.viewport
     this._view.viewportLeft+= (viewport.right - viewport.left)/50
   })
 
-  private moveLeft= keptOnInterval(25, 400, ()=>{
+  readonly scrollLeft= keptOnInterval(25, 300, ()=>{
       const viewport= this._app.editorView.viewport
       this._view.viewportLeft-= (viewport.right - viewport.left)/50
   })

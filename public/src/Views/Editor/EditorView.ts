@@ -137,6 +137,7 @@ export default class EditorView extends Application {
      * @param e Event that contains information of the wheel event.
      */
     public handleWheel(e: WheelEvent): void {
+        console.log("handleWheel");
         let target = e.target as HTMLElement;
         if (target !== this.view as HTMLCanvasElement && target !== this.canvasContainer && target !== this.editorDiv && target !== this.horizontalScrollbar && target !== this.verticalScrollbar) return;
         if (e.shiftKey) {

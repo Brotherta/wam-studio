@@ -7,6 +7,7 @@ import MIDIRegion from "../../Models/Region/MIDIRegion";
 import { RegionOf } from "../../Models/Region/Region";
 import SampleRegion from "../../Models/Region/SampleRegion";
 import Track from "../../Models/Track/Track";
+import { isKeyPressed } from "../../Utils/keys";
 import EditorView from "../../Views/Editor/EditorView";
 import { audioCtx } from "../../index";
 
@@ -183,19 +184,25 @@ export default class EditorController {
             this._view.resizeCanvas();
         });
         window.addEventListener("wheel", (e) => {
-            const currentTime = Date.now();
-            if (currentTime - this._lastExecutedZoom < this.THROTTLE_TIME) return;
+            console.log("wheel called !!!!")
+            if(isKeyPressed("Shift")){ // Zoom in/out
+                const currentTime = Date.now();
+                if (currentTime - this._lastExecutedZoom < this.THROTTLE_TIME) return;
 
-            this._lastExecutedZoom = currentTime;
+                this._lastExecutedZoom = currentTime;
 
-            const isMac = navigator.platform.toUpperCase().includes('MAC');
-            if (isMac && e.metaKey || !isMac && e.ctrlKey) {
-                const zoomIn = e.deltaY > 0;
-                if (zoomIn) this._app.editorController.zoomIn(e.deltaY);
-                else this._app.editorController.zoomOut(e.deltaY * -1);
+                const isMac = navigator.platform.toUpperCase().includes('MAC');
+                if (isMac && e.metaKey || !isMac && e.ctrlKey) {
+                    const zoomIn = e.deltaY > 0;
+                    if (zoomIn) this._app.editorController.zoomIn(e.deltaY);
+                    else this._app.editorController.zoomOut(e.deltaY * -1);
+                }
+                else {
+                    this._view.handleWheel(e);
+                }
             }
-            else {
-                this._view.handleWheel(e);
+            else{ // Scroll
+                this._view.playhead.viewportLeft+= this._view.playhead.viewportWidth * e.deltaY / 2000
             }
         });
         this._view.horizontalScrollbar.addEventListener("change", (e: ScrollEvent) => {
