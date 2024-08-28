@@ -257,7 +257,7 @@ export default class ScrollBarElement extends HTMLElement {
 
     // translate value into pixel position
     this.handlePos =
-      (this.value / (this.worldSize - this.size)) * (trackSize - handleSize);
+      this.value / (this.worldSize - this.size) * (trackSize - handleSize);
 
     handle.style.left = `${this.handlePos}px`;
   }
@@ -299,7 +299,7 @@ export default class ScrollBarElement extends HTMLElement {
 
     this.dispatchEvent(
       new CustomEvent("change", {
-        detail: { value: this.handlePos, type: type },
+        detail: { value: this.handlePos * (this.worldSize - this.size) / (trackSize - handleSize), type: type },
         bubbles: true, // Allows the event to bubble up through the shadow DOM boundary
         composed: true, // Allows the event to propagate across the shadow DOM boundary
       })

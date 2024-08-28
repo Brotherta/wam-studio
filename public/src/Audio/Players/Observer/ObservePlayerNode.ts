@@ -9,6 +9,7 @@ import BaseAudioPlayerNode from "../BaseAudioPlayerNode"
  */
 export default class ObservePlayerNode extends BaseAudioPlayerNode{
 
+    /** Called when the player move the playhead. Not called when the playhead is moved using the setter! */
     readonly on_update = new Set<(playhead: number)=>void>()
 
     constructor(module: WebAudioModule<ObservePlayerNode>){
@@ -28,7 +29,6 @@ export default class ObservePlayerNode extends BaseAudioPlayerNode{
 
     override set playhead(value: number) {
         super.playhead = value
-        this.on_update.forEach(it=>it(value))
     }
     override get playhead(): number {
         return super.playhead

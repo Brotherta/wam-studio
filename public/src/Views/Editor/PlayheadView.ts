@@ -9,6 +9,12 @@ import EditorView from "./EditorView";
  */
 export default class PlayheadView extends Container {
 
+    
+
+    /** Called on  */
+    readonly onViewMove= new Set<(oldPos: number, newPos: number) => void>();
+
+
     /**
      * PIXI.Graphics that represent the line of the playhead.
      */
@@ -155,5 +161,21 @@ export default class PlayheadView extends Container {
         let millis = (playhead / audioCtx.sampleRate) * 1000;
         return millis / RATIO_MILLS_BY_PX;
     }
+
+      /** The viewport left position in pixel */
+
+    set viewportLeft(left: number){
+        const viewportWidth= this._editor.viewport.right - this._editor.viewport.left
+        if(left<0)left=0
+        if(left>this._editor.grid.width-viewportWidth)left= this._editor.grid.width-viewportWidth
+        const oldleft= this._editor.viewport.left
+        if(oldleft==left)return
+        
+        this._editor.viewport.left= left
+        this._editor.horizontalScrollbar.moveTo(left)
+        this.onViewMove.forEach( it => it(oldleft, left))
+    }
+    
+    get viewportLeft(){ return this._editor.viewport.left}
 
 }

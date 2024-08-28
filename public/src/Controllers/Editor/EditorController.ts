@@ -229,6 +229,10 @@ export default class EditorController {
 
 
         })
+        this._view.playhead.onViewMove.add((prev,next)=>{
+            this._view.horizontalScrollbar.scrollLeft=next
+            this._view.automationContainer.scrollLeft=next
+        })
         window.addEventListener('drop', (e) => {
             e.preventDefault();
         })
@@ -279,21 +283,6 @@ export default class EditorController {
         //this._view.playhead.resize();
         //this._app.playheadController.centerViewportAround();
 
-
-        this._timeout = setTimeout(() => {
-            //console.log("Dans le timeout")
-            // if playhead pos is more viewport width/2, center the viewport around the playhead, 
-            // recenter the viewport 
-            console.log("playhead pos = " + this._view.playhead.position.x + " width/2=" + this._view.width / 2);
-            if (this._view.playhead.position.x > this._view.width / 2)
-                this._app.playheadController.centerViewportAround();
-
-
-
-            this._app.tracksController.tracks.forEach(track => {
-                this._view.drawRegions(track);
-            });
-        }, 1000);
     }
 
     /**

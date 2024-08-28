@@ -83,6 +83,7 @@ export default class Host extends SoundProvider {
         
         this.hostNode = (await ObservePlayerWAM.createInstance(hostGroupId,audioCtx)).audioNode as ObservePlayerNode
         this.hostNode.on_update.add(playhead=>{
+            console.log("playhead",playhead)
             this.onPlayHeadMove.forEach(it=>it(playhead,true))
             this._playhead = playhead
         })
@@ -104,7 +105,7 @@ export default class Host extends SoundProvider {
 
     /* PLAYHEAD */
     /** Called when the playhead is moved, with the new position in milliseconds */
-    public onPlayHeadMove= new Set<(position:number, movedByPlaying: boolean)=>void>()
+    public onPlayHeadMove= new Set<(position:number, movedByPlayer: boolean)=>void>()
 
     private _playhead: number
 

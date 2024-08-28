@@ -154,20 +154,8 @@ export default class EditorView extends Application {
      * @param e Event that contains the value of the change of the scrollbar.
      */
     public handleHorizontalScroll(e: ScrollEvent): void {
-        let ratio = this.worldWidth / this.width;
         if (!e.detail) throw new Error("The event on the scrollbar is not properly set. Missing the detail property.");
-        let scrollValue = e.detail.value * ratio;
-        if (isNaN(scrollValue)) return;
-        if (scrollValue === 0) {
-            this.viewport.position.set(0, this.viewport.position.y);
-        }
-        else {
-            let x = this._originalCenter.x + scrollValue;
-            let y = this.viewport.center.y;
-            x = Math.max(0, Math.min(this.worldWidth - (this.width / 2), x));
-            this.viewport.moveCenter(x, y);
-        }
-        this.automationContainer.scrollLeft = scrollValue;
+        this.playhead.viewportLeft = e.detail.value
     }
 
     /**

@@ -1,6 +1,7 @@
 import { FederatedPointerEvent } from "pixi.js";
 import App from "../../App";
 import { RATIO_MILLS_BY_PX } from "../../Env";
+import { keptOnInterval } from "../../Utils/gui_callback";
 import { registerOnKeyDown, registerOnKeyUp } from "../../Utils/keys";
 import EditorView from "../../Views/Editor/EditorView";
 import PlayheadView from "../../Views/Editor/PlayheadView";
@@ -9,6 +10,8 @@ import PlayheadView from "../../Views/Editor/PlayheadView";
  * The class that control the events related to the playhead.
  */
 export default class PlayheadController {
+
+
   /**
    * Route Application.
    */
@@ -30,27 +33,15 @@ export default class PlayheadController {
   /* for disabling snapping is shift key is pressed and global snapping enabled */
   private snappingDisabled: boolean = false;
 
-
-  /* for scrolling the viewport when moving the playhead */
-  private scrollingLeft: boolean = false;
-  private scrollingRight: boolean = false;
-  private incrementScrollSpeed: number = 0;
-  private viewportAnimationLoopId: number = 0;
-
   constructor(app: App) {
     this._app = app;
     this._view = app.editorView.playhead;
     this._movingPlayhead = false;
 
     this.bindEvents();
-    this._app.host.onPlayHeadMove.add((pos,movedByPlaying) => {
+    this._app.host.onPlayHeadMove.add((pos,movedByPlayer) => {
       this._app.editorView.playhead.moveTo(pos/RATIO_MILLS_BY_PX)
-      // Scroll
-      if(movedByPlaying){
-        this.checkIfScrollingNeeded(pos/RATIO_MILLS_BY_PX)
-        this.viewportAnimationLoopId = requestAnimationFrame(this.viewportAnimationLoop.bind(this));
-      }
-      this._app
+      this.moveAccordingToPlayhead(pos,movedByPlayer)
     })
   }
 
@@ -127,7 +118,7 @@ export default class PlayheadController {
    * @param pos - The free position of the playhead in pixels.
    * */
   getSnappedPosition(pos: number) {
-    if (this._app.editorView.snapping && !this.snappingDisabled && !this.scrollingLeft && !this.scrollingRight) {
+    if (this._app.editorView.snapping && !this.snappingDisabled) {
       const cellSize = this._app.editorView.cellSize
       return Math.round(pos / cellSize) * cellSize
     }
@@ -141,7 +132,7 @@ export default class PlayheadController {
   moveTo(pos: number, doSnap:boolean=false){
     let pixelPos= pos / RATIO_MILLS_BY_PX
 
-    if(this._app.editorView.snapping && doSnap && !this.snappingDisabled && !this.scrollingLeft && !this.scrollingRight){
+    if(this._app.editorView.snapping && doSnap && !this.snappingDisabled){
       pixelPos = this.getSnappedPosition(pixelPos)
     }
     if(pixelPos<0)pixelPos=0
@@ -152,124 +143,13 @@ export default class PlayheadController {
     this._app.hostView.metronome.playhead= pos
   }
 
-  /**
-   * Check if scrolling is needed when moving a region.
-   */
-  private checkIfScrollingNeeded(playHeadPos: number) {
-    // scroll viewport if the right end of the moving  region is close
-    // to the right or left edge of the viewport, or left edge of the region close to left edge of viewxport
-    // (and not 0 or end of viewport)
-    // scroll smoothly the viewport if the region is dragged to the right or left
-    // when a region is dragged to the right or to the left, we start scrolling
-    // when the right end of the region is close to the right edge of the viewport or
-    // when the left end of the region is close to the left edge of the viewport
-    // "close" means at a distance of SCROLL_TRIGGER_ZONE_WIDTH pixels from the edge
-
-    // scroll parameters
-    const SCROLL_TRIGGER_ZONE_WIDTH = 50;
-    const MIN_SCROLL_SPEED = 1;
-    const MAX_SCROLL_SPEED = 10;
-
-    let viewport = this._app.editorView.viewport;
-    const viewportWidth = viewport.right - viewport.left;
-
-    const distanceToRightEdge = viewportWidth - (playHeadPos - viewport.left);
-    this.scrollingRight =
-      playHeadPos - viewport.left >= viewportWidth - SCROLL_TRIGGER_ZONE_WIDTH;
-
-    if (this.scrollingRight) {
-      // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
-      // to the right between 1 and 10
-      this.incrementScrollSpeed = this.map(
-        distanceToRightEdge,
-        SCROLL_TRIGGER_ZONE_WIDTH,
-        -SCROLL_TRIGGER_ZONE_WIDTH,
-        MIN_SCROLL_SPEED,
-        MAX_SCROLL_SPEED
-      );
-    }
-
-    //console.log("distanceToRightEdge = " + distanceToRightEdge);
-    const distanceToLeftEdge = viewport.left - playHeadPos;
-    //console.log("distanceToLeftEdge = " + distanceToLeftEdge);
-
-    this.scrollingLeft =
-      playHeadPos < viewport.left + SCROLL_TRIGGER_ZONE_WIDTH &&
-      viewport.left > 0;
-
-    if (this.scrollingLeft) {
-      // when scrolling right, distanceToRightEdge will be considered when in [50, -50] and will map to scroll speed
-      // to the right between 1 and 10
-      // MB : need to adjust the mapping function here !
-      this.incrementScrollSpeed = this.map(
-        distanceToLeftEdge,
-        -SCROLL_TRIGGER_ZONE_WIDTH,
-        SCROLL_TRIGGER_ZONE_WIDTH,
-        MIN_SCROLL_SPEED,
-        MAX_SCROLL_SPEED
-      );
-    }
-  }
-
-  // maps a value from [istart, istop] into [ostart, ostop]
-  map(
-    value: number,
-    istart: number,
-    istop: number,
-    ostart: number,
-    ostop: number
-  ) {
-    return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
-  }
-
-  viewportAnimationLoop() {
-    // scroll the viewport smoothly if needed
-    let viewScrollSpeed = 0;
-    if (this.scrollingRight) {
-      viewScrollSpeed = this.incrementScrollSpeed;
-    } else if (this.scrollingLeft) {
-      viewScrollSpeed = -this.incrementScrollSpeed;
-    }
-
-    console.log("viewScrollSpeed = " + viewScrollSpeed)
-
-    // if needed scroll smoothly the viewport to left or right
-    if (this.scrollingRight || this.scrollingLeft) {
-      let viewport = this._app.editorView.viewport;
-
-      viewport.left += viewScrollSpeed;
-      // move also playhead pos according to scrolling (in pixels)
-      this._view.position.x += viewScrollSpeed;
-
-      // adjust horizontal scrollbar so that it corresponds to the current viewport position
-      // scrollbar pos depends on the left position of the viewport.
-      const horizontalScrollbar = this._app.editorView.horizontalScrollbar;
-      horizontalScrollbar.moveTo(viewport.left);
-
-      // if scrolling left and viewport.left < 0, stop scrolling an put viewport.left to 0
-      if (this.scrollingLeft && viewport.left < 0) {
-        viewport.left = 0;
-        this.scrollingLeft = false;
-      }
-      // if scrolling right and viewport.right > worldWidth, stop scrolling and put viewport.right to worldWidth
-      if (
-        this.scrollingRight &&
-        viewport.right > this._app.editorView.worldWidth
-      ) {
-        viewport.right = this._app.editorView.worldWidth;
-        this.scrollingRight = false;
-      }
-    }
-    requestAnimationFrame(this.viewportAnimationLoop.bind(this));
-  }
-
   private handlePointerMove(e: FederatedPointerEvent) {
     if (this._movingPlayhead) {
       document.body.style.cursor = "grabbing";
       let pos = e.data.global.x + this._app.editorView.viewport.left;
 
       this.moveTo(pos*RATIO_MILLS_BY_PX, true)
-      this.checkIfScrollingNeeded(pos);
+      this.moveAccordingToPlayhead(pos*RATIO_MILLS_BY_PX,false)
     }
   }
   
@@ -296,11 +176,6 @@ export default class PlayheadController {
    */
   private handlePointerUp(e: FederatedPointerEvent) {
     if (this._pointerIsDown) {
-
-      // stop viewport animation
-      cancelAnimationFrame(this.viewportAnimationLoopId);
-      this.scrollingLeft = false;
-      this.scrollingRight = false;
   
       let pos = e.data.global.x + this._app.editorView.viewport.left;
       if (pos < 0){
@@ -324,16 +199,51 @@ export default class PlayheadController {
     //console.log("this._app.editorView.viewport.center.x =" + this._app.editorView.viewport.center.x)
   }
 
-  public centerViewportAround() {
-    // Center the viewport around playhead pos in pixels
-    console.log("playhead pos x = " + this._view.position.x);
-    this._app.editorView.viewport.moveCenter(
-      this._view.position.x,
-      this._app.editorView.viewport.center.y
-    );
-    console.log(
-      "this._app.editorView.viewport.center.x =" +
-        this._app.editorView.viewport.center.x
-    );
+  
+
+  /**
+   * Move the view according to a a new playhead position.
+   * @param newPlayhead The new playhead position in milliseconds.
+   */
+  public moveAccordingToPlayhead(newPlayhead: number, movedByPlayer:boolean){
+    // Get playhead position informations
+    const playheadX= newPlayhead / RATIO_MILLS_BY_PX
+    const previousPlayheadX= (newPlayhead-500) / RATIO_MILLS_BY_PX
+
+    // Get viewport informations
+    const viewport= this._app.editorView.viewport
+    const viewportWidth= viewport.right - viewport.left
+    const viewportCenter= (viewport.right + viewport.left) / 2
+
+    // When playing
+    if(movedByPlayer){
+      // If it has just overpassed the center of the viewport, move the viewport
+      if(previousPlayheadX <= viewportCenter && playheadX >= viewportCenter){
+        this._view.viewportLeft= Math.max(0, playheadX-viewportWidth/2)
+      }
+
+      // If it has just overpassed the right of the viewport, move the viewport
+      if(playheadX>viewport.right){
+        this._view.viewportLeft= Math.max(0, playheadX-viewportWidth/2)
+      }
+    }
+    // When hand moved
+    else{
+      // If it has just overpassed the right of the viewport, move the viewport
+      if(playheadX>viewport.right) this.moveRight()
+      if(playheadX<viewport.left) this.moveLeft()
+    }
+
   }
+
+  private moveRight= keptOnInterval(25, 400, ()=>{
+    const viewport= this._app.editorView.viewport
+    this._view.viewportLeft+= (viewport.right - viewport.left)/50
+  })
+
+  private moveLeft= keptOnInterval(25, 400, ()=>{
+      const viewport= this._app.editorView.viewport
+      this._view.viewportLeft-= (viewport.right - viewport.left)/50
+  })
+
 }
