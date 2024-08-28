@@ -19,7 +19,7 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
         const recorder=new this()
         recorder.app=app
         recorder.midi_listener = recorder.on_midi_message.bind(recorder)
-        recorder.app.settingsView.on_midi_message.add(recorder.midi_listener)
+        recorder.app.settingsController.on_midi_message.add(recorder.midi_listener)
         return recorder;
     }
 
@@ -95,7 +95,7 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
     }
 
     dispose(): void {
-        this.app.settingsView.on_midi_message.delete(this.midi_listener)
+        this.app.settingsController.on_midi_message.delete(this.midi_listener)
     }
 
 }

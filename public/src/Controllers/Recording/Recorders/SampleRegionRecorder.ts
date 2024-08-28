@@ -55,7 +55,6 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
         recorder.recorder= (await SampleRecorderWAM.createInstance(groupId,audioContext,{})).audioNode as SampleRecorderNode
         recorder.linkNodes()
         recorder.mergerNode.connect(recorder.recorder)
-        app.settingsController.updateMediaDevices()
         app.settingsController.soundInputNode.connect(recorder.splitterNode)
         recorder.recorder!.port.postMessage({ sab: recorder.sab });
 

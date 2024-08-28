@@ -1,4 +1,5 @@
 import App from "../App";
+import { createSelect } from "../Utils/dom";
 import SettingsView from "../Views/SettingsView";
 import { audioCtx } from "../index";
 
@@ -7,160 +8,143 @@ import { audioCtx } from "../index";
  */
 export default class SettingsController {
 
-    /**
-     * Route Application.
-     */
-    private _app: App;
-    /**
-     * Settings view.
-     */
-    private _view: SettingsView;
-    /**  
-     * The list of input devices. 
-     */
-    private _inputDevices: MediaDeviceInfo[];
-    /**
-     * The list of output devices.
-     */
-    private _outputDevices: MediaDeviceInfo[];
-    /**
-     * The selected input device.
-     */
-    private _selectedInputDevice: MediaDeviceInfo;
-    /**
-     * The selected output device.
-     */
-    private _selectedOutputDevice: MediaDeviceInfo;
+    /** Called each time a MIDI Event is received. **/ // @ts-ignore 
+    public on_midi_message=new Set<(message: MIDIMessageEvent)=>void>()
 
-    /**
-     * The constraints for the media stream. 
-     */
+    /** The selected microphone input node. */
+    public soundInputNode: AudioNode = audioCtx.createGain()
+
+
+    /** Settings view. */
+    private view: SettingsView;
+
+    /** The constraints for the media stream. */
     public constraints: MediaStreamConstraints | undefined;
 
     constructor(app: App) {
-        this._app = app;
-        this._view = app.settingsView;
+        this.view = app.settingsView;
         
-        this.bindEvents();
+        this.initMIDIInputDevice()
+        this.initAudioInputOutputDevice()
+        this.bindEvents()
     }
 
-    /**
-     * Updates the list of input and output devices.
-     * It also updates the selected input and output devices.
-     */
-    public async updateMediaDevices(): Promise<void> {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
-        const devices = await navigator.mediaDevices.enumerateDevices();
 
-        this._outputDevices = devices.filter(device => device.kind === "audiooutput");
-        this._inputDevices = devices.filter(device => device.kind === "audioinput");
 
-        this._selectedOutputDevice = this._outputDevices.find(device => device.deviceId === "default")!;
-        this._selectedInputDevice = this._inputDevices.find(device => device.deviceId === "default")!;
+    //// MIDI INPUT DEVICE ////
+    private initMIDIInputDevice() {
+        const that=this
 
-        if (this._selectedOutputDevice === undefined || this._selectedInputDevice === undefined) {
-            this._selectedOutputDevice = this._outputDevices[0];
-            this._selectedInputDevice = this._inputDevices[0];
+        // On midi message callback
+        // @ts-ignore
+        function onMidiMessage(e: MIDIMessageEvent){
+            that.on_midi_message.forEach((callback)=>callback(e))
         }
 
-        this._view.updateOutputDevices(this._outputDevices);
-        this._view.updateInputDevices(this._inputDevices);
+        // @ts-ignore
+        if(navigator.requestMIDIAccess){
+            // @ts-ignore
+            navigator.requestMIDIAccess().then((midiAccess) => {
 
-        this.constraints = {
-            audio: {
-                deviceId: this._selectedInputDevice.deviceId ? {exact: this._selectedInputDevice.deviceId} : undefined,
-                echoCancellation: false,
-                noiseSuppression: false,
-                autoGainControl: false
-            }
+                const refresh= () => {
+                    createSelect(
+                        this.view.selectMIDIInputDevice,
+                        "No MIDI Input",
+                        [...midiAccess.inputs.values()],
+                        it => [it.name??"Unknown", it.id],
+                        selected =>{
+                            if(this._selectedMIDIInputDevice!=null){
+                                this._selectedMIDIInputDevice.removeEventListener("midimessage", onMidiMessage)
+                                this._selectedMIDIInputDevice=null
+                            }
+                            if(selected!=null){
+                                this._selectedMIDIInputDevice=selected
+                                selected.addEventListener("midimessage", onMidiMessage)
+                            }
+                        },
+                        -1
+                    )
+                    that.view.selectMIDIInputDevice.options[that.view.selectMIDIInputDevice.options.length-1].selected=true
+                }
+                midiAccess.addEventListener("statechange", refresh)
+                refresh()
+
+            })
         }
-
-        this.changeInputDevice(this._selectedInputDevice.deviceId)
     }
+
+    //@ts-ignore
+    private _selectedMIDIInputDevice: MIDIInput | null = null;
+
+
+
+    //// AUDIO INPUT AND OUTPUT DEVICE ////
+    private async initAudioInputOutputDevice(){
+        const that= this
+
+        async function refresh(){
+            console.log("refresh")
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            console.log(devices.map(it=>it.kind+" "+it.groupId+" "+it.deviceId+" "+it.label+"\n"))
+            
+            // Input Device
+            createSelect(
+                that.view.selectInputDevice,
+                "No Input Device",
+                devices.filter(it => it.kind === "audioinput"),
+                it => [it.label??"Unknown", it.deviceId],
+                async device =>{
+                    console.log("device: ",device)
+                    if(that._selectedInputDevice!=null){
+                        that._selectedInputDevice.disconnect(that.soundInputNode)
+                        that._selectedInputDevice=null
+                    }
+                    if(device!=undefined){
+                        const constraints = { audio: { deviceId: {exact: device.deviceId}, echoCancellation: false, noiseSuppression: false, autoGainControl: false }}
+                        let stream = await navigator.mediaDevices.getUserMedia(constraints)
+                        that._selectedInputDevice = audioCtx.createMediaStreamSource(stream)
+                        that._selectedInputDevice.connect(that.soundInputNode)
+                    }
+                },
+                -1
+            )
+            that.view.selectInputDevice.selectedIndex=that.view.selectInputDevice.options.length-1
+
+            // Output Device
+            // @ts-ignore
+            const baseSinkId = audioCtx.sinkId 
+            createSelect(
+                that.view.selectOutputDevice,
+                "Base Output Device",
+                devices.filter(it => it.kind === "audiooutput"),
+                it => [it.label??"Unknown", it.deviceId],
+                device =>{
+                    // @ts-ignore
+                    if(audioCtx.setSinkId) audioCtx.setSinkId(device!=null ? device.deviceId : baseSinkId)
+                },
+                -1
+            )
+
+            console.log("devices: "+devices.filter(it=>it.kind==="audioinput").map(it=>it.kind+" "+it.groupId+" "+it.deviceId+" "+it.label+"\n"))
+
+            console.log("devices: "+devices.map(it=>it.kind+" "+it.groupId+" "+it.deviceId+" "+it.label+"\n"))
+
+        }
+        refresh()
+        navigator.mediaDevices.addEventListener("devicechange", () => refresh())
+    }
+
+    private _selectedInputDevice: AudioNode | null = null;
 
     /**
      * Opens the settings window. It also updates the list of input and output devices. 
      */
     public async openSettings(): Promise<void> {
-        await this.updateMediaDevices();
-        this._view.settingsWindow.hidden = false;
+        this.view.settingsWindow.hidden = false;
     }
 
-    /**
-     * Binds all the events for the settings menu.
-     * @private
-     */ 
-    private bindEvents(): void {
-        this._view.closeBtn.addEventListener("click", () => {
-            this._view.settingsWindow.hidden = true;
-        });
-
-        // Update the list of input and output devices when a device is added or removed.
-        navigator.mediaDevices.addEventListener("devicechange", async () => {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            let audioInputDevices = devices.filter(device => device.kind === "audioinput");
-            let audioOutputDevices = devices.filter(device => device.kind === "audiooutput");
-            this._view.updateInputDevices(audioInputDevices);
-            this._view.updateOutputDevices(audioOutputDevices);
-            if (audioInputDevices.find(device => device.deviceId === this._selectedInputDevice.deviceId) === undefined) {
-                this._selectedInputDevice = audioInputDevices[0];
-                this.changeInputDevice(this._selectedInputDevice.deviceId);
-            }
-            if (audioOutputDevices.find(device => device.deviceId === this._selectedOutputDevice.deviceId) === undefined
-            && audioOutputDevices[0] !== undefined) {
-                this._selectedOutputDevice = audioOutputDevices[0];
-                this.changeOutputDevice(this._selectedOutputDevice.deviceId);
-            }
-        });
-
-        // Update the selected input devices when the user changes the device.
-        this._view.selectInputDevice.addEventListener("change", () => {
-            this._selectedInputDevice = this._inputDevices.find(device => device.deviceId === this._view.selectInputDevice.value)!;
-            this.changeInputDevice(this._selectedInputDevice.deviceId);
-        });
-
-        // Update the selected output devices when the user changes the device.
-        this._view.selectOutputDevice.addEventListener("change", () => {
-            this._selectedOutputDevice = this._outputDevices.find(device => device.deviceId === this._view.selectOutputDevice.value)!;
-            if (this._selectedOutputDevice !== undefined) {
-                this.changeOutputDevice(this._selectedOutputDevice.deviceId);
-            }
-        });
-    }
-
-    /**
-     * Changes the input device of all the tracks. 
-     * @param deviceId - The id of the new input device.
-     * @private
-     */
-    private async changeInputDevice(deviceId: string): Promise<void> {
-        // Disconnect old one
-        this._soundInputNode?.disconnect()
-
-        // Create new one
-        this.constraints = {
-            audio: {
-                deviceId: deviceId ? {exact: deviceId} : undefined,
-                echoCancellation: false,
-                noiseSuppression: false,
-                autoGainControl: false
-            }
-        }
-        let stream = await navigator.mediaDevices.getUserMedia(this.constraints)
-        this._soundInputNode = audioCtx.createMediaStreamSource(stream)
-        this._soundInputNode.connect(this.soundInputNode)
-    }
-
-    private _soundInputNode?: AudioNode
-    public soundInputNode: AudioNode = audioCtx.createGain()
-
-    /**
-     * Changes the output device of the host.
-     * @param deviceId - The id of the new output device.
-     * @private
-     */
-    private async changeOutputDevice(deviceId: string): Promise<void> {
-        // @ts-ignore
-        await audioCtx.setSinkId(deviceId);
+    private bindEvents() {
+        this.view.closeBtn.onclick = () => this.view.settingsWindow.hidden = true
     }
 }
