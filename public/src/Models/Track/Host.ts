@@ -83,7 +83,6 @@ export default class Host extends SoundProvider {
         
         this.hostNode = (await ObservePlayerWAM.createInstance(hostGroupId,audioCtx)).audioNode as ObservePlayerNode
         this.hostNode.on_update.add(playhead=>{
-            console.log("playhead",playhead)
             this.onPlayHeadMove.forEach(it=>it(playhead,true))
             this._playhead = playhead
         })

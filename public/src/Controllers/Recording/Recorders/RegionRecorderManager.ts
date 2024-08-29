@@ -57,12 +57,13 @@ export default class RegionRecorderManager<CONTEXT>{
 
     @observed({
         set(this: RegionRecorderManager<CONTEXT>, value: boolean, oldValue:boolean){
+            console.log("isMonitoring",value,oldValue)
             if(value!=oldValue){
                 if(value) this._recording_recorders.forEach(recorder => {
                     this.connecteds.forEach(node => recorder.connect(node))
                 })
                 else this._recording_recorders.forEach(recorder => {
-                        this.connecteds.forEach(node => recorder.disconnect(node))
+                    this.connecteds.forEach(node => recorder.disconnect(node))
                 })
             }
         }

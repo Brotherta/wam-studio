@@ -251,7 +251,6 @@ export default class TracksController{
     registerOnKeyDown(e=>{
       if(e=="p"){
         (async ()=>{
-          console.log("Playing",this.selectedTrack)
           if(!this.selectedTrack)return
           let graph= await this.selectedTrack.track_graph.instantiate(audioCtx, this._app.host.groupId)
           graph.connect(audioCtx.destination)

@@ -83,7 +83,6 @@ export default class Track extends SoundProvider {
 
   /* CONNECTION */
   public override set playhead(value: number){
-    console.log("playhead at",value)
     this._playhead_player.audioNode.playhead=value
     for(const [_,[__,player]] of this.merged_regions){ player.playhead=value }
   }
