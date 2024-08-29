@@ -41,7 +41,10 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
                 const note = message.data[1]
                 const velocity = message.data[2]/127
                 const time= message.timeStamp - this.startTime
-                if(noteState == 0x90 || (noteState == 0x80 && velocity == 0)) this.accumulator.noteOn(note, channel, velocity, time)
+                if(noteState == 0x90){
+                    if(velocity>0) this.accumulator.noteOn(note, channel, velocity, time)
+                    else this.accumulator.noteOff(note, channel, time)
+                }
                 else if(noteState == 0x80) this.accumulator.noteOff(note, channel, time)
                 if(this.accumulator.closedCount>0 && this.accumulator.openCount==0){
                     const midi = this.accumulator.build()
