@@ -99,8 +99,8 @@ export default abstract class OperableAudioBuffer implements AudioBuffer {
         for(let i=0; i<length; i++) target[i+bufferOffset] = source[i]
     }
     
-    /** Get the duration of the audio buffer in seconds */
-    get duration(){ return this.length/this.sampleRate }
+    /** Get the duration of the audio buffer in milliseconds */
+    get duration(){ return this.length/this.sampleRate*1000 }
 
 
     /** ESSENTIALS OPERATIONS */

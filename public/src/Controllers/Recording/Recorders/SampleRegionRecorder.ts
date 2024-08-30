@@ -74,7 +74,6 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
 
                 // Get the buffer
                 const pcm = new Float32Array(e.data.buffer);
-                console.log(pcm.length)
                 let audioBuffer
                 if(pcm.length>=2){
                     audioBuffer= OperableAudioBuffer.create({ length: pcm.length / 2, sampleRate: audioContext.sampleRate, numberOfChannels: NUM_CHANNELS})
@@ -84,11 +83,23 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
                         left[i / 2] = pcm[i];
                         right[i / 2] = pcm[i + 1];
                     }
+                    // Latency compensation by ignoring a part of the recorded audio at the beginning
+                    console.log("toIgnore",recorder.toIgnore)
+                    if(recorder.toIgnore>0){
+                        const audioBufferDuration= audioBuffer.duration
+                        if(recorder.toIgnore>audioBufferDuration){
+                            recorder.toIgnore-=audioBufferDuration
+                            audioBuffer= null
+                        }
+                        else{
+                            audioBuffer= audioBuffer.view(recorder.toIgnore*audioBuffer.sampleRate/1000)
+                            recorder.toIgnore=0
+                        }
+                    }
                 }
                 else audioBuffer= null
                 
                 // Send message
-                console.log(e.data.command, audioBuffer?.length)
                 switch(e.data.command){
                     case "audioBufferCurrentUpdated":
                         if(audioBuffer)recorder.on_recording_update(new SampleRegion(audioBuffer,0))
@@ -111,12 +122,15 @@ export class SampleRegionRecorder implements RegionRecorder<SampleRegion> {
 
     private on_recording_stop: (addedRegion: SampleRegion) => void = ()=>{}
 
+    private toIgnore=0
+
     connect(node: WamNode): void { this.mergerNode.connect(node) }
 
     disconnect(node: WamNode): void { this.mergerNode.disconnect(node) }
 
     start(on_update:(addedRegion:SampleRegion)=>void, on_stop:(addedRegion:SampleRegion)=>void): void {
         this.isRecording=true
+        this.toIgnore=this.app.host.latency
         this.linkNodes()
         this.on_recording_update=on_update
         this.on_recording_stop=on_stop

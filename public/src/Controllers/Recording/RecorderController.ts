@@ -117,28 +117,20 @@ export default class RecorderController {
         // Start the recording
         const playhead=this.app.host.playhead
         let region: RegionOf<any>
-        recorder.start(
-            (addedRegion)=>{
-                console.log("Region",region)
-                if(region===undefined){
-                    addedRegion.start=playhead
-                    region=addedRegion
-                    this.app.regionsController.addRegion(track,addedRegion)
-                }
-                else{
-                    addedRegion.start=region.end
-                    region.mergeWith(addedRegion)
-                    this.app.regionsController.removeRegion(region)
-                    this.app.regionsController.addRegion(track,region)
-                }
-            },
-            (addedRegion)=>{
+        let onRecord = (addedRegion: RegionOf<any>)=>{
+            if(region===undefined){
+                addedRegion.start=playhead
+                region=addedRegion
+                this.app.regionsController.addRegion(track,addedRegion)
+            }
+            else{
                 addedRegion.start=region.end
                 region.mergeWith(addedRegion)
                 this.app.regionsController.removeRegion(region)
                 this.app.regionsController.addRegion(track,region)
             }
-        )
+        }
+        recorder.start(onRecord,onRecord)
     }
 
     private async stopRecordingWith(track:Track, recorderType:CRecorderFactory<any>){

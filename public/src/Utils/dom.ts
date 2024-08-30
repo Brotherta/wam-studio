@@ -89,27 +89,30 @@ export function createSelect<T>(target: HTMLSelectElement, noStr: string, items:
     }
 
     target.replaceChildren(doc`
-        <option value="">${noStr}</option>
+        <option value="NOTHING_SELECTED">${noStr}</option>
         ${ Object.entries(itemMap).map( ([id,{name,value}]) => doc`<option value="${id}">${name}</option>` ) }
     `)
 
     target.onchange = ()=>{
-        if(target.value==="") select(null)
+        if(target.value=="NOTHING_SELECTED") select(null)
         else{
             const selected= itemMap[target.value]
             if(selected)select(selected.value)
         }
     }
 
-    // Select
+    // Select default
     {
         const selectedId= (()=>{
-            if(oldSelection=="") return null
-            if(oldSelection!=undefined && itemMap[oldSelection]!=undefined) return oldSelection
+            // Try reselecting the previous value if it still exists
+            if(oldSelection=="NOTHING_SELECTED") return null
+            if(oldSelection && itemMap[oldSelection]!=undefined) return oldSelection
             if(selected==undefined || selected==null) return null
+            // Select by index
             if(typeof selected=="number"){
                 selected= itemArray[selected>=0 ? selected : itemArray.length+selected]
             }
+            // Select by id
             return selected
         })()
         const selectedOption= selectedId!=null ? itemMap[selectedId] : null
@@ -118,7 +121,7 @@ export function createSelect<T>(target: HTMLSelectElement, noStr: string, items:
             select(selectedOption.value)
         }
         else {
-            target.value=""
+            target.value="NOTHING_SELECTED"
             select(null)
         }
     }

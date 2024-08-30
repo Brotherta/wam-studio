@@ -19,7 +19,7 @@ export default class SampleRegion extends RegionOf<SampleRegion>{
     }
     
 
-    override get duration(): number { return this.buffer.duration*1000 }
+    override get duration(): number { return this.buffer.duration }
 
     override split(cut:number): [SampleRegion, SampleRegion] {
         const [first,second]=this.buffer.split(cut * audioCtx.sampleRate / 1000)
