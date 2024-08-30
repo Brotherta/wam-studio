@@ -42,35 +42,30 @@ export default class SettingsController {
         }
 
         // @ts-ignore
-        if(navigator.requestMIDIAccess){
-            // @ts-ignore
-            navigator.requestMIDIAccess().then((midiAccess) => {
+        navigator.requestMIDIAccess?.()?.then((midiAccess) => {
 
-                const refresh= () => {
-                    createSelect(
-                        this.view.selectMIDIInputDevice,
-                        "No MIDI Input",
-                        [...midiAccess.inputs.values()],
-                        it => [it.name??"Unknown", it.id],
-                        selected =>{
-                            if(this._selectedMIDIInputDevice!=null){
-                                this._selectedMIDIInputDevice.removeEventListener("midimessage", onMidiMessage)
-                                this._selectedMIDIInputDevice=null
-                            }
-                            if(selected!=null){
-                                this._selectedMIDIInputDevice=selected
-                                selected.addEventListener("midimessage", onMidiMessage)
-                            }
-                        },
-                        -1
-                    )
-                    that.view.selectMIDIInputDevice.options[that.view.selectMIDIInputDevice.options.length-1].selected=true
-                }
-                midiAccess.addEventListener("statechange", refresh)
-                refresh()
-
-            })
-        }
+            const refresh= function(){
+                createSelect(
+                    that.view.selectMIDIInputDevice,
+                    "No MIDI Input",
+                    [...midiAccess.inputs.values()],
+                    it => [it.name??"Unknown", it.id],
+                    selected =>{
+                        if(that._selectedMIDIInputDevice!=null){
+                            that._selectedMIDIInputDevice.removeEventListener("midimessage", onMidiMessage)
+                            that._selectedMIDIInputDevice=null
+                        }
+                        if(selected!=null){
+                            that._selectedMIDIInputDevice=selected
+                            selected.addEventListener("midimessage", onMidiMessage)
+                        }
+                    },
+                    -1
+                )
+            }
+            midiAccess.onstatechange= refresh
+            refresh()
+        })
     }
 
     //@ts-ignore
@@ -83,7 +78,6 @@ export default class SettingsController {
         const that= this
 
         async function refresh(){
-            console.log("refresh")
             await navigator.mediaDevices.getUserMedia({ audio: true });
             const devices = await navigator.mediaDevices.enumerateDevices();
             console.log(devices.map(it=>it.kind+" "+it.groupId+" "+it.deviceId+" "+it.label+"\n"))
@@ -95,7 +89,6 @@ export default class SettingsController {
                 devices.filter(it => it.kind === "audioinput"),
                 it => [it.label??"Unknown", it.deviceId],
                 async device =>{
-                    console.log("device: ",device)
                     if(that._selectedInputDevice!=null){
                         that._selectedInputDevice.disconnect(that.soundInputNode)
                         that._selectedInputDevice=null
@@ -109,7 +102,6 @@ export default class SettingsController {
                 },
                 -1
             )
-            that.view.selectInputDevice.selectedIndex=that.view.selectInputDevice.options.length-1
 
             // Output Device
             // @ts-ignore

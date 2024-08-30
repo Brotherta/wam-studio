@@ -76,6 +76,9 @@ export function adoc(strings_or_type: TemplateStringsArray|keyof HTMLElementTagN
 }
 
 export function createSelect<T>(target: HTMLSelectElement, noStr: string, items: Iterable<T>, optionFactory: (item: T)=>[name:string,id:string], select: (item: T|null)=>void, selected?: string|null|number){
+    // Get previously selected value
+    const oldSelection = target.value
+    
     // Create map
     const itemMap: {[key:string]:{name:string, value:T}}= {}
     const itemArray: string[]= []
@@ -101,8 +104,10 @@ export function createSelect<T>(target: HTMLSelectElement, noStr: string, items:
     // Select
     {
         const selectedId= (()=>{
-            if(selected===undefined || selected===null)return null
-            if(typeof selected==="number"){
+            if(oldSelection=="") return null
+            if(oldSelection!=undefined && itemMap[oldSelection]!=undefined) return oldSelection
+            if(selected==undefined || selected==null) return null
+            if(typeof selected=="number"){
                 selected= itemArray[selected>=0 ? selected : itemArray.length+selected]
             }
             return selected
