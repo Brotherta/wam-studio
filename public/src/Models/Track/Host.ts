@@ -41,8 +41,6 @@ export default class Host extends SoundProvider {
     
     private tracks: ReadOnlyObservableArray<Track>
 
-    public inRecordingMode=false
-
     /**
      * Create a new host track, a compisite track composed of multiple tracks.
      * @param app The app

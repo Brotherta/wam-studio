@@ -117,14 +117,14 @@ export default class HostView {
     /**
      * Changes the icon of the play button when the user press it.
      *
-     * @param playing - true if the track is playing, false otherwise.
-     * @param stop - true if the track is stopped, false otherwise.
+     * @param playing - true if it is playing, false otherwise.
+     * @param recording - true if it is recording
      */
-    public updatePlayButton(playing: boolean, stop: boolean) {
+    public updatePlayButton(playing: boolean, recording: boolean) {
         let tooltip = this.playBtn.firstElementChild as HTMLSpanElement;
 
         if (playing) {
-            if (stop) {
+            if (recording) {
                 this.playIcon.className = "stop-icon";
                 tooltip.innerHTML = "Stop";
             } else {

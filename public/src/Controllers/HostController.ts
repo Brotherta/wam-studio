@@ -71,11 +71,10 @@ export default class HostController {
   }
 
   /**
-   * Handles the play button. It plays or pauses the audio. It also starts the timer interval and handle the recording.
-   *
-   * @param stop - Boolean to know if the button is a stop button or not when recording.
+   * Start playing the audio. It also starts the metronome if it's enabled.
+   * @param inRecordingMode - Boolean to know if the button is a stop button or not when recording.
    */
-  public play(inRecordingMode: boolean = false): void {
+  public play(): void {
     const host=this._app.host
     if (!host.isPlaying) {
       // disable zoom buttons when playing (this confuses the player in this version)
@@ -83,44 +82,41 @@ export default class HostController {
       this._view.zoomOutBtn.classList.remove("zoom-enabled");
       this._view.zoomInBtn.classList.add("zoom-disabled");
       this._view.zoomOutBtn.classList.add("zoom-disabled");
-      //console.log("Playing zoom-disabled");
 
       this._app.automationController.applyAllAutomations();
       if (host.modified){
         host.update(audioCtx, this._app.host.playhead)
         host.modified=false
       }
-      host.inRecordingMode = inRecordingMode;
       host.play()
       this.launchTimerInterval();
-
-      // Start the metronome if it's enabled
       if (host.metronomeOn) this._view.metronome.start(host.playhead);
+      this._view.updatePlayButton(true, host.recording)
+    }
+  }
 
-    } else {
+  /**
+   * Stop playing the audio.
+   */
+  stop(){
+    const host= this._app.host
+    if(host.isPlaying){
       // enable zoom buttons when playing is stopped
       this._view.zoomInBtn.classList.remove("zoom-disabled")
       this._view.zoomOutBtn.classList.remove("zoom-disabled")
       this._view.zoomInBtn.classList.add("zoom-enabled")
       this._view.zoomOutBtn.classList.add("zoom-enabled")
-      //console.log("Stopping zoom-enabled");
 
       this._app.tracksController.tracks.forEach((track) => {
-        if (track.plugin && track.plugin.instance) {
-          track.plugin.instance?.audioNode?.clearEvents()
-        }
-      });
-      host.inRecordingMode=false
+        if (track.plugin && track.plugin.instance) track.plugin.instance?.audioNode?.clearEvents()
+      })
+
       host.pause()
-      if (this._app.host.recording) {
-        this._app.recorderController.stopRecordingAllTracks()
-        this._view.updateRecordButton(false);
-      }
-      if (this._timerInterval) clearInterval(this._timerInterval);
-      // Always stop the metronome when playback is stopped
-      this._view.metronome.stop();
+      if (this._app.recorderController.isRecording) this._app.recorderController.stopRecordingAll()
+      if (this._timerInterval) clearInterval(this._timerInterval)
+      this._view.metronome.stop()
+      this._view.updatePlayButton(false, host.recording)
     }
-    this._view.updatePlayButton(host.isPlaying, inRecordingMode)
   }
 
   /**
@@ -291,15 +287,23 @@ export default class HostController {
       }
     });
     // TOP BAR CONTROLS
-    this._view.playBtn.addEventListener("click", () => {
-      this.play();
-    });
     this._view.backBtn.addEventListener("click", () => {
       this.back();
     });
-    this._view.recordBtn.addEventListener("click", () => {
-      this._app.recorderController.record();
+
+    this._view.playBtn.addEventListener("click", () => {
+      if(!this._app.host.isPlaying) this._app.hostController.play()
+      else this._app.hostController.stop()
     });
+    
+    this._view.recordBtn.addEventListener("click", () => {
+      if(!this._app.recorderController.isRecording){
+        this._app.recorderController.startRecordingAll()
+        this._app.hostController.play()
+      }
+      else this._app.recorderController.stopRecordingAll()
+    });
+
     this._view.loopBtn.addEventListener("click", () => {
       this.loop();
     });

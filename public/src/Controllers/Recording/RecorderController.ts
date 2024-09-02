@@ -37,13 +37,6 @@ export default class RecorderController {
     /** Stops monitoring on the given track. */
     stopMonitoring(track: Track) { track.monitored = false }
 
-    /** Stops recording all armed tracks. */
-    stopRecordingAllTracks() {
-        for (let track of this.app.tracksController.tracks) {
-            this.stopRecording(track);
-        }
-    }
-
     /** Activate a recorder on the given track. */
     armRecorder(track: Track, recorder: CRecorderFactory<any>) {
         if(!track.recorders.isArmed(recorder)){
@@ -78,11 +71,40 @@ export default class RecorderController {
     }
 
     /**
+     * Starts recording on all armed tracks.
+     * Don't play, just start recording.
+     * The region are recordeds even if the playhead don't move.
+     */
+    async startRecordingAll(){
+        if(!this.app.host.recording){
+            for (let track of this.app.tracksController.tracks) await this.startRecording(track)
+            this.app.hostView.updateRecordButton(true)
+            this.app.host.recording=true
+            this.app.hostView.updatePlayButton(this.app.host.isPlaying, true)
+        }
+    }
+
+    /**
+     * Stop recording on all armed tracks.
+     * Don't stop playing, just stop recording.
+     */
+    async stopRecordingAll(){
+        if(this.app.host.recording){
+            for (let track of this.app.tracksController.tracks) await this.stopRecording(track)
+            this.app.hostView.updateRecordButton(false)
+            this.app.host.recording=false
+            this.app.hostView.updatePlayButton(this.app.host.isPlaying, false)
+        }
+    }
+
+    get isRecording(){ return this.app.host.recording }
+
+    /**
      * Starts recording on the given track.
      * @param track - The track to start recording on.
      * @param playhead - The current playhead position in milliseconds.
      */
-    async startRecording(track: Track, playhead: number) {
+    private async startRecording(track: Track) {
         this.app.host.recording = true;
 
         // Start the recorders
@@ -96,7 +118,7 @@ export default class RecorderController {
      * Stops recording on the given track.
      * @param track - The track to stop recording on.
      */
-    async stopRecording(track: Track) {
+    private async stopRecording(track: Track) {
         this.app.host.recording = false;
 
         // Stop the recorders
@@ -137,38 +159,6 @@ export default class RecorderController {
         let recorder= await track.recorders.get(recorderType)
         if(!recorder)return
         await recorder.stop()
-    }
-
-    /** Toggles the recording status of the controller. */
-    async record() {
-        const recording = !this.app.host.recording;
-        this.app.host.recording = recording;
-        if (recording) {
-            let firstArmed = this.app.tracksController.tracks.find((e) => e.recorders.armeds.size>0);
-
-            // Start the recorders
-            for (let track of this.app.tracksController.tracks) {
-                await this.startRecording(track, this.app.host.playhead);
-            }
-
-            // Start the host recording
-            if (!this.app.host.isPlaying) {
-                this.app.hostController.play(true);
-            }
-            else if(!this.app.host.inRecordingMode){
-                this.app.hostController.play();
-                this.app.hostController.play(true);
-            }
-            
-        }
-        else {
-            // Stop the recorders
-            for (let track of this.app.tracksController.tracks) {
-                await this.stopRecording(track);
-            }
-            this.app.hostController.play();
-        }
-        this.app.hostView.updateRecordButton(recording);
     }
 
     /**
