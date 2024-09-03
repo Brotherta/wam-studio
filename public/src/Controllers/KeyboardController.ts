@@ -1,4 +1,5 @@
 import App from "../App";
+import { registerOnKeyUp } from "../Utils/keys";
 
 /**
  * The class that control the events related to the keyboard.
@@ -21,18 +22,13 @@ export default class KeyboardController {
      * @private
      */
     private bindEvents() {
-        window.addEventListener("keypress", (e) => {
-            // If the user is typing in an input, we don't want to trigger the keyboard shortcuts
-            if(e.target != document.body) return;
-
-            switch (e.key) {
+        registerOnKeyUp((key)=>{
+            switch (key) {
                 case " ": // Space bar pressed : play/pause
-                    this._app.hostController.play();
-                    break;
-                default:
-                    break;
+                    this._app.hostController.onPlayButton()
+                    break
             }
-        });
+        })
     }
 
 }

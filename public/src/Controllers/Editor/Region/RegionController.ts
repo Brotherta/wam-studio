@@ -255,6 +255,7 @@ export default class RegionController {
     });
 
     registerOnKeyDown(key => {
+      const meta= isKeyPressed("Control","Meta")
       switch(key){
         case "Escape":
           this.selection.set(null)
@@ -262,31 +263,34 @@ export default class RegionController {
 
         case "Delete":
         case "Backspace":
-          this.deleteSelectedRegion(true);
-          break;
+          this.deleteSelectedRegion(true)
+          break
 
         case "Shift":
-          this.snappingDisabled=true;
-          break;
+          this.snappingDisabled=true
+          break
         
-        case "S":
         case "s":
-          this.splitSelectedRegion();
-          break;
-
-        case "x":
-          if(isKeyPressed("Control","Meta"))this.cutSelectedRegion();
-          break;
-
-        case "c":
-          if(isKeyPressed("Control","Meta"))this.copySelectedRegion();
-          break;
-
-        case "v":
-          if(isKeyPressed("Control","Meta"))this.pasteRegion(true);
-          break;
+          this.splitSelectedRegion()
+          break
 
         case "m":
+          this.splitSelectedRegion()
+          break
+
+        case "x":
+          if(meta)this.cutSelectedRegion()
+          break
+
+        case "c":
+          if(meta)this.copySelectedRegion()
+          break
+
+        case "v":
+          if(meta)this.pasteRegion(true)
+          break
+
+        case "b":
           const selected=this._app.tracksController.selectedTrack
           if(selected){
             const start=this._app.host.playhead
@@ -298,7 +302,7 @@ export default class RegionController {
             const region=new MIDIRegion(midi,start)
             this.addRegion(selected,region)
           }
-          break;
+          break
 
         case "n":{
           const selected=this._app.tracksController.selectedTrack
@@ -309,7 +313,7 @@ export default class RegionController {
             const region=new MIDIRegion(midi,start)
             this.addRegion(selected,region)
           }
-          break;
+          break
         }
 
         case "k":{
@@ -326,14 +330,14 @@ export default class RegionController {
             this.addRegion(selected,region)
             this._app.host.playhead=region.end
           }
-          break;
+          break
         }
       }
     });
     // handle moving a region on the PIXI Canvas.
     this._editorView.viewport.on("pointermove", (e) => {
       if (this.draggedRegionState) {
-        this.handlePointerMove(e);
+        this.handlePointerMove(e)
       }
     });
   }

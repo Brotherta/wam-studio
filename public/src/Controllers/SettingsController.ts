@@ -47,6 +47,7 @@ export default class SettingsController {
             const refresh= function(){
                 createSelect(
                     that.view.selectMIDIInputDevice,
+                    "midiinput",
                     "No MIDI Input",
                     [...midiAccess.inputs.values()],
                     it => [it.name??"Unknown", it.id],
@@ -85,6 +86,7 @@ export default class SettingsController {
             // Input Device
             createSelect(
                 that.view.selectInputDevice,
+                "audioinput",
                 "No Input Device",
                 devices.filter(it => it.kind === "audioinput"),
                 it => [it.label??"Unknown", it.deviceId],
@@ -108,6 +110,7 @@ export default class SettingsController {
             const baseSinkId = audioCtx.sinkId 
             createSelect(
                 that.view.selectOutputDevice,
+                "audiooutput",
                 "Base Output Device",
                 devices.filter(it => it.kind === "audiooutput"),
                 it => [it.label??"Unknown", it.deviceId],

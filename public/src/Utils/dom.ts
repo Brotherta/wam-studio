@@ -75,9 +75,10 @@ export function adoc(strings_or_type: TemplateStringsArray|keyof HTMLElementTagN
     }
 }
 
-export function createSelect<T>(target: HTMLSelectElement, noStr: string, items: Iterable<T>, optionFactory: (item: T)=>[name:string,id:string], select: (item: T|null)=>void, selected?: string|null|number){
+export function createSelect<T>(target: HTMLSelectElement, id: string, noStr: string, items: Iterable<T>, optionFactory: (item: T)=>[name:string,id:string], select: (item: T|null)=>void, selected?: string|null|number){
     // Get previously selected value
     const oldSelection = target.value
+    const savedSelection = localStorage.getItem(`wamstudio.select.${id}`)
     
     // Create map
     const itemMap: {[key:string]:{name:string, value:T}}= {}
@@ -94,10 +95,16 @@ export function createSelect<T>(target: HTMLSelectElement, noStr: string, items:
     `)
 
     target.onchange = ()=>{
-        if(target.value=="NOTHING_SELECTED") select(null)
+        if(target.value=="NOTHING_SELECTED"){
+            select(null)
+            localStorage.removeItem(`wamstudio.select.${id}`)
+        }
         else{
             const selected= itemMap[target.value]
-            if(selected)select(selected.value)
+            if(selected){
+                localStorage.setItem(`wamstudio.select.${id}`, target.value)
+                select(selected.value)
+            }
         }
     }
 
@@ -107,11 +114,17 @@ export function createSelect<T>(target: HTMLSelectElement, noStr: string, items:
             // Try reselecting the previous value if it still exists
             if(oldSelection=="NOTHING_SELECTED") return null
             if(oldSelection && itemMap[oldSelection]!=undefined) return oldSelection
+
+            // Try the stored value
+            if(savedSelection!=null && itemMap[savedSelection]!=undefined) return savedSelection
+
             if(selected==undefined || selected==null) return null
+
             // Select by index
             if(typeof selected=="number"){
                 selected= itemArray[selected>=0 ? selected : itemArray.length+selected]
             }
+
             // Select by id
             return selected
         })()

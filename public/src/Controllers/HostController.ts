@@ -274,6 +274,19 @@ export default class HostController {
     }
   }
 
+  public onPlayButton(){
+    if(!this._app.host.isPlaying) this._app.hostController.play()
+      else this._app.hostController.stop()
+  }
+
+  public onRecordButton(){
+    if(!this._app.recorderController.isRecording){
+      this._app.recorderController.startRecordingAll()
+      this._app.hostController.play()
+    }
+    else this._app.recorderController.stopRecordingAll()
+  }
+
   /**
    * Binds the events of the host.
    * @private
@@ -291,18 +304,9 @@ export default class HostController {
       this.back();
     });
 
-    this._view.playBtn.addEventListener("click", () => {
-      if(!this._app.host.isPlaying) this._app.hostController.play()
-      else this._app.hostController.stop()
-    });
+    this._view.playBtn.addEventListener("click", () => this.onPlayButton());
     
-    this._view.recordBtn.addEventListener("click", () => {
-      if(!this._app.recorderController.isRecording){
-        this._app.recorderController.startRecordingAll()
-        this._app.hostController.play()
-      }
-      else this._app.recorderController.stopRecordingAll()
-    });
+    this._view.recordBtn.addEventListener("click", () => this.onRecordButton());
 
     this._view.loopBtn.addEventListener("click", () => {
       this.loop();
