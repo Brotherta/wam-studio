@@ -27,7 +27,7 @@ export default class PluginsController {
      **/
     readonly WAM_LIST: {[name: string]:{url:string,state?:any}}={
         "Pedalboard": { url: BACKEND_URL+"/src/index.js" },
-        "Pedalboard2": { url: "http://localhost:7002/index.js", state:{plugins:[],library:"http://localhost:7002/wam_api_library.json"} },
+        "Pedalboard2": { url: "http://localhost:7002/index.js", state:{plugins:[],library:"http://localhost:5002/wamstudio_library.json"} },
         "Disto Machine": { url: BACKEND_URL+"/plugins/disto_machine/src/index.js" },
     }
 

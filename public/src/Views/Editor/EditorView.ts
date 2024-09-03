@@ -327,6 +327,7 @@ export default class EditorView extends Application {
                 if (region) {
                     regionView.stretch(region.duration/1000, region.start);
                 }
+                regionView.redraw(track.color, region);
             }
         });
     }

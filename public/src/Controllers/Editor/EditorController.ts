@@ -99,6 +99,7 @@ export default class EditorController {
      * @param value the of the zoom in pixel
      */
     public zoomIn(value?: number): void {
+        const oldViewLeft= this._view.playhead.viewportLeft*RATIO_MILLS_BY_PX
 
         // for the moment, do not allow zoom in/out while playing
         if (this._app.host.isPlaying) return;
@@ -127,12 +128,10 @@ export default class EditorController {
 
             ratio = this.getZoomRatioByLevel(this._currentLevel);
         }
-        //updateRatioMillsByPx(ratio);
-        incrementZoomLevel();
-        this.updateZoom();
-
-        //this._view.stage.scale.x *= ZOOM_LEVEL;
-
+        
+        incrementZoomLevel()
+        this._view.playhead.viewportLeft= oldViewLeft/RATIO_MILLS_BY_PX
+        this.updateZoom()
     }
 
     /**
@@ -141,7 +140,7 @@ export default class EditorController {
      * @param value the of the zoom in pixel
      */
     public zoomOut(value?: number): void {
-
+        const oldViewLeft= this._view.playhead.viewportLeft*RATIO_MILLS_BY_PX
 
         // for the moment, do not allow zoom in/out while playing
         if (this._app.host.isPlaying) return;
@@ -169,9 +168,9 @@ export default class EditorController {
 
             ratio = this.getZoomRatioByLevel(this._currentLevel);
         }
-        //updateRatioMillsByPx(ratio);
-        decrementZoomLevel();
-        this.updateZoom();
+        decrementZoomLevel()
+        this._view.playhead.viewportLeft= oldViewLeft/RATIO_MILLS_BY_PX
+        this.updateZoom()
     }
 
 
@@ -265,15 +264,9 @@ export default class EditorController {
      * has been called, it will cancel the current timeout to set a new one.
      */
     private async updateZoom(): Promise<void> {
-        let offsetPlayhead = this._view.playhead.position.x;
-
         this._view.resizeCanvas();
         this._view.loop.updatePositionFromTime(...this._app.hostController.loopRange);
         this._app.automationController.updateBPFWidth();
-
-        // let's scroll the viewport + recompute size and pos of the horizontal scrollbar
-        let scrollValue = this._view.playhead.position.x - offsetPlayhead;
-        this._view.horizontalScrollbar.customScrollTo(scrollValue);
 
         this._view.spanZoomLevel.innerHTML = ("x" + ZOOM_LEVEL.toFixed(2));
 
@@ -282,6 +275,8 @@ export default class EditorController {
             //track.updateBuffer(audioCtx, this._app.host.playhead);
             this._view.stretchRegions(track);
         });
+
+        this._app.host.playhead=this._app.host.playhead
 
         // MB: Center the viewport around the playhead if it is visible,
         // otherwise around the center of the viewport

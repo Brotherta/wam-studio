@@ -1,0 +1,55 @@
+{
+    "$schema": "../../pedalboard2/static/library_schema.json",
+    "name": "Wamstudio Official Pedalboard2 Library",
+    "id": "wamstudio.base",
+    "version": [0,0],
+    "permissive": true,
+    "plugins": [
+        "https://mainline.i3s.unice.fr/PedalEditor/Back-End/functional-pedals/published/untitled1/index.js",
+        "https://mainline.i3s.unice.fr/wam2/packages/faustPingPongDelay/plugin/index.js",
+        "https://mainline.i3s.unice.fr/wam2/packages/obxd/index.js",
+        "https://mainline.i3s.unice.fr/wam2/packages/pingpongdelay/dist/index.js",
+        "https://mainline.i3s.unice.fr/wam2/packages/quadrafuzz/dist/index.js",
+        "https://mainline.i3s.unice.fr/WamSampler/src/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/distortion/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/drumsampler/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/envmod/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/jx3p_editor/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/modal/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/soundfont/index.js",
+        "https://www.webaudiomodules.com/community/plugins/burns-audio/synth101/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/BigMuff/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/blipper/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/csoundPitchShifter/dist/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/deathgate/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/DualPitchShifter/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/greyhole/index.js",
+        "https://www.webaudiomodules.com/community/plugins/wimmics/GuitarAmpSim60s/index.js",
+        "https://mainline.i3s.unice.fr/wam2/packages/faustFlute/index.js"
+    ],
+    "presets": {
+        "Piano Echo": {
+            "description": "A MIDI Piano with an echo effect",
+            "category": "instrument",
+            "state": {
+                "plugins":[
+                    {"wam_id":"com.sequencerParty.soundfont", "state":{"instrument":"acoustic_grand_piano"}},
+                    {"wam_id":"Shihong Ren.Faust PingPongDelay", "state":{"/PingPongDelayFaust/bypass":0,"/PingPongDelayFaust/mix":0.5,"/PingPongDelayFaust/time":0.10000000149011612,"/PingPongDelayFaust/feedback":0.30000001192092896}}
+                ]
+            }
+        },
+        "Wam API Library":{
+            "description": "A library fetching its WAM from the WAM API",
+            "category": "library",
+            "state": { "library": "http://localhost:7002/wam_api_library.json", "plugins": []}
+        },
+        "Legacy Library":{
+            "description": "A library of the plugins hosted in the wam bank",
+            "category": "library",
+            "state": { "library": "http://localhost:6002/plugins/library.json", "plugins": []}
+        }
+    },
+    "includes": [
+        {"id": "wamstudio.pedalboard2.legacy", "version": [0,0], "url": "http://localhost:6002/plugins/library.json"}
+    ]
+}

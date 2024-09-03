@@ -63,6 +63,7 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
 
     public redraw(color: string, region: REGION){
         this.region_width = region.width
+        this.drawBackground()
         this.drawContent(this._wave, color, region)
     }
 
