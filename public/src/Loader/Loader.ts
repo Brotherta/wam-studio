@@ -45,6 +45,8 @@ export interface ProjectData {
     version: [major:number, minor:number];
     host: {
         playhead: number;
+        tempo: number,
+        time_signature: [number,number],
         volume: number;
         plugin?: {
             name: string;
@@ -158,6 +160,8 @@ export default class Loader {
             version: CURRENT_PROJECT_VERSION,
             host: {
                 playhead: this._app.host.playhead,
+                tempo: this._app.hostView.tempoSelector.tempo,
+                time_signature: this._app.hostView.timeSignatureSelector.timeSignature,
                 volume: this._app.host.volume,
                 plugin: pluginHostState
             },
@@ -185,11 +189,13 @@ export default class Loader {
             }
         }
 
-        let tracksJson = project.tracks;
-        this._app.hostController.stopAllTracks();
-        this._app.tracksController.clearTracks();
-        this._app.host.playhead = 0;
-        this._app.host.volume=project.host.volume;
+        let tracksJson = project.tracks
+        this._app.hostController.stopAllTracks()
+        this._app.tracksController.clearTracks()
+        this._app.host.playhead = 0
+        this._app.host.volume=project.host.volume
+        this._app.hostView.tempoSelector.tempo = project.host.tempo
+        this._app.hostView.timeSignatureSelector.timeSignature = project.host.time_signature
 
         if (project.host.plugin) {
             const plugin=await this._app.pluginsController.fetchPlugin(project.host.plugin.name)
@@ -203,14 +209,14 @@ export default class Loader {
         for (const trackJson of tracksJson) {
             let track = await this._app.tracksController.createTrack();
 
-            track.element.name = trackJson.name;
-            track.element.trackNameInput.value = trackJson.name;
+            track.element.name = trackJson.name
+            track.element.trackNameInput.value = trackJson.name
 
             track.isMuted= trackJson.muted
             track.isSolo= trackJson.solo
-            track.balance= trackJson.balance;
-            track.volume= trackJson.volume;
-            this._app.tracksController.setColor(track, trackJson.color);
+            track.balance= trackJson.balance
+            track.volume= trackJson.volume
+            this._app.tracksController.setColor(track, trackJson.color)
 
             const pluginData = trackJson.plugin;
             console.log("Load Plugin",pluginData)
