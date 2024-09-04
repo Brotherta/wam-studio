@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from "pixi.js";
-import { DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM, MAX_DURATION_SEC, RATIO_MILLS_BY_PX, ZOOM_LEVEL } from "../../Env";
+import { MAX_DURATION_SEC, RATIO_MILLS_BY_PX, RATIO_MILLS_BY_PX_FOR_120_BPM, ZOOM_LEVEL } from "../../Env";
 import EditorView from "./EditorView";
 
 export default class GridView extends Container {
@@ -61,7 +61,7 @@ export default class GridView extends Container {
     */
     // MB test. Just compute width of grid for tempo = 120, adjust by multiplying by zoom level.
     // For 4/4 time signature, 4 steps per bar, 4 beats per bar, 1 beat per step
-    let barWidth = (2000/DEFAULT_RATIO_MILLS_BY_PX_FOR_120_BPM) * ZOOM_LEVEL * 4 / this.stepNote;
+    let barWidth = (2000/RATIO_MILLS_BY_PX_FOR_120_BPM) * ZOOM_LEVEL * 4 / this.stepNote;
     let stepWidth = barWidth / 4;
     this.cellSize = stepWidth;
 

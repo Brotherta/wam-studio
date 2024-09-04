@@ -2,7 +2,7 @@ import songs from "../../static/songs.json";
 import App from "../App";
 import WebAudioPeakMeter from "../Audio/Utils/PeakMeter";
 import VuMeter from "../Components/VuMeterElement";
-import { SONGS_FILE_URL, TEMPO_DELTA, updateTempo } from "../Env";
+import { setTempo, SONGS_FILE_URL, ZOOM_LEVEL } from "../Env";
 import DraggableWindow from "../Utils/DraggableWindow";
 import HostView from "../Views/HostView";
 import { audioCtx } from "../index";
@@ -368,10 +368,10 @@ export default class HostController {
 
     // ZOOM BUTTONS
     this._view.zoomInBtn.addEventListener("click", async () => {
-      this._app.editorController.zoomIn();
+      this._app.editorController.zoomTo(ZOOM_LEVEL*2);
     });
     this._view.zoomOutBtn.addEventListener("click", async () => {
-      this._app.editorController.zoomOut();
+      this._app.editorController.zoomTo(ZOOM_LEVEL/2);
     });
 
     // Tempo and Time Signature selectors
@@ -387,7 +387,7 @@ export default class HostController {
         return
       }
       this._app.hostView.metronome.tempo= newTempo
-      updateTempo(newTempo)
+      setTempo(newTempo)
       this._app.playheadController.moveTo(this._app.host.playhead,false)
 
       // redraw all tracks according to new tempo
@@ -400,7 +400,7 @@ export default class HostController {
           // region pos should not change when the tempo changes
           // a region that starts at 2000ms at 120bpm, when tempo changes to 60bpm
           // should now start at 2000/TEMPO_DELTA, in other words 2000/0.5 = 4000ms
-          region.start=region.start / TEMPO_DELTA
+          // TODO: Useful for what ? region.start=region.start / TEMPO
         }
 
         track.modified=true
