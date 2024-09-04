@@ -175,6 +175,7 @@ body {
     display: flex;
     overflow: hidden;
     pointer-events: none;
+    z-index: 0;
 }
 
 #plugin-editor {
