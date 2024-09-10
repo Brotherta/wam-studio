@@ -87,8 +87,15 @@ export default class EditorController {
     public zoomTo(new_zoom_level: number, respect_step: boolean=false): void{
         if(this._app.host.isPlaying)return
 
-        // Get previous values
-        const oldViewLeft= this._view.playhead.viewportLeft*RATIO_MILLS_BY_PX
+        // Get zoom center
+        const [zoomTarget,zoomTargetPos]= (()=>{
+            const viewportLeft= this._view.playhead.viewportLeft*RATIO_MILLS_BY_PX
+            const viewportRight= viewportLeft + this._view.playhead.viewportWidth*RATIO_MILLS_BY_PX
+            const viewportWidth= viewportRight-viewportLeft
+            const playhead= this._app.host.playhead
+            if(viewportLeft<=playhead && playhead<=viewportRight) return [playhead, (playhead-viewportLeft)/viewportWidth]
+            else return [(viewportLeft+viewportRight)/2, 0.5]
+        })()
 
         // Init
         this._app.hostView.zoomOutBtn.classList.add("zoom-disabled")
@@ -104,8 +111,8 @@ export default class EditorController {
 
         // Zoom
         setZoomLevel(new_zoom_level)
-        this._app.host.playhead=this._app.host.playhead
-        this._view.playhead.viewportLeft= oldViewLeft/RATIO_MILLS_BY_PX
+        this._app.host.playhead= this._app.host.playhead
+        this._view.playhead.viewportLeft= (zoomTarget/RATIO_MILLS_BY_PX)-this._view.playhead.viewportWidth*zoomTargetPos
         this._view.resizeCanvas()
         this._view.loop.updatePositionFromTime(...this._app.hostController.loopRange)
         this._app.automationController.updateBPFWidth()
@@ -113,7 +120,6 @@ export default class EditorController {
         this._app.tracksController.tracks.forEach( track => this._view.stretchRegions(track) )
         this._app.hostView.zoomOutBtn.classList.remove("zoom-disabled")
         this._app.hostView.zoomOutBtn.classList.add("zoom-enabled")
-
     }
 
 
