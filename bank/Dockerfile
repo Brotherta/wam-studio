@@ -16,7 +16,7 @@ RUN npm install
 COPY . .
 
 # Expose the port used by the Express server
-EXPOSE 7002
+EXPOSE 6002
 
 # Start the Express server
 CMD ["npm", "start"]

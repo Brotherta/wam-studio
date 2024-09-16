@@ -7,7 +7,8 @@ const utils = require('./utils');
 const projectsRoutes = require('./routes/projects.routes');
 const authRoutes = require('./routes/auth.routes');
 const pluginsRoutes = require('./routes/plugins.routes');
-const audioloopsroute = require('./routes/audioloops.routes');
+const audioloopsRoutes = require('./routes/audioloops.routes');
+const pedalboard2Routes = require('./routes/pedalboard2.routes.js');
 
 const path = require("path");
 
@@ -32,7 +33,8 @@ utils.createFiles();
 app.use(cors(CORS_VERIFIED), projectsRoutes);
 app.use(cors(CORS_VERIFIED), authRoutes);
 app.use(cors(CORS_ALL), pluginsRoutes);
-app.use(cors(CORS_ALL), audioloopsroute);
+app.use(cors(CORS_ALL), audioloopsRoutes);
+app.use(cors(CORS_ALL), pedalboard2Routes);
 
 app.use("/", cors(CORS_ALL), express.static(path.join(__dirname, "../PedalBoard")));
 app.use("/plugins", cors(CORS_ALL), express.static(path.join(__dirname, "../plugins")));

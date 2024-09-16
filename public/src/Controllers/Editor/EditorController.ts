@@ -84,7 +84,7 @@ export default class EditorController {
         this.bindEvents();
     }
 
-    public zoomTo(new_zoom_level: number, respect_step: boolean=false): void{
+    public async zoomTo(new_zoom_level: number, respect_step: boolean=false): Promise<void>{
         if(this._app.host.isPlaying)return
 
         // Get zoom center
@@ -113,11 +113,11 @@ export default class EditorController {
         setZoomLevel(new_zoom_level)
         this._app.host.playhead= this._app.host.playhead
         this._view.playhead.viewportLeft= (zoomTarget/RATIO_MILLS_BY_PX)-this._view.playhead.viewportWidth*zoomTargetPos
-        this._view.resizeCanvas()
+        await this._view.resizeCanvas()
         this._view.loop.updatePositionFromTime(...this._app.hostController.loopRange)
         this._app.automationController.updateBPFWidth()
         this._view.spanZoomLevel.innerHTML = ("x" + ZOOM_LEVEL.toFixed(2))
-        this._app.tracksController.tracks.forEach( track => this._view.stretchRegions(track) )
+        await Promise.all(this._app.tracksController.tracks.map( track => this._view.stretchRegions(track)))
         this._app.hostView.zoomOutBtn.classList.remove("zoom-disabled")
         this._app.hostView.zoomOutBtn.classList.add("zoom-enabled")
     }

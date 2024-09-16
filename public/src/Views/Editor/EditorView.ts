@@ -246,33 +246,36 @@ export default class EditorView extends Application {
      * Resize the canvas when the window is resized. It will resize the playhead, the viewport, the PIXI.Renderer,
      * the canvas and the automation div.
      */
-    public resizeCanvas(): void {
-        requestAnimationFrame(() => {
-            this.stage.scale.x = 1;
-            let scrollbarThickness = this.horizontalScrollbar.SCROLL_THICKNESS;
-            this.width += (this.editorDiv.clientWidth - this.width) - scrollbarThickness;
-            this.height += (this.editorDiv.clientHeight - this.height) - scrollbarThickness;
+    public resizeCanvas(): Promise<void> {
+        return new Promise(resolve=>{ 
+            requestAnimationFrame(() => {
+                this.stage.scale.x = 1
+                let scrollbarThickness = this.horizontalScrollbar.SCROLL_THICKNESS
+                this.width += (this.editorDiv.clientWidth - this.width) - scrollbarThickness
+                this.height += (this.editorDiv.clientHeight - this.height) - scrollbarThickness
 
-            let tracksHeight = this.waveforms.length * HEIGHT_TRACK + HEIGHT_NEW_TRACK +4;
-            this.worldHeight = Math.max(tracksHeight, this.height);
-            this.worldWidth = Math.max((MAX_DURATION_SEC*1000) / RATIO_MILLS_BY_PX, this.width);
+                let tracksHeight = this.waveforms.length * HEIGHT_TRACK + HEIGHT_NEW_TRACK +4
+                this.worldHeight = Math.max(tracksHeight, this.height)
+                this.worldWidth = Math.max((MAX_DURATION_SEC*1000) / RATIO_MILLS_BY_PX, this.width)
 
-            this._originalCenter = { x: this.width / 2, y: this.height / 2 };
+                this._originalCenter = { x: this.width / 2, y: this.height / 2 }
 
-            this.viewport.resize(this.width, this.height, this.worldWidth, this.worldHeight);
-            this.renderer.resize(this.width, this.height);
-            this.horizontalScrollbar.resize(this.width, this.worldWidth);
-            this.verticalScrollbar.resize(this.height, this.worldHeight);
+                this.viewport.resize(this.width, this.height, this.worldWidth, this.worldHeight)
+                this.renderer.resize(this.width, this.height)
+                this.horizontalScrollbar.resize(this.width, this.worldWidth)
+                this.verticalScrollbar.resize(this.height, this.worldHeight)
 
-            this.canvasContainer.style.width = `${this.width}px`;
-            this.canvasContainer.style.height = `${this.height}px`;
+                this.canvasContainer.style.width = `${this.width}px`
+                this.canvasContainer.style.height = `${this.height}px`
 
-            this.automationContainer.style.height = `${this.height - EditorView.LOOP_HEIGHT - EditorView.PLAYHEAD_HEIGHT}px`;
-            this.automationContainer.style.width = `${this.width}px`;
+                this.automationContainer.style.height = `${this.height - EditorView.LOOP_HEIGHT - EditorView.PLAYHEAD_HEIGHT}px`
+                this.automationContainer.style.width = `${this.width}px`
 
-            this.playhead.resize();
-            this.loop.resize();
-            this.grid.resize();
+                this.playhead.resize()
+                this.loop.resize()
+                this.grid.resize()
+                resolve()
+            })
         })
     }
 
@@ -316,20 +319,23 @@ export default class EditorView extends Application {
      * milliseconds.
      * @param track - The track that contains the regions.
      */
-    public stretchRegions(track: Track): void {
-        requestAnimationFrame(()=> {
-            let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
-            if (!waveFormView) return
-            for (let regionView of waveFormView.regionViews) {
-                // MB : prevented first click on ZoomIn to do something
-                //if (!track.audioBuffer) return;
-                let region = track.getRegionById(regionView.id);
-                if (region) {
-                    regionView.stretch(region.duration/1000, region.start);
+    public stretchRegions(track: Track): Promise<void> {
+        return new Promise(resolve=>{
+            requestAnimationFrame(()=> {
+                let waveFormView = this.waveforms.find(wave => wave.trackId === track.id);
+                if (!waveFormView) return
+                for (let regionView of waveFormView.regionViews) {
+                    // MB : prevented first click on ZoomIn to do something
+                    //if (!track.audioBuffer) return;
+                    let region = track.getRegionById(regionView.id);
+                    if (region) {
+                        regionView.stretch(region.duration/1000, region.start);
+                    }
+                    regionView.redraw(track.color, region);
                 }
-                regionView.redraw(track.color, region);
-            }
-        });
+                resolve()
+            });
+        })
     }
 
     /**

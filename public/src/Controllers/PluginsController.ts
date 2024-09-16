@@ -26,9 +26,8 @@ export default class PluginsController {
      * A root plugin can himself manage multiple WAM.
      **/
     readonly WAM_LIST: {[name: string]:{url:string,state?:any}}={
+        "Pedalboard2": { url: BACKEND_URL+"/pedalboard2/index.js", state:{plugins:[],library:"/wamstudio_library.json"} },
         "Pedalboard": { url: BACKEND_URL+"/src/index.js" },
-        "Pedalboard2": { url: "http://localhost:7002/index.js", state:{plugins:[],library:"http://localhost:5002/wamstudio_library.json"} },
-        "Disto Machine": { url: BACKEND_URL+"/plugins/disto_machine/src/index.js" },
     }
 
     /** The default WAM to load */

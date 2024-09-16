@@ -36,5 +36,8 @@
   "bugs": {
     "url": "https://github.com/%40webaudiomodules/sdk/issues"
   },
-  "homepage": "https://github.com/%40webaudiomodules/sdk#readme"
+  "homepage": "https://github.com/%40webaudiomodules/sdk#readme",
+  "dependencies": {
+    "@webaudiomodules/sdk": "file:"
+  }
 }

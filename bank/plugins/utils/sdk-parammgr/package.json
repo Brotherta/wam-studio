@@ -32,5 +32,8 @@
   "bugs": {
     "url": "https://github.com/webaudiomodules/sdk-parammgr/issues"
   },
-  "homepage": "https://github.com/webaudiomodules/sdk-parammgr#readme"
+  "homepage": "https://github.com/webaudiomodules/sdk-parammgr#readme",
+  "dependencies": {
+    "@webaudiomodules/sdk-parammgr": "file:"
+  }
 }

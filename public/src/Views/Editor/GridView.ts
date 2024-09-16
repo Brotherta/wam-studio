@@ -1,6 +1,13 @@
-import { Container, Graphics, Text } from "pixi.js";
+import { BitmapFont, BitmapText, Container, Graphics } from "pixi.js";
 import { MAX_DURATION_SEC, RATIO_MILLS_BY_PX, RATIO_MILLS_BY_PX_FOR_120_BPM, ZOOM_LEVEL } from "../../Env";
 import EditorView from "./EditorView";
+
+BitmapFont.from("GridViewFont", {
+  fontFamily: "Arial",
+  fontSize: 12,
+  strokeThickness: 2,
+  fill: "white"
+});
 
 export default class GridView extends Container {
   /**
@@ -11,7 +18,7 @@ export default class GridView extends Container {
    * PIXI.Graphics that represent the grid of bars.
    */
   public grid: Graphics;
-  private listOfTextElements: Text[] = [];
+  private listOfTextElements: BitmapText[] = [];
   private nbStepsPerBar: number = 4;
   private stepNote: number = 4;
   private bpm:number = 120;
@@ -26,6 +33,8 @@ export default class GridView extends Container {
 
     this.zIndex = 99;
 
+    this.grid= new Graphics();
+    this.addChild(this.grid);
     this.draw();
   }
 
@@ -42,7 +51,7 @@ export default class GridView extends Container {
     const width = (MAX_DURATION_SEC * 1000) / RATIO_MILLS_BY_PX; //this._editorView.viewport.width;
     const height = this._editorView.viewport.height;
 
-    this.grid = new Graphics();
+    //this.grid = new Graphics();
 
     // using a for loop, draw vertical lines, from x = 0 to x=width, step = 100 pixels
     this.grid.lineStyle(1, "red", 0.2);
@@ -128,10 +137,12 @@ export default class GridView extends Container {
         this.grid.drawRect(currentBarNumberXpos * barWidth, 7, 1, height);
 
         // using pixi draw text just after bar separator
+        console.log(BitmapFont.available)
         const text = this.addChild(
-          new Text(barNumber + 1, {
+          new BitmapText((barNumber + 1).toString(), {
             fontSize: 10,
-            fill: 0xe3e3e3, //0x858181,
+            fontName: "GridViewFont",
+            tint: 0xe3e3e3, //0x858181,
             align: "left",
           })
         );
@@ -146,21 +157,21 @@ export default class GridView extends Container {
       }
     }
 
-    this.addChild(this.grid);
+    //this.addChild(this.grid);
   }
 
   clearGrid() {
-    this.grid.clear();
+    this.grid.clear()
     this.listOfTextElements.forEach((element) => {
-      this.removeChild(element);
-    });
+      this.removeChild(element)
+    })
 
-    this.listOfTextElements = [];
+    this.listOfTextElements = []
   }
 
   updateGrid() {
     this.clearGrid()
-    this.draw();
+    this.draw()
   }
 
   resize() {

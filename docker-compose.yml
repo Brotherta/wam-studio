@@ -19,6 +19,6 @@ services:
     volumes:
       - projects:/data/storage
     restart: unless-stopped
-
+    
 volumes:
     projects:

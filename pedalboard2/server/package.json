@@ -13,6 +13,7 @@
     "concurrently": "^8.2.2",
     "express": "^4.19.2",
     "pedalboard2": "file:",
+    "pedalboard2_server": "file:",
     "ts-json-schema-generator": "^2.3.0",
     "typescript": "^5.5.4"
   }

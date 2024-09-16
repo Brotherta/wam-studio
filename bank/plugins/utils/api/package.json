@@ -35,5 +35,8 @@
   "homepage": "https://github.com/%40webaudiomodules/api#readme",
   "directories": {
     "doc": "docs"
+  },
+  "dependencies": {
+    "@webaudiomodules/api": "file:"
   }
 }

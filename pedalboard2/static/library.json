@@ -46,7 +46,7 @@
         "Legacy Library":{
             "description": "A library of the plugins hosted in the wam bank",
             "category": "library",
-            "state": { "library": "http://localhost:6002/plugins/library.json", "plugins": []}
+            "state": { "library": "/plugins/library.json", "plugins": []}
         }
     },
     "includes": []
