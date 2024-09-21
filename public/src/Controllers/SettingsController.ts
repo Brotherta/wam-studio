@@ -97,6 +97,7 @@ export default class SettingsController {
                     }
                     if(device!=undefined){
                         const constraints = { audio: { deviceId: {exact: device.deviceId}, echoCancellation: false, noiseSuppression: false, autoGainControl: false }}
+                        that.constraints=constraints
                         let stream = await navigator.mediaDevices.getUserMedia(constraints)
                         that._selectedInputDevice = audioCtx.createMediaStreamSource(stream)
                         that._selectedInputDevice.connect(that.soundInputNode)

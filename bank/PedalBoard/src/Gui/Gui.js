@@ -1,4 +1,4 @@
-import "../../../plugins/utils/webaudio-controls.js";
+import "../../../../plugins/utils/webaudio-controls.js";
 import PedalBoardPlugin from "../index.js";
 import Visualizer from "./Visualizer.js";
 import { elementOf } from "./html.js";

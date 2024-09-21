@@ -36,7 +36,7 @@ app.use(cors(CORS_ALL), pluginsRoutes);
 app.use(cors(CORS_ALL), audioloopsRoutes);
 app.use(cors(CORS_ALL), pedalboard2Routes);
 
-app.use("/", cors(CORS_ALL), express.static(path.join(__dirname, "../PedalBoard")));
+app.use("/pedalboard", cors(CORS_ALL), express.static(path.join(__dirname, "../PedalBoard")));
 app.use("/plugins", cors(CORS_ALL), express.static(path.join(__dirname, "../plugins")));
 app.use("/songs", cors(CORS_ALL), express.static(path.join(__dirname, "../songs")));
 app.use("/loops", cors(CORS_ALL), express.static(path.join(__dirname, "../loops")));

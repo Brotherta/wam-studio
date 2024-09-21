@@ -41,7 +41,7 @@ const mountPlugin = (domNode) => {
   const [hostGroupId] = await initializeWamHost(audioContext);
 
   // Import WAM
-  const { default: WAM } = await import(bankUrl + "/src/index.js");
+  const { default: WAM } = await import("./src/index.js");
   //const { default: WAM } = await import("https://wam-bank.vidalmazuy.fr/plugins/TS9_OverdriveFaustGenerated/index.js");
   // Create a new instance of the plugin
   // You can can optionnally give more options such as the initial state of the plugin

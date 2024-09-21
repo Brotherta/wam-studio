@@ -27,11 +27,10 @@ export default class PluginsController {
      **/
     readonly WAM_LIST: {[name: string]:{url:string,state?:any}}={
         "Pedalboard2": { url: BACKEND_URL+"/pedalboard2/index.js", state:{plugins:[],library:"/wamstudio_library.json"} },
-        "Pedalboard": { url: BACKEND_URL+"/src/index.js" },
     }
 
     /** The default WAM to load */
-    readonly DEFAULT_WAM="Pedalboard"
+    readonly DEFAULT_WAM="Pedalboard2"
 
 
 
