@@ -86,6 +86,7 @@ export default class LatencyController {
         workletNode.port.postMessage({threshold: 0.20 });
 
         workletNode.port.onmessage = (e) => {
+            console.log("   latency:"+JSON.stringify(e.data))
             const roundtripLatency = e.data.latency * 1000;
             // @ts-ignore
             const outputLatency = audioCtx.outputLatency * 1000;
@@ -98,13 +99,14 @@ export default class LatencyController {
             localStorage.setItem("latency-compensation", inputLatency.toFixed(2).toString());
         }
 
-        mic.connect(workletNode).connect(this._recordAudioContext.destination);
+        mic.connect(workletNode).connect(this._recordAudioContext.destination)
     }
 
     /**
      * Starts the calibration of the latency.
      */
     private async startCalibrate(): Promise<void> {
+        console.log("start calibrate")
         await this.setupWorklet()
         await this._recordAudioContext.resume();
         this._calibrating = true;
@@ -116,6 +118,7 @@ export default class LatencyController {
      * @private
      */
     private async stopCalibrate(): Promise<void> {
+        console.log("stop calibrate")
         await this._recordAudioContext.close()
         this._calibrating = false;
         this._view.calibrationButton.innerText = "Calibrate Latency";
