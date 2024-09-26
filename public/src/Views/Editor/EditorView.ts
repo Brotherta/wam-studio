@@ -177,13 +177,10 @@ export default class EditorView extends Application {
             this.loop.position.y = 0;
             this.loop.track.position.y = 0;
             this.grid.position.y = 0;
-
         }
         else {
-            let x = this.viewport.center.x;
-            let y = this._originalCenter.y + scrollValue;
-            y = Math.max(0, Math.min(this.worldHeight - (this.height / 2), y));
-            this.viewport.moveCenter(x, y);
+            this.viewport.y=-this.trackContainer.scrollTop;
+            
             this.playhead.position.y = -this.viewport.y;
             this.playhead.track.position.y = -this.viewport.y;
             this.loop.position.y = -this.viewport.y;
