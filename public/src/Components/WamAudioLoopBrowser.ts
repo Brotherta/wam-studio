@@ -1,22 +1,23 @@
 export default class WamAudioLoopBrowser extends HTMLElement {
     audioData: any = null;
     URL_SERVER: string;
-    override shadowRoot: ShadowRoot;
     searchTimeout: any = null;
     constructor() {
         super();
         this.audioData = null;
-         this.URL_SERVER = "https://wam-bank.i3s.univ-cotedazur.fr";
+        this.URL_SERVER = "https://wam-bank.i3s.univ-cotedazur.fr";
+        console.log("before:",this.shadowRoot)
+        this.attachShadow({ mode: "open" })
+        console.log("after:",this.shadowRoot)
         //this.URL_SERVER = "http://localhost:6002";
-        this.attachShadow({ mode: "open" });
     }
 
 
     connectedCallback() {
-        this.init();
+        this.init()
     }
     init() {
-        this.shadowRoot.innerHTML = `
+        this.shadowRoot!.innerHTML = /*html*/`
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
         <div id="mainWrapper">
             <div id="main">
@@ -326,7 +327,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
             .then((data) => {
                 this.audioData = data;
 
-                const folderContainer = this.shadowRoot.getElementById('folder-container') as HTMLElement;
+                const folderContainer = this.shadowRoot!.getElementById('folder-container') as HTMLElement;
                 this.generateStructure(this.audioData, folderContainer);
 
                 const searchInput = this.shadowRoot?.getElementById('search-input') as HTMLInputElement;
@@ -341,13 +342,13 @@ export default class WamAudioLoopBrowser extends HTMLElement {
                 const bpmInput = this.shadowRoot?.getElementById('bpm-input') as HTMLInputElement;
                 bpmInput?.addEventListener('input', () => this.handleSearchAndFilter());
 
-                let resetFiltersBtn = this.shadowRoot.getElementById('reset-filters-btn') as HTMLButtonElement;
+                let resetFiltersBtn = this.shadowRoot!.getElementById('reset-filters-btn') as HTMLButtonElement;
                 resetFiltersBtn.addEventListener('click', () => this.resetDisplay());
 
-                let showFavoritesCheckbox = this.shadowRoot.getElementById('show-favorites') as HTMLInputElement;
+                let showFavoritesCheckbox = this.shadowRoot!.getElementById('show-favorites') as HTMLInputElement;
                 showFavoritesCheckbox.addEventListener('change', (event) => {
-                    const favoritesContainer = this.shadowRoot.getElementById('favorites-container') as HTMLElement;
-                    const filesContainer = this.shadowRoot.getElementById('files-container') as HTMLElement;
+                    const favoritesContainer = this.shadowRoot!.getElementById('favorites-container') as HTMLElement;
+                    const filesContainer = this.shadowRoot!.getElementById('files-container') as HTMLElement;
 
                     const target = event.target as HTMLInputElement;
                     if (target.checked) {
@@ -378,13 +379,13 @@ export default class WamAudioLoopBrowser extends HTMLElement {
         }, 300); // Throttling avec un délai de 300ms
     }
     performSearchAndFilter(): void {
-        const searchTerm = (this.shadowRoot.getElementById('search-input') as HTMLInputElement).value.toLowerCase();
-        const selectedKey = (this.shadowRoot.getElementById('key-select') as HTMLSelectElement).value;
-        const selectedMode = (this.shadowRoot.getElementById('key-mode-select') as HTMLSelectElement).value;
-        const bpm = (this.shadowRoot.getElementById('bpm-input') as HTMLInputElement).value;
+        const searchTerm = (this.shadowRoot!.getElementById('search-input') as HTMLInputElement).value.toLowerCase();
+        const selectedKey = (this.shadowRoot!.getElementById('key-select') as HTMLSelectElement).value;
+        const selectedMode = (this.shadowRoot!.getElementById('key-mode-select') as HTMLSelectElement).value;
+        const bpm = (this.shadowRoot!.getElementById('bpm-input') as HTMLInputElement).value;
 
-        const folderContainer = this.shadowRoot.getElementById('folder-container') as HTMLElement;
-        const filesContainer = this.shadowRoot.getElementById('files-container') as HTMLElement;
+        const folderContainer = this.shadowRoot!.getElementById('folder-container') as HTMLElement;
+        const filesContainer = this.shadowRoot!.getElementById('files-container') as HTMLElement;
 
         if (searchTerm === '' && !selectedKey && !selectedMode && !bpm) {
             // this.resetFoldersAndFilesDisplay();
@@ -416,13 +417,13 @@ export default class WamAudioLoopBrowser extends HTMLElement {
     }
 
     attachDragListeners() {
-        this.shadowRoot.querySelectorAll(".audio-file-item").forEach((audioLoopDiv) => {
+        this.shadowRoot!.querySelectorAll(".audio-file-item").forEach((audioLoopDiv) => {
             audioLoopDiv.addEventListener("dragstart", this.dragHandler);
         });
     }
 
     attachPlayButtonEventListeners(): void {
-        const playButtons = this.shadowRoot.querySelectorAll('.play-btn');
+        const playButtons = this.shadowRoot!.querySelectorAll('.play-btn');
 
         playButtons.forEach((buttonElement: Element) => {
             const button = buttonElement as HTMLButtonElement;
@@ -443,7 +444,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
         });
     }
     attachFavouriteButtonEventListeners() {
-        const favouriteButtons = this.shadowRoot.querySelectorAll('.favourite-btn') as NodeListOf<HTMLButtonElement>;
+        const favouriteButtons = this.shadowRoot!.querySelectorAll('.favourite-btn') as NodeListOf<HTMLButtonElement>;
         favouriteButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const fullPath = button.parentElement?.getAttribute('data-fullpath') as string;
@@ -502,8 +503,8 @@ export default class WamAudioLoopBrowser extends HTMLElement {
         });
     }
     resetFoldersAndFilesDisplay() {
-        const folderContainer = this.shadowRoot.getElementById('folder-container') as HTMLElement;
-        const filesContainer = this.shadowRoot.getElementById('files-container') as HTMLElement;
+        const folderContainer = this.shadowRoot!.getElementById('folder-container') as HTMLElement;
+        const filesContainer = this.shadowRoot!.getElementById('files-container') as HTMLElement;
 
         folderContainer.innerHTML = '';
         filesContainer.innerHTML = '';
@@ -511,13 +512,13 @@ export default class WamAudioLoopBrowser extends HTMLElement {
         this.attachFavouriteButtonEventListeners();
     }
     resetDisplay() {
-        (this.shadowRoot.getElementById('key-select') as HTMLSelectElement).value = '';
-        (this.shadowRoot.getElementById('key-mode-select') as HTMLSelectElement).value = '';
-        (this.shadowRoot.getElementById('bpm-input') as HTMLInputElement).value = '';
-        (this.shadowRoot.getElementById('search-input') as HTMLInputElement).value = '';
-        const folderContainer = this.shadowRoot.getElementById('folder-container') as HTMLElement;
+        (this.shadowRoot!.getElementById('key-select') as HTMLSelectElement).value = '';
+        (this.shadowRoot!.getElementById('key-mode-select') as HTMLSelectElement).value = '';
+        (this.shadowRoot!.getElementById('bpm-input') as HTMLInputElement).value = '';
+        (this.shadowRoot!.getElementById('search-input') as HTMLInputElement).value = '';
+        const folderContainer = this.shadowRoot!.getElementById('folder-container') as HTMLElement;
         folderContainer.style.display = 'block';
-        const filesContainer = this.shadowRoot.getElementById('files-container') as HTMLElement;
+        const filesContainer = this.shadowRoot!.getElementById('files-container') as HTMLElement;
         filesContainer.innerHTML = '';
     }
     filterFile(file: { name: any; }, selectedKey: string, selectedMode: string, bpm: string) {
@@ -625,7 +626,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
         return null;
     }
     togglePlayPause(audioId: string): void {
-        const audio = this.shadowRoot.querySelector(`#${audioId}`) as HTMLAudioElement;
+        const audio = this.shadowRoot!.querySelector(`#${audioId}`) as HTMLAudioElement;
         if (!audio) {
             console.error("Élément audio introuvable:", audioId);
             return;
@@ -656,11 +657,11 @@ export default class WamAudioLoopBrowser extends HTMLElement {
         }
     }
     setAudioPriorityAndPlay(audioId: string) {
-        const audioElement = this.shadowRoot.querySelector(`#${audioId}`) as HTMLElement;
+        const audioElement = this.shadowRoot!.querySelector(`#${audioId}`) as HTMLElement;
         if (audioElement) {
             (audioElement.parentElement as HTMLElement).setAttribute('data-loading-priority', 'high');
 
-            this.shadowRoot.querySelectorAll('.audio-file-item[data-loading-priority="high"]').forEach(item => {
+            this.shadowRoot!.querySelectorAll('.audio-file-item[data-loading-priority="high"]').forEach(item => {
                 if (item.id !== (audioElement.parentElement as HTMLElement).id) {
                     item.setAttribute('data-loading-priority', 'low');
                 }

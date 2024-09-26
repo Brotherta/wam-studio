@@ -131,7 +131,7 @@ export default class EditorController {
         window.addEventListener("resize", () => {
             this._view.resizeCanvas();
         });
-        window.addEventListener("wheel", (e) => {
+        this._view.editorDiv.addEventListener("wheel", (e) => {
             console.log("wheel called !!!!")
             if(isKeyPressed("Shift")){ // Zoom in/out
                 const currentTime = Date.now();
