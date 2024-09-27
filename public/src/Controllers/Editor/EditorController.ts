@@ -98,8 +98,10 @@ export default class EditorController {
         })()
 
         // Init
-        this._app.hostView.zoomOutBtn.classList.add("zoom-disabled")
-        this._app.hostView.zoomOutBtn.classList.remove("zoom-enabled")
+        for(const button of [this._app.hostView.zoomInBtn, this._app.hostView.zoomOutBtn]){
+            button.classList.add("zoom-disabled")
+            button.classList.remove("zoom-enabled")
+        }
 
         // Get zoom ratio
         new_zoom_level = Math.max(MIN_ZOOM_LEVEL, Math.min(new_zoom_level, MAX_ZOOM_LEVEL))
@@ -118,8 +120,11 @@ export default class EditorController {
         this._app.automationController.updateBPFWidth()
         this._view.spanZoomLevel.innerHTML = ("x" + ZOOM_LEVEL.toFixed(2))
         await Promise.all(this._app.tracksController.tracks.map( track => this._view.stretchRegions(track)))
-        this._app.hostView.zoomOutBtn.classList.remove("zoom-disabled")
-        this._app.hostView.zoomOutBtn.classList.add("zoom-enabled")
+
+        for(const button of [this._app.hostView.zoomInBtn, this._app.hostView.zoomOutBtn]){
+            button.classList.add("zoom-enabled")
+            button.classList.remove("zoom-disabled")
+        }
     }
 
 
