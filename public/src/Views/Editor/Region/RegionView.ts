@@ -68,7 +68,7 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
         this.drawContent(this._wave, color, region)
     }
 
-    redrawSoon = debounce(this.redraw.bind(this), 250)
+    redrawSoon = debounce(this.redraw.bind(this), 500)
 
 
     /** Is the region selected or not. Use to draw the current border of the background. */
