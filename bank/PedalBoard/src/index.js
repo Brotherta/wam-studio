@@ -18,19 +18,13 @@ export default class PedalBoardPlugin extends WebAudioModule {
 
   id = 0;
 
-  gui
-
-  WAMS
-
-  /** @type {PedalBoardNode} */ pedalboardNode
-
   removeRelativeUrl = (relativeURL) => {
     if (relativeURL[0] == ".") {
       return `${this._baseURL}${relativeURL.substring(1)}`;
     } else {
       return `${this._baseURL.replace('/src', '')}${relativeURL}`;
     }
-  }
+  };
 
   async _loadDescriptor() {
     const url = this._descriptorUrl;
@@ -104,8 +98,7 @@ export default class PedalBoardPlugin extends WebAudioModule {
     this.gui.loadingPreset = true;
     this.gui.setPreviewFullness(true);
     let board = this.gui.board;
-    this.pedalboardNode.removeAll()
-    this.pedalboardNode.nodeQueue.forEach(it=>it.node.destroy())
+    this.pedalboardNode.disconnectNodes(board.childNodes, true);
     board.innerHTML = "";
 
     let size = 0;
@@ -127,7 +120,6 @@ export default class PedalBoardPlugin extends WebAudioModule {
    * @author Quentin Beauchet
    */
   async addWAM(WamName, state) {
-    console.assert(this.WAMS[WamName],`The WAM ${WamName} does not exist or is not loaded.`)
     const { default: WAM } = this.WAMS[WamName].module;
     let instance;
     try {
@@ -136,7 +128,7 @@ export default class PedalBoardPlugin extends WebAudioModule {
       return false;
     }
 
-    this.pedalboardNode.addPlugin(instance, WamName, this.id);
+    this.pedalboardNode.addPlugin(instance.audioNode, WamName, this.id);
     await this.gui.addPlugin(instance, this.WAMS[WamName].img, this.id);
     if (state) {
       await instance.audioNode.setState(state);

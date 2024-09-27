@@ -100,7 +100,7 @@ const getCustomProcessor = (moduleId) => {
     /**
      * Manage the messages beetween the audioThread and the mainThread:
      * - "set/init" is called only once and is needed to know the subGroup for the plugins.
-     * - "set/nodes" is called each time the order of the plugins on the Pedalboard is changed.
+     * - "set/nodes" is called each team the order of the plugins on the Pedalboard is changed.
      * - "get/parameterInfo" return to the mainThread informations about a plugin parameter informations.
      * - "get/parameterValues"  return to the mainThread informations about a plugin parameter values.
      * - "add/event" add and event to the EventQueue, mainly used for automation.
@@ -140,19 +140,13 @@ const getCustomProcessor = (moduleId) => {
       events.forEach((event) => {
         const { type, data, time } = event;
         const { id, value } = data;
-        if(id!==undefined && value!==undefined){
-          var param = this._parameterInfo[id];
-          this.group.processors.get(param.nodeId).scheduleEvents({
-            type,
-            time,
-            data: { id: param.id, normalized: param.normalized, value },
-          });
-        }
-        else{
-          this.group.processors.forEach((processor) => {
-            processor.scheduleEvents(event);
-          })
-        }
+        var param = this._parameterInfo[id];
+
+        this.group.processors.get(param.nodeId).scheduleEvents({
+          type,
+          time,
+          data: { id: param.id, normalized: param.normalized, value },
+        });
       });
     }
 

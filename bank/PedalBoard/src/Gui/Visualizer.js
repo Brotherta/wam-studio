@@ -49,67 +49,43 @@ export default class Visualizer {
   }
 
   initShader() {
-    let w = this.analyser.fftSize / 2
+    let w = this.analyser.fftSize / 2;
 
-    let raw = new Float32Array(w)
-    let texture = BABYLON.RawTexture.CreateRTexture(
+    let raw = new Uint8Array(w * 255 * 4);
+    let texture = BABYLON.RawTexture.CreateRGBATexture(
       raw,
       w,
-      1,
+      255,
       this.scene,
-      false,
+      undefined,
       undefined,
       undefined,
       undefined,
       undefined,
       true
-    )
-    texture.hasAlpha = true
+    );
+    texture.hasAlpha = true;
 
-    BABYLON.Effect.ShadersStore["customFragmentShader"] = 
-    /*glsl*/`
-      varying vec2 vUV;
-      uniform sampler2D textureSampler;
-      
-      // Parameters
-      uniform vec2 screenSize;
+    BABYLON.Effect.ShadersStore["customFragmentShader"] = `
+    varying vec2 vUV;
+    uniform sampler2D textureSampler;
+    uniform float time;
+    
+    // Parameters
+    uniform vec2 screenSize;
 
-      const vec4 firstColor = vec4(1.0,0.0,0.0,1.0); //red
-      const vec4 middleColor = vec4(0.0,1.0,0.0,1.0); // green
-      const vec4 endColor = vec4(0.0,0.0,1.0,1.0); // blue
+    vec4 firstColor = vec4(1.0,0.0,0.0,1.0); //red
+    vec4 middleColor = vec4(0.0,1.0,0.0,1.0); // green
+    vec4 endColor = vec4(0.0,0.0,1.0,1.0); // blue
+    
+    void main( void ){
+        vec2 xy = gl_FragCoord.xy / screenSize.xy;
 
-      float getIntensity(vec2 xy, float size, float width, float dimension){
-        float wave_y = texture2D(textureSampler, vec2(xy.x/dimension, 0.5)).r;
-        float intensity= xy.y-((wave_y-0.5)*size+0.5);
-        intensity*=intensity*width;
-        if(intensity<0.001){
-          intensity= 1.0-intensity/0.001;
-        }
-        else intensity=0.0;
-        return intensity;
-      }
-      
-      void main( void ){
-          vec2 xy = gl_FragCoord.xy / screenSize.xy;
-          float wave_y = texture2D(textureSampler, vec2(xy.x, 0.5)).r;
+        float h = 0.5; // adjust position of middleColor
+        vec4 col = mix(mix(firstColor, middleColor, xy.x/h), mix(middleColor, endColor, (xy.x - h)/(1.0 - h)), step(h, xy.x));
 
-          float main_intensity=getIntensity(xy, 1.0, 1.0, 1.0);
-          float second_intensity=getIntensity(xy, 1.0, 5.0, 4.0)*0.8;
-          float total_intensity=max(main_intensity,second_intensity/2.0);
-          if(total_intensity>0.0){
-            float h = 0.5; // adjust position of middleColor
-            gl_FragColor = max(
-              mix(mix(firstColor, middleColor, (xy.x/h)), mix(middleColor, endColor, (xy.x - h)/(1.0 - h)), step(h, xy.x))*main_intensity,
-              vec4(second_intensity,second_intensity,second_intensity,1.0)
-            );
-            wave_y*=2.0;
-            gl_FragColor*=vec4(wave_y, wave_y, wave_y, 1.0);
-          }
-          else{
-            gl_FragColor = vec4(0.0,0.0,0.0,1.0);
-          }
-      }
-    `
+        gl_FragColor = texture2D(textureSampler, xy) * col;
+    }`;
 
     var postProcess = new BABYLON.PostProcess("Wave", "custom", ["screenSize"], null, 0.25, this.camera);
     postProcess.onApply = () => {
@@ -122,16 +98,30 @@ export default class Visualizer {
 
     this.updateTexture = () => {
       this.analyser.getByteTimeDomainData(this.dataArrayAlt);
-      for (let i = 0; i < w; i++) raw[i]= (this.dataArrayAlt[i]/255+raw[i])/2
+
+      for (let i = 0; i < w; i++) {
+        for (let j = 0; j < 255; j++) {
+          let index = 4 * (w * j + i);
+
+          let color = Math.abs(this.dataArrayAlt[i] - j) < 3 ? 255 : 0;
+
+          raw[index + 0] = color;
+          raw[index + 1] = color;
+          raw[index + 2] = color;
+          raw[index + 3] = 255;
+        }
+      }
+
       texture.update(raw);
     };
   }
 
   createScene() {
-    const scene = this.scene = new BABYLON.Scene(this.engine);
-    scene.autoClear = false; 
-    scene.autoClearDepthAndStencil = false; 
-  
+    this.scene = new BABYLON.Scene(this.engine);
+    this.scene.clearColor = new BABYLON.Color3.Black();
+
+    var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), this.scene);
+    light.intensity = 0.7;
 
     this.camera = new BABYLON.ArcRotateCamera(
       "Camera",

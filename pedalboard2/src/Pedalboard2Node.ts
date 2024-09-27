@@ -224,6 +224,7 @@ export class Pedalboard2Node extends WamNode {
             const internalQuery= query
                 .map(name=>ParameterUtils.internal_id(name))
                 .filter(n=>n!=null)
+                .map(n=>n as {id:number, parameter:string})
                 .map(({id,parameter}) => [this._id_to_child.get(id), parameter] as [Pedalboard2NodeChild, string])
                 .filter(([child,parameter]) => child!=undefined)
 
