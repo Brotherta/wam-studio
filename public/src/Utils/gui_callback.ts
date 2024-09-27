@@ -71,7 +71,7 @@ export function waitForEvent<K extends keyof GlobalEventHandlersEventMap>(elemen
  * @param tick The callback called at each tick.
  * @param stop The callback called on timeout.
  */
-export function keptOnInterval(interval: number, timeout: number, tick:()=>void|true, start?:()=>void, stop?:()=>void){
+export function keepAlive(interval: number, timeout: number, tick:()=>void|true, start?:()=>void, stop?:()=>void){
     let timeoutId: NodeJS.Timeout|null= null
     let intervalId: NodeJS.Timeout|null = null
     
@@ -105,7 +105,6 @@ export function keptOnInterval(interval: number, timeout: number, tick:()=>void|
  * @returns 
  */
 export function throttle<T extends Array<any>>(callback: (...args:T)=>void, delay: number) {
-    let timeoutId: NodeJS.Timeout|null= null
     let lastTime=0
     return function (...args:T) {
         let now=Date.now()
@@ -113,5 +112,23 @@ export function throttle<T extends Array<any>>(callback: (...args:T)=>void, dela
             lastTime=now
             callback(...args)
         }
+    };
+}
+
+/**
+ * Decorate a function, so that it wait specified time before really executing.
+ * The timer is reset is the function is called again before the delay.
+ * @param callback The function to decorate.
+ * @param delay The time in milliseconds to wait before calling the function again.
+ * @returns 
+ */
+export function debounce<T extends Array<any>>(callback: (...args:T)=>void, delay: number) {
+    let timeoutId: NodeJS.Timeout|null= null
+    return function (...args:T) {
+        if(timeoutId!=null) clearTimeout(timeoutId)
+        timeoutId= setTimeout(()=>{
+            callback(...args)
+            timeoutId=null
+        },delay)
     };
 }

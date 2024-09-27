@@ -1,6 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import { HEIGHT_TRACK, RATIO_MILLS_BY_PX } from "../../../Env";
 import { RegionOf } from "../../../Models/Region/Region";
+import { debounce } from "../../../Utils/gui_callback";
 import EditorView from "../EditorView";
 
 /**
@@ -66,6 +67,8 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
         this.drawBackground()
         this.drawContent(this._wave, color, region)
     }
+
+    redrawSoon = debounce(this.redraw.bind(this), 250)
 
 
     /** Is the region selected or not. Use to draw the current border of the background. */

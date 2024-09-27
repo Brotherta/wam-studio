@@ -1,7 +1,7 @@
 import { FederatedPointerEvent } from "pixi.js";
 import App from "../../App";
 import { RATIO_MILLS_BY_PX } from "../../Env";
-import { keptOnInterval } from "../../Utils/gui_callback";
+import { keepAlive } from "../../Utils/gui_callback";
 import { registerOnKeyDown, registerOnKeyUp } from "../../Utils/keys";
 import EditorView from "../../Views/Editor/EditorView";
 import PlayheadView from "../../Views/Editor/PlayheadView";
@@ -236,12 +236,12 @@ export default class PlayheadController {
 
   }
 
-  readonly scrollRight= keptOnInterval(25, 300, ()=>{
+  readonly scrollRight= keepAlive(25, 300, ()=>{
     const viewport= this._app.editorView.viewport
     this._view.viewportLeft+= (viewport.right - viewport.left)/50
   })
 
-  readonly scrollLeft= keptOnInterval(25, 300, ()=>{
+  readonly scrollLeft= keepAlive(25, 300, ()=>{
       const viewport= this._app.editorView.viewport
       this._view.viewportLeft-= (viewport.right - viewport.left)/50
   })
