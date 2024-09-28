@@ -5,7 +5,8 @@
         "sourceMap": true,
         "target": "ESNext",
         "module": "ESNext",
-    
+        "useDefineForClassFields": false,
+        
         // Rules for your code
         "strict": true,
         "noImplicitAny": true,

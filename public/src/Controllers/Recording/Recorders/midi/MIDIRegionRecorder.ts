@@ -69,7 +69,10 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
 
     private _connecteds  = new Set<WamNode>()
 
-    connect(node: WamNode): void { this._connecteds.add(node) }
+    connect(node: WamNode): void {
+        console.log("connect")
+        this._connecteds.add(node)
+    }
 
     disconnect(node: WamNode): void { this._connecteds.delete(node) }
 

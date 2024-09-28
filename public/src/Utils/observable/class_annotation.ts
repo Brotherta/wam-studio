@@ -31,6 +31,7 @@ export function observed<THIS>(options: ObservedOptions<THIS,any>){
             set: setter,
             get: getter
         })
+        
     }
 }
 
