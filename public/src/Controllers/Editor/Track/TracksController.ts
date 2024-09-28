@@ -1,7 +1,7 @@
 import App, { crashOnDebug } from "../../../App";
 import OperableAudioBuffer from "../../../Audio/OperableAudioBuffer";
 import TrackElement from "../../../Components/Editor/TrackElement";
-import { RATIO_MILLS_BY_PX } from "../../../Env";
+import { ARE_RECORDER_EXCLUSIVE, RATIO_MILLS_BY_PX, ZOOM_LEVEL } from "../../../Env";
 import TracksView from "../../../Views/TracksView";
 import { audioCtx } from "../../../index";
 
@@ -402,22 +402,40 @@ export default class TracksController{
     
     // TRACK 
     const that=this
+
     /** HELPER METHOD TO REGISTER ARM BUTTON */
+    const recorderButtons: [(t:TrackElement,b:boolean)=>void, CRecorderFactory<any>][] =[]
     function linkArmButton(recorder: CRecorderFactory<any>, button: Element, setter: (track:TrackElement,value:boolean)=>void){
       track.recorders.get(recorder)
       button.addEventListener("click", () => {
         const initialArm= that._app.recorderController.isArmed(track, recorder)
+        const toDisarm= recorderButtons.filter(([_,r])=>that._app.recorderController.isArmed(track,r))
+        console.log(toDisarm)
         that._app.doIt(true,
           ()=> {
             that._app.recorderController.toggleArm(track, recorder, !initialArm)
+            if(ARE_RECORDER_EXCLUSIVE && !initialArm){ // Disarm already armeds recorders
+              for(const [set,r] of toDisarm){
+                that._app.recorderController.toggleArm(track, r, false)
+                set(track.element,false)
+              }
+            }
             setter(track.element,!initialArm)
+            ZOOM_LEVEL
           },
           ()=> {
             that._app.recorderController.toggleArm(track, recorder, initialArm)
+            if(ARE_RECORDER_EXCLUSIVE && !initialArm){
+              for(const [e,r] of toDisarm){
+                that._app.recorderController.toggleArm(track, r, true)
+                setter(track.element,false)
+              }
+            }
             setter(track.element,initialArm)
           }
         );
       })
+      recorderButtons.push([setter,recorder])
     }
 
     linkArmButton(RecorderController.SAMPLE_RECORDER, track.element.armBtn, (t,v)=>t.isSampleArmed=v)

@@ -17,6 +17,10 @@ export const HEIGHT_NEW_TRACK = 88+16; // 88px height + 16px margin
 // and the zoom level, and the ratio is updated accordingly.
 
 
+/// RECORDERS ///
+/** If true, it is not possible to record on the same track with multiple recorders. */
+export let ARE_RECORDER_EXCLUSIVE=true
+
 
 /// TEMPO ////
 /** The current tempo in BPM */
