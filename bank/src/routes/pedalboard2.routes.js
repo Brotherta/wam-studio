@@ -1,7 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const pedalboard2 = require('../../../pedalboard2/server/handler.js');
+const pedalboard2 = require('../../pedalboard2/server/handler.js');
 
 const router = express.Router();
 

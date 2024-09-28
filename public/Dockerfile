@@ -3,10 +3,6 @@
 # Use the official Node.js image as the base image
 FROM node:16
 
-# Pedalboard2
-WORKDIR /pedalboard2
-COPY ../pedalboard2 .
-
 # Set the working directory
 WORKDIR /app
 
