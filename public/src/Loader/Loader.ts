@@ -172,6 +172,7 @@ export default class Loader {
     }
 
     async loadProject(data: ProjectData, contents: (id:string)=>XMLHttpRequest) {
+        this._app.editorView.setLoading(true)
         let project: ProjectData = data;
         console.log("Load Project:", project)
 
@@ -240,6 +241,9 @@ export default class Loader {
             let regions = trackJson.regions;
             this.loadTrackRegions(track, regions, contents);
         }
+
+        this._app.editorView.setLoading(false)
+        
     }
 
     loadTrackRegions(track: Track, regions: ProjectData['tracks'][0]['regions'], contents: (id:string)=>XMLHttpRequest) {

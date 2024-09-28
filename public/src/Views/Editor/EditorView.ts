@@ -346,4 +346,32 @@ export default class EditorView extends Application {
     public createBarGrid() {
         let grid = new GridView(this);
     }
+
+    public setLoading(isLoading: boolean): void {
+        let loadingIcon = document.querySelector('#loading-icon') as HTMLElement;
+        if (isLoading) {
+            if (!loadingIcon) {
+                loadingIcon = document.createElement('div') as HTMLElement;
+                loadingIcon.id = 'loading-icon';
+                loadingIcon.style.position = 'fixed';
+                loadingIcon.style.top = '0';
+                loadingIcon.style.left = '0';
+                loadingIcon.style.width = '100vw';
+                loadingIcon.style.height = '100vh';
+                loadingIcon.style.display = 'flex';
+                loadingIcon.style.alignItems = 'center';
+                loadingIcon.style.justifyContent = 'center';
+                loadingIcon.style.zIndex = '9999';
+                loadingIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                loadingIcon.innerHTML = `
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                `;
+                document.body.appendChild(loadingIcon);
+            }
+        } else {
+            if (loadingIcon) loadingIcon.remove();
+        }
+    }
 }

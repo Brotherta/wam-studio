@@ -269,35 +269,6 @@ export default class EditorController {
         if(!success)target.cancel()
     }
 
-    private showLoadingIcon(show: boolean): void {
-        let loadingIcon = document.querySelector('#loading-icon') as HTMLElement;
-        if (show) {
-            if (!loadingIcon) {
-                loadingIcon = document.createElement('div') as HTMLElement;
-                loadingIcon.id = 'loading-icon';
-                loadingIcon.style.position = 'fixed';
-                loadingIcon.style.top = '0';
-                loadingIcon.style.left = '0';
-                loadingIcon.style.width = '100vw';
-                loadingIcon.style.height = '100vh';
-                loadingIcon.style.display = 'flex';
-                loadingIcon.style.alignItems = 'center';
-                loadingIcon.style.justifyContent = 'center';
-                loadingIcon.style.zIndex = '9999';
-                loadingIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-                loadingIcon.innerHTML = `
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="sr-only"></span>
-                    </div>
-                `;
-                document.body.appendChild(loadingIcon);
-            }
-        } else {
-            if (loadingIcon) loadingIcon.remove();
-        }
-    }
-
-
 
     private async importDraggedAudioLoop(url: string, clientX: number, clientY: number) {
         // Get the track under the given position
@@ -367,13 +338,13 @@ export default class EditorController {
      * @param start The start position of the loaded region
      */
     private async importFile(bufferLoader: ()=>Promise<{buffer:ArrayBuffer, type:string}|null>, track: Track, start: number): Promise<RegionOf<any>|null>{
-        this.showLoadingIcon(true)
+        this._view.setLoading(true)
         track.element.progress();
         
         // Fetch the file
         const file = await bufferLoader()
         if(!file){
-            this.showLoadingIcon(false)
+            this._view.setLoading(false)
             console.error("File could not be loaded")
             return null
         }
@@ -393,7 +364,7 @@ export default class EditorController {
             }
         }
         track.element.progressDone();
-        this.showLoadingIcon(false)
+        this._view.setLoading(false)
         return region
     }
 
