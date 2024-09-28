@@ -38,10 +38,10 @@ export const setTempo = (newTempo: number) => {
 export let ZOOM_LEVEL = 1
 
 /** The minimum zoom level */
-export let MIN_ZOOM_LEVEL = 0.25
+export let MIN_ZOOM_LEVEL = 0.125
 
 /** The maximum zoom level */
-export let MAX_ZOOM_LEVEL = 8
+export let MAX_ZOOM_LEVEL = 16
 
 /**
  * Set the zoom level

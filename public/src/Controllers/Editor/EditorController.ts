@@ -121,9 +121,14 @@ export default class EditorController {
         this._view.spanZoomLevel.innerHTML = ("x" + ZOOM_LEVEL.toFixed(2))
         await Promise.all(this._app.tracksController.tracks.map( track => this._view.stretchRegions(track)))
 
-        for(const button of [this._app.hostView.zoomInBtn, this._app.hostView.zoomOutBtn]){
-            button.classList.add("zoom-enabled")
-            button.classList.remove("zoom-disabled")
+        if(ZOOM_LEVEL!=MAX_ZOOM_LEVEL){
+            this._app.hostView.zoomInBtn.classList.add("zoom-enabled")
+            this._app.hostView.zoomInBtn.classList.remove("zoom-disabled")
+        }
+
+        if(ZOOM_LEVEL!=MIN_ZOOM_LEVEL){
+            this._app.hostView.zoomOutBtn.classList.add("zoom-enabled")
+            this._app.hostView.zoomOutBtn.classList.remove("zoom-disabled")
         }
     }
 
