@@ -1,0 +1,15 @@
+{
+    "name": "Pro54",
+    "vendor": "C-Major",
+    "description": "",
+    "version": "1.0.0",
+    "apiVersion": "2.0.0",
+    "thumbnail": "screenshot.png",
+    "keywords": [ "piano", "C-Major"],
+    "isInstrument": true,
+    "hasMidiInput": true,
+    "hasMidiOutput": false,
+    "hasAudioInput":true,
+    "hasAudioOutput": true,
+    "website": "https://cmajor.dev/docs/Examples/Pro54/"
+    }

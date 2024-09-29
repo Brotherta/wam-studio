@@ -5,7 +5,7 @@ import { WebAudioModule } from "./webaudiomodules/sdk/index.js";
  * Hold multiples WAMs connected in a chain.
  */
 export default class Pedalboard2WAM extends WebAudioModule<Pedalboard2Node> {
-    _descriptorUrl: string;
+    _descriptorUrl: any;
     initialize(state?: Pedalboard2NodeState): Promise<import("./webaudiomodules/api/index.js").WebAudioModule<import("./webaudiomodules/api/index.js").WamNode>>;
     createGui(): Promise<Element>;
     destroyGui(gui: Element): void;

@@ -151,6 +151,8 @@ export class Pedalboard2Node extends WamNode {
         const instance = await constructor.createInstance(this.innerGroupId, this.context);
         const id = forced_id ?? this.idcounter;
         this.idcounter = Math.max(this.idcounter, id + 1);
+        console.log("#### DESCRIPTOR ####");
+        console.log(instance.descriptor);
         return { wam: instance, descriptor: instance.descriptor, id };
     }
     idcounter = 0;
