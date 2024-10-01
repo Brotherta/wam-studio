@@ -10,6 +10,7 @@
   "scripts": {
     "watch": "cd server/node_modules/.bin && tsc --project ../../.. -w",
     "start": "npm run watch",
+    "build": "cd server/node_modules/.bin && tsc --project ../../..",
     "generate_schema": "cd server && npx ts-json-schema-generator --path \"../src/Pedalboard2Library.ts\" --type \"Pedalboard2LibraryDescriptor\" --no-type-check --tsconfig \"../tsconfig.json\" > \"../static/library_schema.json\"",
     "postinstall": "cd server && npm install"
   },
