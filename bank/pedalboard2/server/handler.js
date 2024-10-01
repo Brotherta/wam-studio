@@ -50,5 +50,5 @@ exports.wam_api_library= async(req,res,next)=>{
     }
     for(const plugin of json) descriptor.plugins.push(new URL(plugin.path,WAM_API_BASE).href)
     
-    res.json(descriptor)
+    res.status(200).json(descriptor)
 }
