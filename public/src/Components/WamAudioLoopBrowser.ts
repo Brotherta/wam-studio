@@ -5,6 +5,7 @@ export default class WamAudioLoopBrowser extends HTMLElement {
     constructor() {
         super();
         this.audioData = null;
+        // MB @@ : should be in .env file !!!
         this.URL_SERVER = "https://wam-bank.i3s.univ-cotedazur.fr";
         console.log("before:",this.shadowRoot)
         this.attachShadow({ mode: "open" })
