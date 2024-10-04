@@ -11,9 +11,7 @@ const CORS_OPTIONS = {
     },
     verified: {
         origin: [
-            'http://localhost:5002',
-            'https://wam-studio.vidalmazuy.fr',
-            'https://wam-studio.i3s.univ-cotedazur.fr/',
+            '*''
         ],
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
