@@ -30,7 +30,7 @@ utils.checkEnvVars();
 utils.createDirectories();
 utils.createFiles();
 
-app.use(cors(CORS_VERIFIED), projectsRoutes);
+app.use(cors(CORS_ALL)), projectsRoutes);
 app.use(cors(CORS_VERIFIED), authRoutes);
 app.use(cors(CORS_ALL), pluginsRoutes);
 app.use(cors(CORS_ALL), audioloopsRoutes);
