@@ -1,3 +1,5 @@
+import { BACKEND_URL } from "../Env";
+
 export default class WamAudioLoopBrowser extends HTMLElement {
     audioData: any = null;
     URL_SERVER: string;
@@ -5,11 +7,10 @@ export default class WamAudioLoopBrowser extends HTMLElement {
     constructor() {
         super();
         this.audioData = null;
-        this.URL_SERVER = "https://wam-bank.i3s.univ-cotedazur.fr";
+        this.URL_SERVER = BACKEND_URL;
         console.log("before:",this.shadowRoot)
         this.attachShadow({ mode: "open" })
         console.log("after:",this.shadowRoot)
-        //this.URL_SERVER = "http://localhost:6002";
     }
 
 

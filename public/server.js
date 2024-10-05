@@ -11,6 +11,12 @@ const HTTPS_DEV = process.env.HTTPS_DEV === "true";
 const PORT = process.env.PORT || 5002;
 
 // Set headers
+const crossorigins= (req, res, next)=>{
+    res.set('Access-Control-Allow-Origin',['*'])
+    res.set('Cross-Origin-Resource-Policy','cross-origin')
+    next()
+}
+
 app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
@@ -18,6 +24,7 @@ app.use((req, res, next) => {
 });
 
 // Serve your webpack-built static files
+app.use(crossorigins, express.static(path.join(__dirname, 'dist/shareable')));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.use(express.json());

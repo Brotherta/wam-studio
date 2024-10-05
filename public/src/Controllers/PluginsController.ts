@@ -26,7 +26,7 @@ export default class PluginsController {
      * A root plugin can himself manage multiple WAM.
      **/
     readonly WAM_LIST: {[name: string]:{url:string,state?:any}}={
-        "Pedalboard2": { url: BACKEND_URL+"/pedalboard2/index.js", state:{plugins:[],library:"/wamstudio_library.json"} },
+        "Pedalboard2": { url: BACKEND_URL+"/pedalboard2/index.js", state:{plugins:[],library:BACKEND_URL+"/wamstudio_library.json"} },
     }
 
     /** The default WAM to load */
