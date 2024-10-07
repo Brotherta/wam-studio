@@ -12,7 +12,7 @@
     "version:major": "npm version major"
   },
   "dependencies": {
-    ,
+    "@pixi/app": "7.2.4",
     "@pixi/core": "7.2.4",
     "@popperjs/core": "^2.11.6",
     "@types/audioworklet": "^0.0.55",
