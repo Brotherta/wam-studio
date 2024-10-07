@@ -189,6 +189,13 @@ export class Pedalboard2Node extends WamNode {
         if(!this.library) return null
         const wam= this.library.value?.plugins[wamId]
         if(!wam) return null
+
+         // MB HACK : if wam.classURL starts with http://localhost do nothing, otherwise change http into https
+         if (!wam.classURL.startsWith("http://localhost") && (wam.classURL.startsWith("http://"))) {
+            wam.classURL = wam.classURL.replace("http://", "https://");
+            console.log("classURL changed to start with https : " + wam.classURL);
+        }
+
         console.log("Loading:"+wam.classURL)
         const constructor= (await import(wam.classURL))?.default
         if(!constructor?.isWebAudioModuleConstructor)return null
