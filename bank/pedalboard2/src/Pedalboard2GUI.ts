@@ -8,9 +8,17 @@ import { ArrayLinkId, LinkId, Observable } from "./Utils/observable.js";
 import { prettyfy, standardize } from "./Utils/strings.js";
 
 
+// Michel Buffa : I'm not sure what this does, but it seems to be a way to get the URL of the CSS file, had to change
+// so that it works with the new version of typescript that redefined import.meta and did not provide resolve method
+const baseUrl = new URL(import.meta.url);
+// Resolve the relative path to "style.css"
+const styleCSSURL = new URL('../style.css', baseUrl).href;
+console.log("### host.js base URL = " + baseUrl + " styleCSSURL ### + " + styleCSSURL)
+
+
 
 const template= doc/*html*/`
-    <link rel="stylesheet" href="${import.meta.resolve("./style.css")}">
+    <link rel="stylesheet" href="${styleCSSURL}">
     <h1>Pedalboard 2</h1>
     <div id="loading-state"></div>
     <div id="loading-message">Loading</div>

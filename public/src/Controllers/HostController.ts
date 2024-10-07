@@ -41,7 +41,7 @@ export default class HostController {
   /**
    * Interval to update the timer.
    */
-  private _timerInterval: NodeJS.Timer | undefined;
+  private _timerInterval: any| undefined;
   /**
    * Interval time to update the vu meter.
    */
