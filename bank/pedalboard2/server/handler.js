@@ -23,7 +23,7 @@ exports.pedalboard2_static.get("*.json",(req,res,next)=>{
     let content= fs.readFileSync(file,'utf8')
     content=content.replace(/\{\{[A-Z_0-9]+\}\}/g,it=>{
         switch(it){
-            case "{{HOSTNAME}}": return (req.protocol??"http")+"://"+(req.headers.host??"unknown")
+            case "{{HOSTNAME}}": return (req.protocol??"https")+"://"+(req.headers.host??"unknown")
             default: return it
         }
     })

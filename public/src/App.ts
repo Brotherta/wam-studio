@@ -28,6 +28,7 @@ import AutomationView from "./Views/AutomationView";
 import EditorView from "./Views/Editor/EditorView";
 import KeyboardShortcutsView from "./Views/KeyboardShortcutsView";
 import LatencyView from "./Views/LatencyView";
+import PlaygroundWindow from "./Views/PlaygroundView";
 import PluginsView from "./Views/PluginsView";
 import ProjectView from "./Views/ProjectView";
 import SettingsView from "./Views/SettingsView";
@@ -63,6 +64,7 @@ export default class App {
     projectView: ProjectView;
     editorView: EditorView;
     aboutView: AboutView;
+    playgroundView: PlaygroundWindow;
     keyboardShortcutsView: KeyboardShortcutsView;
 
     host: Host;
@@ -83,6 +85,7 @@ export default class App {
         this.projectView = new ProjectView();
         this.editorView = new EditorView();
         this.aboutView = new AboutView();
+        this.playgroundView = new PlaygroundWindow();
         this.keyboardShortcutsView = new KeyboardShortcutsView();
 
         this.editorController = new EditorController(this);

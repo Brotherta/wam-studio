@@ -413,39 +413,45 @@ export default class HostController {
     this._view.exportProject.addEventListener("click", () => {
       this._app.projectController.openExportWindow();
       this.focus(this._app.projectView);
-    });
+    })
     this._view.saveBtn.addEventListener("click", () => {
       this._app.projectController.openSaveWindow();
       this.focus(this._app.projectView);
-    });
+    })
     this._view.loadBtn.addEventListener("click", () => {
       this._app.projectController.openLoadWindow();
       this.focus(this._app.projectView);
-    });
+    })
     this._view.loginBtn.addEventListener("click", () => {
       this._app.projectController.openLoginWindow();
       this.focus(this._app.projectView);
-    });
+    })
     this._view.settingsBtn.addEventListener("click", () => {
       this._app.settingsController.openSettings();
       this.focus(this._app.settingsView);
-    });
+    })
 
     this._view.aboutBtn.addEventListener("click", () => {
       this._view.aboutWindow.hidden = false;
       this.focus(this._app.aboutView);
-    });
+    })
+    this._view.playgroundBtn.addEventListener("click", () => {
+      this._view.playgroundWindow.hidden = false;
+    })
     this._view.aboutCloseBtn.addEventListener("click", () => {
       this._view.aboutWindow.hidden = true;
-    });
+    })
+    this._view.playgroundCloseBtn.addEventListener("click", () => {
+      this._view.playgroundWindow.hidden = true;
+    })
 
     this._view.keyboardShortcutsBtn.addEventListener("click", () => {
       this._view.keyboardShortcutsWindow.hidden = false;
       this.focus(this._app.keyboardShortcutsView);
-    });
+    })
     this._view.keyboardShortcutsCloseBtn.addEventListener("click", () => {
       this._view.keyboardShortcutsWindow.hidden = true;
-    });
+    })
 
     this._view.latencyBtn.addEventListener("click", () => {
       this._app.latencyView.openWindow();

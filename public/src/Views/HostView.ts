@@ -49,18 +49,21 @@ export default class HostView {
     songsContainer = document.getElementById("songs-container") as HTMLDivElement;
 
     // Menu buttons
-    importSongs = document.getElementById("import-songs") as HTMLInputElement;
-    newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement;
-    latencyBtn = document.getElementById("latency-btn") as HTMLDivElement;
-    settingsBtn = document.getElementById("settings-btn") as HTMLDivElement;
-    saveBtn = document.getElementById("save-project") as HTMLDivElement;
-    loadBtn = document.getElementById("load-project") as HTMLDivElement;
-    loginBtn = document.getElementById("login") as HTMLDivElement;
-    exportProject = document.getElementById("export-project") as HTMLInputElement;
+    importSongs = document.getElementById("import-songs") as HTMLInputElement
+    newTrackInput: HTMLInputElement = document.getElementById("new-track-input") as HTMLInputElement
+    latencyBtn = document.getElementById("latency-btn") as HTMLDivElement
+    settingsBtn = document.getElementById("settings-btn") as HTMLDivElement
+    saveBtn = document.getElementById("save-project") as HTMLDivElement
+    loadBtn = document.getElementById("load-project") as HTMLDivElement
+    loginBtn = document.getElementById("login") as HTMLDivElement
+    exportProject = document.getElementById("export-project") as HTMLInputElement
 
-    aboutBtn = document.getElementById("about-btn") as HTMLDivElement;
-    aboutCloseBtn = document.getElementById("about-close-button") as HTMLDivElement;
-    aboutWindow = document.getElementById("about-window") as HTMLDivElement;
+    aboutBtn = document.getElementById("about-btn") as HTMLDivElement
+    aboutCloseBtn = document.getElementById("about-close-button") as HTMLDivElement
+    aboutWindow = document.getElementById("about-window") as HTMLDivElement
+    playgroundBtn = document.getElementById("playground-btn") as HTMLDivElement
+    playgroundCloseBtn = document.getElementById("playground-close-button") as HTMLDivElement
+    playgroundWindow = document.getElementById("playground-window") as HTMLDivElement
 
     keyboardShortcutsBtn = document.getElementById("keyboard-shortcuts-btn") as HTMLDivElement;
     keyboardShortcutsCloseBtn = document.getElementById("keyboard-shortcuts-close-button") as HTMLDivElement;
