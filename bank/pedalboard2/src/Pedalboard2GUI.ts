@@ -324,12 +324,15 @@ export default class Pedalboard2GUI extends HTMLElement{
                     let src= descriptor.thumbnail
                     if(!src) return null
 
-                    // MB hack.
-                    if(!(src.startsWith("http://localhost")) && (src.startsWith("http://"))) {
-                        src = src.replace("http://", "https://");
-                    }
+                   
 
                     src= new URL(src, classURL).href
+
+                     // MB hack.
+                     if(!(src.startsWith("http://localhost")) && (src.startsWith("http://"))) {
+                        src = src.replace("http://", "https://");
+                    }
+                    
                     console.log(src, classURL)
                     
                     // Check if thumbnail exists
