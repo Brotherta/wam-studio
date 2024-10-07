@@ -81,7 +81,7 @@ const app = new App();
     showLoading();
     await app.initHost();
     hideLoading();
-    let interval: NodeJS.Timer;
+    let interval: any
 
     interval = setInterval(() => {
         audioCtx.resume().then((_onfulfilled) => {

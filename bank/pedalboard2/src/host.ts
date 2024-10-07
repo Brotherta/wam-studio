@@ -96,8 +96,17 @@ document.addEventListener("keypress",async e=>{
 
 // Load library
 console.log("> Importing Descriptor")
-const descriptor= await importPedalboard2Library(import.meta.resolve("./library.json"))
-console.log("> Resovle descriptor")
+// Get the base URL of the current module
+
+// Michel Buffa : I had to change the following line to make it work with the new version of TypeScript
+const baseUrl = new URL(import.meta.url);
+// Resolve the relative path to "descriptor.json"
+const descriptorUrl = new URL('./descriptor.json', baseUrl).href;
+console.log("### host.js descriptorUrl ### + " + descriptorUrl)
+const descriptor= await importPedalboard2Library(descriptorUrl);
+
+//const descriptor= await importPedalboard2Library(import.meta.resolve("./library.json"))
+console.log("> Resolve descriptor")
 const library= await resolvePedalboard2Library(descriptor)
 pedalboard.audioNode.library.value=library
 console.log(descriptor,library)
