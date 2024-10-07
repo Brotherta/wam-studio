@@ -139,7 +139,7 @@ export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescr
     // Load the plugins
     for(const pluginUrl of libDesc.plugins){
         const classURL= new URL(pluginUrl, libDesc.url).href
-        const descriptorURL= new URL("descriptor.json", classURL).href
+        let descriptorURL= new URL("descriptor.json", classURL).href
         console.log("descriptor before : " + descriptorURL);
 
         // if desriptorURL starts with http://localhost do nothing, otherwise change http into https
