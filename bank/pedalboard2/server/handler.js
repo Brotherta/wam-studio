@@ -15,7 +15,6 @@ exports.pedalboard2_bin= express.static(path.resolve(__dirname, '../bin'))
 
 /** The request handler that expose files of the static directory, containing the uncompiled files */
 exports.pedalboard2_static= new express.Router()
-
 exports.pedalboard2_static.get("*.json",(req,res,next)=>{
     const root= path.resolve(__dirname, '../static')
     const file= path.resolve(root, req.url.slice(1,-5)+".t.json")

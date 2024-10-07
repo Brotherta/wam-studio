@@ -140,8 +140,14 @@ export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescr
     for(const pluginUrl of libDesc.plugins){
         const classURL= new URL(pluginUrl, libDesc.url).href
         const descriptorURL= new URL("descriptor.json", classURL).href
-        console.log(descriptorURL)
+        console.log("descriptor before : " + descriptorURL);
 
+        // if desxriptorURL starts with http://localhost do nothing, otherwise change http into https
+        if (!descriptorURL.startsWith("http://localhost")) {
+            descriptorURL = descriptorURL.replace("http://", "https://");
+            console.log("descriptor changed to start with https : " + descriptorURL);
+
+        }
         // Load a plugin
         try{
             const descriptor=await fetch(descriptorURL).then(response=>response.json()) as WamDescriptor
