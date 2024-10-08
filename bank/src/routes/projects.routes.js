@@ -31,7 +31,7 @@ const cors= (req,res,next)=>{
 
 
 const router = express.Router();
-router.use(cors)
+//router.use(cors)
 
 // Setup multer for audio file uploads
 const storage = multer.diskStorage({
