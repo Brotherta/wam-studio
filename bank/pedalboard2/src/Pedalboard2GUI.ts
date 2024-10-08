@@ -105,9 +105,14 @@ export default class Pedalboard2GUI extends HTMLElement{
         wall.addEventListener("dragleave", (event)=> wall.nextElementSibling?.remove() )
         wall.addEventListener("dragover", (event)=> event.preventDefault() )
         wall.addEventListener("drop", (event)=>{
+            const content= event.dataTransfer?.getData("text/plain")
+
+            // Test if pedalboard2
+            if(!content?.startsWith("pedalboard2:"))return
             wall.nextElementSibling?.remove()
+
             // Get child
-            const dropInstanceID=event.dataTransfer?.getData("text/plain")
+            const dropInstanceID= content.slice("pedalboard2:".length)
             if(!dropInstanceID)return
             const dropChild= this.node.childs.find(it=>it.wam.instanceId==dropInstanceID)
             if(!dropChild)return
@@ -204,19 +209,29 @@ export default class Pedalboard2GUI extends HTMLElement{
                 // Start dragging
                 window.addEventListener("dragstart", (event)=>{
                     event.dataTransfer?.setDragImage(window, 0, 0)
-                    event.dataTransfer?.setData("text/plain", child.wam.instanceId)
+                    event.dataTransfer?.setData("text/plain", "pedalboard2:"+child.wam.instanceId)
                 })
 
                 // Drag enter -> over -> leave -> drop
-                window.addEventListener("dragenter", (event)=> window.after(dropMarkerTemplate.cloneNode(true)) )
-                window.addEventListener("dragleave", (event)=> window.nextElementSibling?.remove() )
+                window.addEventListener("dragenter", (event)=> {
+                    if(event.dataTransfer?.getData("text/plain")?.startsWith("pedalboard2:")??false)
+                        window.after(dropMarkerTemplate.cloneNode(true))
+                })
+                window.addEventListener("dragleave", (event)=> {
+                    if(event.dataTransfer?.getData("text/plain")?.startsWith("pedalboard2:")??false)
+                        window.nextElementSibling?.remove()
+                })
+                
                 window.addEventListener("dragover", (event)=> event.preventDefault() )
                 window.addEventListener("drop", (event)=>{
+                    const content= event.dataTransfer?.getData("text/plain")
+
+                    // Test if pedalboard2
+                    if(!content?.startsWith("pedalboard2:"))return
                     window.nextElementSibling?.remove()
 
                     // Get child
-                    const dropInstanceID=event.dataTransfer?.getData("text/plain")
-                    if(!dropInstanceID)return
+                    const dropInstanceID= content.slice("pedalboard2:".length)
                     const dropChild= this.node.childs.find(it=>it.wam.instanceId==dropInstanceID)
                     if(!dropChild || dropChild===child)return
 
