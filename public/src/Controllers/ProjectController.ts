@@ -227,7 +227,7 @@ export default class ProjectController {
             if (response.status === 200) {
                 let responseData = await response.json();
                 await this._app.loader.loadProject(
-                    responseData.data,
+                    responseData.data??{},
                     id=>{
                         const xhr=new XMLHttpRequest()
                         xhr.open('GET',url+'/audio/'+id,true)
