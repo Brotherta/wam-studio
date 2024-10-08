@@ -4,7 +4,9 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "npx concurrently -c red,blue \"node src/index.js\" \"cd pedalboard2 && npm start\"",
+    "start": "node src/index.js",
+    "buildpedalboard2": "cd pedalboard2 && npm start",
+    "start1": "npx concurrently -c red,blue \"node src/index.js\" \"cd pedalboard2 && npm start\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

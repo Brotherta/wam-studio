@@ -279,6 +279,10 @@ export default class Pedalboard2GUI extends HTMLElement {
                     if (!src)
                         return null;
                     src = new URL(src, classURL).href;
+                    // MB hack.
+                    if (!(src.startsWith("http://localhost")) && (src.startsWith("http://"))) {
+                        src = src.replace("http://", "https://");
+                    }
                     console.log(src, classURL);
                     // Check if thumbnail exists
                     const head = await fetch(src, { method: "HEAD", mode: "cors" }).catch(err => null).then(res => res?.ok ? res : null);
@@ -299,6 +303,10 @@ export default class Pedalboard2GUI extends HTMLElement {
                 selector.appendChild(thumbnail);
                 // Add wam
                 thumbnail.addEventListener("click", () => this.executePromise(async () => {
+                    // MB hack.
+                    if (!(descriptor.identifier.startsWith("http://localhost")) && (descriptor.identifier.startsWith("http://"))) {
+                        descriptor.identifier = descriptor.identifier.replace("http://", "https://");
+                    }
                     const wam = await this.node.createChildWAM(descriptor.identifier);
                     if (wam == null)
                         throw Error("Failed to create WAM");

@@ -49,8 +49,13 @@ export async function resolvePedalboard2Library(libDesc, ignored = []) {
     // Load the plugins
     for (const pluginUrl of libDesc.plugins) {
         const classURL = new URL(pluginUrl, libDesc.url).href;
-        const descriptorURL = new URL("descriptor.json", classURL).href;
-        console.log(descriptorURL);
+        let descriptorURL = new URL("descriptor.json", classURL).href;
+        console.log("descriptor before : " + descriptorURL);
+        // if desriptorURL starts with http://localhost do nothing, otherwise change http into https
+        if (!descriptorURL.startsWith("http://localhost") && (descriptorURL.startsWith("http://"))) {
+            descriptorURL = descriptorURL.replace("http://", "https://");
+            console.log("descriptor changed to start with https : " + descriptorURL);
+        }
         // Load a plugin
         try {
             const descriptor = await fetch(descriptorURL).then(response => response.json());
@@ -74,7 +79,11 @@ export async function resolvePedalboard2Library(libDesc, ignored = []) {
     for (const include of libDesc.includes) {
         if (ignored.includes(include.id))
             continue;
-        const fetchUrl = new URL(include.url, libDesc.url).href;
+        let fetchUrl = new URL(include.url, libDesc.url).href;
+        if (!fetchUrl.startsWith("http://localhost") && (fetchUrl.startsWith("http://"))) {
+            fetchUrl = fetchUrl.replace("http://", "https://");
+            console.log("Lib URL changed to start with https : " + fetchUrl);
+        }
         try {
             const subdescriptor = await importPedalboard2Library(fetchUrl, include.version, include.id);
             const lib = await resolvePedalboard2Library(subdescriptor, ignored);

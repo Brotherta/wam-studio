@@ -5,7 +5,7 @@
     "version": [0,0],
     "permissive": true,
     "plugins": [
-        "{{HOSTNAME}}/plugins/Pro54/index.js",
+        "https://wam-4tt.pages.dev/Pro54/index.js",
         "https://mainline.i3s.unice.fr/PedalEditor/Back-End/functional-pedals/published/fluteForIS2/index.js",
         "https://mainline.i3s.unice.fr/wam2/packages/faustPingPongDelay/plugin/index.js",
         "https://mainline.i3s.unice.fr/wam2/packages/obxd/index.js",
