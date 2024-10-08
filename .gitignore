@@ -2,6 +2,7 @@
 .cache
 dist
 node_modules
+**/bin/
 *.DS_STORE
 
 storage/*

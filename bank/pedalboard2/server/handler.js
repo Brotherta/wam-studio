@@ -22,10 +22,8 @@ exports.pedalboard2_static.get("*.json",(req,res,next)=>{
     if(!fs.existsSync(file)) return next()
     let content= fs.readFileSync(file,'utf8')
     content=content.replace(/\{\{[A-Z_0-9]+\}\}/g,it=>{
-        switch(it){
-            case "{{HOSTNAME}}": return (req.protocol??"https")+"://"+(req.headers.host??"unknown")
-            default: return it
-        }
+        const value= process.env[it.slice(2,-2)]
+        return value ?? it
     })
     res.set('Content-Type','application/json')
     res.status(200).send(content)
