@@ -41,12 +41,12 @@
         "Wam API Library":{
             "description": "A library fetching its WAM from the WAM API",
             "category": "library",
-            "state": { "library": "{{HOSTNAME}}/wam_api_library.json", "plugins": []}
+            "state": { "library": "{{BANKURL}}/wam_api_library.json", "plugins": []}
         },
         "Legacy Library":{
             "description": "A library of the plugins hosted in the wam bank",
             "category": "library",
-            "state": { "library": "{{HOSTNAME}}/local_library.json", "plugins": []}
+            "state": { "library": "{{BANKURL}}/local_library.json", "plugins": []}
         }
     },
     "includes": []

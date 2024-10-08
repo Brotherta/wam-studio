@@ -55,14 +55,11 @@ export class PresetManager extends HTMLElement{
 
     /** Recreate the preset repository */
     refreshPresets(){
-        console.log("aaa",this.node.library.value?.descriptor?.name)
-
         const groupGUIs = this.querySelector(":scope>._directories")!
         const presetGUIs= this.querySelector(":scope>._files")!
         const presetDesc= this.querySelector(":scope>._content")!
 
         const repository=this.getAllPresets()
-        console.log("groupguis",repository, groupGUIs)
 
         // Create groups
         groupGUIs.replaceChildren()

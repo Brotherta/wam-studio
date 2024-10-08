@@ -44,13 +44,11 @@ export class Pedalboard2Node extends WamNode {
             numberOfOutputs: 1,
             outputChannelCount: [2] ,
         })
-        console.log("Pedalboard2Node constructor")
         super.connect(this._outputNode)
     }
 
     override async _initialize(): Promise<void> {
         await super._initialize()
-        console.log("Pedalboard2Node initialize")
         const [innerGroupId, innerGroupKey] = await initializeWamHost(this.module.audioContext);
         this.innerGroupId = innerGroupId
         this.innerGroupKey = innerGroupKey
@@ -190,15 +188,11 @@ export class Pedalboard2Node extends WamNode {
         const wam= this.library.value?.plugins[wamId]
         if(!wam) return null
 
-        console.log("Loading:"+wam.classURL)
         const constructor= (await import(wam.classURL))?.default
         if(!constructor?.isWebAudioModuleConstructor)return null
-        console.log(this.innerGroupId, this.innerGroupKey)
         const instance= await constructor.createInstance(this.innerGroupId, this.context)
         const id= forced_id ?? this.idcounter
         this.idcounter=Math.max(this.idcounter, id+1)
-        console.log("#### DESCRIPTOR ####")
-        console.log(instance.descriptor)
         return {wam: instance as WebAudioModule<WamNode>, descriptor: instance.descriptor, id} 
     }
 
@@ -242,7 +236,6 @@ export class Pedalboard2Node extends WamNode {
     // Expose the parameter info of the child nodes with a new exposed name
     async getParameterInfo(...parameterIdQuery: string[]): Promise<WamParameterInfoMap> {
         const query= this.convertQuery(parameterIdQuery)
-        console.log(query)
         const ret: WamParameterInfoMap= {}
         for(let [child, params] of query.entries()){
             const infos= await child.wam.audioNode.getParameterInfo(...params)
@@ -300,7 +293,6 @@ export class Pedalboard2Node extends WamNode {
         this.libraryError=null
         try{
             if(state.library){
-                console.log(state)
                 const descriptor= await importPedalboard2Library(state.library)
                 if(descriptor)this.library.value= await resolvePedalboard2Library(descriptor)
                 else this.library.value= null

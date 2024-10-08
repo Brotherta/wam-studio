@@ -42,15 +42,15 @@
         "Wam API Library":{
             "description": "A library fetching its WAM from the WAM API",
             "category": "library",
-            "state": { "library": "{{HOSTNAME}}/wam_api_library.json", "plugins": []}
+            "state": { "library": "{{BANKURL}}/wam_api_library.json", "plugins": []}
         },
         "Legacy Library":{
             "description": "A library of the plugins hosted in the wam bank",
             "category": "library",
-            "state": { "library": "{{HOSTNAME}}/plugins/library.json", "plugins": []}
+            "state": { "library": "{{BANKURL}}/plugins/library.json", "plugins": []}
         }
     },
     "includes": [
-        {"id": "wamstudio.pedalboard2.legacy", "version": [0,0], "url": "{{HOSTNAME}}/local_library.json"}
+        {"id": "wamstudio.pedalboard2.legacy", "version": [0,0], "url": "{{BANKURL}}/local_library.json"}
     ]
 }
