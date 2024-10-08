@@ -9,13 +9,17 @@ const utils = require('../utils');
 
 const cors= (req,res,next)=>{
     console.log(req.method, req.url)
-    res.set('Access-Control-Allow-Origin',['*'])
+    //res.set('Access-Control-Allow-Origin',['*'])
+    // MB
+    res.header('Access-Control-Allow-Origin', 'https://wam-studio.i3s.univ-cotedazur.fr');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
     res.set('Cross-Origin-Resource-Policy','cross-origin')
     next()
 }
 
 const router = express.Router();
-//router.use(cors)
+router.use(cors)
 
 // Setup multer for audio file uploads
 const storage = multer.diskStorage({
