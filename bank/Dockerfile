@@ -9,6 +9,7 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 COPY pedalboard2/package*.json ./pedalboard2/
+COPY pedalboard2/server/package*.json ./pedalboard2/server/
 
 # Install dependencies
 RUN npm install
