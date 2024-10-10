@@ -181,7 +181,7 @@ export default class Loader {
             let error_message=null
             let version = project.version;
             if(!Array.isArray(version) || version.length!=2)error_message= `The project version(${version}) is invalid, the project incompatible`
-            if(version[0]<CURRENT_PROJECT_VERSION[0])error_message= `The project version(${version.join(".")}) is too old`
+            else if(version[0]<CURRENT_PROJECT_VERSION[0])error_message= `The project version(${version.join(".")}) is too old`
             else if(version[0]>CURRENT_PROJECT_VERSION[0])error_message= `The project version(${version.join(".")}) is too recent. Use a more recent version WAMStudio`
             else if(version[1]>CURRENT_PROJECT_VERSION[1])error_message= `The project version(${version.join(".")}) is too recent. Use a more recent version WAMStudio`
             if(error_message!=null){
