@@ -6,8 +6,9 @@
   "scripts": {
     "start": "npx concurrently -c red,blue \"node src/index.js\" \"cd pedalboard2 && npm start\"",
     "start:prod": "node src/index.js",
-    "build": "cd pedalboard2 && npm build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "cd pedalboard2 && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"postinstall": "cd pedalboard2 && npm i"
   },
   "repository": {
     "type": "git",

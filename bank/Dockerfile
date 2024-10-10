@@ -12,6 +12,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+# Build
+RUN npm run build
+
 # Copy the rest of the application code
 COPY . .
 
@@ -19,4 +22,4 @@ COPY . .
 EXPOSE 6002
 
 # Start the Express server
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:prod"]
