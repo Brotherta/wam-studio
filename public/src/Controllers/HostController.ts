@@ -137,13 +137,6 @@ export default class HostController {
     // adjust horizontal scrollbar
     this._app.editorView.horizontalScrollbar.moveToBeginning();
   }
-
-  /**
-   * Handles the mute button. It mutes or unmutes the audio.
-   */
-  public mute(): void {
-    this._app.host.isMuted=true
-  }
   
 
   public toggleMetronome(): void {
@@ -312,7 +305,8 @@ export default class HostController {
       this.loop();
     });
     this._view.muteBtn.addEventListener("click", () => {
-      this.mute();
+      this._app.host.isMuted=!this._app.host.isMuted
+      this._view.updateMuteButton(this._app.host.isMuted)
     });
     this._view.metroBtn.addEventListener("click", () => {
       this.toggleMetronome();
