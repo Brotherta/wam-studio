@@ -147,9 +147,7 @@ export default class RecorderController {
             }
             else{
                 addedRegion.start=region.end
-                region.mergeWith(addedRegion)
-                this.app.regionsController.removeRegion(region)
-                this.app.regionsController.addRegion(track,region)
+                this.app.regionsController.mergeRegionWith(region,addedRegion)
             }
         }
         recorder.start(onRecord,onRecord)

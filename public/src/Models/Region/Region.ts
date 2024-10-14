@@ -116,8 +116,9 @@ export abstract class RegionOf<THIS extends RegionOf<THIS>> extends Region {
     abstract override emptyAlike(start: number, duration: number): THIS
 
     /**
-     * Merge the region with another region.
+     * Merge another region into this region.
      * The don't have to be consecutive, and they can overlap.
+     * The start of this region can be changed if the other region starts before.
      */
     abstract mergeWith(other: THIS): void
 

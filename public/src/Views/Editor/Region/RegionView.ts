@@ -56,16 +56,37 @@ export default abstract class RegionView<REGION extends RegionOf<REGION>> extend
         this.position.x = region.pos
         this.region_width = region.width
 
-        this.drawContent(this._wave, color, region)
+        this.drawContent(this._wave, color, region, 0, region.duration)
         this.drawBackground()
     }
 
-    protected abstract drawContent(target: Graphics, color: string, region: REGION): void
+    /**
+     * Redraw the full content of the region.
+     * @param target 
+     * @param color 
+     * @param region 
+     * @param start 
+     */
+    protected abstract drawContent(target: Graphics, color: string, region: REGION, from: number, to :number): void
 
     public redraw(color: string, region: REGION){
         this.region_width = region.width
         this.drawBackground()
-        this.drawContent(this._wave, color, region)
+        this._wave.clear()
+        this.drawContent(this._wave, color, region, 0, region.duration)
+    }
+
+    /**
+     * Draw the region on the given target, in the given color, in the given region, from the given start to the given end (in milliseconds).
+     * @param color 
+     * @param region 
+     * @param start 
+     * @param from 
+     */
+    public draw(color: string, region: REGION, start: number=0, from: number=region.duration){
+        this.region_width = region.width
+        this.drawBackground()
+        this.drawContent(this._wave, color, region, start, from)
     }
 
     redrawSoon = debounce(this.redraw.bind(this), 1000)

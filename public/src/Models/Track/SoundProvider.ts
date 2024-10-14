@@ -233,13 +233,13 @@ export default abstract class SoundProvider {
    * The modified state of the track. It is used to know if the track has been modified and should be updated.
    */
   public set modified(value: boolean){ this._modified=value }
-  public get modified(): boolean{ return this._modified || this._isModified() }
+  public get modified(): boolean{ return this._isModified(this._modified) }
 
   /**
    * Override this method to add more conditions to the modified state.
    * @returns 
    */
-  protected _isModified():boolean{ return false }
+  protected _isModified(decorated: boolean):boolean{ return decorated }
 
 
   /** Audio Graph Creation */

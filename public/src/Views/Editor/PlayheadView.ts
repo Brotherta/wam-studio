@@ -174,6 +174,7 @@ export default class PlayheadView extends Container {
         this._editor.viewport.left= left
         this._editor.horizontalScrollbar.moveTo(left)
         this.onViewMove.forEach( it => it(oldleft, left))
+
     }
     
     get viewportLeft(){ return this._editor.viewport.left}

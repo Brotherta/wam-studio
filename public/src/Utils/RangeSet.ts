@@ -52,17 +52,16 @@ export class RangeSet{
 
         if(Array.isArray(ret)){
             const overlaps=ret.map(it=>this.ranges[it])
-            console.log(overlaps)
             let min=start
             let max=end
             for(let o of overlaps){
                 if(o[0]<min)min=o[0]
                 if(o[1]>max)max=o[1]
             }
-            overlaps[0][0]=min
-            overlaps[0][1]=max
+            overlaps[overlaps.length-1][0]=min
+            overlaps[overlaps.length-1][1]=max
             ret.length--
-            for(let i=ret.length-1; i>=1; i--) overlaps.splice(ret[i],1)
+            for(let i=ret.length-1; i>=0; i--) this.ranges.splice(ret[i],1)
         }
         else{
             this.ranges.splice(ret,0,[start,end])

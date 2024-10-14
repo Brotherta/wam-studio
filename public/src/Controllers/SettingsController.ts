@@ -38,7 +38,16 @@ export default class SettingsController {
         // On midi message callback
         // @ts-ignore
         function onMidiMessage(e: MIDIMessageEvent) {
-            that.on_midi_message.forEach((callback) => callback(e))
+            if(e.data){
+                // Transform "NoteOn + Velocity 0" en "NoteOff" to maximize compatibility
+                const type= e.data[0] >> 4
+                const channel = e.data[0] & 0xf
+                if(type == 0x9 && e.data[2] == 0){
+                    e.data[0] = 0x8 + channel
+                }
+                
+                that.on_midi_message.forEach((callback) => callback(e))
+            }
         }
 
         // @ts-ignore

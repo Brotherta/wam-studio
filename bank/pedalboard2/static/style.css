@@ -16,6 +16,7 @@
     resize: both;
     min-width: 30em;
     min-height: 30em;
+    max-height: 90vh;
     width: 60em;
 
     position: relative;
@@ -176,7 +177,10 @@ h1{
     ._content{
         margin-top: 2em;
         width: fit-content;
-        min-height: 50%;
+        /*max-height: 90%;*/
+        >*{
+            max-height: 90%;
+        }
     }
     ._loading{
         position: relative;

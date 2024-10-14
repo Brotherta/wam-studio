@@ -90,11 +90,10 @@ export default class Host extends SoundProvider {
         this.playhead = 0;
     }
 
-    public override update(context: AudioContext, playhead: number): void {
+    public override update(context: AudioContext): void {
         for(const track of this.tracks){
-            track.playhead=this.playhead
             if (track.modified){
-                track.update(context, playhead)
+                track.update(context)
                 track.modified=false
             }
         }
@@ -135,7 +134,7 @@ export default class Host extends SoundProvider {
         // Check for updates while playing
         const host=this
         setTimeout(function updateTrack(){
-            if(host.modified)host.update(audioCtx, host.playhead)
+            if(host.modified)host.update(audioCtx)
             if (host._playing) setTimeout(updateTrack, 300)
         },300)
     }
@@ -171,7 +170,8 @@ export default class Host extends SoundProvider {
         for(const track of this.tracks) track.setLoop(this.loopRange)
     }
 
-    protected override _isModified(): boolean {
+    protected override _isModified(decorated: boolean): boolean {
+        if(decorated) return true
         for(const track of this.tracks){
             if (track.modified) return true
         }

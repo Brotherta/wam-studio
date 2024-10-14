@@ -56,10 +56,8 @@ export default class Track extends SoundProvider {
   /**
    * Updates the track cached data when his content has been modified.
    * @param context - The audio context.
-   * @param playhead - The playhead position in buffer samples.
    */
-  public update(context: AudioContext, playhead: number): void{
-    console.log("Mergeds")
+  public update(context: AudioContext): void{
     this.updateMergedRegions()
   }
 
@@ -272,5 +270,7 @@ export class TrackGraphInstance implements AudioGraphInstance{
   playEfficiently(start: number, duration: number): Promise<void>{
     return Promise.all(this.players.map(player=>player.playEfficiently(start,duration))).then(()=>{})
   }
+
+  
 
 }

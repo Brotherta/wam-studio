@@ -20,21 +20,22 @@ export default class SampleRegionView extends RegionView<SampleRegion> {
      * @param color - The color in HEX format (#FF00FF).
      * @param region - The region that will contain the buffer to draw.
      */
-    override drawContent(target: Graphics, color: string, region: SampleRegion){
+    override drawContent(target: Graphics, color: string, region: SampleRegion, from: number, to: number): void {
         let range = region.width;
         this.scale.x = 1;
 
         let colorHex = +("0x" + color.slice(1));
-        target.clear();
         // use some color transparency as regions can overlap
         target.beginFill(colorHex, 0.8);
 
         let amp = (HEIGHT_TRACK-1) / 2;
+        let fromX = Math.floor(from/region.duration * range);
+        let toX = Math.floor(to/region.duration * range);
         for (let channel = 0; channel < region.buffer.numberOfChannels; channel++) {
             let data = region.buffer.getChannelData(channel);
             let step = Math.round(data.length / range);
 
-            for (let i = 0; i < range; i++) {
+            for (let i = fromX; i < toX; i++) {
                 let min = 1.0;
                 let max = -1.0;
                 for (let j = 0; j < step; j++) {

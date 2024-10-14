@@ -85,7 +85,7 @@ export default class HostController {
 
       this._app.automationController.applyAllAutomations();
       if (host.modified){
-        host.update(audioCtx, this._app.host.playhead)
+        host.update(audioCtx)
         host.modified=false
       }
       host.play()

@@ -35,6 +35,7 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
             }
         })
         if(message.data){
+            console.log(">",this.on_part, this.on_stop)
             if(this.on_part && this.accumulator){
                 const noteState= message.data[0] & 0xf0
                 const channel= message.data[0] & 0x0f
@@ -53,16 +54,6 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
                     this.accumulator = new MIDIAccumulator()
                     this.startTime = message.timeStamp
                 }
-            }
-            else if(this.on_stop){
-                if(this.accumulator && this.accumulator.closedCount>0){
-                    const midi = this.accumulator.build()
-                    const region = new MIDIRegion(midi,0)
-                    this.on_stop(region)
-                    this.accumulator=undefined
-                }
-                this.on_stop=undefined
-                this.resolver?.()
             }
         }
     }
@@ -92,10 +83,15 @@ export class MIDIRegionRecorder implements RegionRecorder<MIDIRegion>{
     }
 
     stop(): Promise<void> {
-        return new Promise(resolver=>{
-            this.on_part=undefined
-            this.resolver=resolver
-        })
+        this.on_part=undefined
+        if(this.accumulator && this.accumulator.closedCount>0 && this.on_stop){
+            const midi = this.accumulator.build()
+            const region = new MIDIRegion(midi,0)
+            this.on_stop(region)
+            this.accumulator=undefined
+        }
+        this.on_stop=undefined
+        return Promise.resolve()
     }
 
     dispose(): void {

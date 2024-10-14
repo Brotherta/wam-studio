@@ -153,6 +153,34 @@ export default class RegionController {
   }
 
   /**
+   * Merge a region with another region, refreshing the view only on the changed range.
+   * @param track 
+   * @param region 
+   * @param extension 
+   */
+  public mergeRegionWith<T extends RegionOf<T>>(region: T, extension: T){
+    region.mergeWith(extension)
+    const view= this.getView(region)
+    const waveform= this._editorView.getWaveFormViewById(region.trackId)!
+    const track= this._app.tracksController.getTrackById(region.trackId)!
+    if(!view){
+      crashOnDebug("Try to merge into a region without view")
+      return
+    }
+    track.modified=true
+    if(extension.start<region.start){
+      // Impossible to just redraw the changing because all the drawing have to be offseted
+      view.redraw(waveform.color, region)
+    }
+    else{
+      // Redraw only the changing part
+      const redrawStart= extension.start-region.start
+      const redrawEnd= extension.end-region.start
+      view.draw(waveform.color, region, redrawStart, redrawEnd)
+    }
+  }
+
+  /**
    * Move a region to a track by removing it from the previous track and adding it to the new track.
    * @param region The region to move
    * @param newTrack The track where to move the region
@@ -185,24 +213,6 @@ export default class RegionController {
       if(selected)this.selection.add(region)
     }
 
-  }
-
-  /**
-   * Updates a region with a new registered region.
-   *
-   * @param region - The temporary region tu update.
-   * @param track - The track where the region is.
-   * @param buffer - The new buffer for the region.
-   */
-  public updateTemporaryRegion(region: RegionOf<any>, track: Track, added: RegionOf<any>) {
-    const waveformView = this._editorView.getWaveFormViewById(track.id)!;
-    const regionView = waveformView.getRegionViewById(region.id)!;
-    if(region.isCompatibleWith(added)){
-      region.mergeWith(added)
-      regionView.initializeRegionView(track.color, region)
-      this._app.tracksController.getTrackById(track.id)!.modified=true
-    }
-    else crashOnDebug("Try to complete a temporary region with an incompatible region")
   }
 
   /**

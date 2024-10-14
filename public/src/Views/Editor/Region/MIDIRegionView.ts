@@ -22,29 +22,27 @@ export default class MIDIRegionView extends RegionView<MIDIRegion> {
      * @param color - The color in HEX format (#FF00FF).
      * @param region - The region that will contain the buffer to draw.
      */
-    override drawContent(target: Graphics, color: string, region: MIDIRegion){
+    override drawContent(target: Graphics, color: string, region: MIDIRegion, from: number, to: number): void {
         let range = this.width = region.duration/RATIO_MILLS_BY_PX;
         this.height=HEIGHT_TRACK
         this.scale.x = 1;
 
         let colorHex = +("0x" + color.slice(1));
-        target.clear();
 
         target.beginFill(colorHex, 0.5);
 
         // Get max amplitude
-        let minnote=50
-        let maxnote=78
-        region.midi.forEachNote((note, start)=>{
-            if(note.note<minnote) minnote=note.note
-            if(note.note>maxnote) maxnote=note.note
-        })
+        let minnote=0
+        let maxnote=255
         let amplitude=maxnote-minnote
 
         // Draw notes
         const note_height=(HEIGHT_TRACK-HEIGHT_TRACK/20)/amplitude
         const note_width=range/region.duration
+        console.log(from,to)
         region.midi.forEachNote((note, start)=>{
+            if(start+note.duration<from) return
+            if(start>to) return
             const local_note=amplitude-(note.note-minnote)
             const y=local_note*note_height
             const x=start*note_width

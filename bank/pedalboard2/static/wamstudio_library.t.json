@@ -26,7 +26,8 @@
         "https://www.webaudiomodules.com/community/plugins/wimmics/DualPitchShifter/index.js",
         "https://www.webaudiomodules.com/community/plugins/wimmics/greyhole/index.js",
         "https://www.webaudiomodules.com/community/plugins/wimmics/GuitarAmpSim60s/index.js",
-        "https://mainline.i3s.unice.fr/wam2/packages/faustFlute/index.js"
+        "https://mainline.i3s.unice.fr/wam2/packages/faustFlute/index.js",
+        "https://wam-4tt.pages.dev/TX81Z/index.js"
     ],
     "presets": {
         "Piano Echo": {
