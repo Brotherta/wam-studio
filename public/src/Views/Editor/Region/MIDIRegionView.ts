@@ -33,7 +33,7 @@ export default class MIDIRegionView extends RegionView<MIDIRegion> {
 
         // Get max amplitude
         let minnote=0
-        let maxnote=255
+        let maxnote=127
         let amplitude=maxnote-minnote
 
         // Draw notes

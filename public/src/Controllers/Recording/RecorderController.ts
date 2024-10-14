@@ -81,6 +81,7 @@ export default class RecorderController {
             this.app.hostView.updateRecordButton(true)
             this.app.host.recording=true
             this.app.hostView.updatePlayButton(this.app.host.isPlaying, true)
+            for (let track of this.app.tracksController.tracks) if(track.recorders.armeds.size>0) this.app.host.forbidUpdate.add(track)
         }
     }
 
@@ -94,6 +95,7 @@ export default class RecorderController {
             this.app.hostView.updateRecordButton(false)
             this.app.host.recording=false
             this.app.hostView.updatePlayButton(this.app.host.isPlaying, false)
+            this.app.host.forbidUpdate.clear()
         }
     }
 

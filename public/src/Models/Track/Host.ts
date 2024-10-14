@@ -92,7 +92,7 @@ export default class Host extends SoundProvider {
 
     public override update(context: AudioContext): void {
         for(const track of this.tracks){
-            if (track.modified){
+            if (track.modified && !this.forbidUpdate.has(track)){
                 track.update(context)
                 track.modified=false
             }
@@ -116,6 +116,9 @@ export default class Host extends SoundProvider {
 
     /* PLAY AND PAUSE */
     private _playing: boolean=false
+
+    /** Tracks that should not be updated. */
+    readonly forbidUpdate: Set<Track>=new Set()
 
 
     public get isPlaying(){
