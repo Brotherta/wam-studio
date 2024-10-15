@@ -142,7 +142,10 @@ export default class EditorController {
             this._view.resizeCanvas();
         });
         this._view.editorDiv.addEventListener("wheel", (e) => {
-            console.log("wheel called !!!!")
+            //console.log("wheel called !!!!")
+             // MB: Prevent the default scroll behavior (i.e., browser swipe navigation)
+            e.preventDefault();
+
             if(isKeyPressed("Shift")){ // Zoom in/out
                 const currentTime = Date.now();
                 if (currentTime - this._lastExecutedZoom < this.THROTTLE_TIME) return;
@@ -160,8 +163,16 @@ export default class EditorController {
                 }
             }
             else{ // Scroll
-                this._view.playhead.viewportLeft+= this._view.playhead.viewportWidth * e.deltaY / 2000
+                //console.log("Detected horizontal scroll with two fingers");
+                //console.log("Horizontal scroll distance: ", e.deltaX);
+                //console.log("Vertical scroll distance: ", e.deltaY);
+
+                // MB changed e.deltaY to e.deltaX
+                this._view.playhead.viewportLeft+= this._view.playhead.viewportWidth * e.deltaX / 2000
             }
+
+            
+            e.stopPropagation();
         });
         this._view.horizontalScrollbar.addEventListener("change", (e: ScrollEvent) => {
             this._view.handleHorizontalScroll(e);

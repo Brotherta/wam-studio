@@ -34,6 +34,8 @@ utils.createFiles();
 // MB
 app.use(projectsRoutes);
 
+// MB it works like that but imho, it should be like that :
+// app.use(cauthRoutes); like for projects routes that have a custom CORS config in the file
 app.use(cors(CORS_VERIFIED), authRoutes);
 app.use(cors(CORS_ALL), pluginsRoutes);
 app.use(cors(CORS_ALL), audioloopsRoutes);
