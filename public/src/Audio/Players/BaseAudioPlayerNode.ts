@@ -44,9 +44,13 @@ export default class BaseAudioPlayerNode extends WamNode{
     set playhead(value: number){
         this.port.postMessage({playhead: value})
         this._playhead = value
+
+        //console.log("Track.ts set playhead = " + value);
     }
 
-    get playhead(): number{ return this._playhead }
+    get playhead(): number{ 
+        return this._playhead 
+    }
 
     private _playhead: number = 0
     
