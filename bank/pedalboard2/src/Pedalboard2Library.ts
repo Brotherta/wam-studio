@@ -137,7 +137,7 @@ export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescr
     ignored.push(libDesc.id)
 
     // Load the plugins
-    for(const pluginUrl of libDesc.plugins){
+    await Promise.all(libDesc.plugins.map(async (pluginUrl) => {
         const classURL= new URL(pluginUrl, libDesc.url).href
         let descriptorURL= new URL("descriptor.json", classURL).href
         console.log("descriptor before : " + descriptorURL);
@@ -154,8 +154,7 @@ export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescr
 
         //if(!plugin.default) throw new Pedalboard2Error("missing_default", `Missing default export for the plugin at ${fetchUrl}`)
         //if(!plugin?.isWebAudioModuleConstructor) throw new Pedalboard2Error("not_a_wam", `The plugin at ${fetchUrl} is not a WebAudioModule class`)
-        
-    }
+    }))
 
     // Load the presets
     const preset = ret.presets
@@ -165,8 +164,8 @@ export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescr
     }
 
     // Load the included libraries
-    for(const include of libDesc.includes){
-        if(ignored.includes(include.id))continue
+    await Promise.all(libDesc.includes.map(async (include) => {
+        if(ignored.includes(include.id))return
         let fetchUrl= new URL(include.url, libDesc.url).href
 
         try{
@@ -180,7 +179,7 @@ export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescr
         }catch(e){
             if(libDesc.permissive!==true)throw e
         }
-    }
+    }))
 
     return ret
 }

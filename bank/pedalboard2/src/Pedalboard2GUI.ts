@@ -328,9 +328,9 @@ export default class Pedalboard2GUI extends HTMLElement{
 
             // Plugin Selector
             const ids= category ? this.category_to_plugins[category] : Object.keys(this.node.library.value?.plugins??{})
-            for(const identifier of ids){
+            await Promise.all(ids.map(async(identifier)=>{
                 const pluginInfo=this.node.library.value?.plugins[identifier]
-                if(!pluginInfo)continue
+                if(!pluginInfo)return
 
                 const {descriptor, classURL}= pluginInfo
 
@@ -362,7 +362,7 @@ export default class Pedalboard2GUI extends HTMLElement{
                     if(wam==null) throw Error("Failed to create WAM")
                     this.node.addChild(wam)
                 }))
-            }
+            }))
         })
     }
 
