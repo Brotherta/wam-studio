@@ -35,7 +35,7 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
     abstract class BaseAudioPlayerProcessor extends WamProcessor implements IBaseAudioPlayerProcessor  {
 
         /** The playhead position in milliseconds */
-        playhead= 0
+        playheadBuffer: Float32Array
         /**The previous playhead position in milliseconds */
         previousPlayhead= 0
     
@@ -51,10 +51,7 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
         override async _onMessage(event: MessageEvent){
             await super._onMessage(event)
             let payload=undefined
-            if("playhead" in event.data){
-                this.playhead = event.data.playhead
-                this.previousPlayhead = this.playhead-1
-            }
+            if("init_playhead" in event.data) this.playheadBuffer= new Float32Array(event.data.init_playhead)
             if("loopStart" in event.data) this.loopStart = event.data.loopStart
             if("loopEnd" in event.data) this.loopEnd = event.data.loopEnd
             if("playEfficiently" in event.data){
@@ -67,20 +64,19 @@ export function getBaseAudioPlayerProcessor(moduleId: string){
             if(parameters["isPlaying"][0]<0.5)return
 
             // Move the playhead
-            this.previousPlayhead= this.playhead
+            this.previousPlayhead= this.playheadBuffer[0]
+            let playhead= this.previousPlayhead
             const msRate= 1000/sampleRate
-            this.playhead+= outputs[0][0].length*msRate
+            playhead+= outputs[0][0].length*msRate
     
             // Play the note
-            this.play(this.previousPlayhead, this.playhead, msRate, inputs, outputs, parameters)
+            this.play(this.previousPlayhead, playhead, msRate, inputs, outputs, parameters)
             
             // Loop
-            if(this.loopStart>=0 && this.previousPlayhead<this.loopEnd && this.playhead>this.loopEnd){
-                this.playhead= this.loopStart
+            if(this.loopStart>=0 && this.previousPlayhead<this.loopEnd && playhead>this.loopEnd){
+                playhead= this.loopStart
             }
-    
-            // Move the playhead in the node
-            this.port.postMessage({playhead: this.playhead})
+            this.playheadBuffer[0]= playhead
         }
 
         /**

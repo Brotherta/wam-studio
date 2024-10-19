@@ -68,6 +68,7 @@ export default class Host extends SoundProvider {
      * It is asynchronous because it needs to load the WAM SDK and the AudioPlayerNode.
      */
     override async init() {
+        console.log("startinit")
         const {default: initializeWamHost} = await import("@webaudiomodules/sdk/src/initializeWamHost");
         await audioCtx.audioWorklet.addModule(new URL('../../Audio/HostProcessor.js', import.meta.url));
 
@@ -77,9 +78,9 @@ export default class Host extends SoundProvider {
         this.groupId = hostGroupId
 
         await super.init()
-
         
         this.hostNode = (await ObservePlayerWAM.createInstance(hostGroupId,audioCtx)).audioNode as ObservePlayerNode
+        console.log("after")
         this.hostNode.on_update.add(playhead=>{
             this.onPlayHeadMove.forEach(it=>it(playhead,true))
             this._playhead = playhead
@@ -88,6 +89,7 @@ export default class Host extends SoundProvider {
         this.outputNode.connect(audioCtx.destination)
 
         this.playhead = 0;
+        console.log("stopinit")
     }
 
     public override update(context: AudioContext): void {

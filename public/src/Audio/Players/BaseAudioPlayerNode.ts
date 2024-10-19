@@ -1,5 +1,5 @@
-import { WamNode, WebAudioModule, addFunctionModule } from "@webaudiomodules/sdk"
-import { getBaseAudioPlayerProcessor } from "./BaseAudioPlayerProcessor"
+import { WamNode, WebAudioModule, addFunctionModule } from "@webaudiomodules/sdk";
+import { getBaseAudioPlayerProcessor } from "./BaseAudioPlayerProcessor";
 
 
 /**
@@ -9,15 +9,23 @@ import { getBaseAudioPlayerProcessor } from "./BaseAudioPlayerProcessor"
  */
 export default class BaseAudioPlayerNode extends WamNode{
 
+    private playheadBuffer!: Float32Array
+
     constructor(module: WebAudioModule<BaseAudioPlayerNode>, options: AudioWorkletNodeOptions){
         super(module,options)
     }
 
+    override async _initialize(): Promise<void> {
+        console.log("initialize")
+        await super._initialize()
+        this.playheadBuffer = new Float32Array(new SharedArrayBuffer(Float32Array.BYTES_PER_ELEMENT))
+        await this.postMessageAsync({ "init_playhead": this.playheadBuffer.buffer })
+        console.log("initialize2")
+
+    }
+
     override _onMessage(message: MessageEvent<any>): void {
         super._onMessage(message)
-        if(message.data.playhead){
-            this._playhead = message.data.playhead
-        }
         if(message.data.resolve){
             this.waitMap[message.data.resolve]?.(message.data.payload)
             delete this.waitMap[message.data.resolve]
@@ -42,17 +50,14 @@ export default class BaseAudioPlayerNode extends WamNode{
 
     /* The player playhead position in milliseconds. */
     set playhead(value: number){
-        this.port.postMessage({playhead: value})
-        this._playhead = value
-
+        console.trace()
+        this.playheadBuffer[0]  = value
         //console.log("Track.ts set playhead = " + value);
     }
 
     get playhead(): number{ 
-        return this._playhead 
+        return this.playheadBuffer[0] 
     }
-
-    private _playhead: number = 0
     
     /**
      * Set the loop start and end in milliseconds

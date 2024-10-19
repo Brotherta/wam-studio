@@ -1,4 +1,4 @@
-import { importPedalboard2Library, Pedalboard2Library, resolvePedalboard2Library } from "./Pedalboard2Library.js";
+import { importCachedPedalboard2Library, Pedalboard2Library } from "./Pedalboard2Library.js";
 import { getPedalboard2Processor } from "./Pedalboard2Processor.js";
 import { Observable, ObservableArray, ReadonlyObservableArray } from "./Utils/observable.js";
 import type { WamDescriptor, WamParameterDataMap, WamParameterInfo, WamParameterInfoMap } from "./webaudiomodules/api/index.js";
@@ -293,9 +293,8 @@ export class Pedalboard2Node extends WamNode {
         this.libraryError=null
         try{
             if(state.library){
-                const descriptor= await importPedalboard2Library(state.library)
-                if(descriptor)this.library.value= await resolvePedalboard2Library(descriptor)
-                else this.library.value= null
+                const lib= await importCachedPedalboard2Library(state.library)
+                this.library.value=lib
             }
         }
         catch(e){

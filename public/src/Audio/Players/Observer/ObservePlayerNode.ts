@@ -20,19 +20,20 @@ export default class ObservePlayerNode extends BaseAudioPlayerNode{
         })
     }
 
-    override _onMessage(message: MessageEvent<any>): void {
-        super._onMessage(message)
-        if(message.data.playhead){
-            this.on_update.forEach(it=>it(message.data.playhead))
-        }
-    }
+    override get isPlaying(){ return super.isPlaying }
 
-    override set playhead(value: number) {
-        super.playhead = value
+    override set isPlaying(value: boolean){
+        if(!super.isPlaying && value && !this.timeout){
+            const player= this
+            this.timeout = setTimeout(function fn(){
+                player.on_update.forEach(it=>it(player.playhead))
+                if(player.isPlaying) player.timeout=setTimeout(fn)
+                else player.timeout=undefined
+            })
+        }
+        super.isPlaying = value
     }
-    override get playhead(): number {
-        return super.playhead
-    }
+    private timeout!: any
 
     
 }

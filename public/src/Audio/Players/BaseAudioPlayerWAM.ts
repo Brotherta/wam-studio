@@ -21,7 +21,7 @@ export default abstract class BaseAudioPlayerWAM<T extends BaseAudioPlayerNode> 
         await BaseAudioPlayerNode.addModules(this.audioContext, this.moduleId);
         await addFunctionModule(this.audioContext.audioWorklet, this.processorFn, this.moduleId);
         const node = this.factory(this)
-        node._initialize();
+        await node._initialize();
         return node;
     }
 

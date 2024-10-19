@@ -183,3 +183,21 @@ export async function resolvePedalboard2Library(libDesc: Pedalboard2LibraryDescr
 
     return ret
 }
+
+
+//// Cached version ////
+let library_cache: {[path:string]:Pedalboard2Library} = {}
+
+/** Reset the library cache */
+export function resetLibraryCache(){
+    library_cache={}
+}
+
+/** Fetch and resolve a library, cache the result and try to resolve it from the cache if it was already fetched */
+export async function importCachedPedalboard2Library(path: string, version?: [number,number], id?: string): Promise<Pedalboard2Library>{
+    if(library_cache[path])return library_cache[path]
+    const libDesc=await importPedalboard2Library(path, version, id)
+    const lib=await resolvePedalboard2Library(libDesc)
+    library_cache[path]=lib
+    return lib
+}

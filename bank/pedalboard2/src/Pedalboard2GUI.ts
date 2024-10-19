@@ -1,5 +1,5 @@
 import { PresetManager } from "./Gui/PresetManager.js";
-import { importPedalboard2Library, Pedalboard2Library, resolvePedalboard2Library } from "./Pedalboard2Library.js";
+import { importCachedPedalboard2Library, Pedalboard2Library, resetLibraryCache } from "./Pedalboard2Library.js";
 import { Pedalboard2Node, Pedalboard2NodeChild } from "./Pedalboard2Node.js";
 import Pedalboard2WAM from "./Pedalboard2WAM.js";
 import { adoc, doc, replaceInTemplate } from "./Utils/dom.js";
@@ -130,9 +130,9 @@ export default class Pedalboard2GUI extends HTMLElement{
             error.className=""
             this.library_input.disabled= true
             try{
-                const descriptor= await importPedalboard2Library(this.library_input.value)
-                const library= await resolvePedalboard2Library(descriptor)
-                this.node.library.value= library
+                resetLibraryCache()
+                const lib= await importCachedPedalboard2Library(this.library_input.value)
+                this.node.library.value= lib
 
                 error.value="Loaded!"
                 error.className="success"
