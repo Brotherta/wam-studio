@@ -143,6 +143,33 @@ export default class ScrollBarElement extends HTMLElement {
     this.animationFrameId = window.requestAnimationFrame(animateScroll);
   }
 
+  customScrollIncremental(deltaPixels: number) {
+    const track = this.shadowRoot!.querySelector("#track") as HTMLElement;
+    const handle = this.shadowRoot!.querySelector("#handle") as HTMLElement;
+
+    let trackSize =
+      this.orientation === "vertical"
+        ? track.offsetHeight
+        : track.offsetWidth;
+    let handleSize =
+      this.orientation === "vertical"
+        ? handle.offsetHeight
+        : handle.offsetWidth;
+
+    let valueChange =
+      (deltaPixels / (trackSize - handleSize)) * (this.worldSize - this.size);
+
+    if (isNaN(valueChange)) return; // If the handle is the same size as the track, don't do anything
+    this.value = Math.max(
+      0,
+      Math.min(this.startValue + valueChange, this.worldSize - this.size)
+    );
+
+    //console.log("this.value = " + this.value)
+    this.updateHandlePosition("dragging");
+  }
+
+
   customScrollTop(top: number) {
     let newValue = Math.max(0, Math.min(top, this.worldSize - this.size));
     this.value = newValue;
@@ -166,7 +193,7 @@ export default class ScrollBarElement extends HTMLElement {
     });
 
     track.addEventListener("mousedown", (e) => {
-      if(this.orientation === "horizontal") {
+      if (this.orientation === "horizontal") {
         // 200 = width of the left track panel
         let clickPos = e.clientX - 200;
         //console.log("Click on scrollbar track x = " + clickPos + " handle x pos = " 
@@ -175,7 +202,7 @@ export default class ScrollBarElement extends HTMLElement {
         this.customScrollTo(clickPos - this.handlePos);
       } else {
         // 60 is the height of the top panel
-        let clickPos = e.clientY -60;
+        let clickPos = e.clientY - 60;
         //console.log("Click on scrollbar track y = " + clickPos + " handle y pos = " 
         //+ this.handlePos + " trackSize = " + track.offsetHeight);
         this.customScrollTo(clickPos - this.handlePos);
