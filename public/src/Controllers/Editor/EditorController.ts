@@ -142,9 +142,15 @@ export default class EditorController {
             this._view.resizeCanvas();
         });
         this._view.editorDiv.addEventListener("wheel", (e) => {
-            //console.log("wheel called !!!!")
+            console.log("wheel called !!!!")
              // MB: Prevent the default scroll behavior (i.e., browser swipe navigation)
             e.preventDefault();
+
+            // Idéalement :
+            // Avec souris : scroll vertical avec la molette et zoom sur control + molette
+            // avec pad ou surface : scroll horizontal avec deux doigts et
+            // scroll vertical avec deux doigts et control pour zoom
+            // ou gesture multi pinch out et in pour zoom
 
             if(isKeyPressed("Shift")){ // Zoom in/out
                 const currentTime = Date.now();
@@ -164,11 +170,15 @@ export default class EditorController {
             }
             else{ // Scroll
                 //console.log("Detected horizontal scroll with two fingers");
-                //console.log("Horizontal scroll distance: ", e.deltaX);
-                //console.log("Vertical scroll distance: ", e.deltaY);
+                console.log("Horizontal scroll distance: ", e.deltaX);
+                console.log("Vertical scroll distance: ", e.deltaY);
 
                 // MB changed e.deltaY to e.deltaX
                 this._view.playhead.viewportLeft+= this._view.playhead.viewportWidth * e.deltaX / 2000
+                // scroll vertically, use e.deltaY to initiate the scroll options.
+               
+
+                //this._view.verticalScrollbar.customScrollIncremental(e.deltaY);
             }
 
             

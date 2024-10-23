@@ -25,7 +25,6 @@
         "{{BANKURL}}/plugins/OwlShimmer/index.js",
         "{{BANKURL}}/plugins/SmoothDelay/index.js",
         "{{BANKURL}}/plugins/StereoFreqShifter/index.js",
-        "{{BANKURL}}/plugins/stonephaser/index.js",
         "{{BANKURL}}/plugins/StonePhaserStereo/index.js",
         "{{BANKURL}}/plugins/sweetWah/index.js",
         "{{BANKURL}}/plugins/temper/index.js",
