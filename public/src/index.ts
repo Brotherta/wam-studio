@@ -10,9 +10,8 @@ import ScrollBarElement from "./Components/ScrollBarElement";
 import ConfirmElement from "./Components/Utils/ConfirmElement";
 import DialogElement from "./Components/Utils/DialogElement";
 import PlaceholderElement from "./Components/Utils/PlaceholderElement";
-import { setupCustomElementsDefine } from './Utils/customElements';
 
-setupCustomElementsDefine()
+//setupCustomElementsDefine()
 
 customElements.define(
     "bpf-automation",
