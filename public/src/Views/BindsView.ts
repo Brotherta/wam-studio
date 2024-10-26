@@ -7,6 +7,7 @@ import {app} from "../index";
 export default class BindsView {
 
     controlsContainer = document.getElementById("special-controls-container") as HTMLDivElement;
+    newTrackBind = document.getElementById("new-track-bind") as HTMLDivElement;
     advancedWindow = document.getElementById("advanced-window") as HTMLDivElement;
     advancedMount = document.getElementById("advanced-mount") as HTMLDivElement;
     closeAdvancedBtn = document.getElementById("advanced-close-button") as HTMLButtonElement;
@@ -37,7 +38,8 @@ export default class BindsView {
     }
 
     addTrackBindElement(trackBindElement: TrackBindElement) {
-        this.controlsContainer.appendChild(trackBindElement);
+        // this.controlsContainer.appendChild(trackBindElement);
+        this.controlsContainer.insertBefore(trackBindElement, this.newTrackBind);
     }
 
     removeTrackBindElement(trackId: number) {

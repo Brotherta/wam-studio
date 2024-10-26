@@ -4,7 +4,7 @@ services:
   attune:
     build: ./public
     ports:
-      - "7002:7002"
+      - "5002:5002"
     environment:
       - HTTPS=false
     restart: unless-stopped
@@ -12,7 +12,7 @@ services:
   attune-bank:
     build: ./bank
     ports:
-      - "8002:8002"
+      - "6002:6002"
     environment:
       - HTTPS=true
       - STORAGE_DIR=/data/storage

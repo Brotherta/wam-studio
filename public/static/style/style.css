@@ -354,6 +354,10 @@ div::-webkit-scrollbar-thumb:hover {
     margin-top: 34px;
 }
 
+#new-track-bind {
+    min-height: 106px;  
+}
+
 
 
 
@@ -600,7 +604,7 @@ div::-webkit-scrollbar-thumb:hover {
     background-color: #121213;
     overflow-y: scroll;
     margin-top: 25px;
-    padding-bottom: 106px;
+    padding-bottom: 25px;
     top: 0px;
 }
 
