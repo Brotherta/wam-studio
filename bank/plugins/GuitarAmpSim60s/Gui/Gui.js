@@ -362,7 +362,9 @@ export default class GuitarAmpSim60sGui extends HTMLElement {
 
   fixRelativeImagePathsInCSS() {
     // change webaudiocontrols relative paths for spritesheets to absolute
-    let webaudioControls = this._root.querySelectorAll("webaudio-knob, webaudio-slider, webaudio-switch, img");
+    let webaudioControls = this._root.querySelectorAll(
+      "webaudio-knob, webaudio-slider, webaudio-switch, img",
+    );
     webaudioControls.forEach((e) => {
       let currentImagePath = e.getAttribute("src");
       if (currentImagePath !== undefined) {
@@ -380,7 +382,9 @@ export default class GuitarAmpSim60sGui extends HTMLElement {
         console.log("Got img src as " + e.getAttribute("src"));
         let imagePath = e.getAttribute("knobsrc");
         e.setAttribute("knobsrc", this.basePath + "/" + imagePath);
-        console.log("After fix : slider knobsrc as " + e.getAttribute("knobsrc"));
+        console.log(
+          "After fix : slider knobsrc as " + e.getAttribute("knobsrc"),
+        );
       }
     });
   }
@@ -388,7 +392,8 @@ export default class GuitarAmpSim60sGui extends HTMLElement {
   setImageBackground() {
     // check if the shadowroot host has a background image
     let mainDiv = this._root.querySelector("#main");
-    mainDiv.style.backgroundImage = "url(" + this.basePath + "/" + imageRelativeURI + ")";
+    mainDiv.style.backgroundImage =
+      "url(" + this.basePath + "/" + imageRelativeURI + ")";
 
     //console.log("background =" + mainDiv.style.backgroundImage);
     //this._root.style.backgroundImage = "toto.png";
@@ -461,19 +466,44 @@ export default class GuitarAmpSim60sGui extends HTMLElement {
   setKnobs() {
     this._root
       .getElementById("/GuitarAmpSim60s/Bass")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/GuitarAmpSim60s/Bass", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/GuitarAmpSim60s/Bass",
+          e.target.value,
+        ),
+      );
     this._root
       .getElementById("/GuitarAmpSim60s/Master")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/GuitarAmpSim60s/Master", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/GuitarAmpSim60s/Master",
+          e.target.value,
+        ),
+      );
     this._root
       .getElementById("/GuitarAmpSim60s/Middle")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/GuitarAmpSim60s/Middle", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/GuitarAmpSim60s/Middle",
+          e.target.value,
+        ),
+      );
     this._root
       .getElementById("/GuitarAmpSim60s/Treble")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/GuitarAmpSim60s/Treble", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/GuitarAmpSim60s/Treble",
+          e.target.value,
+        ),
+      );
     this._root
       .getElementById("/GuitarAmpSim60s/Volume")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/GuitarAmpSim60s/Volume", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/GuitarAmpSim60s/Volume",
+          e.target.value,
+        ),
+      );
   }
 
   setSliders() {}
@@ -481,10 +511,20 @@ export default class GuitarAmpSim60sGui extends HTMLElement {
   setSwitches() {
     this._root
       .getElementById("/GuitarAmpSim60s/Bright")
-      .addEventListener("change", (e) => this._plug.audioNode.setParamValue("/GuitarAmpSim60s/Bright", e.target.value));
+      .addEventListener("change", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/GuitarAmpSim60s/Bright",
+          e.target.value,
+        ),
+      );
     this._root
       .getElementById("/GuitarAmpSim60s/bypass")
-      .addEventListener("change", (e) => this._plug.audioNode.setParamValue("/GuitarAmpSim60s/bypass", e.target.value));
+      .addEventListener("change", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/GuitarAmpSim60s/bypass",
+          e.target.value,
+        ),
+      );
   }
 
   setInactive() {
@@ -498,7 +538,6 @@ export default class GuitarAmpSim60sGui extends HTMLElement {
 }
 try {
   customElements.define("wap-guitarampsim60s", GuitarAmpSim60sGui);
-  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

@@ -36,18 +36,39 @@ const mountPlugin = (domNode) => {
   const { default: pluginFactory } = await import("./index.js");
 
   // Init WamEnv
-  const { default: apiVersion } = await import("../../utils/api/src/version.js");
-  const { default: addFunctionModule } = await import("../../utils/sdk/src/addFunctionModule.js");
-  const { default: initializeWamEnv } = await import("../../utils/sdk/src/WamEnv.js");
-  await addFunctionModule(audioContext.audioWorklet, initializeWamEnv, apiVersion);
-  const { default: initializeWamGroup } = await import("../../utils/sdk/src/WamGroup.js");
+  const { default: apiVersion } = await import(
+    "../../utils/api/src/version.js"
+  );
+  const { default: addFunctionModule } = await import(
+    "../../utils/sdk/src/addFunctionModule.js"
+  );
+  const { default: initializeWamEnv } = await import(
+    "../../utils/sdk/src/WamEnv.js"
+  );
+  await addFunctionModule(
+    audioContext.audioWorklet,
+    initializeWamEnv,
+    apiVersion,
+  );
+  const { default: initializeWamGroup } = await import(
+    "../../utils/sdk/src/WamGroup.js"
+  );
   const hostGroupId = "test-host";
   const hostGroupKey = performance.now().toString();
-  await addFunctionModule(audioContext.audioWorklet, initializeWamGroup, hostGroupId, hostGroupKey);
+  await addFunctionModule(
+    audioContext.audioWorklet,
+    initializeWamGroup,
+    hostGroupId,
+    hostGroupKey,
+  );
 
   // Create a new instance of the plugin
   // You can can optionnally give more options such as the initial state of the plugin
-  const pluginInstance = await pluginFactory.createInstance(hostGroupId, audioContext, {});
+  const pluginInstance = await pluginFactory.createInstance(
+    hostGroupId,
+    audioContext,
+    {},
+  );
 
   window.instance = pluginInstance;
   // instance.enable();

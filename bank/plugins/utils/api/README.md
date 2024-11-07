@@ -17,10 +17,12 @@ The WAM API provides a specification which should be implemented in each WAM plu
 Similar to the VST, AudioUnit or AAX standards supported by desktop DAWs, WAMs are modular audio plugins which include a DSP component and a UI component along with some extra features such as parameter automation, MIDI message processing, and state saving/loading, etc. Plugins and hosts which conform to the standard defined by the API are guaranteed to be compatible, regardless of their underlying implementations.
 
 > VSCode IntelliSense will take the types into account by using JSDoc or TypeScript import. For example:
+
 ```JavaScript
 // JavaScript
 /** @typedef {import('@webaudiomodules/api').WamEvent} IWamEvent */
 ```
+
 ```TypeScript
 // TypeScript
 import { WamEvent } from '@webaudiomodules/api';
@@ -56,7 +58,7 @@ The API supports these primary features:
 
 ### API Overview
 
-The interfaces defined are: 
+The interfaces defined are:
 
 - `WebAudioModule`, which is the main entry point of a WAM plugin instance.
 
@@ -84,11 +86,11 @@ A WAM distribution should include at least a JSON descriptor file and a JavaScri
 
 - `createInstance` method that asynchronously instantiates the WebAudioModule.
 
-    > This method is a short hand for calling the constructor then the `initialize` method, and should return a Promise that resolves the `WebAudioModule` constructed and initialized.
-    
+  > This method is a short hand for calling the constructor then the `initialize` method, and should return a Promise that resolves the `WebAudioModule` constructed and initialized.
+
 - the `new` constructor.
 
-    > The WAM instance constructed by the `new` operator is only usable after calling `initialize` method.
+  > The WAM instance constructed by the `new` operator is only usable after calling `initialize` method.
 
 After importing the default export from the ESM module, the host can first do a type check using the `isWebAudioModuleConstructor` getter, then construct the WAM instance using the `createInstance` method. The following example demonstrates the steps required for a host to create a WAM using the [WAM SDK](https://github.com/webaudiomodules/sdk):
 
@@ -116,11 +118,13 @@ After importing the default export from the ESM module, the host can first do a 
 })();
 ```
 
-Here, 
+Here,
+
 ```JavaScript
 const wam = await WAM.createInstance(audioCtx, initialState);
 ```
-is equivalent to 
+
+is equivalent to
 
 ```JavaScript
 const wam = new WAM(audioCtx);
@@ -149,13 +153,13 @@ The following getters and methods should also be implemented.
 
 - `vendor` getter that returns the WAM vendor's name.
 
-- `createAudioNode` method that asynchronously instantiates an `AudioNode` (which may or may not be a `Wamnode` which will be inserted into the host's audio graph. 
+- `createAudioNode` method that asynchronously instantiates an `AudioNode` (which may or may not be a `Wamnode` which will be inserted into the host's audio graph.
 
 - `initialize` method that asynchronously initializes the newly constructed WAM and creates its `AudioNode` via `createAudioNode`. After initialization, the WAM will be ready to connect its `AudioNode` to the host's audio graph.
 
 - `createGui` method that asynchronously creates an `Element` containing the WAM's GUI which can be attached to the HTML Document.
 
-    > There could be multiple GUIs controlling the same WAM, for example if the host generates its own controls to adjust plugin parameters. Make sure the WAM's primary GUI can both control the WAM and responding to any state changes that might occur via interactions with the host.
+  > There could be multiple GUIs controlling the same WAM, for example if the host generates its own controls to adjust plugin parameters. Make sure the WAM's primary GUI can both control the WAM and responding to any state changes that might occur via interactions with the host.
 
 - `destroyGui` method that cleans up the WAM's existing but no longer useful GUI element created via `createGui`.
 
@@ -226,7 +230,8 @@ The `WamDescriptor` also contains a set of boolean properties indicating the WAM
 - `hasSysexOutput`
 
 ### WamNode interface
-`WamNode` extends WebAudio's `AudioNode`. Instances are accessed via the `audioNode` getter under the `WebAudioModule` interface. 
+
+`WamNode` extends WebAudio's `AudioNode`. Instances are accessed via the `audioNode` getter under the `WebAudioModule` interface.
 
 A WAM host will use its native (or overridden) [`connect`](https://www.w3.org/TR/webaudio/#dom-audionode-connect) and [`disconnect`](https://www.w3.org/TR/webaudio/#dom-audionode-disconnect) methods to run its underlying DSP in an audio graph. The `WamNode` can also be the destination node of any `AudioNode` connection.
 
@@ -235,7 +240,7 @@ It has following getters and methods:
 - `module` getter: returns the WAM instance's corresponding `WebAudioModule` object.
 - `groupId` getter: returns the WAM instance's `WamGroup` identifier.
 - `moduleId` getter: returns the WAM instance's `WebAudioModule` identifier.
-- `instanceId` getter: returns the WAM instance's unique identifier. 
+- `instanceId` getter: returns the WAM instance's unique identifier.
 
 Lifecycle related:
 
@@ -243,7 +248,7 @@ Lifecycle related:
 
 State related:
 
-A state object can be any serializable type and should contain all information required to fully save or restore a WAM. 
+A state object can be any serializable type and should contain all information required to fully save or restore a WAM.
 
 - `getState`
 - `setState`
@@ -291,7 +296,7 @@ The following getters and methods mirror the `WamNode` interface, providing the 
 
 - `groupId`
 - `moduleId`
-- `instanceId` 
+- `instanceId`
 - `getCompensationDelay`
 - `scheduleEvents`
 - `clearEvents`
@@ -303,9 +308,9 @@ Event related:
 
 ### WamGroup interface
 
-Hosts and WAMs which act as sub-hosts (such as 'pedalboard' type plugins) must register a `WamGroup` with the `WamEnv` in order to manage `WamProcessor`s and facilitate `WamEvent` connections on the audio thread. 
+Hosts and WAMs which act as sub-hosts (such as 'pedalboard' type plugins) must register a `WamGroup` with the `WamEnv` in order to manage `WamProcessor`s and facilitate `WamEvent` connections on the audio thread.
 
-After initializing the `WamEnv`, hosts must also initialize a `WamGroup` before creating any WAM instances. Registering a `WamGroup` requires both a `groupId` and a `groupKey`. The former will be shared with all plugins the host (or sub-host) creates via the `WebAudioModule` constructor or `createInstance` method, thus facilitating those WAMs' interactions with the `WamEnv`. The latter should be kept 'secret' to prevent any entity other than the host/sub-host from gaining access to a reference to the `WamGroup` instance via `WamEnv`'s `getGroup` method. 
+After initializing the `WamEnv`, hosts must also initialize a `WamGroup` before creating any WAM instances. Registering a `WamGroup` requires both a `groupId` and a `groupKey`. The former will be shared with all plugins the host (or sub-host) creates via the `WebAudioModule` constructor or `createInstance` method, thus facilitating those WAMs' interactions with the `WamEnv`. The latter should be kept 'secret' to prevent any entity other than the host/sub-host from gaining access to a reference to the `WamGroup` instance via `WamEnv`'s `getGroup` method.
 
 `WamGroup`s make it possible for there to be multiple hosts sharing the same `AudioContext`. WAMs will not interact directly with their `WamGroup`s -- these interactions are instead mediated by the `WamEnv`. This is meant to ensure that WAMs are 'sandboxed' within a `WamGroup`, thus facilitating the creation of sub-host WAMs which can manage and have privileged access to a sub-graph composed of its child WAMs while preventing them from accessing other WAMs belonging to the primary host. Therefore a sub-host WAM's `groupId` will be that of the primary host, while the `groupId` of any plugins the sub-host creates will be a different ID corresponding to the sub-host's own `WamGroup`.
 
@@ -313,7 +318,7 @@ After initializing the `WamEnv`, hosts must also initialize a `WamGroup` before 
 
 - `groupId` getter: returns the `WamGroup`'s unique identifier.
 
-- `validate`: returns a boolean indicating whether or not the specified `groupKey` matches that used to initialize the `WamGroup`. This is meant to be used by `WamEnv` to control access to `WamGroup` instances via its `getGroup` method. 
+- `validate`: returns a boolean indicating whether or not the specified `groupKey` matches that used to initialize the `WamGroup`. This is meant to be used by `WamEnv` to control access to `WamGroup` instances via its `getGroup` method.
 
 - `addWam`: registers a `WamProcessor` with the group.
 
@@ -327,7 +332,7 @@ After initializing the `WamEnv`, hosts must also initialize a `WamGroup` before 
 
 ### WamEnv interface
 
-The host application must initialize the `WamEnv` and then initialize a `WamGroup` before any WAMs can be instantiated. The `WamEnv` is a global singleton which facilitates WAM functionality on the audio thread. `WamEnv` manages `WamGroup` instances and acts as an intermediary between `WamProcessors` and their corresponding `WamGroup`s when adding/removing `WamProcessor`s or connecting/disconnecting/emitting `WamEvent`s. It also allows WAMs to access code on the audio thread as an alternative to `import` statements, which should not be used in audio thread code. 
+The host application must initialize the `WamEnv` and then initialize a `WamGroup` before any WAMs can be instantiated. The `WamEnv` is a global singleton which facilitates WAM functionality on the audio thread. `WamEnv` manages `WamGroup` instances and acts as an intermediary between `WamProcessors` and their corresponding `WamGroup`s when adding/removing `WamProcessor`s or connecting/disconnecting/emitting `WamEvent`s. It also allows WAMs to access code on the audio thread as an alternative to `import` statements, which should not be used in audio thread code.
 
 `WamEnv` has the following getters and methods:
 
@@ -337,9 +342,9 @@ The host application must initialize the `WamEnv` and then initialize a `WamGrou
 
 - `getGroup`: allows host to access its `WamGroup` on the audio thread using its `groupId` and `groupKey`.
 
-- `addGroup`: registers a `WamGroup` with the `WamEnv`. 
+- `addGroup`: registers a `WamGroup` with the `WamEnv`.
 
-- `removeGroup`: deregisters a `WamGroup` from the `WamEnv`. 
+- `removeGroup`: deregisters a `WamGroup` from the `WamEnv`.
 
 Since parent `WamGroup`s are not directly accessible by `WamProcessor`s, the following proxy methods are provided with an additional `groupId` argument:
 
@@ -348,6 +353,3 @@ Since parent `WamGroup`s are not directly accessible by `WamProcessor`s, the fol
 - `connectEvents`
 - `disconnectEvents`
 - `emitEvents`
-
-
-

@@ -114,12 +114,24 @@ export default class GraphicEQNode extends CompositeAudioNode {
     this.isEnabled = _sig;
     if (_sig) {
       // console.log("BYPASS MODE OFF FX RUNNING");
-      this.wetGainNode.gain.linearRampToValueAtTime(1, this.context.currentTime + 0.5);
-      this.dryGainNode.gain.linearRampToValueAtTime(0, this.context.currentTime + 0.5);
+      this.wetGainNode.gain.linearRampToValueAtTime(
+        1,
+        this.context.currentTime + 0.5,
+      );
+      this.dryGainNode.gain.linearRampToValueAtTime(
+        0,
+        this.context.currentTime + 0.5,
+      );
     } else {
       // console.log("BYPASS MODE ON");
-      this.wetGainNode.gain.linearRampToValueAtTime(0, this.context.currentTime + 0.5);
-      this.dryGainNode.gain.linearRampToValueAtTime(1, this.context.currentTime + 0.5);
+      this.wetGainNode.gain.linearRampToValueAtTime(
+        0,
+        this.context.currentTime + 0.5,
+      );
+      this.dryGainNode.gain.linearRampToValueAtTime(
+        1,
+        this.context.currentTime + 0.5,
+      );
     }
   }
 

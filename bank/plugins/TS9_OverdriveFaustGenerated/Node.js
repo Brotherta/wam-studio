@@ -48,7 +48,11 @@ class TS9_OverdriveFaustGeneratedNode extends AudioWorkletNode {
     };
 
     this.parse_item = function (item, obj) {
-      if (item.type === "vgroup" || item.type === "hgroup" || item.type === "tgroup") {
+      if (
+        item.type === "vgroup" ||
+        item.type === "hgroup" ||
+        item.type === "tgroup"
+      ) {
         this.parse_items(item.items, obj);
       } else if (item.type === "hbargraph" || item.type === "vbargraph") {
         // Keep bargraph adresses
@@ -74,7 +78,9 @@ class TS9_OverdriveFaustGeneratedNode extends AudioWorkletNode {
                   max: parseFloat(item.max),
                 });
               } else if (item.meta[i].midi.trim().split(" ")[0] === "ctrl") {
-                obj.fCtrlLabel[parseInt(item.meta[i].midi.trim().split(" ")[1])].push({
+                obj.fCtrlLabel[
+                  parseInt(item.meta[i].midi.trim().split(" ")[1])
+                ].push({
                   path: item.address,
                   min: parseFloat(item.min),
                   max: parseFloat(item.max),
@@ -123,7 +129,8 @@ class TS9_OverdriveFaustGeneratedNode extends AudioWorkletNode {
     // Set message handler
     this.port.onmessage = this.handleMessage.bind(this);
     try {
-      if (this.parameters) this.parameters.forEach((p) => (p.automationRate = "k-rate"));
+      if (this.parameters)
+        this.parameters.forEach((p) => (p.automationRate = "k-rate"));
     } catch (e) {}
   }
 
@@ -155,7 +162,8 @@ class TS9_OverdriveFaustGeneratedNode extends AudioWorkletNode {
   // For WAP
   async getMetadata() {
     return new Promise((resolve) => {
-      let real_url = this.baseURL === "" ? "main.json" : this.baseURL + "/main.json";
+      let real_url =
+        this.baseURL === "" ? "main.json" : this.baseURL + "/main.json";
       fetch(real_url)
         .then((responseJSON) => {
           return responseJSON.json();
@@ -253,7 +261,7 @@ class TS9_OverdriveFaustGeneratedNode extends AudioWorkletNode {
                 defaultValue: this.descriptor[item].init,
               },
             },
-            desc
+            desc,
           );
         }
       }
@@ -279,8 +287,8 @@ class TS9_OverdriveFaustGeneratedNode extends AudioWorkletNode {
             0,
             127,
             this.fCtrlLabel[ctrl][i].min,
-            this.fCtrlLabel[ctrl][i].max
-          )
+            this.fCtrlLabel[ctrl][i].max,
+          ),
         );
         if (this.output_handler) {
           this.output_handler(path, this.getParamValue(path));
@@ -298,7 +306,10 @@ class TS9_OverdriveFaustGeneratedNode extends AudioWorkletNode {
   pitchWheel(channel, wheel) {
     for (var i = 0; i < this.fPitchwheelLabel.length; i++) {
       var pw = this.fPitchwheelLabel[i];
-      this.setParamValue(pw.path, TS9_OverdriveFaustGeneratedNode.remap(wheel, 0, 16383, pw.min, pw.max));
+      this.setParamValue(
+        pw.path,
+        TS9_OverdriveFaustGeneratedNode.remap(wheel, 0, 16383, pw.min, pw.max),
+      );
       if (this.output_handler) {
         this.output_handler(pw.path, this.getParamValue(pw.path));
       }
@@ -334,7 +345,9 @@ class TS9_OverdriveFaustGeneratedNode extends AudioWorkletNode {
   async getState() {
     var params = new Object();
     for (let i = 0; i < this.getParams().length; i++) {
-      Object.assign(params, { [this.getParams()[i]]: `${this.getParam(this.getParams()[i])}` });
+      Object.assign(params, {
+        [this.getParams()[i]]: `${this.getParam(this.getParams()[i])}`,
+      });
     }
     return new Promise((resolve) => {
       resolve(params);
@@ -473,11 +486,16 @@ export default class TS9_OverdriveFaustGenerated {
       };
 
       let real_url =
-        this.baseURL === "" ? "TS9_OverdriveFaustGenerated.wasm" : this.baseURL + "/TS9_OverdriveFaustGenerated.wasm";
+        this.baseURL === ""
+          ? "TS9_OverdriveFaustGenerated.wasm"
+          : this.baseURL + "/TS9_OverdriveFaustGenerated.wasm";
       const dspFile = await fetch(real_url);
       const dspBuffer = await dspFile.arrayBuffer();
       const dspModule = await WebAssembly.compile(dspBuffer);
-      const dspInstance = await WebAssembly.instantiate(dspModule, importObject);
+      const dspInstance = await WebAssembly.instantiate(
+        dspModule,
+        importObject,
+      );
 
       let HEAPU8 = new Uint8Array(dspInstance.exports.memory.buffer);
       let json = this.heap2Str(HEAPU8);
@@ -487,12 +505,12 @@ export default class TS9_OverdriveFaustGenerated {
       if (this.fWorkletProcessors.indexOf(name) === -1) {
         try {
           let re = /JSON_STR/g;
-          let TS9_OverdriveFaustGeneratedProcessorString1 = TS9_OverdriveFaustGeneratedProcessorString.replace(
-            re,
-            json
-          );
+          let TS9_OverdriveFaustGeneratedProcessorString1 =
+            TS9_OverdriveFaustGeneratedProcessorString.replace(re, json);
           let real_url = window.URL.createObjectURL(
-            new Blob([TS9_OverdriveFaustGeneratedProcessorString1], { type: "text/javascript" })
+            new Blob([TS9_OverdriveFaustGeneratedProcessorString1], {
+              type: "text/javascript",
+            }),
           );
           await this.context.audioWorklet.addModule(real_url);
           // Keep the DSP name
@@ -504,15 +522,19 @@ export default class TS9_OverdriveFaustGenerated {
           return null;
         }
       }
-      this.node = new TS9_OverdriveFaustGeneratedNode(this.context, this.baseURL, {
-        numberOfInputs: parseInt(json_object.inputs) > 0 ? 1 : 0,
-        numberOfOutputs: parseInt(json_object.outputs) > 0 ? 1 : 0,
-        channelCount: Math.max(1, parseInt(json_object.inputs)),
-        outputChannelCount: [parseInt(json_object.outputs)],
-        channelCountMode: "explicit",
-        channelInterpretation: "speakers",
-        processorOptions: options,
-      });
+      this.node = new TS9_OverdriveFaustGeneratedNode(
+        this.context,
+        this.baseURL,
+        {
+          numberOfInputs: parseInt(json_object.inputs) > 0 ? 1 : 0,
+          numberOfOutputs: parseInt(json_object.outputs) > 0 ? 1 : 0,
+          channelCount: Math.max(1, parseInt(json_object.inputs)),
+          outputChannelCount: [parseInt(json_object.outputs)],
+          channelCountMode: "explicit",
+          channelInterpretation: "speakers",
+          processorOptions: options,
+        },
+      );
       this.node.onprocessorerror = () => {
         // console.log("An error from TS9_OverdriveFaustGenerated-processor was detected.");
       };
@@ -528,7 +550,8 @@ export default class TS9_OverdriveFaustGenerated {
     return new Promise((resolve, reject) => {
       try {
         // DO THIS ONLY ONCE. If another instance has already been added, do not add the html file again
-        let real_url = this.baseURL === "" ? "main.html" : this.baseURL + "/main.html";
+        let real_url =
+          this.baseURL === "" ? "main.html" : this.baseURL + "/main.html";
         if (!this.linkExists(real_url)) {
           // LINK DOES NOT EXIST, let's add it to the document
           var link = document.createElement("link");

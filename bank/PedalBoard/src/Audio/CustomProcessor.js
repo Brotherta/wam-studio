@@ -2,7 +2,8 @@ const getCustomProcessor = (moduleId) => {
   const audioWorkletGlobalScope = globalThis;
   const { registerProcessor } = audioWorkletGlobalScope;
 
-  const ModuleScope = audioWorkletGlobalScope.webAudioModules.getModuleScope(moduleId);
+  const ModuleScope =
+    audioWorkletGlobalScope.webAudioModules.getModuleScope(moduleId);
   const { WamProcessor } = ModuleScope;
 
   class CustomProcessor extends WamProcessor {
@@ -55,7 +56,9 @@ const getCustomProcessor = (moduleId) => {
         this._parameterInfo = {};
 
         var childInfos = await Promise.all(
-          this.nodes.map((node) => this.group.processors.get(node.nodeId).getParameterInfo())
+          this.nodes.map((node) =>
+            this.group.processors.get(node.nodeId).getParameterInfo(),
+          ),
         );
 
         childInfos.forEach((child, i) => {
@@ -90,7 +93,9 @@ const getCustomProcessor = (moduleId) => {
     async getParameterValues(normalized, parameterIdQuery) {
       let parameter = this._parameterInfo[parameterIdQuery];
       if (parameter) {
-        let value = await this.group.processors.get(parameter.nodeId).getParameterValues();
+        let value = await this.group.processors
+          .get(parameter.nodeId)
+          .getParameterValues();
         return {
           [parameterIdQuery]: value[parameter.id],
         };
@@ -112,11 +117,18 @@ const getCustomProcessor = (moduleId) => {
       const { id, request, content } = message.data;
       if (request == "set/init") {
         let { subGroupId, subGroupKey } = content;
-        this.group = audioWorkletGlobalScope.webAudioModules.getGroup(subGroupId, subGroupKey);
+        this.group = audioWorkletGlobalScope.webAudioModules.getGroup(
+          subGroupId,
+          subGroupKey,
+        );
       } else if (request == "set/nodes") {
         this.nodes = content.nodes;
       } else if (request == "get/parameterInfo") {
-        this.port.postMessage({ id, response: request, content: await this.getParameterInfo(...content.parameterIds) });
+        this.port.postMessage({
+          id,
+          response: request,
+          content: await this.getParameterInfo(...content.parameterIds),
+        });
       } else if (request == "get/parameterValues") {
         let { normalized, parameterIds } = content;
         this.port.postMessage({

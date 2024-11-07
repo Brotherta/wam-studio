@@ -7,10 +7,13 @@ import { createElement } from "./Gui/index.js";
  * @returns {string}
  */
 const getBasetUrl = (relativeURL) => {
-  const baseURL = relativeURL.href.substring(0, relativeURL.href.lastIndexOf("/"));
+  const baseURL = relativeURL.href.substring(
+    0,
+    relativeURL.href.lastIndexOf("/"),
+  );
   // if not localhost, force https
-  if (!baseURL.includes('localhost')) {
-    const secureURL = baseURL.replace(/^http:/, 'https:');
+  if (!baseURL.includes("localhost")) {
+    const secureURL = baseURL.replace(/^http:/, "https:");
     return secureURL;
   }
   return baseURL;
@@ -27,7 +30,7 @@ export default class PedalBoardPlugin extends WebAudioModule {
     if (relativeURL[0] == ".") {
       return `${this._baseURL}${relativeURL.substring(1)}`;
     } else {
-      return `${this._baseURL.replace('/src', '')}${relativeURL}`;
+      return `${this._baseURL.replace("/src", "")}${relativeURL}`;
     }
   };
 
@@ -72,19 +75,30 @@ export default class PedalBoardPlugin extends WebAudioModule {
    * @author Quentin Beauchet
    */
   async fetchServers() {
-    const filterFetch = (el) => el.status == "fulfilled" && el.value.status == 200;
+    const filterFetch = (el) =>
+      el.status == "fulfilled" && el.value.status == 200;
 
     let repos = await fetch(`${this._baseURL}/repositories.json`);
     let json2 = await repos.json();
-    let files = await Promise.allSettled(json2.map((el) => fetch(this.removeRelativeUrl(el))));
-    let urls = await Promise.all(files.filter(filterFetch).map((el) => el.value.json()));
+    let files = await Promise.allSettled(
+      json2.map((el) => fetch(this.removeRelativeUrl(el))),
+    );
+    let urls = await Promise.all(
+      files.filter(filterFetch).map((el) => el.value.json()),
+    );
 
     urls = urls.reduce((arr, next) => arr.concat(next), []);
-    let responses = await Promise.allSettled(urls.map((el) => fetch(`${el}descriptor.json`)));
+    let responses = await Promise.allSettled(
+      urls.map((el) => fetch(`${el}descriptor.json`)),
+    );
 
-    let descriptors = await Promise.all(responses.map((el) => (filterFetch(el) ? el.value.json() : undefined)));
+    let descriptors = await Promise.all(
+      responses.map((el) => (filterFetch(el) ? el.value.json() : undefined)),
+    );
 
-    let modules = await Promise.allSettled(urls.map((el) => import(`${el}index.js`)));
+    let modules = await Promise.allSettled(
+      urls.map((el) => import(`${el}index.js`)),
+    );
 
     this.WAMS = {};
     descriptors.forEach((el, index) => {
@@ -127,7 +141,10 @@ export default class PedalBoardPlugin extends WebAudioModule {
     const { default: WAM } = this.WAMS[WamName].module;
     let instance;
     try {
-      instance = await WAM.createInstance(this.pedalboardNode.subGroupId, this.pedalboardNode.context);
+      instance = await WAM.createInstance(
+        this.pedalboardNode.subGroupId,
+        this.pedalboardNode.context,
+      );
     } catch (e) {
       return false;
     }

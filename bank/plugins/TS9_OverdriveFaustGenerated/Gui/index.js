@@ -1,7 +1,7 @@
 // This file is the factory for the GUI part.
 // The imporant thing here is the createElement async method
 // This file must be an es module in order to be loaded with the SDK (with dynamic imports)
-import Gui from './Gui.js';
+import Gui from "./Gui.js";
 
 export { Gui };
 
@@ -11,7 +11,7 @@ export { Gui };
  * @returns {Elem} - the HTML element that contains the GUI
  */
 export async function createElement(plugin, ...args) {
-	// here we return the WebComponent GUI but it could be
-// any DOM node
-	return new Gui(plugin, ...args);
+  // here we return the WebComponent GUI but it could be
+  // any DOM node
+  return new Gui(plugin, ...args);
 }

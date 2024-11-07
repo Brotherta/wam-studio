@@ -144,7 +144,9 @@ export default class BigMuffGui extends HTMLElement {
 
   fixRelativeImagePathsInCSS() {
     // change webaudiocontrols relative paths for spritesheets to absolute
-    const webaudioControls = this._root.querySelectorAll("webaudio-knob, webaudio-slider, webaudio-switch, img");
+    const webaudioControls = this._root.querySelectorAll(
+      "webaudio-knob, webaudio-slider, webaudio-switch, img",
+    );
     webaudioControls.forEach((e) => {
       const currentImagePath = e.getAttribute("src");
       if (currentImagePath !== undefined) {
@@ -162,7 +164,9 @@ export default class BigMuffGui extends HTMLElement {
         console.log(`Got img src as ${e.getAttribute("src")}`);
         const imagePath = e.getAttribute("knobsrc");
         e.setAttribute("knobsrc", `${this.basePath}/${imagePath}`);
-        console.log(`After fix : slider knobsrc as ${e.getAttribute("knobsrc")}`);
+        console.log(
+          `After fix : slider knobsrc as ${e.getAttribute("knobsrc")}`,
+        );
       }
     });
   }
@@ -199,18 +203,22 @@ export default class BigMuffGui extends HTMLElement {
   }
 
   handleAnimationFrame = () => {
-    this._root.getElementById("/BigMuff/Drive").value = this._plug.audioNode.getParamValue("/BigMuff/Drive");
+    this._root.getElementById("/BigMuff/Drive").value =
+      this._plug.audioNode.getParamValue("/BigMuff/Drive");
 
-    this._root.getElementById("/BigMuff/Input").value = this._plug.audioNode.getParamValue("/BigMuff/Input");
+    this._root.getElementById("/BigMuff/Input").value =
+      this._plug.audioNode.getParamValue("/BigMuff/Input");
 
     /*
 		this._root.getElementById(
 			'/BigMuff/Output'
 		).value = this._plug.audioNode.getParamValue('/BigMuff/Output');
         */
-    this._root.getElementById("/BigMuff/Tone").value = this._plug.audioNode.getParamValue("/BigMuff/Tone");
+    this._root.getElementById("/BigMuff/Tone").value =
+      this._plug.audioNode.getParamValue("/BigMuff/Tone");
 
-    this._root.getElementById("/BigMuff/bypass").value = 1 - this._plug.audioNode.getParamValue("/BigMuff/bypass");
+    this._root.getElementById("/BigMuff/bypass").value =
+      1 - this._plug.audioNode.getParamValue("/BigMuff/bypass");
 
     window.requestAnimationFrame(this.handleAnimationFrame);
   };
@@ -236,10 +244,14 @@ export default class BigMuffGui extends HTMLElement {
   setKnobs() {
     this._root
       .getElementById("/BigMuff/Drive")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/BigMuff/Drive", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/BigMuff/Drive", e.target.value),
+      );
     this._root
       .getElementById("/BigMuff/Input")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/BigMuff/Input", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/BigMuff/Input", e.target.value),
+      );
     /*
 		this._root
 			.getElementById('/BigMuff/Output')
@@ -252,7 +264,9 @@ export default class BigMuffGui extends HTMLElement {
             */
     this._root
       .getElementById("/BigMuff/Tone")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/BigMuff/Tone", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/BigMuff/Tone", e.target.value),
+      );
   }
 
   setSliders() {}
@@ -261,15 +275,21 @@ export default class BigMuffGui extends HTMLElement {
     const led = this._root.querySelector("#powerLed");
     led.style.backgroundColor = "red";
 
-    this._root.getElementById("/BigMuff/bypass").addEventListener("change", (e) => {
-      this._plug.audioNode.setParamValue("/BigMuff/bypass", 1 - e.target.value);
+    this._root
+      .getElementById("/BigMuff/bypass")
+      .addEventListener("change", (e) => {
+        this._plug.audioNode.setParamValue(
+          "/BigMuff/bypass",
+          1 - e.target.value,
+        );
 
-      // change color of power led
-      const led = this._root.querySelector("#powerLed");
+        // change color of power led
+        const led = this._root.querySelector("#powerLed");
 
-      if (led.style.backgroundColor === "red") led.style.backgroundColor = "grey";
-      else led.style.backgroundColor = "red";
-    });
+        if (led.style.backgroundColor === "red")
+          led.style.backgroundColor = "grey";
+        else led.style.backgroundColor = "red";
+      });
   }
 
   setInactive() {
@@ -283,7 +303,6 @@ export default class BigMuffGui extends HTMLElement {
 }
 try {
   customElements.define("wap-bigmuff", BigMuffGui);
-  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

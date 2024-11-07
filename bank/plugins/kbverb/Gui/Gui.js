@@ -152,7 +152,7 @@ webaudio-switch{
   fixRelativeImagePathsInCSS() {
     // change webaudiocontrols relative paths for spritesheets to absolute
     let webaudioControls = this._root.querySelectorAll(
-      "webaudio-knob, webaudio-slider, webaudio-switch, img"
+      "webaudio-knob, webaudio-slider, webaudio-switch, img",
     );
     webaudioControls.forEach((e) => {
       let currentImagePath = e.getAttribute("src");
@@ -268,7 +268,7 @@ webaudio-switch{
     this._root
       .getElementById("/kbverb/feedback")
       .addEventListener("input", (e) =>
-        this._plug.audioNode.setParamValue("/kbverb/feedback", e.target.value)
+        this._plug.audioNode.setParamValue("/kbverb/feedback", e.target.value),
       );
   }
 
@@ -278,7 +278,10 @@ webaudio-switch{
     this._root
       .getElementById("/kbverb/bypass")
       .addEventListener("change", (e) =>
-        this._plug.audioNode.setParamValue("/kbverb/bypass", 1 - e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/kbverb/bypass",
+          1 - e.target.value,
+        ),
       );
   }
 
@@ -293,7 +296,6 @@ webaudio-switch{
 }
 try {
   customElements.define("wap-kbverb", kbverbGui);
-  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

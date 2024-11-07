@@ -153,11 +153,25 @@ export default class DistoMachineNode extends CompositeAudioNode {
     this._inputGain = this.context.createGain();
 
     this.equalizer = new EqualizerDisto(this.context);
-    this.ampReverb = new ConvolverDisto(this.context, this.reverbImpulses, "reverbImpulses");
-    this.cabinetSim = new ConvolverDisto(this.context, this.cabinetImpulses, "cabinetImpulses");
+    this.ampReverb = new ConvolverDisto(
+      this.context,
+      this.reverbImpulses,
+      "reverbImpulses",
+    );
+    this.cabinetSim = new ConvolverDisto(
+      this.context,
+      this.cabinetImpulses,
+      "cabinetImpulses",
+    );
     this.boost = new BoostDisto(this.context);
 
-    this.amp = new AmpDisto(this.context, this.boost, this.equalizer, this.ampReverb, this.cabinetSim);
+    this.amp = new AmpDisto(
+      this.context,
+      this.boost,
+      this.equalizer,
+      this.ampReverb,
+      this.cabinetSim,
+    );
   }
 
   connectNodes() {

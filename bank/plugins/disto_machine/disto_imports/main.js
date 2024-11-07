@@ -1,7 +1,7 @@
-import ConvolverDisto from './convolverdisto.mjs';
-import AmpDisto from './ampdisto.mjs';
-import EqualizerDisto from './equalizerdisto.mjs';
-import BoostDisto from './boostdisto.mjs';
+import ConvolverDisto from "./convolverdisto.mjs";
+import AmpDisto from "./ampdisto.mjs";
+import EqualizerDisto from "./equalizerdisto.mjs";
+import BoostDisto from "./boostdisto.mjs";
 
 window.DistoMachine = class DistoMachine extends WebAudioPluginCompositeNode {
   constructor(ctx, URL, options) {
@@ -120,12 +120,12 @@ window.DistoMachine = class DistoMachine extends WebAudioPluginCompositeNode {
     this.ampReverb = new ConvolverDisto(
       this.context,
       this.reverbImpulses,
-      "reverbImpulses"
+      "reverbImpulses",
     );
     this.cabinetSim = new ConvolverDisto(
       this.context,
       this.cabinetImpulses,
-      "cabinetImpulses"
+      "cabinetImpulses",
     );
     this.boost = new BoostDisto(this.context);
 
@@ -134,7 +134,7 @@ window.DistoMachine = class DistoMachine extends WebAudioPluginCompositeNode {
       this.boost,
       this.equalizer,
       this.ampReverb,
-      this.cabinetSim
+      this.cabinetSim,
     );
   }
 
@@ -254,7 +254,7 @@ window.DistoMachine = class DistoMachine extends WebAudioPluginCompositeNode {
     this.params.CG = val;
     this.amp.changeRoom(val);
   }
-  
+
   bypass(bypassOn) {
     if (!bypassOn) {
       this._input.disconnect();
@@ -268,12 +268,10 @@ window.DistoMachine = class DistoMachine extends WebAudioPluginCompositeNode {
   }
 };
 
-
-
-
-window.WasabiDistoMachine = class WasabiDistoMachine extends WebAudioPluginFactory {
+window.WasabiDistoMachine = class WasabiDistoMachine extends (
+  WebAudioPluginFactory
+) {
   constructor(context, baseUrl, options) {
     super(context, baseUrl, options);
   }
 };
-

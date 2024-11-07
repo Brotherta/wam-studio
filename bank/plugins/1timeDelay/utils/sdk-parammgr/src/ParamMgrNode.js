@@ -1,4 +1,4 @@
-import MgrAudioParam from './MgrAudioParam.js';
+import MgrAudioParam from "./MgrAudioParam.js";
 
 /** @typedef {import('@webaudiomodules/api').WebAudioModule} WebAudioModule */
 /** @typedef {import('@webaudiomodules/api').WamNode} WamNode */
@@ -21,478 +21,482 @@ const AudioWorkletNode = globalThis.AudioWorkletNode;
  * @implements {IParamMgrNode}
  */
 export default class ParamMgrNode extends AudioWorkletNode {
-	/**
-     * @param {WebAudioModule} module
-     * @param {ParamMgrOptions} options
+  /**
+   * @param {WebAudioModule} module
+   * @param {ParamMgrOptions} options
+   */
+  constructor(module, options) {
+    super(module.audioContext, module.moduleId, {
+      numberOfInputs: 0,
+      numberOfOutputs: 1 + options.processorOptions.internalParams.length,
+      parameterData: options.parameterData,
+      processorOptions: options.processorOptions,
+    });
+    const { processorOptions, internalParamsConfig } = options;
+    this.initialized = false;
+    this.module = module;
+    this.paramsConfig = processorOptions.paramsConfig;
+    this.internalParams = processorOptions.internalParams;
+    this.internalParamsConfig = internalParamsConfig;
+    this.$prevParamsBuffer = new Float32Array(this.internalParams.length);
+    this.paramsUpdateCheckFn = [];
+    this.paramsUpdateCheckFnRef = [];
+    this.messageRequestId = 0;
+
+    Object.entries(this.getParams()).forEach(([name, param]) => {
+      Object.setPrototypeOf(param, MgrAudioParam.prototype);
+      param._info = this.paramsConfig[name];
+    });
+
+    /** @type {Record<number, ((...args: any[]) => any)>} */
+    const resolves = {};
+    /** @type {Record<number, ((...args: any[]) => any)>} */
+    const rejects = {};
+    /**
+     * @param {keyof ParamMgrCallToProcessor} call
+     * @param {any} args
      */
-	constructor(module, options) {
-		super(module.audioContext, module.moduleId, {
-			numberOfInputs: 0,
-			numberOfOutputs: 1 + options.processorOptions.internalParams.length,
-			parameterData: options.parameterData,
-			processorOptions: options.processorOptions,
-		});
-		const { processorOptions, internalParamsConfig } = options;
-		this.initialized = false;
-		this.module = module;
-		this.paramsConfig = processorOptions.paramsConfig;
-		this.internalParams = processorOptions.internalParams;
-		this.internalParamsConfig = internalParamsConfig;
-		this.$prevParamsBuffer = new Float32Array(this.internalParams.length);
-		this.paramsUpdateCheckFn = [];
-		this.paramsUpdateCheckFnRef = [];
-		this.messageRequestId = 0;
+    this.call = (call, ...args) => {
+      const id = this.messageRequestId;
+      this.messageRequestId += 1;
+      return new Promise((resolve, reject) => {
+        resolves[id] = resolve;
+        rejects[id] = reject;
+        this.port.postMessage({ id, call, args });
+      });
+    };
+    this.handleMessage = ({ data }) => {
+      const { id, call, args, value, error } = data;
+      if (call) {
+        /** @type {any} */
+        const r = { id };
+        try {
+          r.value = this[call](...args);
+        } catch (e) {
+          r.error = e;
+        }
+        this.port.postMessage(r);
+      } else {
+        if (error) {
+          if (rejects[id]) rejects[id](error);
+          delete rejects[id];
+          return;
+        }
+        if (resolves[id]) {
+          resolves[id](value);
+          delete resolves[id];
+        }
+      }
+    };
+    this.port.start();
+    this.port.addEventListener("message", this.handleMessage);
+  }
 
-		Object.entries(this.getParams()).forEach(([name, param]) => {
-			Object.setPrototypeOf(param, MgrAudioParam.prototype);
-			param._info = this.paramsConfig[name];
-		});
+  /**
+   * @returns {ReadonlyMap<string, MgrAudioParam>}
+   */
+  get parameters() {
+    // @ts-ignore
+    return super.parameters;
+  }
 
-		/** @type {Record<number, ((...args: any[]) => any)>} */
-		const resolves = {};
-		/** @type {Record<number, ((...args: any[]) => any)>} */
-		const rejects = {};
-		/**
-		 * @param {keyof ParamMgrCallToProcessor} call
-		 * @param {any} args
-		 */
-		this.call = (call, ...args) => {
-			const id = this.messageRequestId;
-			this.messageRequestId += 1;
-			return new Promise((resolve, reject) => {
-				resolves[id] = resolve;
-				rejects[id] = reject;
-				this.port.postMessage({ id, call, args });
-			});
-		};
-		this.handleMessage = ({ data }) => {
-			const { id, call, args, value, error } = data;
-			if (call) {
-				/** @type {any} */
-				const r = { id };
-				try {
-					r.value = this[call](...args);
-				} catch (e) {
-					r.error = e;
-				}
-				this.port.postMessage(r);
-			} else {
-				if (error) {
-					if (rejects[id]) rejects[id](error);
-					delete rejects[id];
-					return;
-				}
-				if (resolves[id]) {
-					resolves[id](value);
-					delete resolves[id];
-				}
-			}
-		};
-		this.port.start();
-		this.port.addEventListener('message', this.handleMessage);
-	}
+  get groupId() {
+    return this.module.groupId;
+  }
 
-	/**
-	 * @returns {ReadonlyMap<string, MgrAudioParam>}
-	 */
-	get parameters() {
-		// @ts-ignore
-		return super.parameters;
-	}
+  get moduleId() {
+    return this.module.moduleId;
+  }
 
-	get groupId() {
-		return this.module.groupId;
-	}
+  get instanceId() {
+    return this.module.instanceId;
+  }
 
-	get moduleId() {
-		return this.module.moduleId;
-	}
+  async initialize() {
+    /** @type {ReturnType<ParamMgrCallToProcessor['getBuffer']>} */
+    const response = await this.call("getBuffer");
+    const { lock, paramsBuffer } = response;
+    this.$lock = lock;
+    this.$paramsBuffer = paramsBuffer;
+    const offset = 1;
+    Object.entries(this.internalParamsConfig).forEach(([name, config], i) => {
+      if (this.context.state === "suspended")
+        this.$paramsBuffer[i] = config.defaultValue;
+      if (config instanceof AudioParam) {
+        try {
+          config.automationRate = "a-rate";
+          // eslint-disable-next-line no-empty
+        } catch {
+        } finally {
+          config.value = Math.max(0, config.minValue);
+          this.connect(config, offset + i);
+        }
+      } else if (config instanceof AudioNode) {
+        this.connect(config, offset + i);
+      } else {
+        this.requestDispatchIParamChange(name);
+      }
+    });
+    this.connect(this.module.audioContext.destination, 0, 0);
+    this.initialized = true;
+    return this;
+  }
 
-	get instanceId() {
-		return this.module.instanceId;
-	}
+  /**
+   * @param {ReturnType<ParamMgrCallToProcessor['getBuffer']>} buffer
+   */
+  setBuffer({ lock, paramsBuffer }) {
+    this.$lock = lock;
+    this.$paramsBuffer = paramsBuffer;
+  }
 
-	async initialize() {
-		/** @type {ReturnType<ParamMgrCallToProcessor['getBuffer']>} */
-		const response = await this.call('getBuffer');
-		const { lock, paramsBuffer } = response;
-		this.$lock = lock;
-		this.$paramsBuffer = paramsBuffer;
-		const offset = 1;
-		Object.entries(this.internalParamsConfig).forEach(([name, config], i) => {
-			if (this.context.state === 'suspended') this.$paramsBuffer[i] = config.defaultValue;
-			if (config instanceof AudioParam) {
-				try {
-					config.automationRate = 'a-rate';
-				// eslint-disable-next-line no-empty
-				} catch {
-				} finally {
-					config.value = Math.max(0, config.minValue);
-					this.connect(config, offset + i);
-				}
-			} else if (config instanceof AudioNode) {
-				this.connect(config, offset + i);
-			} else {
-				this.requestDispatchIParamChange(name);
-			}
-		});
-		this.connect(this.module.audioContext.destination, 0, 0);
-		this.initialized = true;
-		return this;
-	}
+  setParamsMapping(paramsMapping) {
+    return this.call("setParamsMapping", paramsMapping);
+  }
 
-	/**
-	 * @param {ReturnType<ParamMgrCallToProcessor['getBuffer']>} buffer
-	 */
-	setBuffer({ lock, paramsBuffer }) {
-		this.$lock = lock;
-		this.$paramsBuffer = paramsBuffer;
-	}
+  getCompensationDelay() {
+    return this.call("getCompensationDelay");
+  }
 
-	setParamsMapping(paramsMapping) {
-		return this.call('setParamsMapping', paramsMapping);
-	}
+  getParameterInfo(...parameterIdQuery) {
+    return this.call("getParameterInfo", ...parameterIdQuery);
+  }
 
-	getCompensationDelay() {
-		return this.call('getCompensationDelay');
-	}
+  getParameterValues(normalized, ...parameterIdQuery) {
+    return this.call("getParameterValues", normalized, ...parameterIdQuery);
+  }
 
-	getParameterInfo(...parameterIdQuery) {
-		return this.call('getParameterInfo', ...parameterIdQuery);
-	}
+  /**
+   * @param {WamAutomationEvent} event
+   */
+  scheduleAutomation(event) {
+    const time = event.time || this.context.currentTime;
+    const { id, normalized, value } = event.data;
+    const audioParam = this.getParam(id);
+    if (!audioParam) return;
+    if (audioParam.info.type === "float") {
+      if (normalized) audioParam.linearRampToNormalizedValueAtTime(value, time);
+      else audioParam.linearRampToValueAtTime(value, time);
+    } else {
+      // eslint-disable-next-line no-lonely-if
+      if (normalized) audioParam.setNormalizedValueAtTime(value, time);
+      else audioParam.setValueAtTime(value, time);
+    }
+  }
 
-	getParameterValues(normalized, ...parameterIdQuery) {
-		return this.call('getParameterValues', normalized, ...parameterIdQuery);
-	}
+  /**
+   * @param {WamEvent[]} events
+   */
+  scheduleEvents(...events) {
+    events.forEach((event) => {
+      if (event.type === "wam-automation") {
+        this.scheduleAutomation(event);
+      }
+    });
+    this.call("scheduleEvents", ...events);
+  }
 
-	/**
-	 * @param {WamAutomationEvent} event
-	 */
-	scheduleAutomation(event) {
-		const time = event.time || this.context.currentTime;
-		const { id, normalized, value } = event.data;
-		const audioParam = this.getParam(id);
-		if (!audioParam) return;
-		if (audioParam.info.type === 'float') {
-			if (normalized) audioParam.linearRampToNormalizedValueAtTime(value, time);
-			else audioParam.linearRampToValueAtTime(value, time);
-		} else {
-			// eslint-disable-next-line no-lonely-if
-			if (normalized) audioParam.setNormalizedValueAtTime(value, time);
-			else audioParam.setValueAtTime(value, time);
-		}
-	}
+  /**
+   * @param {WamEvent[]} events
+   */
+  emitEvents(...events) {
+    this.call("emitEvents", ...events);
+  }
 
-	/**
-	 * @param {WamEvent[]} events
-	 */
-	scheduleEvents(...events) {
-		events.forEach((event) => {
-			if (event.type === 'wam-automation') {
-				this.scheduleAutomation(event);
-			}
-		});
-		this.call('scheduleEvents', ...events);
-	}
+  clearEvents() {
+    this.call("clearEvents");
+  }
 
-	/**
-	 * @param {WamEvent[]} events
-	 */
-	emitEvents(...events) {
-		this.call('emitEvents', ...events);
-	}
+  /**
+   * @param {WamEvent} event
+   */
+  dispatchWamEvent(event) {
+    if (event.type === "wam-automation") {
+      this.scheduleAutomation(event);
+    } else {
+      this.dispatchEvent(new CustomEvent(event.type, { detail: event }));
+    }
+  }
 
-	clearEvents() {
-		this.call('clearEvents');
-	}
+  /**
+   * @param {WamParameterValueMap} parameterValues
+   */
+  async setParameterValues(parameterValues) {
+    Object.keys(parameterValues).forEach((parameterId) => {
+      const parameterUpdate = parameterValues[parameterId];
+      const parameter = this.parameters.get(parameterId);
+      if (!parameter) return;
+      if (!parameterUpdate.normalized) parameter.value = parameterUpdate.value;
+      else parameter.normalizedValue = parameterUpdate.value;
+    });
+  }
 
-	/**
-	 * @param {WamEvent} event
-	 */
-	dispatchWamEvent(event) {
-		if (event.type === 'wam-automation') {
-			this.scheduleAutomation(event);
-		} else {
-			this.dispatchEvent(new CustomEvent(event.type, { detail: event }));
-		}
-	}
+  async getState() {
+    return this.getParamsValues();
+  }
 
-	/**
-	 * @param {WamParameterValueMap} parameterValues
-	 */
-	async setParameterValues(parameterValues) {
-		Object.keys(parameterValues).forEach((parameterId) => {
-			const parameterUpdate = parameterValues[parameterId];
-			const parameter = this.parameters.get(parameterId);
-			if (!parameter) return;
-			if (!parameterUpdate.normalized) parameter.value = parameterUpdate.value;
-			else parameter.normalizedValue = parameterUpdate.value;
-		});
-	}
+  async setState(state) {
+    this.setParamsValues(state);
+  }
 
-	async getState() {
-		return this.getParamsValues();
-	}
+  convertTimeToFrame(time) {
+    return Math.round(time * this.context.sampleRate);
+  }
 
-	async setState(state) {
-		this.setParamsValues(state);
-	}
+  convertFrameToTime(frame) {
+    return frame / this.context.sampleRate;
+  }
 
-	convertTimeToFrame(time) {
-		return Math.round(time * this.context.sampleRate);
-	}
+  /**
+   * @param {string} name
+   */
+  requestDispatchIParamChange = (name) => {
+    const config = this.internalParamsConfig[name];
+    if (!("onChange" in config)) return;
+    const { automationRate, onChange } = config;
+    if (typeof automationRate !== "number" || !automationRate) return;
+    const interval = 1000 / automationRate;
+    const i = this.internalParams.indexOf(name);
+    if (i === -1) return;
+    if (i >= this.internalParams.length) return;
+    if (typeof this.paramsUpdateCheckFnRef[i] === "number") {
+      window.clearTimeout(this.paramsUpdateCheckFnRef[i]);
+    }
 
-	convertFrameToTime(frame) {
-		return frame / this.context.sampleRate;
-	}
+    this.paramsUpdateCheckFn[i] = () => {
+      const prev = this.$prevParamsBuffer[i];
+      const cur = this.$paramsBuffer[i];
+      if (cur !== prev) {
+        onChange(cur, prev);
+        this.$prevParamsBuffer[i] = cur;
+      }
+      this.paramsUpdateCheckFnRef[i] = window.setTimeout(
+        this.paramsUpdateCheckFn[i],
+        interval,
+      );
+    };
+    this.paramsUpdateCheckFn[i]();
+  };
 
-	/**
-	 * @param {string} name
-	 */
-	requestDispatchIParamChange = (name) => {
-		const config = this.internalParamsConfig[name];
-		if (!('onChange' in config)) return;
-		const { automationRate, onChange } = config;
-		if (typeof automationRate !== 'number' || !automationRate) return;
-		const interval = 1000 / automationRate;
-		const i = this.internalParams.indexOf(name);
-		if (i === -1) return;
-		if (i >= this.internalParams.length) return;
-		if (typeof this.paramsUpdateCheckFnRef[i] === 'number') {
-			window.clearTimeout(this.paramsUpdateCheckFnRef[i]);
-		}
+  /**
+   * @param {string} name
+   */
+  getIParamIndex(name) {
+    const i = this.internalParams.indexOf(name);
+    return i === -1 ? null : i;
+  }
 
-		this.paramsUpdateCheckFn[i] = () => {
-			const prev = this.$prevParamsBuffer[i];
-			const cur = this.$paramsBuffer[i];
-			if (cur !== prev) {
-				onChange(cur, prev);
-				this.$prevParamsBuffer[i] = cur;
-			}
-			this.paramsUpdateCheckFnRef[i] = window.setTimeout(this.paramsUpdateCheckFn[i], interval);
-		};
-		this.paramsUpdateCheckFn[i]();
-	}
+  /**
+   * @param {string} name
+   * @param {AudioParam | AudioNode} dest
+   * @param {number} index
+   */
+  connectIParam(name, dest, index) {
+    const offset = 1;
+    const i = this.getIParamIndex(name);
+    if (i !== null) {
+      if (dest instanceof AudioNode) {
+        if (typeof index === "number") this.connect(dest, offset + i, index);
+        else this.connect(dest, offset + i);
+      } else {
+        this.connect(dest, offset + i);
+      }
+    }
+  }
 
-	/**
-	 * @param {string} name
-	 */
-	getIParamIndex(name) {
-		const i = this.internalParams.indexOf(name);
-		return i === -1 ? null : i;
-	}
+  /**
+   * @param {string} name
+   * @param {AudioParam | AudioNode} dest
+   * @param {number} index
+   */
+  disconnectIParam(name, dest, index) {
+    const offset = 1;
+    const i = this.getIParamIndex(name);
+    if (i !== null) {
+      if (dest instanceof AudioNode) {
+        if (typeof index === "number") this.disconnect(dest, offset + i, index);
+        else this.disconnect(dest, offset + i);
+      } else {
+        this.disconnect(dest, offset + i);
+      }
+    }
+  }
 
-	/**
-	 * @param {string} name
-	 * @param {AudioParam | AudioNode} dest
-	 * @param {number} index
-	 */
-	connectIParam(name, dest, index) {
-		const offset = 1;
-		const i = this.getIParamIndex(name);
-		if (i !== null) {
-			if (dest instanceof AudioNode) {
-				if (typeof index === 'number') this.connect(dest, offset + i, index);
-				else this.connect(dest, offset + i);
-			} else {
-				this.connect(dest, offset + i);
-			}
-		}
-	}
+  getIParamValue(name) {
+    const i = this.getIParamIndex(name);
+    return i !== null ? this.$paramsBuffer[i] : null;
+  }
 
-	/**
-	 * @param {string} name
-	 * @param {AudioParam | AudioNode} dest
-	 * @param {number} index
-	 */
-	disconnectIParam(name, dest, index) {
-		const offset = 1;
-		const i = this.getIParamIndex(name);
-		if (i !== null) {
-			if (dest instanceof AudioNode) {
-				if (typeof index === 'number') this.disconnect(dest, offset + i, index);
-				else this.disconnect(dest, offset + i);
-			} else {
-				this.disconnect(dest, offset + i);
-			}
-		}
-	}
+  getIParamsValues() {
+    /** @type {Record<string, number>} */
+    const values = {};
+    this.internalParams.forEach((name, i) => {
+      values[name] = this.$paramsBuffer[i];
+    });
+    return values;
+  }
 
-	getIParamValue(name) {
-		const i = this.getIParamIndex(name);
-		return i !== null ? this.$paramsBuffer[i] : null;
-	}
+  getParam(name) {
+    return this.parameters.get(name) || null;
+  }
 
-	getIParamsValues() {
-		/** @type {Record<string, number>} */
-		const values = {};
-		this.internalParams.forEach((name, i) => {
-			values[name] = this.$paramsBuffer[i];
-		});
-		return values;
-	}
+  getParams() {
+    // @ts-ignore
+    return Object.fromEntries(this.parameters);
+  }
 
-	getParam(name) {
-		return this.parameters.get(name) || null;
-	}
+  getParamValue(name) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.value;
+  }
 
-	getParams() {
-		// @ts-ignore
-		return Object.fromEntries(this.parameters);
-	}
+  setParamValue(name, value) {
+    const param = this.parameters.get(name);
+    if (!param) return;
+    param.value = value;
+  }
 
-	getParamValue(name) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.value;
-	}
+  getParamsValues() {
+    /** @type {Record<string, number>} */
+    const values = {};
+    this.parameters.forEach((v, k) => {
+      values[k] = v.value;
+    });
+    return values;
+  }
 
-	setParamValue(name, value) {
-		const param = this.parameters.get(name);
-		if (!param) return;
-		param.value = value;
-	}
+  /**
+   * @param {Record<string, number>} values
+   */
+  setParamsValues(values) {
+    if (!values) return;
+    Object.entries(values).forEach(([k, v]) => {
+      this.setParamValue(k, v);
+    });
+  }
 
-	getParamsValues() {
-		/** @type {Record<string, number>} */
-		const values = {};
-		this.parameters.forEach((v, k) => {
-			values[k] = v.value;
-		});
-		return values;
-	}
+  getNormalizedParamValue(name) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.normalizedValue;
+  }
 
-	/**
-	 * @param {Record<string, number>} values
-	 */
-	setParamsValues(values) {
-		if (!values) return;
-		Object.entries(values).forEach(([k, v]) => {
-			this.setParamValue(k, v);
-		});
-	}
+  setNormalizedParamValue(name, value) {
+    const param = this.parameters.get(name);
+    if (!param) return;
+    param.normalizedValue = value;
+  }
 
-	getNormalizedParamValue(name) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.normalizedValue;
-	}
+  getNormalizedParamsValues() {
+    const values = {};
+    this.parameters.forEach((v, k) => {
+      values[k] = this.getNormalizedParamValue(k);
+    });
+    return values;
+  }
 
-	setNormalizedParamValue(name, value) {
-		const param = this.parameters.get(name);
-		if (!param) return;
-		param.normalizedValue = value;
-	}
+  setNormalizedParamsValues(values) {
+    if (!values) return;
+    Object.entries(values).forEach(([k, v]) => {
+      this.setNormalizedParamValue(k, v);
+    });
+  }
 
-	getNormalizedParamsValues() {
-		const values = {};
-		this.parameters.forEach((v, k) => {
-			values[k] = this.getNormalizedParamValue(k);
-		});
-		return values;
-	}
+  setParamValueAtTime(name, value, startTime) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.setValueAtTime(value, startTime);
+  }
 
-	setNormalizedParamsValues(values) {
-		if (!values) return;
-		Object.entries(values).forEach(([k, v]) => {
-			this.setNormalizedParamValue(k, v);
-		});
-	}
+  setNormalizedParamValueAtTime(name, value, startTime) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.setNormalizedValueAtTime(value, startTime);
+  }
 
-	setParamValueAtTime(name, value, startTime) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.setValueAtTime(value, startTime);
-	}
+  linearRampToParamValueAtTime(name, value, endTime) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.linearRampToValueAtTime(value, endTime);
+  }
 
-	setNormalizedParamValueAtTime(name, value, startTime) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.setNormalizedValueAtTime(value, startTime);
-	}
+  linearRampToNormalizedParamValueAtTime(name, value, endTime) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.linearRampToNormalizedValueAtTime(value, endTime);
+  }
 
-	linearRampToParamValueAtTime(name, value, endTime) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.linearRampToValueAtTime(value, endTime);
-	}
+  exponentialRampToParamValueAtTime(name, value, endTime) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.exponentialRampToValueAtTime(value, endTime);
+  }
 
-	linearRampToNormalizedParamValueAtTime(name, value, endTime) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.linearRampToNormalizedValueAtTime(value, endTime);
-	}
+  exponentialRampToNormalizedParamValueAtTime(name, value, endTime) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.exponentialRampToNormalizedValueAtTime(value, endTime);
+  }
 
-	exponentialRampToParamValueAtTime(name, value, endTime) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.exponentialRampToValueAtTime(value, endTime);
-	}
+  setParamTargetAtTime(name, target, startTime, timeConstant) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.setTargetAtTime(target, startTime, timeConstant);
+  }
 
-	exponentialRampToNormalizedParamValueAtTime(name, value, endTime) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.exponentialRampToNormalizedValueAtTime(value, endTime);
-	}
+  setNormalizedParamTargetAtTime(name, target, startTime, timeConstant) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.setNormalizedTargetAtTime(target, startTime, timeConstant);
+  }
 
-	setParamTargetAtTime(name, target, startTime, timeConstant) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.setTargetAtTime(target, startTime, timeConstant);
-	}
+  setParamValueCurveAtTime(name, values, startTime, duration) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.setValueCurveAtTime(values, startTime, duration);
+  }
 
-	setNormalizedParamTargetAtTime(name, target, startTime, timeConstant) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.setNormalizedTargetAtTime(target, startTime, timeConstant);
-	}
+  setNormalizedParamValueCurveAtTime(name, values, startTime, duration) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.setNormalizedValueCurveAtTime(values, startTime, duration);
+  }
 
-	setParamValueCurveAtTime(name, values, startTime, duration) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.setValueCurveAtTime(values, startTime, duration);
-	}
+  cancelScheduledParamValues(name, cancelTime) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.cancelScheduledValues(cancelTime);
+  }
 
-	setNormalizedParamValueCurveAtTime(name, values, startTime, duration) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.setNormalizedValueCurveAtTime(values, startTime, duration);
-	}
+  cancelAndHoldParamAtTime(name, cancelTime) {
+    const param = this.parameters.get(name);
+    if (!param) return null;
+    return param.cancelAndHoldAtTime(cancelTime);
+  }
 
-	cancelScheduledParamValues(name, cancelTime) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.cancelScheduledValues(cancelTime);
-	}
+  /**
+   * @param {string} toId
+   * @param {number} [output]
+   */
+  connectEvents(toId, output) {
+    this.call("connectEvents", toId, output);
+  }
 
-	cancelAndHoldParamAtTime(name, cancelTime) {
-		const param = this.parameters.get(name);
-		if (!param) return null;
-		return param.cancelAndHoldAtTime(cancelTime);
-	}
+  /**
+   * @param {string} [toId]
+   * @param {number} [output]
+   */
+  disconnectEvents(toId, output) {
+    this.call("disconnectEvents", toId, output);
+  }
 
-	/**
-	 * @param {string} toId
-	 * @param {number} [output]
-	 */
-	connectEvents(toId, output) {
-		this.call('connectEvents', toId, output);
-	}
-
-	/**
-	 * @param {string} [toId]
-	 * @param {number} [output]
-	 */
-	disconnectEvents(toId, output) {
-		this.call('disconnectEvents', toId, output);
-	}
-
-	async destroy() {
-		this.disconnect();
-		this.paramsUpdateCheckFnRef.forEach((ref) => {
-			if (typeof ref === 'number') window.clearTimeout(ref);
-		});
-		await this.call('destroy');
-		this.port.close();
-	}
+  async destroy() {
+    this.disconnect();
+    this.paramsUpdateCheckFnRef.forEach((ref) => {
+      if (typeof ref === "number") window.clearTimeout(ref);
+    });
+    await this.call("destroy");
+    this.port.close();
+  }
 }

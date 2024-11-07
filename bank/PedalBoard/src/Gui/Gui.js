@@ -6,7 +6,10 @@ import "../../../plugins/utils/webaudio-controls.js";
  * @returns {string}
  */
 const getBasetUrl = (relativeURL) => {
-  const baseURL = relativeURL.href.substring(0, relativeURL.href.lastIndexOf("/"));
+  const baseURL = relativeURL.href.substring(
+    0,
+    relativeURL.href.lastIndexOf("/"),
+  );
   return baseURL;
 };
 
@@ -65,7 +68,10 @@ export default class pedalboardGui extends HTMLElement {
 
     return new Promise((resolve, reject) => {
       new ResizeObserver(function (entries) {
-        if (Math.round(entries[0].contentRect.width) == entries[0].target.baseWidth) {
+        if (
+          Math.round(entries[0].contentRect.width) ==
+          entries[0].target.baseWidth
+        ) {
           this.disconnect();
           resolve(true);
         }
@@ -98,7 +104,7 @@ export default class pedalboardGui extends HTMLElement {
           keywords[k].push(el);
         });
         return `${wam.url}${wam.descriptor.thumbnail}`;
-      })
+      }),
     );
 
     let details = document.createElement("details");
@@ -150,7 +156,9 @@ export default class pedalboardGui extends HTMLElement {
         " Faust Plugins are disabled because the WASM memory is full. This is not the PedalBoard Fault. Reload the page if you want to use them.";
       details.insertBefore(error, preview);
 
-      keywords["faust"].forEach((el) => this._plug.WAMS[el].img.setAttribute("disabled", ""));
+      keywords["faust"].forEach((el) =>
+        this._plug.WAMS[el].img.setAttribute("disabled", ""),
+      );
     };
 
     details.appendChild(summary);
@@ -207,8 +215,10 @@ export default class pedalboardGui extends HTMLElement {
       let target = this.dropZone.nextSibling;
       this.board.removeChild(this.dropZone);
 
-      this._plug.pedalboardNode.disconnectNodes(this.board.childNodes, false, () =>
-        this.board.insertBefore(this.dragOrigin, target)
+      this._plug.pedalboardNode.disconnectNodes(
+        this.board.childNodes,
+        false,
+        () => this.board.insertBefore(this.dragOrigin, target),
       );
 
       this.dragOrigin = undefined;
@@ -233,7 +243,12 @@ export default class pedalboardGui extends HTMLElement {
       gui = await instance.createGui();
     } catch (e) {
       if (e instanceof TypeError) {
-        let path = e.stack.split("\n")[1].split("(")[1].split(":").slice(0, -2).join(":");
+        let path = e.stack
+          .split("\n")[1]
+          .split("(")[1]
+          .split(":")
+          .slice(0, -2)
+          .join(":");
         let module = await import(path);
         let name = module.default.name.toLowerCase();
         let id = 0;
@@ -255,9 +270,14 @@ export default class pedalboardGui extends HTMLElement {
     };
     wrapper.ondragover = (event) => {
       let target = this.getWrapper(event);
-      let mid = target.getBoundingClientRect().x + target.getBoundingClientRect().width / 2;
+      let mid =
+        target.getBoundingClientRect().x +
+        target.getBoundingClientRect().width / 2;
       if (target && this.dragOrigin) {
-        this.board.insertBefore(this.dropZone, mid > event.x ? target : target.nextSibling);
+        this.board.insertBefore(
+          this.dropZone,
+          mid > event.x ? target : target.nextSibling,
+        );
       }
     };
     wrapper.ondragend = (event) => {
@@ -276,7 +296,11 @@ export default class pedalboardGui extends HTMLElement {
     cross.src = this._crossIMGUrl;
     cross.setAttribute("crossorigin", "anonymous");
     cross.addEventListener("click", () => {
-      this._plug.pedalboardNode.disconnectNodes(this.board.childNodes, false, () => wrapper.remove());
+      this._plug.pedalboardNode.disconnectNodes(
+        this.board.childNodes,
+        false,
+        () => wrapper.remove(),
+      );
     });
     header.append(cross);
     wrapper.appendChild(gui);
@@ -417,7 +441,9 @@ export default class pedalboardGui extends HTMLElement {
     this.presets.appendChild(button);
 
     Object.keys(this.PresetsBank[bank]).forEach((preset) => {
-      this.presets.appendChild(this.createPresetElement(bankNameCallBack, preset));
+      this.presets.appendChild(
+        this.createPresetElement(bankNameCallBack, preset),
+      );
     });
   }
 
@@ -538,7 +564,8 @@ export default class pedalboardGui extends HTMLElement {
     let text = document.createElement("span");
     text.innerHTML = presetName;
     const clickEventCallBack = () => {
-      if (!this.loadingPreset) this.displayPreset(bankNameCallBack, text.innerHTML);
+      if (!this.loadingPreset)
+        this.displayPreset(bankNameCallBack, text.innerHTML);
     };
     text.addEventListener("click", clickEventCallBack);
     el.append(text);
@@ -560,8 +587,10 @@ export default class pedalboardGui extends HTMLElement {
       this.createLiButton(this._saveSVGUrl, "SAVE", () => {
         this._plug.pedalboardNode
           .getState(this.board.childNodes)
-          .then((state) => (this.PresetsBank[bank][text.innerHTML] = state.current));
-      })
+          .then(
+            (state) => (this.PresetsBank[bank][text.innerHTML] = state.current),
+          );
+      }),
     );
 
     el.append(
@@ -572,13 +601,13 @@ export default class pedalboardGui extends HTMLElement {
         text.innerHTML = "";
         text.appendChild(input);
         input.focus();
-      })
+      }),
     );
 
     el.append(
       this.createLiButton(this._deleteSVGUrl, "DELETE", () =>
-        this.deletePreset(bankNameCallBack, () => text.innerHTML, el)
-      )
+        this.deletePreset(bankNameCallBack, () => text.innerHTML, el),
+      ),
     );
 
     return el;
@@ -622,10 +651,14 @@ export default class pedalboardGui extends HTMLElement {
         text.innerHTML = "";
         text.appendChild(input);
         input.focus();
-      })
+      }),
     );
 
-    el.append(this.createLiButton(this._deleteSVGUrl, "DELETE", () => this.deleteBank(() => text.innerHTML, el)));
+    el.append(
+      this.createLiButton(this._deleteSVGUrl, "DELETE", () =>
+        this.deleteBank(() => text.innerHTML, el),
+      ),
+    );
 
     return el;
   }

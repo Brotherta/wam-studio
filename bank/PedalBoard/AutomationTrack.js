@@ -218,7 +218,9 @@ export default class AutomationTrack extends HTMLElement {
 
   getValue(y, fixed = true) {
     let rect = this.canvas.getBoundingClientRect();
-    let value = (y * (this.param.minValue - this.param.maxValue)) / rect.height + this.param.maxValue;
+    let value =
+      (y * (this.param.minValue - this.param.maxValue)) / rect.height +
+      this.param.maxValue;
     return fixed ? value.toFixed(2) : value;
   }
 

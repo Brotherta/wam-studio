@@ -1,7 +1,7 @@
 {
-"name": "Sweet",
-"vendor": "Faust",
-"version": "1.01",
-"homepage": "https://faust.grame.fr",
-"thumbnail": "screenshot.png"
+  "name": "Sweet",
+  "vendor": "Faust",
+  "version": "1.01",
+  "homepage": "https://faust.grame.fr",
+  "thumbnail": "screenshot.png"
 }

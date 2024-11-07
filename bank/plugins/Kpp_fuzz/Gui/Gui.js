@@ -263,7 +263,9 @@ export default class Kpp_fuzzGui extends HTMLElement {
 
   fixRelativeImagePathsInCSS() {
     // change webaudiocontrols relative paths for spritesheets to absolute
-    let webaudioControls = this._root.querySelectorAll("webaudio-knob, webaudio-slider, webaudio-switch, img");
+    let webaudioControls = this._root.querySelectorAll(
+      "webaudio-knob, webaudio-slider, webaudio-switch, img",
+    );
     webaudioControls.forEach((e) => {
       let currentImagePath = e.getAttribute("src");
       if (currentImagePath !== undefined) {
@@ -288,12 +290,16 @@ export default class Kpp_fuzzGui extends HTMLElement {
     let usedFonts = "";
     let fonts = this._root.querySelectorAll("label[font]");
     fonts.forEach((e) => {
-      if (!usedFonts.includes(e.getAttribute("font"))) usedFonts += "family=" + e.getAttribute("font") + "&";
+      if (!usedFonts.includes(e.getAttribute("font")))
+        usedFonts += "family=" + e.getAttribute("font") + "&";
     });
     let link = document.createElement("link");
     link.rel = "stylesheet";
     if (usedFonts.slice(0, -1))
-      link.href = "https://fonts.googleapis.com/css2?" + usedFonts.slice(0, -1) + "&display=swap";
+      link.href =
+        "https://fonts.googleapis.com/css2?" +
+        usedFonts.slice(0, -1) +
+        "&display=swap";
     document.querySelector("head").appendChild(link);
 
     // BMT Adapt for background-image
@@ -303,7 +309,9 @@ export default class Kpp_fuzzGui extends HTMLElement {
         let currentImagePath = e.style.backgroundImage.slice(4, -1);
         if (currentImagePath !== undefined) {
           let imagePath = e.style.backgroundImage.slice(5, -2);
-          if (imagePath != "") e.style.backgroundImage = "url(" + this.basePath + "/" + imagePath + ")";
+          if (imagePath != "")
+            e.style.backgroundImage =
+              "url(" + this.basePath + "/" + imagePath + ")";
         }
       }
     });
@@ -312,7 +320,8 @@ export default class Kpp_fuzzGui extends HTMLElement {
   setImageBackground() {
     // check if the shadowroot host has a background image
     let mainDiv = this._root.querySelector("#main");
-    mainDiv.style.backgroundImage = "url(" + this.basePath + "/" + imageRelativeURI + ")";
+    mainDiv.style.backgroundImage =
+      "url(" + this.basePath + "/" + imageRelativeURI + ")";
 
     //console.log("background =" + mainDiv.style.backgroundImage);
     //this._root.style.backgroundImage = "toto.png";
@@ -340,11 +349,14 @@ export default class Kpp_fuzzGui extends HTMLElement {
     }
   }
   handleAnimationFrame = () => {
-    this._root.getElementById("/Kpp_fuzz/fuzz").value = this._plug.audioNode.getParamValue("/Kpp_fuzz/fuzz");
+    this._root.getElementById("/Kpp_fuzz/fuzz").value =
+      this._plug.audioNode.getParamValue("/Kpp_fuzz/fuzz");
 
-    this._root.getElementById("/Kpp_fuzz/tone").value = this._plug.audioNode.getParamValue("/Kpp_fuzz/tone");
+    this._root.getElementById("/Kpp_fuzz/tone").value =
+      this._plug.audioNode.getParamValue("/Kpp_fuzz/tone");
 
-    this._root.getElementById("/Kpp_fuzz/volume").value = this._plug.audioNode.getParamValue("/Kpp_fuzz/volume");
+    this._root.getElementById("/Kpp_fuzz/volume").value =
+      this._plug.audioNode.getParamValue("/Kpp_fuzz/volume");
 
     this._root.getElementById("/Kpp_fuzz/99_bypass").value =
       1 - this._plug.audioNode.getParamValue("/Kpp_fuzz/99_bypass");
@@ -373,13 +385,19 @@ export default class Kpp_fuzzGui extends HTMLElement {
   setKnobs() {
     this._root
       .getElementById("/Kpp_fuzz/fuzz")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/Kpp_fuzz/fuzz", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/Kpp_fuzz/fuzz", e.target.value),
+      );
     this._root
       .getElementById("/Kpp_fuzz/tone")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/Kpp_fuzz/tone", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/Kpp_fuzz/tone", e.target.value),
+      );
     this._root
       .getElementById("/Kpp_fuzz/volume")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/Kpp_fuzz/volume", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/Kpp_fuzz/volume", e.target.value),
+      );
   }
 
   setSliders() {}
@@ -387,7 +405,12 @@ export default class Kpp_fuzzGui extends HTMLElement {
   setSwitches() {
     this._root
       .getElementById("/Kpp_fuzz/99_bypass")
-      .addEventListener("change", (e) => this._plug.audioNode.setParamValue("/Kpp_fuzz/99_bypass", 1 - e.target.value));
+      .addEventListener("change", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/Kpp_fuzz/99_bypass",
+          1 - e.target.value,
+        ),
+      );
   }
 
   setInactive() {
@@ -401,7 +424,6 @@ export default class Kpp_fuzzGui extends HTMLElement {
 }
 try {
   customElements.define("wap-kpp_fuzz", Kpp_fuzzGui);
-  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

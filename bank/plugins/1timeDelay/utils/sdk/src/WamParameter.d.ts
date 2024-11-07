@@ -1,4 +1,4 @@
-import { WamParameter } from '@webaudiomodules/api';
+import { WamParameter } from "@webaudiomodules/api";
 
 declare const getWamParameter: (moduleId?: string) => typeof WamParameter;
 

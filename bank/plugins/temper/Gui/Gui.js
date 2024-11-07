@@ -759,7 +759,9 @@ webaudio-switch{
 
   fixRelativeImagePathsInCSS() {
     // change webaudiocontrols relative paths for spritesheets to absolute
-    let webaudioControls = this._root.querySelectorAll("webaudio-knob, webaudio-slider, webaudio-switch, img");
+    let webaudioControls = this._root.querySelectorAll(
+      "webaudio-knob, webaudio-slider, webaudio-switch, img",
+    );
     webaudioControls.forEach((e) => {
       let currentImagePath = e.getAttribute("src");
       if (currentImagePath !== undefined) {
@@ -784,12 +786,16 @@ webaudio-switch{
     let usedFonts = "";
     let fonts = this._root.querySelectorAll("label[font]");
     fonts.forEach((e) => {
-      if (!usedFonts.includes(e.getAttribute("font"))) usedFonts += "family=" + e.getAttribute("font") + "&";
+      if (!usedFonts.includes(e.getAttribute("font")))
+        usedFonts += "family=" + e.getAttribute("font") + "&";
     });
     let link = document.createElement("link");
     link.rel = "stylesheet";
     if (usedFonts.slice(0, -1))
-      link.href = "https://fonts.googleapis.com/css2?" + usedFonts.slice(0, -1) + "&display=swap";
+      link.href =
+        "https://fonts.googleapis.com/css2?" +
+        usedFonts.slice(0, -1) +
+        "&display=swap";
     document.querySelector("head").appendChild(link);
 
     // BMT Adapt for background-image
@@ -799,7 +805,9 @@ webaudio-switch{
         let currentImagePath = e.style.backgroundImage.slice(4, -1);
         if (currentImagePath !== undefined) {
           let imagePath = e.style.backgroundImage.slice(5, -2);
-          if (imagePath != "") e.style.backgroundImage = "url(" + this.basePath + "/" + imagePath + ")";
+          if (imagePath != "")
+            e.style.backgroundImage =
+              "url(" + this.basePath + "/" + imagePath + ")";
         }
       }
     });
@@ -808,7 +816,8 @@ webaudio-switch{
   setImageBackground() {
     // check if the shadowroot host has a background image
     let mainDiv = this._root.querySelector("#main");
-    mainDiv.style.backgroundImage = "url(" + this.basePath + "/" + imageRelativeURI + ")";
+    mainDiv.style.backgroundImage =
+      "url(" + this.basePath + "/" + imageRelativeURI + ")";
 
     //console.log("background =" + mainDiv.style.backgroundImage);
     //this._root.style.backgroundImage = "toto.png";
@@ -836,21 +845,29 @@ webaudio-switch{
     }
   }
   handleAnimationFrame = () => {
-    this._root.getElementById("/temper/Curve").value = this._plug.audioNode.getParamValue("/temper/Curve");
+    this._root.getElementById("/temper/Curve").value =
+      this._plug.audioNode.getParamValue("/temper/Curve");
 
-    this._root.getElementById("/temper/Cutoff").value = this._plug.audioNode.getParamValue("/temper/Cutoff");
+    this._root.getElementById("/temper/Cutoff").value =
+      this._plug.audioNode.getParamValue("/temper/Cutoff");
 
-    this._root.getElementById("/temper/Drive").value = this._plug.audioNode.getParamValue("/temper/Drive");
+    this._root.getElementById("/temper/Drive").value =
+      this._plug.audioNode.getParamValue("/temper/Drive");
 
-    this._root.getElementById("/temper/Feedback").value = this._plug.audioNode.getParamValue("/temper/Feedback");
+    this._root.getElementById("/temper/Feedback").value =
+      this._plug.audioNode.getParamValue("/temper/Feedback");
 
-    this._root.getElementById("/temper/Level").value = this._plug.audioNode.getParamValue("/temper/Level");
+    this._root.getElementById("/temper/Level").value =
+      this._plug.audioNode.getParamValue("/temper/Level");
 
-    this._root.getElementById("/temper/Resonance").value = this._plug.audioNode.getParamValue("/temper/Resonance");
+    this._root.getElementById("/temper/Resonance").value =
+      this._plug.audioNode.getParamValue("/temper/Resonance");
 
-    this._root.getElementById("/temper/Saturation").value = this._plug.audioNode.getParamValue("/temper/Saturation");
+    this._root.getElementById("/temper/Saturation").value =
+      this._plug.audioNode.getParamValue("/temper/Saturation");
 
-    this._root.getElementById("/temper/99_bypass").value = 1 - this._plug.audioNode.getParamValue("/temper/99_bypass");
+    this._root.getElementById("/temper/99_bypass").value =
+      1 - this._plug.audioNode.getParamValue("/temper/99_bypass");
 
     window.requestAnimationFrame(this.handleAnimationFrame);
   };
@@ -876,25 +893,42 @@ webaudio-switch{
   setKnobs() {
     this._root
       .getElementById("/temper/Curve")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/temper/Curve", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/temper/Curve", e.target.value),
+      );
     this._root
       .getElementById("/temper/Cutoff")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/temper/Cutoff", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/temper/Cutoff", e.target.value),
+      );
     this._root
       .getElementById("/temper/Drive")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/temper/Drive", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/temper/Drive", e.target.value),
+      );
     this._root
       .getElementById("/temper/Feedback")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/temper/Feedback", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/temper/Feedback", e.target.value),
+      );
     this._root
       .getElementById("/temper/Level")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/temper/Level", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/temper/Level", e.target.value),
+      );
     this._root
       .getElementById("/temper/Resonance")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/temper/Resonance", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/temper/Resonance", e.target.value),
+      );
     this._root
       .getElementById("/temper/Saturation")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/temper/Saturation", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/temper/Saturation",
+          e.target.value,
+        ),
+      );
   }
 
   setSliders() {}
@@ -902,7 +936,12 @@ webaudio-switch{
   setSwitches() {
     this._root
       .getElementById("/temper/99_bypass")
-      .addEventListener("change", (e) => this._plug.audioNode.setParamValue("/temper/99_bypass", 1 - e.target.value));
+      .addEventListener("change", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/temper/99_bypass",
+          1 - e.target.value,
+        ),
+      );
   }
 
   setInactive() {
@@ -916,7 +955,6 @@ webaudio-switch{
 }
 try {
   customElements.define("wap-temper", temperGui);
-  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

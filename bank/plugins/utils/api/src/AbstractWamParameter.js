@@ -7,13 +7,26 @@
  * @implements {IWamParameter}
  */
 export default class WamParameter {
-	constructor(info) {}
+  constructor(info) {}
 
-	get info() { throw new Error('Not Implemented.'); return null; }
+  get info() {
+    throw new Error("Not Implemented.");
+    return null;
+  }
 
-	get value() { throw new Error('Not Implemented.'); return null; }
-	set value(value) { throw new Error('Not Implemented.'); }
+  get value() {
+    throw new Error("Not Implemented.");
+    return null;
+  }
+  set value(value) {
+    throw new Error("Not Implemented.");
+  }
 
-	get normalizedValue() { throw new Error('Not Implemented.'); return null; }
-	set normalizedValue(normalizedValue) { throw new Error('Not Implemented.'); }
+  get normalizedValue() {
+    throw new Error("Not Implemented.");
+    return null;
+  }
+  set normalizedValue(normalizedValue) {
+    throw new Error("Not Implemented.");
+  }
 }

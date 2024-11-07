@@ -1,11 +1,11 @@
 {
-    "name": "Octaver",
-    "vendor": "Faust IDE",
-    "description": "A WAM written in Faust with a generated GUI",
-    "version": "1.0.0",
-    "apiVersion": "1.0.0",
-    "thumbnail": "default.png",
-    "keywords": ["faust"],
-    "isInstrument": false,
-    "website": ""
+  "name": "Octaver",
+  "vendor": "Faust IDE",
+  "description": "A WAM written in Faust with a generated GUI",
+  "version": "1.0.0",
+  "apiVersion": "1.0.0",
+  "thumbnail": "default.png",
+  "keywords": ["faust"],
+  "isInstrument": false,
+  "website": ""
 }

@@ -1,11 +1,11 @@
 {
-    "name": "Faust BigMuff",
-    "vendor": "Wimmics/Michel Buffa",
-    "description": "",
-    "version": "1.0.0",
-    "apiVersion": "2.0.0",
-    "thumbnail": "screenshot.png",
-    "keywords": ["fuzz"],
-    "isInstrument": false,
-    "website": ""
+  "name": "Faust BigMuff",
+  "vendor": "Wimmics/Michel Buffa",
+  "description": "",
+  "version": "1.0.0",
+  "apiVersion": "2.0.0",
+  "thumbnail": "screenshot.png",
+  "keywords": ["fuzz"],
+  "isInstrument": false,
+  "website": ""
 }

@@ -319,19 +319,27 @@ export default class DistoMachineHTMLElement extends HTMLElement {
 
   attributeChangedCallback() {
     this.state = JSON.parse(this.getAttribute("state"));
-    console.log("attributeChangedCallback state = " + this.getAttribute("state"));
+    console.log(
+      "attributeChangedCallback state = " + this.getAttribute("state"),
+    );
 
     try {
       if (this.state.status == "enable") {
-        this.root.querySelector("#switch1").querySelector("webaudio-switch").value = 1;
+        this.root
+          .querySelector("#switch1")
+          .querySelector("webaudio-switch").value = 1;
         this.isOn = true;
       } else {
-        this.root.querySelector("#switch1").querySelector("webaudio-switch").value = 0;
+        this.root
+          .querySelector("#switch1")
+          .querySelector("webaudio-switch").value = 0;
         this.isOn = false;
       }
       this.knobs = this._root.querySelectorAll(".knob");
       for (var i = 0; i < this.knobs.length; i++) {
-        this.knobs[i].querySelector("webaudio-knob").setValue(this.state[this.knobs[i].id], false);
+        this.knobs[i]
+          .querySelector("webaudio-knob")
+          .setValue(this.state[this.knobs[i].id], false);
       }
       if (this.state.preset) {
         var preset = this.root.querySelector("#menuPresets");
@@ -344,8 +352,17 @@ export default class DistoMachineHTMLElement extends HTMLElement {
   };
 
   handleAnimationFrame = () => {
-    const { volume, master, drive, bass, middle, treble, reverb, presence, enabled } =
-      this.plugin.audioNode.getParamsValues();
+    const {
+      volume,
+      master,
+      drive,
+      bass,
+      middle,
+      treble,
+      reverb,
+      presence,
+      enabled,
+    } = this.plugin.audioNode.getParamsValues();
     this.shadowRoot.querySelector("#knob1").value = volume;
     this.shadowRoot.querySelector("#knob2").value = master;
     this.shadowRoot.querySelector("#knob3").value = drive;
@@ -369,11 +386,15 @@ export default class DistoMachineHTMLElement extends HTMLElement {
     background.style = "border-radius : 10px;";
     // Setting up the knobs imgs, those are loaded from the assets
     this.root.querySelectorAll(".knob").forEach((knob) => {
-      knob.querySelector("webaudio-knob").setAttribute("src", getAssetUrl(knobImg));
+      knob
+        .querySelector("webaudio-knob")
+        .setAttribute("src", getAssetUrl(knobImg));
       knob.style.fontFamily = "BouWeste";
     });
     // Setting up the switches imgs, those are loaded from the assets
-    this.root.querySelector("webaudio-switch").setAttribute("src", getAssetUrl(switchImg));
+    this.root
+      .querySelector("webaudio-switch")
+      .setAttribute("src", getAssetUrl(switchImg));
 
     let menuPresets = this.root.querySelector("#menuPresets");
     menuPresets.onchange = (e) => {
@@ -460,9 +481,11 @@ export default class DistoMachineHTMLElement extends HTMLElement {
     // by default, plugin is disabled
     //plugin.audioNode.setParamsValues({ enabled: 1 });
 
-    this.root.querySelector("#switch1").addEventListener("change", function onChange() {
-      plugin.audioNode.setParamsValues({ enabled: +!!this.checked });
-    });
+    this.root
+      .querySelector("#switch1")
+      .addEventListener("change", function onChange() {
+        plugin.audioNode.setParamsValues({ enabled: +!!this.checked });
+      });
   }
 
   // name of the custom HTML element associated

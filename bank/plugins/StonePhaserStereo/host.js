@@ -25,13 +25,28 @@ const mountPlugin = (domNode) => {
 (async () => {
   // Init WamEnv
   const { default: apiVersion } = await import("../utils/api/src/version.js");
-  const { default: addFunctionModule } = await import("../utils/sdk/src/addFunctionModule.js");
-  const { default: initializeWamEnv } = await import("../utils/sdk/src/WamEnv.js");
-  await addFunctionModule(audioContext.audioWorklet, initializeWamEnv, apiVersion);
-  const { default: initializeWamGroup } = await import("../utils/sdk/src/WamGroup.js");
+  const { default: addFunctionModule } = await import(
+    "../utils/sdk/src/addFunctionModule.js"
+  );
+  const { default: initializeWamEnv } = await import(
+    "../utils/sdk/src/WamEnv.js"
+  );
+  await addFunctionModule(
+    audioContext.audioWorklet,
+    initializeWamEnv,
+    apiVersion,
+  );
+  const { default: initializeWamGroup } = await import(
+    "../utils/sdk/src/WamGroup.js"
+  );
   const hostGroupId = "test-host";
   const hostGroupKey = performance.now().toString();
-  await addFunctionModule(audioContext.audioWorklet, initializeWamGroup, hostGroupId, hostGroupKey);
+  await addFunctionModule(
+    audioContext.audioWorklet,
+    initializeWamGroup,
+    hostGroupId,
+    hostGroupKey,
+  );
 
   // Import WAM
   const { default: WAM } = await import("./index.js");

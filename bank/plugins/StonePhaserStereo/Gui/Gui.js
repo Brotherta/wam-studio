@@ -311,7 +311,9 @@ export default class StonePhaserStereoGui extends HTMLElement {
 
   fixRelativeImagePathsInCSS() {
     // change webaudiocontrols relative paths for spritesheets to absolute
-    let webaudioControls = this._root.querySelectorAll("webaudio-knob, webaudio-slider, webaudio-switch, img");
+    let webaudioControls = this._root.querySelectorAll(
+      "webaudio-knob, webaudio-slider, webaudio-switch, img",
+    );
     webaudioControls.forEach((e) => {
       let currentImagePath = e.getAttribute("src");
       if (currentImagePath !== undefined) {
@@ -337,7 +339,8 @@ export default class StonePhaserStereoGui extends HTMLElement {
   setImageBackground() {
     // check if the shadowroot host has a background image
     let mainDiv = this._root.querySelector("#main");
-    mainDiv.style.backgroundImage = "url(" + this.basePath + "/" + imageRelativeURI + ")";
+    mainDiv.style.backgroundImage =
+      "url(" + this.basePath + "/" + imageRelativeURI + ")";
 
     //console.log("background =" + mainDiv.style.backgroundImage);
     //this._root.style.backgroundImage = "toto.png";
@@ -377,9 +380,8 @@ export default class StonePhaserStereoGui extends HTMLElement {
     this._root.getElementById("/StonePhaserStereo/Mix").value =
       this._plug.audioNode.getParamValue("/StonePhaserStereo/Mix");
 
-    this._root.getElementById("/StonePhaserStereo/Stereo_phase").value = this._plug.audioNode.getParamValue(
-      "/StonePhaserStereo/Stereo_phase"
-    );
+    this._root.getElementById("/StonePhaserStereo/Stereo_phase").value =
+      this._plug.audioNode.getParamValue("/StonePhaserStereo/Stereo_phase");
 
     this._root.getElementById("/StonePhaserStereo/Bypass").value =
       1 - this._plug.audioNode.getParamValue("/StonePhaserStereo/Bypass");
@@ -411,24 +413,43 @@ export default class StonePhaserStereoGui extends HTMLElement {
   setKnobs() {
     this._root
       .getElementById("/StonePhaserStereo/LFO")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/StonePhaserStereo/LFO", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/StonePhaserStereo/LFO",
+          e.target.value,
+        ),
+      );
     this._root
       .getElementById("/StonePhaserStereo/Feedback")
       .addEventListener("input", (e) =>
-        this._plug.audioNode.setParamValue("/StonePhaserStereo/Feedback", e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/StonePhaserStereo/Feedback",
+          e.target.value,
+        ),
       );
     this._root
       .getElementById("/StonePhaserStereo/Lo-cut")
       .addEventListener("input", (e) =>
-        this._plug.audioNode.setParamValue("/StonePhaserStereo/Lo-cut", e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/StonePhaserStereo/Lo-cut",
+          e.target.value,
+        ),
       );
     this._root
       .getElementById("/StonePhaserStereo/Mix")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/StonePhaserStereo/Mix", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/StonePhaserStereo/Mix",
+          e.target.value,
+        ),
+      );
     this._root
       .getElementById("/StonePhaserStereo/Stereo_phase")
       .addEventListener("input", (e) =>
-        this._plug.audioNode.setParamValue("/StonePhaserStereo/Stereo_phase", e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/StonePhaserStereo/Stereo_phase",
+          e.target.value,
+        ),
       );
   }
 
@@ -438,12 +459,18 @@ export default class StonePhaserStereoGui extends HTMLElement {
     this._root
       .getElementById("/StonePhaserStereo/Bypass")
       .addEventListener("change", (e) =>
-        this._plug.audioNode.setParamValue("/StonePhaserStereo/Bypass", 1 - e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/StonePhaserStereo/Bypass",
+          1 - e.target.value,
+        ),
       );
     this._root
       .getElementById("/StonePhaserStereo/Color")
       .addEventListener("change", (e) =>
-        this._plug.audioNode.setParamValue("/StonePhaserStereo/Color", 1 - e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/StonePhaserStereo/Color",
+          1 - e.target.value,
+        ),
       );
   }
 

@@ -48,7 +48,11 @@ class OwlDirtyNode extends AudioWorkletNode {
     };
 
     this.parse_item = function (item, obj) {
-      if (item.type === "vgroup" || item.type === "hgroup" || item.type === "tgroup") {
+      if (
+        item.type === "vgroup" ||
+        item.type === "hgroup" ||
+        item.type === "tgroup"
+      ) {
         this.parse_items(item.items, obj);
       } else if (item.type === "hbargraph" || item.type === "vbargraph") {
         // Keep bargraph adresses
@@ -74,7 +78,9 @@ class OwlDirtyNode extends AudioWorkletNode {
                   max: parseFloat(item.max),
                 });
               } else if (item.meta[i].midi.trim().split(" ")[0] === "ctrl") {
-                obj.fCtrlLabel[parseInt(item.meta[i].midi.trim().split(" ")[1])].push({
+                obj.fCtrlLabel[
+                  parseInt(item.meta[i].midi.trim().split(" ")[1])
+                ].push({
                   path: item.address,
                   min: parseFloat(item.min),
                   max: parseFloat(item.max),
@@ -123,7 +129,8 @@ class OwlDirtyNode extends AudioWorkletNode {
     // Set message handler
     this.port.onmessage = this.handleMessage.bind(this);
     try {
-      if (this.parameters) this.parameters.forEach((p) => (p.automationRate = "k-rate"));
+      if (this.parameters)
+        this.parameters.forEach((p) => (p.automationRate = "k-rate"));
     } catch (e) {}
   }
 
@@ -155,7 +162,8 @@ class OwlDirtyNode extends AudioWorkletNode {
   // For WAP
   async getMetadata() {
     return new Promise((resolve) => {
-      let real_url = this.baseURL === "" ? "main.json" : this.baseURL + "/main.json";
+      let real_url =
+        this.baseURL === "" ? "main.json" : this.baseURL + "/main.json";
       fetch(real_url)
         .then((responseJSON) => {
           return responseJSON.json();
@@ -253,7 +261,7 @@ class OwlDirtyNode extends AudioWorkletNode {
                 defaultValue: this.descriptor[item].init,
               },
             },
-            desc
+            desc,
           );
         }
       }
@@ -274,7 +282,13 @@ class OwlDirtyNode extends AudioWorkletNode {
         var path = this.fCtrlLabel[ctrl][i].path;
         this.setParamValue(
           path,
-          OwlDirtyNode.remap(value, 0, 127, this.fCtrlLabel[ctrl][i].min, this.fCtrlLabel[ctrl][i].max)
+          OwlDirtyNode.remap(
+            value,
+            0,
+            127,
+            this.fCtrlLabel[ctrl][i].min,
+            this.fCtrlLabel[ctrl][i].max,
+          ),
         );
         if (this.output_handler) {
           this.output_handler(path, this.getParamValue(path));
@@ -292,7 +306,10 @@ class OwlDirtyNode extends AudioWorkletNode {
   pitchWheel(channel, wheel) {
     for (var i = 0; i < this.fPitchwheelLabel.length; i++) {
       var pw = this.fPitchwheelLabel[i];
-      this.setParamValue(pw.path, OwlDirtyNode.remap(wheel, 0, 16383, pw.min, pw.max));
+      this.setParamValue(
+        pw.path,
+        OwlDirtyNode.remap(wheel, 0, 16383, pw.min, pw.max),
+      );
       if (this.output_handler) {
         this.output_handler(pw.path, this.getParamValue(pw.path));
       }
@@ -328,7 +345,9 @@ class OwlDirtyNode extends AudioWorkletNode {
   async getState() {
     var params = new Object();
     for (let i = 0; i < this.getParams().length; i++) {
-      Object.assign(params, { [this.getParams()[i]]: `${this.getParam(this.getParams()[i])}` });
+      Object.assign(params, {
+        [this.getParams()[i]]: `${this.getParam(this.getParams()[i])}`,
+      });
     }
     return new Promise((resolve) => {
       resolve(params);
@@ -480,11 +499,15 @@ export default class OwlDirty {
         },
       };
 
-      let real_url = this.baseURL === "" ? "OwlDirty.wasm" : this.baseURL + "/OwlDirty.wasm";
+      let real_url =
+        this.baseURL === "" ? "OwlDirty.wasm" : this.baseURL + "/OwlDirty.wasm";
       const dspFile = await fetch(real_url);
       const dspBuffer = await dspFile.arrayBuffer();
       const dspModule = await WebAssembly.compile(dspBuffer);
-      const dspInstance = await WebAssembly.instantiate(dspModule, importObject);
+      const dspInstance = await WebAssembly.instantiate(
+        dspModule,
+        importObject,
+      );
 
       let HEAPU8 = new Uint8Array(dspInstance.exports.memory.buffer);
       let json = this.heap2Str(HEAPU8);
@@ -494,8 +517,13 @@ export default class OwlDirty {
       if (this.fWorkletProcessors.indexOf(name) === -1) {
         try {
           let re = /JSON_STR/g;
-          let OwlDirtyProcessorString1 = OwlDirtyProcessorString.replace(re, json);
-          let real_url = window.URL.createObjectURL(new Blob([OwlDirtyProcessorString1], { type: "text/javascript" }));
+          let OwlDirtyProcessorString1 = OwlDirtyProcessorString.replace(
+            re,
+            json,
+          );
+          let real_url = window.URL.createObjectURL(
+            new Blob([OwlDirtyProcessorString1], { type: "text/javascript" }),
+          );
           await this.context.audioWorklet.addModule(real_url);
           // Keep the DSP name
           console.log("Keep the DSP name");
@@ -530,7 +558,8 @@ export default class OwlDirty {
     return new Promise((resolve, reject) => {
       try {
         // DO THIS ONLY ONCE. If another instance has already been added, do not add the html file again
-        let real_url = this.baseURL === "" ? "main.html" : this.baseURL + "/main.html";
+        let real_url =
+          this.baseURL === "" ? "main.html" : this.baseURL + "/main.html";
         if (!this.linkExists(real_url)) {
           // LINK DOES NOT EXIST, let's add it to the document
           var link = document.createElement("link");

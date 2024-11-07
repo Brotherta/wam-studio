@@ -8,3 +8,6 @@ storage
 *.env
 *.pem
 /bank/storage/
+
+bank/build.sh
+public/build.sh

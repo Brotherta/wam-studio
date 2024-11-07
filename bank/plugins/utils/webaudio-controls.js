@@ -97,7 +97,8 @@ if (window.customElements) {
     paramHeight: 16,
     paramColors: "#fff;#000",
   };
-  if (window.WebAudioControlsOptions) Object.assign(opt, window.WebAudioControlsOptions);
+  if (window.WebAudioControlsOptions)
+    Object.assign(opt, window.WebAudioControlsOptions);
   class WebAudioControlsWidget extends HTMLElement {
     constructor() {
       super();
@@ -213,7 +214,8 @@ if (window.customElements) {
           this.ttframe.style.display = "inline-block";
           this.ttframe.style.width = "auto";
           this.ttframe.style.height = "auto";
-          this.ttframe.style.transition = "opacity 0.5s " + d + "s,visibility 0.5s " + d + "s";
+          this.ttframe.style.transition =
+            "opacity 0.5s " + d + "s,visibility 0.5s " + d + "s";
           this.ttframe.style.opacity = 0.9;
           this.ttframe.style.visibility = "visible";
           let rc = this.getBoundingClientRect(),
@@ -224,7 +226,8 @@ if (window.customElements) {
           return;
         }
       }
-      this.ttframe.style.transition = "opacity 0.1s " + d + "s,visibility 0.1s " + d + "s";
+      this.ttframe.style.transition =
+        "opacity 0.1s " + d + "s,visibility 0.1s " + d + "s";
       this.ttframe.style.opacity = 0;
       this.ttframe.style.visibility = "hidden";
     }
@@ -246,7 +249,14 @@ if (window.customElements) {
     setMidiController(channel, cc) {
       if (this.listeningToThisMidiController(channel, cc)) return;
       this.midiController = { channel: channel, cc: cc };
-      console.log("Added mapping for channel=" + channel + " cc=" + cc + " tooltip=" + this.tooltip);
+      console.log(
+        "Added mapping for channel=" +
+          channel +
+          " cc=" +
+          cc +
+          " tooltip=" +
+          this.tooltip,
+      );
     }
     listeningToThisMidiController(channel, cc) {
       const c = this.midiController;
@@ -271,7 +281,9 @@ if (window.customElements) {
               this.setValue(event.data[2] >= 64 ? 1 : 0);
               break;
             case "radio":
-              let els = document.querySelectorAll("webaudio-switch[type='radio'][group='" + this.group + "']");
+              let els = document.querySelectorAll(
+                "webaudio-switch[type='radio'][group='" + this.group + "']",
+              );
               for (let i = 0; i < els.length; ++i) {
                 if (els[i] == this) els[i].setValue(1);
                 else els[i].setValue(0);
@@ -447,8 +459,12 @@ webaudio-knob{
           this.midiController = {};
           this.midiMode = "normal";
           if (this.midicc) {
-            let ch = parseInt(this.midicc.substring(0, this.midicc.lastIndexOf("."))) - 1;
-            let cc = parseInt(this.midicc.substring(this.midicc.lastIndexOf(".") + 1));
+            let ch =
+              parseInt(this.midicc.substring(0, this.midicc.lastIndexOf("."))) -
+              1;
+            let cc = parseInt(
+              this.midicc.substring(this.midicc.lastIndexOf(".") + 1),
+            );
             this.setMidiController(ch, cc);
           }
           this.setupImage();
@@ -476,7 +492,8 @@ webaudio-knob{
               })"/>`;
             }
             svg += "</svg>";
-            this.elem.style.backgroundImage = "url(data:image/svg+xml;base64," + btoa(svg) + ")";
+            this.elem.style.backgroundImage =
+              "url(data:image/svg+xml;base64," + btoa(svg) + ")";
             //        this.elem.style.backgroundSize = "100% 10100%";
             this.elem.style.backgroundSize = `${this.kw}px ${this.kh * 101}px`;
           } else {
@@ -519,7 +536,8 @@ webaudio-knob{
           }
         }
         _setValue(v) {
-          if (this.step) v = Math.round((v - this.min) / this.step) * this.step + this.min;
+          if (this.step)
+            v = Math.round((v - this.min) / this.step) * this.step + this.min;
           this._value = Math.min(this.max, Math.max(this.min, v));
           if (this._value != this.oldvalue) {
             this.oldvalue = this._value;
@@ -532,13 +550,15 @@ webaudio-knob{
           return 0;
         }
         setValue(v, f) {
-          if (this._setValue(v) && f) this.sendEvent("input"), this.sendEvent("change");
+          if (this._setValue(v) && f)
+            this.sendEvent("input"), this.sendEvent("change");
         }
         wheel(e) {
           let delta = (this.max - this.min) * 0.01;
           delta = e.deltaY > 0 ? -delta : delta;
           if (!e.shiftKey) delta *= 5;
-          if (Math.abs(delta) < this.step) delta = delta > 0 ? +this.step : -this.step;
+          if (Math.abs(delta) < this.step)
+            delta = delta > 0 ? +this.step : -this.step;
           this.setValue(+this.value + delta, true);
           e.preventDefault();
           e.stopPropagation();
@@ -571,13 +591,18 @@ webaudio-knob{
               this.startPosY = e.pageY;
               this.startVal = this.value;
             }
-            let offset = (this.startPosY - e.pageY - this.startPosX + e.pageX) * this.sensitivity;
+            let offset =
+              (this.startPosY - e.pageY - this.startPosX + e.pageX) *
+              this.sensitivity;
             this._setValue(
               this.min +
-                (((this.startVal + ((this.max - this.min) * offset) / ((e.shiftKey ? 4 : 1) * 128) - this.min) /
+                (((this.startVal +
+                  ((this.max - this.min) * offset) /
+                    ((e.shiftKey ? 4 : 1) * 128) -
+                  this.min) /
                   this.step) |
                   0) *
-                  this.step
+                  this.step,
             );
             this.sendEvent("input");
             if (e.preventDefault) e.preventDefault();
@@ -598,11 +623,15 @@ webaudio-knob{
             this.showtip(0);
             this.startPosX = this.startPosY = null;
             window.removeEventListener("mousemove", pointermove);
-            window.removeEventListener("touchmove", pointermove, { passive: false });
+            window.removeEventListener("touchmove", pointermove, {
+              passive: false,
+            });
             window.removeEventListener("mouseup", pointerup);
             window.removeEventListener("touchend", pointerup);
             window.removeEventListener("touchcancel", pointerup);
-            document.body.removeEventListener("touchstart", preventScroll, { passive: false });
+            document.body.removeEventListener("touchstart", preventScroll, {
+              passive: false,
+            });
             this.sendEvent("change");
           };
           let preventScroll = (e) => {
@@ -614,17 +643,21 @@ webaudio-knob{
             this.startPosY = e.pageY;
             this.startVal = this.value;
             window.addEventListener("mousemove", pointermove);
-            window.addEventListener("touchmove", pointermove, { passive: false });
+            window.addEventListener("touchmove", pointermove, {
+              passive: false,
+            });
           }
           window.addEventListener("mouseup", pointerup);
           window.addEventListener("touchend", pointerup);
           window.addEventListener("touchcancel", pointerup);
-          document.body.addEventListener("touchstart", preventScroll, { passive: false });
+          document.body.addEventListener("touchstart", preventScroll, {
+            passive: false,
+          });
           ev.preventDefault();
           ev.stopPropagation();
           return false;
         }
-      }
+      },
     );
   } catch (error) {
     //console.log("webaudio-knob already defined");
@@ -811,7 +844,10 @@ webaudio-slider{
               this.setupImage();
             },
           });
-          this._ditchlength = this.getAttr("ditchlength", opt.sliderDitchlength);
+          this._ditchlength = this.getAttr(
+            "ditchlength",
+            opt.sliderDitchlength,
+          );
           Object.defineProperty(this, "ditchlength", {
             get: () => {
               return this._ditchlength;
@@ -843,8 +879,12 @@ webaudio-slider{
           this.midiController = {};
           this.midiMode = "normal";
           if (this.midicc) {
-            let ch = parseInt(this.midicc.substring(0, this.midicc.lastIndexOf("."))) - 1;
-            let cc = parseInt(this.midicc.substring(this.midicc.lastIndexOf(".") + 1));
+            let ch =
+              parseInt(this.midicc.substring(0, this.midicc.lastIndexOf("."))) -
+              1;
+            let cc = parseInt(
+              this.midicc.substring(this.midicc.lastIndexOf(".") + 1),
+            );
             this.setMidiController(ch, cc);
           }
           this.setupImage();
@@ -879,8 +919,10 @@ webaudio-slider{
           this.elem.style.backgroundSize = "100% 100%";
           this.elem.style.width = this.width + "px";
           this.elem.style.height = this.height + "px";
-          this.kwidth = this.knobwidth || (this.dr == "horz" ? this.height : this.width);
-          this.kheight = this.knobheight || (this.dr == "horz" ? this.height : this.width);
+          this.kwidth =
+            this.knobwidth || (this.dr == "horz" ? this.height : this.width);
+          this.kheight =
+            this.knobheight || (this.dr == "horz" ? this.height : this.width);
           this.knob.style.width = this.kwidth + "px";
           this.knob.style.height = this.kheight + "px";
           if (!this.src) {
@@ -891,7 +933,8 @@ webaudio-slider{
 <rect x="1" y="1" rx="${r}" ry="${r}" width="${this.width - 2}" height="${this.height - 2}" fill="${
               this.coltab[1]
             }"/></svg>`;
-            this.elem.style.backgroundImage = "url(data:image/svg+xml;base64," + btoa(svgbody) + ")";
+            this.elem.style.backgroundImage =
+              "url(data:image/svg+xml;base64," + btoa(svgbody) + ")";
           } else {
             this.elem.style.backgroundImage = "url(" + this.src + ")";
           }
@@ -905,7 +948,8 @@ webaudio-slider{
 <rect x="2" y="2" width="${this.kwidth - 4}" height="${this.kheight - 4}" rx="${this.kwidth * 0.5}" ry="${
               this.kheight * 0.5
             }" fill="url(#gr)"/></svg>`;
-            this.knob.style.backgroundImage = "url(data:image/svg+xml;base64," + btoa(svgthumb) + ")";
+            this.knob.style.backgroundImage =
+              "url(data:image/svg+xml;base64," + btoa(svgthumb) + ")";
           } else {
             this.knob.style.backgroundImage = "url(" + this.knobsrc + ")";
           }
@@ -929,7 +973,8 @@ webaudio-slider{
           let style = this.knob.style;
           if (this.dr == "vert") {
             style.left = (this.width - this.kwidth) * 0.5 + "px";
-            style.top = (1 - (this.value - this.min) / range) * this.dlen + "px";
+            style.top =
+              (1 - (this.value - this.min) / range) * this.dlen + "px";
             this.sensex = 0;
             this.sensey = 1;
           } else {
@@ -953,13 +998,15 @@ webaudio-slider{
           return 0;
         }
         setValue(v, f) {
-          if (this._setValue(v) && f) this.sendEvent("input"), this.sendEvent("change");
+          if (this._setValue(v) && f)
+            this.sendEvent("input"), this.sendEvent("change");
         }
         wheel(e) {
           let delta = (this.max - this.min) * 0.01;
           delta = e.deltaY > 0 ? -delta : delta;
           if (!e.shiftKey) delta *= 5;
-          if (Math.abs(delta) < this.step) delta = delta > 0 ? +this.step : -this.step;
+          if (Math.abs(delta) < this.step)
+            delta = delta > 0 ? +this.step : -this.step;
           this.setValue(+this.value + delta, true);
           e.preventDefault();
           e.stopPropagation();
@@ -994,13 +1041,18 @@ webaudio-slider{
               this.startVal = this.value;
             }
             let offset =
-              ((this.startPosY - e.pageY) * this.sensey - (this.startPosX - e.pageX) * this.sensex) * this.sensitivity;
+              ((this.startPosY - e.pageY) * this.sensey -
+                (this.startPosX - e.pageX) * this.sensex) *
+              this.sensitivity;
             this._setValue(
               this.min +
-                (((this.startVal + ((this.max - this.min) * offset) / ((e.shiftKey ? 4 : 1) * this.dlen) - this.min) /
+                (((this.startVal +
+                  ((this.max - this.min) * offset) /
+                    ((e.shiftKey ? 4 : 1) * this.dlen) -
+                  this.min) /
                   this.step) |
                   0) *
-                  this.step
+                  this.step,
             );
             this.sendEvent("input");
             if (e.preventDefault) e.preventDefault();
@@ -1021,11 +1073,15 @@ webaudio-slider{
             this.showtip(0);
             this.startPosX = this.startPosY = null;
             window.removeEventListener("mousemove", pointermove);
-            window.removeEventListener("touchmove", pointermove, { passive: false });
+            window.removeEventListener("touchmove", pointermove, {
+              passive: false,
+            });
             window.removeEventListener("mouseup", pointerup);
             window.removeEventListener("touchend", pointerup);
             window.removeEventListener("touchcancel", pointerup);
-            document.body.removeEventListener("touchstart", preventScroll, { passive: false });
+            document.body.removeEventListener("touchstart", preventScroll, {
+              passive: false,
+            });
             this.sendEvent("change");
           };
           let preventScroll = (e) => {
@@ -1038,17 +1094,21 @@ webaudio-slider{
             this.startPosY = e.pageY;
             this.startVal = this.value;
             window.addEventListener("mousemove", pointermove);
-            window.addEventListener("touchmove", pointermove, { passive: false });
+            window.addEventListener("touchmove", pointermove, {
+              passive: false,
+            });
           }
           window.addEventListener("mouseup", pointerup);
           window.addEventListener("touchend", pointerup);
           window.addEventListener("touchcancel", pointerup);
-          document.body.addEventListener("touchstart", preventScroll, { passive: false });
+          document.body.addEventListener("touchstart", preventScroll, {
+            passive: false,
+          });
           e.preventDefault();
           e.stopPropagation();
           return false;
         }
-      }
+      },
     );
   } catch (error) {
     //console.log("webaudio-slider already defined");
@@ -1167,8 +1227,12 @@ webaudio-switch{
           this.midiController = {};
           this.midiMode = "normal";
           if (this.midicc) {
-            let ch = parseInt(this.midicc.substring(0, this.midicc.lastIndexOf("."))) - 1;
-            let cc = parseInt(this.midicc.substring(this.midicc.lastIndexOf(".") + 1));
+            let ch =
+              parseInt(this.midicc.substring(0, this.midicc.lastIndexOf("."))) -
+              1;
+            let cc = parseInt(
+              this.midicc.substring(this.midicc.lastIndexOf(".") + 1),
+            );
             this.setMidiController(ch, cc);
           }
           this.setupImage();
@@ -1182,8 +1246,16 @@ webaudio-switch{
         }
         disconnectedCallback() {}
         setupImage() {
-          let w = this.width || this.diameter || opt.switchWidth || opt.switchDiameter;
-          let h = this.height || this.diameter || opt.switchHeight || opt.switchDiameter;
+          let w =
+            this.width ||
+            this.diameter ||
+            opt.switchWidth ||
+            opt.switchDiameter;
+          let h =
+            this.height ||
+            this.diameter ||
+            opt.switchHeight ||
+            opt.switchDiameter;
           if (!this.src) {
             this.coltab = this.colors.split(";");
             let mm = Math.min(w, h);
@@ -1203,12 +1275,14 @@ webaudio-switch{
 <circle cx="${w * 0.5}" cy="${h * 1.5}" r="${mm * 0.3}" stroke="${
               this.coltab[0]
             }" stroke-width="2" fill="url(#gr)"/></svg>`;
-            this.elem.style.backgroundImage = "url(data:image/svg+xml;base64," + btoa(svg) + ")";
+            this.elem.style.backgroundImage =
+              "url(data:image/svg+xml;base64," + btoa(svg) + ")";
             this.elem.style.backgroundSize = "100% 200%";
           } else {
             this.elem.style.backgroundImage = "url(" + this.src + ")";
             if (!this.sprites) this.elem.style.backgroundSize = "100% 200%";
-            else this.elem.style.backgroundSize = `100% ${(this.sprites + 1) * 100}%`;
+            else
+              this.elem.style.backgroundSize = `100% ${(this.sprites + 1) * 100}%`;
           }
           this.elem.style.width = w + "px";
           this.elem.style.height = h + "px";
@@ -1255,11 +1329,15 @@ webaudio-switch{
             this.drag = 0;
             this.showtip(0);
             window.removeEventListener("mousemove", pointermove);
-            window.removeEventListener("touchmove", pointermove, { passive: false });
+            window.removeEventListener("touchmove", pointermove, {
+              passive: false,
+            });
             window.removeEventListener("mouseup", pointerup);
             window.removeEventListener("touchend", pointerup);
             window.removeEventListener("touchcancel", pointerup);
-            document.body.removeEventListener("touchstart", preventScroll, { passive: false });
+            document.body.removeEventListener("touchstart", preventScroll, {
+              passive: false,
+            });
             if (this.type == "kick") {
               this.value = 0;
               this.checked = false;
@@ -1285,7 +1363,9 @@ webaudio-switch{
               this.sendEvent("change");
               break;
             case "radio":
-              let els = document.querySelectorAll("webaudio-switch[type='radio'][group='" + this.group + "']");
+              let els = document.querySelectorAll(
+                "webaudio-switch[type='radio'][group='" + this.group + "']",
+              );
               for (let i = 0; i < els.length; ++i) {
                 if (els[i] == this) els[i].setValue(1);
                 else els[i].setValue(0);
@@ -1297,13 +1377,15 @@ webaudio-switch{
           window.addEventListener("mouseup", pointerup);
           window.addEventListener("touchend", pointerup);
           window.addEventListener("touchcancel", pointerup);
-          document.body.addEventListener("touchstart", preventScroll, { passive: false });
+          document.body.addEventListener("touchstart", preventScroll, {
+            passive: false,
+          });
           this.redraw();
           e.preventDefault();
           e.stopPropagation();
           return false;
         }
-      }
+      },
     );
   } catch (error) {
     //console.log("webaudio-switch already defined");
@@ -1316,8 +1398,12 @@ webaudio-switch{
         constructor() {
           super();
           this.addEventListener("keydown", this.keydown);
-          this.addEventListener("mousedown", this.pointerdown, { passive: false });
-          this.addEventListener("touchstart", this.pointerdown, { passive: false });
+          this.addEventListener("mousedown", this.pointerdown, {
+            passive: false,
+          });
+          this.addEventListener("touchstart", this.pointerdown, {
+            passive: false,
+          });
           this.addEventListener("wheel", this.wheel);
           this.addEventListener("mouseover", this.pointerover);
           this.addEventListener("mouseout", this.pointerout);
@@ -1431,8 +1517,12 @@ webaudio-param{
           this.midiController = {};
           this.midiMode = "normal";
           if (this.midicc) {
-            let ch = parseInt(this.midicc.substring(0, this.midicc.lastIndexOf("."))) - 1;
-            let cc = parseInt(this.midicc.substring(this.midicc.lastIndexOf(".") + 1));
+            let ch =
+              parseInt(this.midicc.substring(0, this.midicc.lastIndexOf("."))) -
+              1;
+            let cc = parseInt(
+              this.midicc.substring(this.midicc.lastIndexOf(".") + 1),
+            );
             this.setMidiController(ch, cc);
           }
           this.setupImage();
@@ -1507,7 +1597,9 @@ webaudio-param{
             window.removeEventListener("mouseup", pointerup);
             window.removeEventListener("touchend", pointerup);
             window.removeEventListener("touchcancel", pointerup);
-            document.body.removeEventListener("touchstart", preventScroll, { passive: false });
+            document.body.removeEventListener("touchstart", preventScroll, {
+              passive: false,
+            });
           };
           let preventScroll = (e) => {
             e.preventDefault();
@@ -1515,13 +1607,15 @@ webaudio-param{
           window.addEventListener("mouseup", pointerup);
           window.addEventListener("touchend", pointerup);
           window.addEventListener("touchcancel", pointerup);
-          document.body.addEventListener("touchstart", preventScroll, { passive: false });
+          document.body.addEventListener("touchstart", preventScroll, {
+            passive: false,
+          });
           this.redraw();
           if (e.preventDefault) e.preventDefault();
           if (e.stopPropagation) e.stopPropagation();
           return false;
         }
-      }
+      },
     );
   } catch (error) {
     //console.log("webaudio-param already defined");
@@ -1607,7 +1701,10 @@ webaudio-keyboard{
                 this.setupImage();
               },
             });
-          this._colors = this.getAttr("colors", "#222;#eee;#ccc;#333;#000;#e88;#c44;#c33;#800");
+          this._colors = this.getAttr(
+            "colors",
+            "#222;#eee;#ccc;#333;#000;#e88;#c44;#c33;#800",
+          );
           if (!this.hasOwnProperty("colors"))
             Object.defineProperty(this, "colors", {
               get: () => {
@@ -1622,20 +1719,32 @@ webaudio-keyboard{
           this.midilearn = this.getAttr("midilearn", 0);
           this.midicc = this.getAttr("midicc", null);
           this.press = 0;
-          this.keycodes1 = [90, 83, 88, 68, 67, 86, 71, 66, 72, 78, 74, 77, 188, 76, 190, 187, 191, 226];
-          this.keycodes2 = [81, 50, 87, 51, 69, 82, 53, 84, 54, 89, 55, 85, 73, 57, 79, 48, 80, 192, 222, 219];
+          this.keycodes1 = [
+            90, 83, 88, 68, 67, 86, 71, 66, 72, 78, 74, 77, 188, 76, 190, 187,
+            191, 226,
+          ];
+          this.keycodes2 = [
+            81, 50, 87, 51, 69, 82, 53, 84, 54, 89, 55, 85, 73, 57, 79, 48, 80,
+            192, 222, 219,
+          ];
           this.addEventListener("keyup", this.keyup);
           this.midiController = {};
           this.midiMode = "normal";
           if (this.midicc) {
-            let ch = parseInt(this.midicc.substring(0, this.midicc.lastIndexOf("."))) - 1;
-            let cc = parseInt(this.midicc.substring(this.midicc.lastIndexOf(".") + 1));
+            let ch =
+              parseInt(this.midicc.substring(0, this.midicc.lastIndexOf("."))) -
+              1;
+            let cc = parseInt(
+              this.midicc.substring(this.midicc.lastIndexOf(".") + 1),
+            );
             this.setMidiController(ch, cc);
           }
           this.setupImage();
           this.digits = 0;
           this.addEventListener("mousemove", this.pointermove);
-          this.addEventListener("touchmove", this.pointermove, { passive: false });
+          this.addEventListener("touchmove", this.pointermove, {
+            passive: false,
+          });
           this.addEventListener("mouseup", this.pointerup);
           this.addEventListener("touchend", this.pointerup);
           this.addEventListener("touchcancel", this.pointerup);
@@ -1648,7 +1757,20 @@ webaudio-keyboard{
           this.cv.style.width = this.width + "px";
           this.cv.style.height = this.height + "px";
           this.bheight = this.height * 0.55;
-          this.kp = [0, 7 / 12, 1, (3 * 7) / 12, 2, 3, (6 * 7) / 12, 4, (8 * 7) / 12, 5, (10 * 7) / 12, 6];
+          this.kp = [
+            0,
+            7 / 12,
+            1,
+            (3 * 7) / 12,
+            2,
+            3,
+            (6 * 7) / 12,
+            4,
+            (8 * 7) / 12,
+            5,
+            (10 * 7) / 12,
+            6,
+          ];
           this.kf = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
           this.ko = [
             0,
@@ -1710,24 +1832,66 @@ webaudio-keyboard{
             if (this.kf[i % 12] == 0) {
               let x = this.wwidth * j++ + 1;
               if (this.dispvalues.indexOf(i) >= 0)
-                rrect(this.ctx, x, 1, this.wwidth - 1, this.height - 2, r, this.coltab[5], this.coltab[6]);
-              else rrect(this.ctx, x, 1, this.wwidth - 1, this.height - 2, r, this.coltab[1], this.coltab[2]);
+                rrect(
+                  this.ctx,
+                  x,
+                  1,
+                  this.wwidth - 1,
+                  this.height - 2,
+                  r,
+                  this.coltab[5],
+                  this.coltab[6],
+                );
+              else
+                rrect(
+                  this.ctx,
+                  x,
+                  1,
+                  this.wwidth - 1,
+                  this.height - 2,
+                  r,
+                  this.coltab[1],
+                  this.coltab[2],
+                );
             }
           }
           r = Math.min(8, this.bwidth * 0.3);
           for (let i = this.min; i < this.max; ++i) {
             if (this.kf[i % 12]) {
-              let x = this.wwidth * this.ko[this.min % 12] + this.bwidth * (i - this.min) + 1;
+              let x =
+                this.wwidth * this.ko[this.min % 12] +
+                this.bwidth * (i - this.min) +
+                1;
               if (this.dispvalues.indexOf(i) >= 0)
-                rrect(this.ctx, x, 1, this.bwidth, h2, r, this.coltab[7], this.coltab[8]);
-              else rrect(this.ctx, x, 1, this.bwidth, h2, r, this.coltab[3], this.coltab[4]);
+                rrect(
+                  this.ctx,
+                  x,
+                  1,
+                  this.bwidth,
+                  h2,
+                  r,
+                  this.coltab[7],
+                  this.coltab[8],
+                );
+              else
+                rrect(
+                  this.ctx,
+                  x,
+                  1,
+                  this.bwidth,
+                  h2,
+                  r,
+                  this.coltab[3],
+                  this.coltab[4],
+                );
               this.ctx.strokeStyle = this.coltab[0];
               this.ctx.stroke();
             }
           }
         }
         _setValue(v) {
-          if (this.step) v = Math.round((v - this.min) / this.step) * this.step + this.min;
+          if (this.step)
+            v = Math.round((v - this.min) / this.step) * this.step + this.min;
           this._value = Math.min(this.max, Math.max(this.min, v));
           if (this._value != this.oldvalue) {
             this.oldvalue = this._value;
@@ -1738,7 +1902,8 @@ webaudio-keyboard{
           return 0;
         }
         setValue(v, f) {
-          if (this._setValue(v) && f) this.sendEvent("input"), this.sendEvent("change");
+          if (this._setValue(v) && f)
+            this.sendEvent("input"), this.sendEvent("change");
         }
         wheel(e) {}
         keydown(e) {
@@ -1800,7 +1965,11 @@ webaudio-keyboard{
               k = (px / this.wwidth) | 0;
               ko = this.kp[this.min % 12];
               k += ko;
-              k = this.min + ((k / 7) | 0) * 12 + this.kn[k % 7] - this.kn[ko % 7];
+              k =
+                this.min +
+                ((k / 7) | 0) * 12 +
+                this.kn[k % 7] -
+                this.kn[ko % 7];
             }
             if (k >= this.min && k <= this.max) v.push(k);
           }
@@ -1828,10 +1997,12 @@ webaudio-keyboard{
         sendevent() {
           let notes = [];
           for (let i = 0, j = this.valuesold.length; i < j; ++i) {
-            if (this.values.indexOf(this.valuesold[i]) < 0) notes.push([0, this.valuesold[i]]);
+            if (this.values.indexOf(this.valuesold[i]) < 0)
+              notes.push([0, this.valuesold[i]]);
           }
           for (let i = 0, j = this.values.length; i < j; ++i) {
-            if (this.valuesold.indexOf(this.values[i]) < 0) notes.push([1, this.values[i]]);
+            if (this.valuesold.indexOf(this.values[i]) < 0)
+              notes.push([1, this.values[i]]);
           }
           if (notes.length) {
             this.valuesold = this.values;
@@ -1856,7 +2027,7 @@ webaudio-keyboard{
           this.setdispvalues(state, note);
           this.redraw();
         }
-      }
+      },
     );
   } catch (error) {
     //console.log("webaudio-keyboard already defined");
@@ -1885,14 +2056,18 @@ webaudio-keyboard{
           },
           (err) => {
             console.log("MIDI not initialized - error encountered:" + err.code);
-          }
+          },
         );
       }
     }
     enableInputs() {
       let inputs = this.midiAccess.inputs.values();
       //console.log("Found " + this.midiAccess.inputs.size + " MIDI input(s)");
-      for (let input = inputs.next(); input && !input.done; input = inputs.next()) {
+      for (
+        let input = inputs.next();
+        input && !input.done;
+        input = inputs.next()
+      ) {
         //console.log("Connected input: " + input.value.name);
         input.value.onmidimessage = this.handleMIDIMessage.bind(this);
       }
@@ -1918,7 +2093,11 @@ webaudio-keyboard{
       this.listOfExternalMidiListeners.forEach(function (externalListener) {
         externalListener(event);
       });
-      if ((event.data[0] & 0xf0) == 0xf0 || ((event.data[0] & 0xf0) == 0xb0 && event.data[1] >= 120)) return;
+      if (
+        (event.data[0] & 0xf0) == 0xf0 ||
+        ((event.data[0] & 0xf0) == 0xb0 && event.data[1] >= 120)
+      )
+        return;
       for (let w of this.listOfWidgets) {
         if (w.processMidiEvent) w.processMidiEvent(event);
       }
@@ -1933,7 +2112,10 @@ webaudio-keyboard{
       menu.classList.add("active");
       menu.knob.focus();
       //      document.activeElement.onblur=this.contextMenuClose;
-      menu.knob.addEventListener("keydown", this.contextMenuCloseByKey.bind(this));
+      menu.knob.addEventListener(
+        "keydown",
+        this.contextMenuCloseByKey.bind(this),
+      );
     }
     contextMenuCloseByKey(e) {
       if (e.keyCode == 27) this.contextMenuClose();
@@ -1942,13 +2124,17 @@ webaudio-keyboard{
       let menu = document.getElementById("webaudioctrl-context-menu");
       menu.knob.removeEventListener("keydown", this.contextMenuCloseByKey);
       menu.classList.remove("active");
-      let menuItemLearn = document.getElementById("webaudioctrl-context-menu-learn");
+      let menuItemLearn = document.getElementById(
+        "webaudioctrl-context-menu-learn",
+      );
       menuItemLearn.innerHTML = "Learn";
       menu.knob.midiMode = "normal";
     }
     contextMenuLearn() {
       let menu = document.getElementById("webaudioctrl-context-menu");
-      let menuItemLearn = document.getElementById("webaudioctrl-context-menu-learn");
+      let menuItemLearn = document.getElementById(
+        "webaudioctrl-context-menu-learn",
+      );
       menuItemLearn.innerHTML = "Listening...";
       menu.knob.midiMode = "learn";
     }

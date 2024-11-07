@@ -1,7 +1,7 @@
 {
-"name": "stonephaser",
-"vendor": "Faust",
-"version": "1.01",
-"homepage": "https://faust.grame.fr",
-"thumbnail": "default.png"
+  "name": "stonephaser",
+  "vendor": "Faust",
+  "version": "1.01",
+  "homepage": "https://faust.grame.fr",
+  "thumbnail": "default.png"
 }

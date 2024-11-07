@@ -318,7 +318,9 @@ export default class SweetGui extends HTMLElement {
 
   fixRelativeImagePathsInCSS() {
     // change webaudiocontrols relative paths for spritesheets to absolute
-    let webaudioControls = this._root.querySelectorAll("webaudio-knob, webaudio-slider, webaudio-switch, img");
+    let webaudioControls = this._root.querySelectorAll(
+      "webaudio-knob, webaudio-slider, webaudio-switch, img",
+    );
     webaudioControls.forEach((e) => {
       let currentImagePath = e.getAttribute("src");
       if (currentImagePath !== undefined) {
@@ -343,12 +345,16 @@ export default class SweetGui extends HTMLElement {
     let usedFonts = "";
     let fonts = this._root.querySelectorAll("label[font]");
     fonts.forEach((e) => {
-      if (!usedFonts.includes(e.getAttribute("font"))) usedFonts += "family=" + e.getAttribute("font") + "&";
+      if (!usedFonts.includes(e.getAttribute("font")))
+        usedFonts += "family=" + e.getAttribute("font") + "&";
     });
     let link = document.createElement("link");
     link.rel = "stylesheet";
     if (usedFonts.slice(0, -1))
-      link.href = "https://fonts.googleapis.com/css2?" + usedFonts.slice(0, -1) + "&display=swap";
+      link.href =
+        "https://fonts.googleapis.com/css2?" +
+        usedFonts.slice(0, -1) +
+        "&display=swap";
     document.querySelector("head").appendChild(link);
 
     // BMT Adapt for background-image
@@ -358,7 +364,9 @@ export default class SweetGui extends HTMLElement {
         let currentImagePath = e.style.backgroundImage.slice(4, -1);
         if (currentImagePath !== undefined) {
           let imagePath = e.style.backgroundImage.slice(5, -2);
-          if (imagePath != "") e.style.backgroundImage = "url(" + this.basePath + "/" + imagePath + ")";
+          if (imagePath != "")
+            e.style.backgroundImage =
+              "url(" + this.basePath + "/" + imagePath + ")";
         }
       }
     });
@@ -367,7 +375,8 @@ export default class SweetGui extends HTMLElement {
   setImageBackground() {
     // check if the shadowroot host has a background image
     let mainDiv = this._root.querySelector("#main");
-    mainDiv.style.backgroundImage = "url(" + this.basePath + "/" + imageRelativeURI + ")";
+    mainDiv.style.backgroundImage =
+      "url(" + this.basePath + "/" + imageRelativeURI + ")";
 
     //console.log("background =" + mainDiv.style.backgroundImage);
     //this._root.style.backgroundImage = "toto.png";
@@ -395,15 +404,20 @@ export default class SweetGui extends HTMLElement {
     }
   }
   handleAnimationFrame = () => {
-    this._root.getElementById("/Sweet/Frequency").value = this._plug.audioNode.getParamValue("/Sweet/Frequency");
+    this._root.getElementById("/Sweet/Frequency").value =
+      this._plug.audioNode.getParamValue("/Sweet/Frequency");
 
-    this._root.getElementById("/Sweet/High").value = this._plug.audioNode.getParamValue("/Sweet/High");
+    this._root.getElementById("/Sweet/High").value =
+      this._plug.audioNode.getParamValue("/Sweet/High");
 
-    this._root.getElementById("/Sweet/Low").value = this._plug.audioNode.getParamValue("/Sweet/Low");
+    this._root.getElementById("/Sweet/Low").value =
+      this._plug.audioNode.getParamValue("/Sweet/Low");
 
-    this._root.getElementById("/Sweet/Mix").value = this._plug.audioNode.getParamValue("/Sweet/Mix");
+    this._root.getElementById("/Sweet/Mix").value =
+      this._plug.audioNode.getParamValue("/Sweet/Mix");
 
-    this._root.getElementById("/Sweet/bypass").value = 1 - this._plug.audioNode.getParamValue("/Sweet/bypass");
+    this._root.getElementById("/Sweet/bypass").value =
+      1 - this._plug.audioNode.getParamValue("/Sweet/bypass");
 
     window.requestAnimationFrame(this.handleAnimationFrame);
   };
@@ -429,16 +443,24 @@ export default class SweetGui extends HTMLElement {
   setKnobs() {
     this._root
       .getElementById("/Sweet/Frequency")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/Sweet/Frequency", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/Sweet/Frequency", e.target.value),
+      );
     this._root
       .getElementById("/Sweet/High")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/Sweet/High", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/Sweet/High", e.target.value),
+      );
     this._root
       .getElementById("/Sweet/Low")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/Sweet/Low", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/Sweet/Low", e.target.value),
+      );
     this._root
       .getElementById("/Sweet/Mix")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/Sweet/Mix", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/Sweet/Mix", e.target.value),
+      );
   }
 
   setSliders() {}
@@ -446,7 +468,9 @@ export default class SweetGui extends HTMLElement {
   setSwitches() {
     this._root
       .getElementById("/Sweet/bypass")
-      .addEventListener("change", (e) => this._plug.audioNode.setParamValue("/Sweet/bypass", 1 - e.target.value));
+      .addEventListener("change", (e) =>
+        this._plug.audioNode.setParamValue("/Sweet/bypass", 1 - e.target.value),
+      );
   }
 
   setInactive() {
@@ -460,7 +484,6 @@ export default class SweetGui extends HTMLElement {
 }
 try {
   customElements.define("wap-sweet", SweetGui);
-  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

@@ -36,8 +36,12 @@ export default class PedalBoardNode extends WamNode {
    */
   async _initialize() {
     await super._initialize();
-    const { default: initializeWamHost } = await import("../../plugins/utils/sdk/src/initializeWamHost.js");
-    let [subGroupId, subGroupKey] = await initializeWamHost(this.module.audioContext);
+    const { default: initializeWamHost } = await import(
+      "../../plugins/utils/sdk/src/initializeWamHost.js"
+    );
+    let [subGroupId, subGroupKey] = await initializeWamHost(
+      this.module.audioContext,
+    );
     this.subGroupId = subGroupId;
 
     this.port.postMessage({
@@ -179,7 +183,9 @@ export default class PedalBoardNode extends WamNode {
   async getState() {
     let gui = this.module.gui;
     let ids = Array.from(gui.board.childNodes).map((el) => el.id);
-    let states = await Promise.all(ids.map((id) => this.nodes[id].node.getState()));
+    let states = await Promise.all(
+      ids.map((id) => this.nodes[id].node.getState()),
+    );
 
     let current = states.map((el, index) => ({
       name: this.nodes[ids[index]].name,
@@ -224,18 +230,24 @@ export default class PedalBoardNode extends WamNode {
       request: "set/nodes",
       content: {
         nodes: nodes.map(([key, value]) => {
-          return { name: value.name, nodeId: value.node.instanceId, customId: key };
+          return {
+            name: value.name,
+            nodeId: value.node.instanceId,
+            customId: key,
+          };
         }),
       },
     });
     this.dispatchEvent(
       new CustomEvent("wam-info", {
         detail: { data: this },
-      })
+      }),
     );
 
     if (this.module?.gui) {
-      this.module.gui.setPreviewFullness(nodes.length >= this.MAX_NODES || this.module.gui.loadingPreset);
+      this.module.gui.setPreviewFullness(
+        nodes.length >= this.MAX_NODES || this.module.gui.loadingPreset,
+      );
     }
   }
 }

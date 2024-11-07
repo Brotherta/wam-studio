@@ -372,7 +372,9 @@ webaudio-knob{
 
   fixRelativeImagePathsInCSS() {
     // change webaudiocontrols relative paths for spritesheets to absolute
-    let webaudioControls = this._root.querySelectorAll("webaudio-knob, webaudio-slider, webaudio-switch, img");
+    let webaudioControls = this._root.querySelectorAll(
+      "webaudio-knob, webaudio-slider, webaudio-switch, img",
+    );
     webaudioControls.forEach((e) => {
       let currentImagePath = e.getAttribute("src");
       if (currentImagePath !== undefined) {
@@ -397,12 +399,16 @@ webaudio-knob{
     let usedFonts = "";
     let fonts = this._root.querySelectorAll("label[font]");
     fonts.forEach((e) => {
-      if (!usedFonts.includes(e.getAttribute("font"))) usedFonts += "family=" + e.getAttribute("font") + "&";
+      if (!usedFonts.includes(e.getAttribute("font")))
+        usedFonts += "family=" + e.getAttribute("font") + "&";
     });
     let link = document.createElement("link");
     link.rel = "stylesheet";
     if (usedFonts.slice(0, -1))
-      link.href = "https://fonts.googleapis.com/css2?" + usedFonts.slice(0, -1) + "&display=swap";
+      link.href =
+        "https://fonts.googleapis.com/css2?" +
+        usedFonts.slice(0, -1) +
+        "&display=swap";
     document.querySelector("head").appendChild(link);
 
     // BMT Adapt for background-image
@@ -412,7 +418,9 @@ webaudio-knob{
         let currentImagePath = e.style.backgroundImage.slice(4, -1);
         if (currentImagePath !== undefined) {
           let imagePath = e.style.backgroundImage.slice(5, -2);
-          if (imagePath != "") e.style.backgroundImage = "url(" + this.basePath + "/" + imagePath + ")";
+          if (imagePath != "")
+            e.style.backgroundImage =
+              "url(" + this.basePath + "/" + imagePath + ")";
         }
       }
     });
@@ -421,7 +429,8 @@ webaudio-knob{
   setImageBackground() {
     // check if the shadowroot host has a background image
     let mainDiv = this._root.querySelector("#main");
-    mainDiv.style.backgroundImage = "url(" + this.basePath + "/" + imageRelativeURI + ")";
+    mainDiv.style.backgroundImage =
+      "url(" + this.basePath + "/" + imageRelativeURI + ")";
 
     //console.log("background =" + mainDiv.style.backgroundImage);
     //this._root.style.backgroundImage = "toto.png";
@@ -449,7 +458,8 @@ webaudio-knob{
     }
   }
   handleAnimationFrame = () => {
-    this._root.getElementById("/untitled/Color").value = this._plug.audioNode.getParamValue("/untitled/Color");
+    this._root.getElementById("/untitled/Color").value =
+      this._plug.audioNode.getParamValue("/untitled/Color");
 
     this._root.getElementById("/untitled/LFO frequency").value =
       this._plug.audioNode.getParamValue("/untitled/LFO frequency");
@@ -463,7 +473,8 @@ webaudio-knob{
     this._root.getElementById("/untitled/Dry/wet mix").value =
       this._plug.audioNode.getParamValue("/untitled/Dry/wet mix");
 
-    this._root.getElementById("/untitled/Bypass").value = 1 - this._plug.audioNode.getParamValue("/untitled/Bypass");
+    this._root.getElementById("/untitled/Bypass").value =
+      1 - this._plug.audioNode.getParamValue("/untitled/Bypass");
 
     window.requestAnimationFrame(this.handleAnimationFrame);
   };
@@ -489,21 +500,41 @@ webaudio-knob{
   setKnobs() {
     this._root
       .getElementById("/untitled/Color")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/untitled/Color", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/untitled/Color", e.target.value),
+      );
     this._root
       .getElementById("/untitled/LFO frequency")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/untitled/LFO frequency", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/untitled/LFO frequency",
+          e.target.value,
+        ),
+      );
     this._root
       .getElementById("/untitled/Feedback depth")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/untitled/Feedback depth", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/untitled/Feedback depth",
+          e.target.value,
+        ),
+      );
     this._root
       .getElementById("/untitled/Feedback bass cut")
       .addEventListener("input", (e) =>
-        this._plug.audioNode.setParamValue("/untitled/Feedback bass cut", e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/untitled/Feedback bass cut",
+          e.target.value,
+        ),
       );
     this._root
       .getElementById("/untitled/Dry/wet mix")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/untitled/Dry/wet mix", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/untitled/Dry/wet mix",
+          e.target.value,
+        ),
+      );
   }
 
   setSliders() {}
@@ -511,7 +542,12 @@ webaudio-knob{
   setSwitches() {
     this._root
       .getElementById("/untitled/Bypass")
-      .addEventListener("change", (e) => this._plug.audioNode.setParamValue("/untitled/Bypass", 1 - e.target.value));
+      .addEventListener("change", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/untitled/Bypass",
+          1 - e.target.value,
+        ),
+      );
   }
 
   setInactive() {
@@ -525,7 +561,6 @@ webaudio-knob{
 }
 try {
   customElements.define("wap-stonephaser", untitledGui);
-  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

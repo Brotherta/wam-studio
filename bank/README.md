@@ -1,7 +1,7 @@
 <h1>Better styling tool for faust generated plugins</h1>
 
 ```js
-window.instance.gui.__proto__.cleanup = function(ignore){
+window.instance.gui.__proto__.cleanup = function (ignore) {
   var grid = document.createElement("div");
   grid.id = "grid";
   grid.style.display = "grid";
@@ -42,13 +42,13 @@ window.instance.gui.__proto__.cleanup = function(ignore){
 
   console.log(this.cleanUpChilds);
 };
-window.instance.gui.__proto__.reOrder = function(order){
+window.instance.gui.__proto__.reOrder = function (order) {
   this._root.querySelector(".my-pedal").innerHTML = "";
   order.forEach((i) => {
     this._root.querySelector(".my-pedal").appendChild(this.cleanUpChilds[i]);
   });
 };
-window.instance.gui.__proto__.reOrderGrid = function(order){
+window.instance.gui.__proto__.reOrderGrid = function (order) {
   var childs = [];
   var grid = this._root.getElementById("grid");
   grid.childNodes.forEach((el) => {
@@ -60,8 +60,11 @@ window.instance.gui.__proto__.reOrderGrid = function(order){
     grid.appendChild(childs[i]);
   });
 };
-window.instance.gui.__proto__.toHTML = function(){
-  var html = this._root.innerHTML.split("<!-- Code injected by live-server -->")[0].split(this.basePath).join("");
+window.instance.gui.__proto__.toHTML = function () {
+  var html = this._root.innerHTML
+    .split("<!-- Code injected by live-server -->")[0]
+    .split(this.basePath)
+    .join("");
   console.log(html);
 };
 ```

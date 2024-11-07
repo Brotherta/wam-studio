@@ -19,7 +19,10 @@ import { createElement } from "./Gui/index.js";
  * @returns {string}
  */
 const getBasetUrl = (relativeURL) => {
-  const baseURL = relativeURL.href.substring(0, relativeURL.href.lastIndexOf("/"));
+  const baseURL = relativeURL.href.substring(
+    0,
+    relativeURL.href.lastIndexOf("/"),
+  );
   return baseURL;
 };
 

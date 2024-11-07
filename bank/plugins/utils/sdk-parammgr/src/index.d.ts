@@ -4,4 +4,4 @@ export { default as CompositeAudioNode } from "./CompositeAudioNode";
 export { default as ParamMgrFactory } from "./ParamMgrFactory";
 // export { default as ParamMgrNode } from "./ParamMgrNode";
 export * from "./types";
-export * from "./TypedAudioWorklet"
+export * from "./TypedAudioWorklet";

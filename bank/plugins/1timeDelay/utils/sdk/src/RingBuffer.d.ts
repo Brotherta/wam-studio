@@ -1,4 +1,4 @@
-import { RingBuffer } from './types';
+import { RingBuffer } from "./types";
 
 declare const getRingBuffer: (moduleId?: string) => typeof RingBuffer;
 

@@ -5,7 +5,10 @@ import "https://preview.babylonjs.com/babylon.js";
  * @returns {string}
  */
 const getBasetUrl = (relativeURL) => {
-  const baseURL = relativeURL.href.substring(0, relativeURL.href.lastIndexOf("/"));
+  const baseURL = relativeURL.href.substring(
+    0,
+    relativeURL.href.lastIndexOf("/"),
+  );
   return baseURL;
 };
 export default class Visualizer {
@@ -61,7 +64,7 @@ export default class Visualizer {
       undefined,
       undefined,
       undefined,
-      true
+      true,
     );
     texture.hasAlpha = true;
 
@@ -86,12 +89,24 @@ export default class Visualizer {
         gl_FragColor = texture2D(textureSampler, xy) * col;
     }`;
 
-    var postProcess = new BABYLON.PostProcess("Wave", "custom", ["screenSize"], null, 0.25, this.camera);
+    var postProcess = new BABYLON.PostProcess(
+      "Wave",
+      "custom",
+      ["screenSize"],
+      null,
+      0.25,
+      this.camera,
+    );
     postProcess.onApply = () => {
       let effect = postProcess._drawWrapper.effect;
       let { width, height } = this.canvas.getBoundingClientRect();
-      let parentScaling = this.canvas.getBoundingClientRect().width / this.canvas.offsetWidth;
-      effect.setFloat2("screenSize", width / parentScaling, height / parentScaling);
+      let parentScaling =
+        this.canvas.getBoundingClientRect().width / this.canvas.offsetWidth;
+      effect.setFloat2(
+        "screenSize",
+        width / parentScaling,
+        height / parentScaling,
+      );
       effect.setTexture("textureSampler", texture);
     };
 
@@ -119,7 +134,11 @@ export default class Visualizer {
     this.scene = new BABYLON.Scene(this.engine);
     this.scene.clearColor = new BABYLON.Color3.Black();
 
-    var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), this.scene);
+    var light = new BABYLON.HemisphericLight(
+      "light",
+      new BABYLON.Vector3(0, 1, 0),
+      this.scene,
+    );
     light.intensity = 0.7;
 
     this.camera = new BABYLON.ArcRotateCamera(
@@ -128,7 +147,7 @@ export default class Visualizer {
       Math.PI / 2,
       5,
       BABYLON.Vector3.Zero(),
-      this.scene
+      this.scene,
     );
   }
 }

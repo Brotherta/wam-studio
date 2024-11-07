@@ -275,7 +275,9 @@ export default class TS9_OverdriveFaustGeneratedGui extends HTMLElement {
 
   fixRelativeImagePathsInCSS() {
     // change webaudiocontrols relative paths for spritesheets to absolute
-    let webaudioControls = this._root.querySelectorAll("webaudio-knob, webaudio-slider, webaudio-switch, img");
+    let webaudioControls = this._root.querySelectorAll(
+      "webaudio-knob, webaudio-slider, webaudio-switch, img",
+    );
     webaudioControls.forEach((e) => {
       let currentImagePath = e.getAttribute("src");
       if (currentImagePath !== undefined) {
@@ -301,7 +303,8 @@ export default class TS9_OverdriveFaustGeneratedGui extends HTMLElement {
   setImageBackground() {
     // check if the shadowroot host has a background image
     let mainDiv = this._root.querySelector("#main");
-    mainDiv.style.backgroundImage = "url(" + this.basePath + "/" + imageRelativeURI + ")";
+    mainDiv.style.backgroundImage =
+      "url(" + this.basePath + "/" + imageRelativeURI + ")";
 
     //console.log("background =" + mainDiv.style.backgroundImage);
     //this._root.style.backgroundImage = "toto.png";
@@ -329,17 +332,27 @@ export default class TS9_OverdriveFaustGeneratedGui extends HTMLElement {
     }
   }
   handleAnimationFrame = () => {
-    this._root.getElementById("/TS9_OverdriveFaustGenerated/TubeScreamer/drive").value =
-      this._plug.audioNode.getParamValue("/TS9_OverdriveFaustGenerated/TubeScreamer/drive");
+    this._root.getElementById(
+      "/TS9_OverdriveFaustGenerated/TubeScreamer/drive",
+    ).value = this._plug.audioNode.getParamValue(
+      "/TS9_OverdriveFaustGenerated/TubeScreamer/drive",
+    );
 
-    this._root.getElementById("/TS9_OverdriveFaustGenerated/TubeScreamer/level").value =
-      this._plug.audioNode.getParamValue("/TS9_OverdriveFaustGenerated/TubeScreamer/level");
+    this._root.getElementById(
+      "/TS9_OverdriveFaustGenerated/TubeScreamer/level",
+    ).value = this._plug.audioNode.getParamValue(
+      "/TS9_OverdriveFaustGenerated/TubeScreamer/level",
+    );
 
-    this._root.getElementById("/TS9_OverdriveFaustGenerated/TubeScreamer/tone").value =
-      this._plug.audioNode.getParamValue("/TS9_OverdriveFaustGenerated/TubeScreamer/tone");
+    this._root.getElementById(
+      "/TS9_OverdriveFaustGenerated/TubeScreamer/tone",
+    ).value = this._plug.audioNode.getParamValue(
+      "/TS9_OverdriveFaustGenerated/TubeScreamer/tone",
+    );
 
     this._root.getElementById("/TS9_OverdriveFaustGenerated/bypass").value =
-      1 - this._plug.audioNode.getParamValue("/TS9_OverdriveFaustGenerated/bypass");
+      1 -
+      this._plug.audioNode.getParamValue("/TS9_OverdriveFaustGenerated/bypass");
 
     window.requestAnimationFrame(this.handleAnimationFrame);
   };
@@ -366,17 +379,26 @@ export default class TS9_OverdriveFaustGeneratedGui extends HTMLElement {
     this._root
       .getElementById("/TS9_OverdriveFaustGenerated/TubeScreamer/drive")
       .addEventListener("input", (e) =>
-        this._plug.audioNode.setParamValue("/TS9_OverdriveFaustGenerated/TubeScreamer/drive", e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/TS9_OverdriveFaustGenerated/TubeScreamer/drive",
+          e.target.value,
+        ),
       );
     this._root
       .getElementById("/TS9_OverdriveFaustGenerated/TubeScreamer/level")
       .addEventListener("input", (e) =>
-        this._plug.audioNode.setParamValue("/TS9_OverdriveFaustGenerated/TubeScreamer/level", e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/TS9_OverdriveFaustGenerated/TubeScreamer/level",
+          e.target.value,
+        ),
       );
     this._root
       .getElementById("/TS9_OverdriveFaustGenerated/TubeScreamer/tone")
       .addEventListener("input", (e) =>
-        this._plug.audioNode.setParamValue("/TS9_OverdriveFaustGenerated/TubeScreamer/tone", e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/TS9_OverdriveFaustGenerated/TubeScreamer/tone",
+          e.target.value,
+        ),
       );
   }
 
@@ -386,7 +408,10 @@ export default class TS9_OverdriveFaustGeneratedGui extends HTMLElement {
     this._root
       .getElementById("/TS9_OverdriveFaustGenerated/bypass")
       .addEventListener("change", (e) =>
-        this._plug.audioNode.setParamValue("/TS9_OverdriveFaustGenerated/bypass", 1 - e.target.value)
+        this._plug.audioNode.setParamValue(
+          "/TS9_OverdriveFaustGenerated/bypass",
+          1 - e.target.value,
+        ),
       );
   }
 
@@ -400,7 +425,10 @@ export default class TS9_OverdriveFaustGeneratedGui extends HTMLElement {
   }
 }
 try {
-  customElements.define("wap-ts9_overdrivefaustgenerated", TS9_OverdriveFaustGeneratedGui);
+  customElements.define(
+    "wap-ts9_overdrivefaustgenerated",
+    TS9_OverdriveFaustGeneratedGui,
+  );
   // ;
 } catch (error) {
   // console.log(error);

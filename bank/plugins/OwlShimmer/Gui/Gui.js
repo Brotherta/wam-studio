@@ -317,7 +317,9 @@ webaudio-switch{
 
   fixRelativeImagePathsInCSS() {
     // change webaudiocontrols relative paths for spritesheets to absolute
-    let webaudioControls = this._root.querySelectorAll("webaudio-knob, webaudio-slider, webaudio-switch, img");
+    let webaudioControls = this._root.querySelectorAll(
+      "webaudio-knob, webaudio-slider, webaudio-switch, img",
+    );
     webaudioControls.forEach((e) => {
       let currentImagePath = e.getAttribute("src");
       if (currentImagePath !== undefined) {
@@ -342,12 +344,16 @@ webaudio-switch{
     let usedFonts = "";
     let fonts = this._root.querySelectorAll("label[font]");
     fonts.forEach((e) => {
-      if (!usedFonts.includes(e.getAttribute("font"))) usedFonts += "family=" + e.getAttribute("font") + "&";
+      if (!usedFonts.includes(e.getAttribute("font")))
+        usedFonts += "family=" + e.getAttribute("font") + "&";
     });
     let link = document.createElement("link");
     link.rel = "stylesheet";
     if (usedFonts.slice(0, -1))
-      link.href = "https://fonts.googleapis.com/css2?" + usedFonts.slice(0, -1) + "&display=swap";
+      link.href =
+        "https://fonts.googleapis.com/css2?" +
+        usedFonts.slice(0, -1) +
+        "&display=swap";
     document.querySelector("head").appendChild(link);
 
     // BMT Adapt for background-image
@@ -357,7 +363,9 @@ webaudio-switch{
         let currentImagePath = e.style.backgroundImage.slice(4, -1);
         if (currentImagePath !== undefined) {
           let imagePath = e.style.backgroundImage.slice(5, -2);
-          if (imagePath != "") e.style.backgroundImage = "url(" + this.basePath + "/" + imagePath + ")";
+          if (imagePath != "")
+            e.style.backgroundImage =
+              "url(" + this.basePath + "/" + imagePath + ")";
         }
       }
     });
@@ -366,7 +374,8 @@ webaudio-switch{
   setImageBackground() {
     // check if the shadowroot host has a background image
     let mainDiv = this._root.querySelector("#main");
-    mainDiv.style.backgroundImage = "url(" + this.basePath + "/" + imageRelativeURI + ")";
+    mainDiv.style.backgroundImage =
+      "url(" + this.basePath + "/" + imageRelativeURI + ")";
 
     //console.log("background =" + mainDiv.style.backgroundImage);
     //this._root.style.backgroundImage = "toto.png";
@@ -394,15 +403,20 @@ webaudio-switch{
     }
   }
   handleAnimationFrame = () => {
-    this._root.getElementById("/untitled/DECAY").value = this._plug.audioNode.getParamValue("/untitled/DECAY");
+    this._root.getElementById("/untitled/DECAY").value =
+      this._plug.audioNode.getParamValue("/untitled/DECAY");
 
-    this._root.getElementById("/untitled/MIX").value = this._plug.audioNode.getParamValue("/untitled/MIX");
+    this._root.getElementById("/untitled/MIX").value =
+      this._plug.audioNode.getParamValue("/untitled/MIX");
 
-    this._root.getElementById("/untitled/SHIMMER").value = this._plug.audioNode.getParamValue("/untitled/SHIMMER");
+    this._root.getElementById("/untitled/SHIMMER").value =
+      this._plug.audioNode.getParamValue("/untitled/SHIMMER");
 
-    this._root.getElementById("/untitled/TONE").value = this._plug.audioNode.getParamValue("/untitled/TONE");
+    this._root.getElementById("/untitled/TONE").value =
+      this._plug.audioNode.getParamValue("/untitled/TONE");
 
-    this._root.getElementById("/untitled/bypass").value = 1 - this._plug.audioNode.getParamValue("/untitled/bypass");
+    this._root.getElementById("/untitled/bypass").value =
+      1 - this._plug.audioNode.getParamValue("/untitled/bypass");
 
     window.requestAnimationFrame(this.handleAnimationFrame);
   };
@@ -428,16 +442,24 @@ webaudio-switch{
   setKnobs() {
     this._root
       .getElementById("/untitled/DECAY")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/untitled/DECAY", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/untitled/DECAY", e.target.value),
+      );
     this._root
       .getElementById("/untitled/MIX")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/untitled/MIX", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/untitled/MIX", e.target.value),
+      );
     this._root
       .getElementById("/untitled/SHIMMER")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/untitled/SHIMMER", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/untitled/SHIMMER", e.target.value),
+      );
     this._root
       .getElementById("/untitled/TONE")
-      .addEventListener("input", (e) => this._plug.audioNode.setParamValue("/untitled/TONE", e.target.value));
+      .addEventListener("input", (e) =>
+        this._plug.audioNode.setParamValue("/untitled/TONE", e.target.value),
+      );
   }
 
   setSliders() {}
@@ -445,7 +467,12 @@ webaudio-switch{
   setSwitches() {
     this._root
       .getElementById("/untitled/bypass")
-      .addEventListener("change", (e) => this._plug.audioNode.setParamValue("/untitled/bypass", 1 - e.target.value));
+      .addEventListener("change", (e) =>
+        this._plug.audioNode.setParamValue(
+          "/untitled/bypass",
+          1 - e.target.value,
+        ),
+      );
   }
 
   setInactive() {
@@ -459,7 +486,6 @@ webaudio-switch{
 }
 try {
   customElements.define("wap-owlshimmer", OwlShimmer);
-  ;
 } catch (error) {
   console.log(error);
   console.log("Element already defined");

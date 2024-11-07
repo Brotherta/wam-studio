@@ -1,11 +1,11 @@
 {
-    "name": "Sweet Wah",
-    "vendor": "Faust IDE",
-    "description": "A WAM written in Faust with a generated GUI",
-    "version": "1.0.0",
-    "apiVersion": "1.0.0",
-    "thumbnail": "screenshot.png",
-    "keywords": ["faust"],
-    "isInstrument": false,
-    "website": ""
+  "name": "Sweet Wah",
+  "vendor": "Faust IDE",
+  "description": "A WAM written in Faust with a generated GUI",
+  "version": "1.0.0",
+  "apiVersion": "1.0.0",
+  "thumbnail": "screenshot.png",
+  "keywords": ["faust"],
+  "isInstrument": false,
+  "website": ""
 }

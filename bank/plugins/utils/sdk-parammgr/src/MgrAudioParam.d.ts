@@ -1,3 +1,3 @@
-import { MgrAudioParam } from './types';
+import { MgrAudioParam } from "./types";
 
 export default MgrAudioParam;

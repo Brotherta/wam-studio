@@ -1,3 +1,3 @@
-import { ParamMgrFactory } from './types';
+import { ParamMgrFactory } from "./types";
 
 export default ParamMgrFactory;

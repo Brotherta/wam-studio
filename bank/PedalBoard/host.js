@@ -10,14 +10,13 @@ let currentProtocol = window.location.protocol; // http: or https:
 const currentDomain = window.location.hostname;
 const bankUrl = `${currentProtocol}//${currentDomain}:${window.location.port}`;
 
-
 inCache.setAttribute("data", localStorage.getItem("instanceState") != null);
 
 // Safari...
 const AudioContext =
-    window.AudioContext || // Default
-    window.webkitAudioContext || // Safari and old versions of Chrome
-    false;
+  window.AudioContext || // Default
+  window.webkitAudioContext || // Safari and old versions of Chrome
+  false;
 
 const audioContext = new AudioContext();
 const mediaElementSource = audioContext.createMediaElementSource(player);
@@ -36,7 +35,9 @@ const mountPlugin = (domNode) => {
 
 (async () => {
   // Init WamEnv
-  const { default: initializeWamHost } = await import(bankUrl + "/plugins/utils/sdk/src/initializeWamHost.js");
+  const { default: initializeWamHost } = await import(
+    bankUrl + "/plugins/utils/sdk/src/initializeWamHost.js"
+  );
   const [hostGroupId] = await initializeWamHost(audioContext);
 
   // Import WAM
@@ -80,8 +81,8 @@ const mountPlugin = (domNode) => {
   });
 
   document.querySelector("#toggleGuitarIn").onclick = (event) => {
-    toggleGuitarInput(event)
-  }
+    toggleGuitarInput(event);
+  };
 
   // live input
   var guitarPluggedIn = false;
@@ -93,9 +94,9 @@ const mountPlugin = (domNode) => {
       mozNoiseSuppression: false,
       mozAutoGainControl: false,
       //deviceId: id ? {exact: id} : undefined
-    }
+    },
   };
-  // User input part 
+  // User input part
   navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
     window.stream = stream;
     userMedia = audioContext.createMediaStreamSource(stream);
@@ -103,19 +104,19 @@ const mountPlugin = (domNode) => {
 
   function toggleGuitarInput(event) {
     audioContext.resume().then(() => {
-      console.log('Playback resumed successfully');
+      console.log("Playback resumed successfully");
     });
     var button = document.querySelector("#toggleGuitarIn");
 
     if (!guitarPluggedIn) {
       userMedia.connect(instance.audioNode);
-      button.innerHTML = "Guitar input: <span style='color:green;'>ACTIVATED</span>, click to toggle on/off!";
+      button.innerHTML =
+        "Guitar input: <span style='color:green;'>ACTIVATED</span>, click to toggle on/off!";
     } else {
       userMedia.disconnect(instance.audioNode);
-      button.innerHTML = "Guitar input: <span style='color:red;'>NOT ACTIVATED</span>, click to toggle on/off!";
+      button.innerHTML =
+        "Guitar input: <span style='color:red;'>NOT ACTIVATED</span>, click to toggle on/off!";
     }
     guitarPluggedIn = !guitarPluggedIn;
   }
 })();
-
- 

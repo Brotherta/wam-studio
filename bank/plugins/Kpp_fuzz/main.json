@@ -1,7 +1,7 @@
 {
-"name": "Kpp_fuzz",
-"vendor": "Faust",
-"version": "1.01",
-"homepage": "https://faust.grame.fr",
-"thumbnail": "default.png"
+  "name": "Kpp_fuzz",
+  "vendor": "Faust",
+  "version": "1.01",
+  "homepage": "https://faust.grame.fr",
+  "thumbnail": "default.png"
 }

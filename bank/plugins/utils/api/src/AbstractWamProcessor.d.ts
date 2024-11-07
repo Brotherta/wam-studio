@@ -1,4 +1,4 @@
-import { WamProcessor } from './types';
+import { WamProcessor } from "./types";
 
 declare const getWamProcessor: () => typeof WamProcessor;
 

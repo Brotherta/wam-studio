@@ -206,7 +206,9 @@ export default class GraphicEQHTMLElement extends HTMLElement {
    */
   setResources() {
     // Setting up the switches imgs, those are loaded from the assets
-    this.root.querySelector("webaudio-switch").setAttribute("src", getAssetUrl(switchImg));
+    this.root
+      .querySelector("webaudio-switch")
+      .setAttribute("src", getAssetUrl(switchImg));
   }
 
   setKnobs() {}
@@ -217,9 +219,11 @@ export default class GraphicEQHTMLElement extends HTMLElement {
     // by default, plugin is disabled
     plugin.audioNode.setParamsValues({ enabled: 1 });
 
-    this.shadowRoot.querySelector("#switch1").addEventListener("change", function onChange() {
-      plugin.audioNode.setParamsValues({ enabled: +!!this.checked });
-    });
+    this.shadowRoot
+      .querySelector("#switch1")
+      .addEventListener("change", function onChange() {
+        plugin.audioNode.setParamsValues({ enabled: +!!this.checked });
+      });
   }
   setCanvas() {
     // canvas
@@ -487,7 +491,11 @@ export default class GraphicEQHTMLElement extends HTMLElement {
 
     // Draw decibel scale.
     let dbIncrement = (this.dbScale * 10) / 60;
-    for (let db = -this.dbScale; db + dbIncrement < this.dbScale; db += dbIncrement) {
+    for (
+      let db = -this.dbScale;
+      db + dbIncrement < this.dbScale;
+      db += dbIncrement
+    ) {
       let y = this.dbToY(db);
       ctx.fillStyle = this.textColor;
       ctx.fillText(db.toFixed(0) + "dB", this.width - this.width / 25, y - 2);
@@ -552,15 +560,24 @@ export default class GraphicEQHTMLElement extends HTMLElement {
       case "none":
         // color each control point in red
         this.plugin.audioNode.filters.forEach((f) => {
-          this.drawControlPointAsColoredCircle(f.controlPoint.x, f.controlPoint.y, f.color);
+          this.drawControlPointAsColoredCircle(
+            f.controlPoint.x,
+            f.controlPoint.y,
+            f.color,
+          );
         });
 
         // if mouse close to a control point color it in green
-        if ((this.selectedFilter = this.findClosestFilterControlPoint(this.mousePos.x, this.mousePos.y))) {
+        if (
+          (this.selectedFilter = this.findClosestFilterControlPoint(
+            this.mousePos.x,
+            this.mousePos.y,
+          ))
+        ) {
           this.drawControlPointAsColoredCircle(
             this.selectedFilter.controlPoint.x,
             this.selectedFilter.controlPoint.y,
-            "red"
+            "red",
           );
         }
         break;
@@ -572,7 +589,7 @@ export default class GraphicEQHTMLElement extends HTMLElement {
           this.mousePos.x / scale,
           this.mousePos.y / scale,
           this.shiftPressed,
-          this.dy
+          this.dy,
         );
         break;
     }
@@ -605,13 +622,17 @@ export default class GraphicEQHTMLElement extends HTMLElement {
     this.ctx2.clearRect(0, 0, this.canvas2.width, this.canvas2.height);
 
     // Get analyser data
-    this.plugin.audioNode.analyser.getFloatFrequencyData(this.plugin.audioNode.dataArray);
+    this.plugin.audioNode.analyser.getFloatFrequencyData(
+      this.plugin.audioNode.dataArray,
+    );
 
     var barWidth = [];
     var barHeight;
     var x = 0;
 
-    var analyserRange = this.plugin.audioNode.analyser.maxDecibels - this.plugin.audioNode.analyser.minDecibels;
+    var analyserRange =
+      this.plugin.audioNode.analyser.maxDecibels -
+      this.plugin.audioNode.analyser.minDecibels;
     // ration between analyser range and our range
     var range = this.dbScale * 2;
     var dbRatio = range / analyserRange;
@@ -625,9 +646,15 @@ export default class GraphicEQHTMLElement extends HTMLElement {
       //this.ctx2.fillStyle = 'rgb(' + (barHeight+100) + ',0,0)';
       this.ctx2.fillStyle = "red";
       barWidth[i] =
-        ((Math.log(i + 2) - Math.log(i + 1)) * this.canvas2.width) / Math.log(this.plugin.audioNode.bufferLength - 80);
+        ((Math.log(i + 2) - Math.log(i + 1)) * this.canvas2.width) /
+        Math.log(this.plugin.audioNode.bufferLength - 80);
 
-      this.ctx2.fillRect(x, this.canvas2.height - barHeight, barWidth[i], barHeight);
+      this.ctx2.fillRect(
+        x,
+        this.canvas2.height - barHeight,
+        barWidth[i],
+        barHeight,
+      );
       // 2 is the number of pixels between bars
       x += barWidth[i] + 1;
     }
@@ -711,7 +738,8 @@ export default class GraphicEQHTMLElement extends HTMLElement {
 
     let ctx = this.ctx;
     ctx.save();
-    if (this.mousePos.x < this.canvas.width - tooltipWidth) ctx.translate(this.mousePos.x, this.mousePos.y);
+    if (this.mousePos.x < this.canvas.width - tooltipWidth)
+      ctx.translate(this.mousePos.x, this.mousePos.y);
     else ctx.translate(this.mousePos.x - tooltipWidth, this.mousePos.y);
 
     ctx.fillStyle = "rgba(200, 200, 200, 0.3)";
@@ -728,15 +756,24 @@ export default class GraphicEQHTMLElement extends HTMLElement {
     ctx.fillText(this.selectedFilter.type, 15, xText);
     xText += 13;
 
-    ctx.fillText(this.selectedFilter.frequency.value.toFixed(0) + "Hz", 15, xText);
+    ctx.fillText(
+      this.selectedFilter.frequency.value.toFixed(0) + "Hz",
+      15,
+      xText,
+    );
     xText += 13;
 
     if (displayGain) {
-      ctx.fillText(this.selectedFilter.gain.value.toFixed(0) + "dB/Oct", 15, 38);
+      ctx.fillText(
+        this.selectedFilter.gain.value.toFixed(0) + "dB/Oct",
+        15,
+        38,
+      );
       xText += 13;
     }
 
-    if (displayQ) ctx.fillText(this.selectedFilter.Q.value.toFixed(3), 15, xText);
+    if (displayQ)
+      ctx.fillText(this.selectedFilter.Q.value.toFixed(3), 15, xText);
 
     ctx.restore();
   }
@@ -762,30 +799,48 @@ export default class GraphicEQHTMLElement extends HTMLElement {
         break;
       case "lowshelf":
       case "highshelf":
-        this.plugin.audioNode.setParamValue(`${filter.type}_${index}_gain`, 2 * db);
+        this.plugin.audioNode.setParamValue(
+          `${filter.type}_${index}_gain`,
+          2 * db,
+        );
         // filter.gain.value = 2 * db;
         this.draw();
         break;
       case "peaking":
-        if (!shiftPressed) this.plugin.audioNode.setParamValue(`${filter.type}_${index}_gain`, db);
+        if (!shiftPressed)
+          this.plugin.audioNode.setParamValue(
+            `${filter.type}_${index}_gain`,
+            db,
+          );
         // filter.gain.value = db;
         else {
-          this.plugin.audioNode.setParamValue(`${filter.type}_${index}_Q`, this.dyToQ(dy));
+          this.plugin.audioNode.setParamValue(
+            `${filter.type}_${index}_Q`,
+            this.dyToQ(dy),
+          );
           // filter.Q.value = this.dyToQ(dy);
         }
         this.draw();
         break;
       case "notch":
-        if (!shiftPressed) this.plugin.audioNode.setParamValue(`${filter.type}_${index}_gain`, db);
+        if (!shiftPressed)
+          this.plugin.audioNode.setParamValue(
+            `${filter.type}_${index}_gain`,
+            db,
+          );
         // filter.gain.value = db;
         else {
-          this.plugin.audioNode.setParamValue(`${filter.type}_${index}_Q`, this.dyToQ(dy));
+          this.plugin.audioNode.setParamValue(
+            `${filter.type}_${index}_Q`,
+            this.dyToQ(dy),
+          );
           // filter.Q.value = this.dyToQ(dy);
         }
         this.draw();
         break;
       case "bandpass":
-        if (db >= 0.16) this.plugin.audioNode.setParamValue(`${filter.type}_${index}_Q`, db);
+        if (db >= 0.16)
+          this.plugin.audioNode.setParamValue(`${filter.type}_${index}_Q`, db);
         // filter.Q.value = db;
         this.draw();
         break;

@@ -1,3 +1,3 @@
-import { ParamMgrNode } from './types';
+import { ParamMgrNode } from "./types";
 
 export default ParamMgrNode;

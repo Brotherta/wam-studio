@@ -1,5 +1,7 @@
-import { WamArrayRingBuffer } from './types';
+import { WamArrayRingBuffer } from "./types";
 
-declare const getWamArrayRingBuffer: (moduleId?: string) => typeof WamArrayRingBuffer;
+declare const getWamArrayRingBuffer: (
+  moduleId?: string,
+) => typeof WamArrayRingBuffer;
 
 export default getWamArrayRingBuffer;

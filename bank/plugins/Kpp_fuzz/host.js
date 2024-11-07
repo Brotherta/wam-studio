@@ -24,7 +24,9 @@ const mountPlugin = (domNode) => {
 
 (async () => {
   // Init WamEnv
-  const { default: initializeWamHost } = await import("../utils/sdk/src/initializeWamHost.js");
+  const { default: initializeWamHost } = await import(
+    "../utils/sdk/src/initializeWamHost.js"
+  );
   const [hostGroupId] = await initializeWamHost(audioContext);
 
   // Import WAM
