@@ -8,6 +8,11 @@ import { createElement } from "./Gui/index.js";
  */
 const getBasetUrl = (relativeURL) => {
   const baseURL = relativeURL.href.substring(0, relativeURL.href.lastIndexOf("/"));
+  // if not localhost, force https
+  if (!baseURL.includes('localhost')) {
+    const secureURL = baseURL.replace(/^http:/, 'https:');
+    return secureURL;
+  }
   return baseURL;
 };
 
