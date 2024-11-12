@@ -97,7 +97,7 @@ export default class PedalBoardPlugin extends WebAudioModule {
     );
 
     let modules = await Promise.allSettled(
-      urls.map((el) => import(`${el}index.js`)),
+      urls.map((el) => import (`${el}index.js`)),
     );
 
     this.WAMS = {};

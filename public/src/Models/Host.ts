@@ -20,7 +20,6 @@ export default class Host extends Track {
     audioCtx: AudioContext;
     hostGroupId: string = "";
 
-    oldGlobalVolume: number;
     globalVolume: number;
     timer: number;
     playhead: number;
@@ -33,7 +32,6 @@ export default class Host extends Track {
         this.app = app;
         this.audioCtx = audioCtx;
         this.globalVolume = 1;
-        this.oldGlobalVolume = 0.0;
         this.timer = 0;
         this.playhead = 0;
 
@@ -86,22 +84,21 @@ export default class Host extends Track {
      * @param value the new global volume
      */
     override setVolume(value: number) {
-        this.globalVolume = value;
+        this.globalVolume = Math.pow(value, 1.5); // tzfeng: 11/11/24 or 2.0
         this.gainNode.gain.value = this.globalVolume;
     }
 
     /**
-     * Mute the host. It save the old global volume and set the global volume to 0.
+     * Mute the host.
      */
     muteHost() {
-        this.oldGlobalVolume = this.globalVolume;
-        this.setVolume(0);
+        this.gainNode.gain.value = 0;
     }
 
     /**
-     * Unmute the host. It set the global volume to the old global volume.
+     * Unmute the host. It set the global volume to the global volume.
      */
     unmuteHost() {
-        this.setVolume(this.oldGlobalVolume);
+        this.gainNode.gain.value = this.globalVolume;
     }
 }

@@ -19,7 +19,6 @@ export default class Track {
     pannerNode: StereoPannerNode;
 
     volume: number = 1;
-    oldVolume: number = 1;
 
     isMuted: boolean = false;
     isSolo: boolean = false;
@@ -75,7 +74,7 @@ export default class Track {
      * @param value
      */
     setVolume(value: number) {
-        this.volume = value;
+        this.volume = Math.pow(value, 1.5); // tzfeng 11/11/24 or 2.0
         this.gainNode.gain.value = this.volume;
     }
 
@@ -83,22 +82,21 @@ export default class Track {
      * Mute the track.
      */
     mute() {
-        this.oldVolume = this.volume;
-        this.setVolume(0);
+        this.gainNode.gain.value = 0;
     }
 
     /**
      * Unmute the track.
      */
     unmute() {
-        this.setVolume(this.oldVolume);
+        this.gainNode.gain.value = this.volume;
     }
 
     /**
      * Solo the track.
      */
     muteSolo() {
-        this.setVolume(0);
+        this.gainNode.gain.value = 0;
     }
 
     /**

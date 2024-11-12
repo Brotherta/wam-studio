@@ -124,8 +124,7 @@ export default class TracksController {
                 if (!track.isSolo) {
                     if (track.isMuted) {
                         track.muteSolo();
-                    }
-                    else {
+                    } else {
                         track.unmute();
                     }
                 }
