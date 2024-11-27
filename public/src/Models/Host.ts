@@ -26,6 +26,7 @@ export default class Host extends Track {
 
     hostNode: AudioPlayerNode | undefined;
     override gainNode: GainNode;
+    limiterNode: DynamicsCompressorNode;
 
     constructor(app: App) {
         super(-1, new TrackElement(), undefined);
@@ -39,7 +40,15 @@ export default class Host extends Track {
         
         this.gainNode = this.audioCtx.createGain()
         this.setVolume(1);
-        this.gainNode.connect(this.audioCtx.destination);
+        this.limiterNode = this.audioCtx.createDynamicsCompressor();
+        // master limiter parameters
+        this.limiterNode.threshold.value = -3;
+        this.limiterNode.knee.value = 0;
+        this.limiterNode.ratio.value = 20;
+        this.limiterNode.attack.value = 0.003;
+        this.limiterNode.release.value = 0.1;
+
+        this.gainNode.connect(this.limiterNode).connect(this.audioCtx.destination);
     }
 
     /**
@@ -75,7 +84,7 @@ export default class Host extends Track {
             }
 
         }
-        this.gainNode.connect(this.hostNode);
+        this.limiterNode.connect(this.hostNode);
     }
 
     /**

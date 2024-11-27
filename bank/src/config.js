@@ -17,6 +17,7 @@ const CORS_OPTIONS = {
       "https://wam-openstudio.vidalmazuy.fr",
       "https://attune.i3s.univ-cotedazur.fr", // <-- Add this line
       "https://attuneplayer.com",
+      "https://www.attuneplayer.com",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
