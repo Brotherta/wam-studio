@@ -79,7 +79,7 @@ with {
 
 // We have a resonant lowpass filter at the beginning of our signal chain
 // to control what part of the input signal becomes the modulating signal.
-filter = resonlp(pfilterfc, pfilterq, 1.0);
+filter = fi.resonlp(pfilterfc, pfilterq, 1.0);
 
 // Our main processing block.
 main = (+ : modfilter : fi.dcblocker) ~ *(pfeedback) : gain with {
@@ -92,6 +92,6 @@ main = (+ : modfilter : fi.dcblocker) ~ *(pfeedback) : gain with {
 
 // And the overall process declaration.
 
-output = _,_ : + : ba.bypass1(bypass, filter,main) <: _,_;
+output = _,_ : + : ba.bypass1(bypass, filter:main) <: _,_;
 
 process = output;
