@@ -270,10 +270,12 @@ export default class TracksController {
     connectPlugin(track: Track) {
         if (track.id === -1) {
             let host = track as Host;
-            host.gainNode.disconnect(audioCtx.destination);
+            // tzfeng 11/27/24
+            // Add plugin between gain and limiter, limiter => destination
+            host.gainNode.disconnect(host.limiterNode);
             host.gainNode
                 .connect(host.plugin.instance!._audioNode)
-                .connect(host.audioCtx.destination);
+                .connect(host.limiterNode);
         }
         else {
             track.node!.disconnect(track.pannerNode);
