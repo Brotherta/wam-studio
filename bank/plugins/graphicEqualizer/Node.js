@@ -16,6 +16,8 @@ export default class GraphicEQNode extends CompositeAudioNode {
    */
   filters = [];
 
+  isEnabled = false;
+
   /**
    * @param {ParamMgrNode} wamNode
    */
@@ -53,7 +55,7 @@ export default class GraphicEQNode extends CompositeAudioNode {
     this.bufferLength = this.analyser.frequencyBinCount;
     this.dataArray = new Float32Array(this.bufferLength);
 
-    var analyserRange = this.analyser.maxDecibels - this.analyser.minDecibels;
+    // var analyserRange = this.analyser.maxDecibels - this.analyser.minDecibels;
     // ration between analyser range and our range
     //var range = this.dbScale * 2;
     //this.dbRatio = range / analyserRange;
@@ -106,13 +108,15 @@ export default class GraphicEQNode extends CompositeAudioNode {
     }
   }
 
-  isEnabled = true;
 
-  set status(_sig) {
-    if (this.isEnabled === _sig) return;
+  /**
+   * Update the bypass status of the plugin
+   * @param {boolean} enable
+   */
+  set status(enable) {
+    if (this.isEnabled === enable) return;
 
-    this.isEnabled = _sig;
-    if (_sig) {
+    if (enable) {
       // console.log("BYPASS MODE OFF FX RUNNING");
       this.wetGainNode.gain.linearRampToValueAtTime(
         1,
@@ -133,6 +137,8 @@ export default class GraphicEQNode extends CompositeAudioNode {
         this.context.currentTime + 0.5,
       );
     }
+
+    this.isEnabled = enable;
   }
 
   // MANDATORY : redefine these methods

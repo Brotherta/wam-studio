@@ -157,7 +157,6 @@ export default class GraphicEQHTMLElement extends HTMLElement {
     this.textColor = "rgb(235, 235, 235)";
     this.nyquist = 0.5 * this.plugin.audioContext.sampleRate;
     this.noctaves = 11;
-    this.setSwitchListener();
     this.setCanvas();
     this.draw();
 
@@ -214,17 +213,20 @@ export default class GraphicEQHTMLElement extends HTMLElement {
   setKnobs() {}
 
   setSwitchListener() {
-    // console.log("GraphicEQ : set switch listener");
     const { plugin } = this;
-    // by default, plugin is disabled
+    const fxSwitch = this.shadowRoot.querySelector("#switch1");
+    
+    // Set initial state to enabled
     plugin.audioNode.setParamsValues({ enabled: 1 });
-
-    this.shadowRoot
-      .querySelector("#switch1")
-      .addEventListener("change", function onChange() {
-        plugin.audioNode.setParamsValues({ enabled: +!!this.checked });
-      });
+    fxSwitch.value = plugin.audioNode.getParamValue("enabled");
+  
+    // Listen for switch changes
+    fxSwitch.addEventListener("change", function(event) {
+      const enable = event.target.checked ? 1 : 0;
+      plugin.audioNode.setParamsValues({ enabled: enable });
+    });
   }
+
   setCanvas() {
     // canvas
     this.canvas = document.createElement("canvas");
@@ -861,16 +863,6 @@ export default class GraphicEQHTMLElement extends HTMLElement {
     return Math.pow(2, flog); // reverse of a log function is 2^logf
   }
 
-  /*
-	bypass() {
-		this.plugin.params.state = "disable";
-		this.plugin.audioNode.connectNodes();
-	}
-	reactivate() {
-		this.plugin.params.state = "enable";
-		this.plugin.audioNode.connectNodes();
-	}
-*/
   letDrag() {
     this.root.querySelector("#DivFilterBank").draggable = true;
   }
