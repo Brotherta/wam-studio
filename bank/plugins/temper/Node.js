@@ -277,7 +277,7 @@ class temperNode extends AudioWorkletNode {
    * @param value - the MIDI controller value (0..127)
    */
   ctrlChange(channel, ctrl, value) {
-    if (this.fCtrlLabel[ctrl] !== []) {
+    if (this.fCtrlLabel[ctrl].length > 0) {
       for (var i = 0; i < this.fCtrlLabel[ctrl].length; i++) {
         var path = this.fCtrlLabel[ctrl][i].path;
         this.setParamValue(
