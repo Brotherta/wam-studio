@@ -93,8 +93,8 @@ export default class Host extends Track {
      * @param value the new global volume
      */
     override setVolume(value: number) {
-        this.globalVolume = Math.pow(value, 1.5); // tzfeng: 11/11/24 or 2.0
-        this.gainNode.gain.value = this.globalVolume;
+        this.globalVolume = value;
+        this.gainNode.gain.value = Math.pow(this.globalVolume, 1.5); // tzfeng 12/2/24
     }
 
     /**

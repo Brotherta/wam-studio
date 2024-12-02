@@ -74,8 +74,8 @@ export default class Track {
      * @param value
      */
     setVolume(value: number) {
-        this.volume = Math.pow(value, 1.5); // tzfeng 11/11/24 or 2.0
-        this.gainNode.gain.value = this.volume;
+        this.volume = value
+        this.gainNode.gain.value = Math.pow(this.volume, 1.5); // tzfeng 12/2/24
     }
 
     /**
