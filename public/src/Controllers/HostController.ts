@@ -254,7 +254,7 @@ export default class HostController {
             this.app.tracksController.trackList.forEach((track) => {
                 //@ts-ignore
                 track.node.parameters.get("playing").value = 0;
-                clearInterval(this.timerInterval!!);
+                clearInterval(this.timerInterval as NodeJS.Timeout);
             });
             //@ts-ignore
             this.app.host.hostNode.parameters.get("playing").value = 0;
