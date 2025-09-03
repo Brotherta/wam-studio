@@ -4,7 +4,7 @@
     "id": "wamstudio.pedalboard2.legacy",
     "version": [0,0],
     "plugins": [
-        "{{BANKURL}}/plugins/BigMuff/index.js",
+         "{{BANKURL}}/plugins/BigMuff/index.js",
         "{{BANKURL}}/plugins/blipper/index.js",
         "{{BANKURL}}/plugins/CompressorGuitarix/index.js",
         "{{BANKURL}}/plugins/deathgate/index.js",

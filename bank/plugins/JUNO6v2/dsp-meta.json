@@ -1,0 +1,721 @@
+{
+    "name": "JUNO6v2",
+    "filename": "JUNO6v2.dsp",
+    "version": "2.74.8",
+    "compile_options": "-lang wasm-e -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
+    "include_pathnames": [
+        "/share/faust",
+        "/usr/local/share/faust",
+        "/usr/share/faust",
+        "."
+    ],
+    "size": 33068,
+    "code": "+JU+AfQBHw==",
+    "inputs": 0,
+    "outputs": 2,
+    "meta": [
+        {
+            "compile_options": "-single -scal -I /usr/share/project/"
+        },
+        {
+            "envelopes_lib_adsr_author": "Yann Orlarey and Andrey Bundin"
+        },
+        {
+            "envelopes_lib_asr_author": "Yann Orlarey, Stéphane Letz"
+        },
+        {
+            "envelopes_lib_author": "GRAME"
+        },
+        {
+            "envelopes_lib_copyright": "GRAME"
+        },
+        {
+            "envelopes_lib_license": "LGPL with exception"
+        },
+        {
+            "envelopes_lib_name": "Faust Envelope Library"
+        },
+        {
+            "envelopes_lib_version": "1.3.0"
+        },
+        {
+            "filename": "JUNO6v2.dsp"
+        },
+        {
+            "filters_lib_fir_author": "Julius O. Smith III"
+        },
+        {
+            "filters_lib_fir_copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters_lib_fir_license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters_lib_highpass_author": "Julius O. Smith III"
+        },
+        {
+            "filters_lib_highpass_copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters_lib_iir_author": "Julius O. Smith III"
+        },
+        {
+            "filters_lib_iir_copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters_lib_iir_license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters_lib_lowpass0_highpass1": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters_lib_lowpass0_highpass1_author": "Julius O. Smith III"
+        },
+        {
+            "filters_lib_name": "Faust Filters Library"
+        },
+        {
+            "filters_lib_resonlp_author": "Julius O. Smith III"
+        },
+        {
+            "filters_lib_resonlp_copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters_lib_resonlp_license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters_lib_tf2_author": "Julius O. Smith III"
+        },
+        {
+            "filters_lib_tf2_copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters_lib_tf2_license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters_lib_tf2s_author": "Julius O. Smith III"
+        },
+        {
+            "filters_lib_tf2s_copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters_lib_tf2s_license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters_lib_version": "1.3.0"
+        },
+        {
+            "library_path0": "/usr/share/faust/stdfaust.lib"
+        },
+        {
+            "library_path1": "/usr/share/faust/oscillators.lib"
+        },
+        {
+            "library_path2": "/usr/share/faust/maths.lib"
+        },
+        {
+            "library_path3": "/usr/share/faust/platform.lib"
+        },
+        {
+            "library_path4": "/usr/share/faust/envelopes.lib"
+        },
+        {
+            "library_path5": "/usr/share/faust/noises.lib"
+        },
+        {
+            "library_path6": "/usr/share/faust/filters.lib"
+        },
+        {
+            "library_path7": "/usr/share/faust/signals.lib"
+        },
+        {
+            "maths_lib_author": "GRAME"
+        },
+        {
+            "maths_lib_copyright": "GRAME"
+        },
+        {
+            "maths_lib_license": "LGPL with exception"
+        },
+        {
+            "maths_lib_name": "Faust Math Library"
+        },
+        {
+            "maths_lib_version": "2.8.0"
+        },
+        {
+            "name": "JUNO6v2"
+        },
+        {
+            "noises_lib_name": "Faust Noise Generator Library"
+        },
+        {
+            "noises_lib_version": "1.4.1"
+        },
+        {
+            "oscillators_lib_lf_sawpos_author": "Bart Brouns, revised by Stéphane Letz"
+        },
+        {
+            "oscillators_lib_lf_sawpos_licence": "STK-4.3"
+        },
+        {
+            "oscillators_lib_lf_triangle_author": "Bart Brouns"
+        },
+        {
+            "oscillators_lib_lf_triangle_licence": "STK-4.3"
+        },
+        {
+            "oscillators_lib_name": "Faust Oscillator Library"
+        },
+        {
+            "oscillators_lib_saw1_author": "Bart Brouns"
+        },
+        {
+            "oscillators_lib_saw1_licence": "STK-4.3"
+        },
+        {
+            "oscillators_lib_saw2ptr_author": "Julius O. Smith III"
+        },
+        {
+            "oscillators_lib_saw2ptr_license": "STK-4.3"
+        },
+        {
+            "oscillators_lib_sawN_author": "Julius O. Smith III"
+        },
+        {
+            "oscillators_lib_sawN_license": "STK-4.3"
+        },
+        {
+            "oscillators_lib_version": "1.5.1"
+        },
+        {
+            "platform_lib_name": "Generic Platform Library"
+        },
+        {
+            "platform_lib_version": "1.3.0"
+        },
+        {
+            "signals_lib_name": "Faust Signal Routing Library"
+        },
+        {
+            "signals_lib_version": "1.6.0"
+        },
+        {
+            "version": "2.75.15"
+        }
+    ],
+    "ui": [
+        {
+            "type": "vgroup",
+            "label": "JUNO6v2",
+            "items": [
+                {
+                    "type": "hgroup",
+                    "label": "MAIN",
+                    "items": [
+                        {
+                            "type": "hgroup",
+                            "label": "POWER",
+                            "meta": [
+                                {
+                                    "0": ""
+                                }
+                            ],
+                            "items": [
+                                {
+                                    "type": "checkbox",
+                                    "label": "ON",
+                                    "shortname": "ON",
+                                    "address": "/JUNO6v2/MAIN/POWER/ON",
+                                    "index": 0
+                                }
+                            ]
+                        },
+                        {
+                            "type": "hgroup",
+                            "label": "LFO",
+                            "meta": [
+                                {
+                                    "1": ""
+                                }
+                            ],
+                            "items": [
+                                {
+                                    "type": "vslider",
+                                    "label": "RATE",
+                                    "shortname": "RATE",
+                                    "address": "/JUNO6v2/MAIN/LFO/RATE",
+                                    "index": 44,
+                                    "meta": [
+                                        {
+                                            "0": ""
+                                        }
+                                    ],
+                                    "init": 0.4,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "DELAY TIME",
+                                    "shortname": "DELAY_TIME",
+                                    "address": "/JUNO6v2/MAIN/LFO/DELAY_TIME",
+                                    "index": 56,
+                                    "meta": [
+                                        {
+                                            "1": ""
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vgroup",
+                                    "label": "TRIG",
+                                    "meta": [
+                                        {
+                                            "2": ""
+                                        }
+                                    ],
+                                    "items": [
+                                        {
+                                            "type": "vslider",
+                                            "label": "TRIG MODE",
+                                            "shortname": "TRIG_MODE",
+                                            "address": "/JUNO6v2/MAIN/LFO/TRIG/TRIG_MODE",
+                                            "index": 72,
+                                            "meta": [
+                                                {
+                                                    "0": ""
+                                                },
+                                                {
+                                                    "style": "radio{-AUTO-:0;-MAN-:1}"
+                                                }
+                                            ],
+                                            "init": 0,
+                                            "min": 0,
+                                            "max": 1,
+                                            "step": 1
+                                        },
+                                        {
+                                            "type": "button",
+                                            "label": "LFO",
+                                            "shortname": "TRIG_LFO",
+                                            "address": "/JUNO6v2/MAIN/LFO/TRIG/LFO",
+                                            "index": 76,
+                                            "meta": [
+                                                {
+                                                    "1": ""
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "hgroup",
+                            "label": "DCO",
+                            "meta": [
+                                {
+                                    "2": ""
+                                }
+                            ],
+                            "items": [
+                                {
+                                    "type": "vslider",
+                                    "label": "LFO",
+                                    "shortname": "DCO_LFO",
+                                    "address": "/JUNO6v2/MAIN/DCO/LFO",
+                                    "index": 36,
+                                    "meta": [
+                                        {
+                                            "0": ""
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "PWM",
+                                    "shortname": "PWM",
+                                    "address": "/JUNO6v2/MAIN/DCO/PWM",
+                                    "index": 16524,
+                                    "meta": [
+                                        {
+                                            "1": ""
+                                        }
+                                    ],
+                                    "init": 0.5,
+                                    "min": 0.01,
+                                    "max": 0.99,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "MODE",
+                                    "shortname": "DCO_MODE",
+                                    "address": "/JUNO6v2/MAIN/DCO/MODE",
+                                    "index": 16528,
+                                    "meta": [
+                                        {
+                                            "2": ""
+                                        },
+                                        {
+                                            "style": "radio{-LFO-:0;-MANUAL-:1;-ENV-:2}"
+                                        }
+                                    ],
+                                    "init": 1,
+                                    "min": 0,
+                                    "max": 2,
+                                    "step": 1
+                                },
+                                {
+                                    "type": "checkbox",
+                                    "label": "RECT",
+                                    "shortname": "RECT",
+                                    "address": "/JUNO6v2/MAIN/DCO/RECT",
+                                    "index": 116,
+                                    "meta": [
+                                        {
+                                            "3": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "checkbox",
+                                    "label": "SAW",
+                                    "shortname": "SAW",
+                                    "address": "/JUNO6v2/MAIN/DCO/SAW",
+                                    "index": 8,
+                                    "meta": [
+                                        {
+                                            "4": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "checkbox",
+                                    "label": "SUB",
+                                    "shortname": "SUB",
+                                    "address": "/JUNO6v2/MAIN/DCO/SUB",
+                                    "index": 16564,
+                                    "meta": [
+                                        {
+                                            "5": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "SUB OSC",
+                                    "shortname": "SUB_OSC",
+                                    "address": "/JUNO6v2/MAIN/DCO/SUB_OSC",
+                                    "index": 16568,
+                                    "meta": [
+                                        {
+                                            "6": ""
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "NOISE",
+                                    "shortname": "NOISE",
+                                    "address": "/JUNO6v2/MAIN/DCO/NOISE",
+                                    "index": 32972,
+                                    "meta": [
+                                        {
+                                            "7": ""
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                }
+                            ]
+                        },
+                        {
+                            "type": "hgroup",
+                            "label": "HPF",
+                            "meta": [
+                                {
+                                    "3": ""
+                                }
+                            ],
+                            "items": [
+                                {
+                                    "type": "vslider",
+                                    "label": "FREQ",
+                                    "shortname": "HPF_FREQ",
+                                    "address": "/JUNO6v2/MAIN/HPF/FREQ",
+                                    "index": 32992,
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 10,
+                                    "step": 0.01
+                                }
+                            ]
+                        },
+                        {
+                            "type": "hgroup",
+                            "label": "VCF",
+                            "meta": [
+                                {
+                                    "4": ""
+                                }
+                            ],
+                            "items": [
+                                {
+                                    "type": "vslider",
+                                    "label": "FREQ",
+                                    "shortname": "VCF_FREQ",
+                                    "address": "/JUNO6v2/MAIN/VCF/FREQ",
+                                    "index": 33024,
+                                    "meta": [
+                                        {
+                                            "0": ""
+                                        }
+                                    ],
+                                    "init": 1,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "RES",
+                                    "shortname": "RES",
+                                    "address": "/JUNO6v2/MAIN/VCF/RES",
+                                    "index": 33048,
+                                    "meta": [
+                                        {
+                                            "1": ""
+                                        }
+                                    ],
+                                    "init": 1,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "POLAR",
+                                    "shortname": "POLAR",
+                                    "address": "/JUNO6v2/MAIN/VCF/POLAR",
+                                    "index": 33020,
+                                    "meta": [
+                                        {
+                                            "2": ""
+                                        },
+                                        {
+                                            "style": "radio{-UP-:0;-DOWN-:1}"
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 1
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "ENV",
+                                    "shortname": "ENV",
+                                    "address": "/JUNO6v2/MAIN/VCF/ENV",
+                                    "index": 33036,
+                                    "meta": [
+                                        {
+                                            "3": ""
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "LFO",
+                                    "shortname": "VCF_LFO",
+                                    "address": "/JUNO6v2/MAIN/VCF/LFO",
+                                    "index": 33032,
+                                    "meta": [
+                                        {
+                                            "4": ""
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "KYBD",
+                                    "shortname": "KYBD",
+                                    "address": "/JUNO6v2/MAIN/VCF/KYBD",
+                                    "index": 33028,
+                                    "meta": [
+                                        {
+                                            "5": ""
+                                        }
+                                    ],
+                                    "init": 1,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                }
+                            ]
+                        },
+                        {
+                            "type": "hgroup",
+                            "label": "VCA",
+                            "meta": [
+                                {
+                                    "5": ""
+                                }
+                            ],
+                            "items": [
+                                {
+                                    "type": "vslider",
+                                    "label": "MODE",
+                                    "shortname": "VCA_MODE",
+                                    "address": "/JUNO6v2/MAIN/VCA/MODE",
+                                    "index": 33064,
+                                    "meta": [
+                                        {
+                                            "style": "radio{-ENV-:0;-GATE-:1}"
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 1
+                                }
+                            ]
+                        },
+                        {
+                            "type": "hgroup",
+                            "label": "ENV",
+                            "meta": [
+                                {
+                                    "6": ""
+                                }
+                            ],
+                            "items": [
+                                {
+                                    "type": "vslider",
+                                    "label": "A",
+                                    "shortname": "A",
+                                    "address": "/JUNO6v2/MAIN/ENV/A",
+                                    "index": 16532,
+                                    "meta": [
+                                        {
+                                            "0": ""
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "D",
+                                    "shortname": "D",
+                                    "address": "/JUNO6v2/MAIN/ENV/D",
+                                    "index": 16548,
+                                    "meta": [
+                                        {
+                                            "1": ""
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "S",
+                                    "shortname": "S",
+                                    "address": "/JUNO6v2/MAIN/ENV/S",
+                                    "index": 16544,
+                                    "meta": [
+                                        {
+                                            "2": ""
+                                        }
+                                    ],
+                                    "init": 1,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                },
+                                {
+                                    "type": "vslider",
+                                    "label": "R",
+                                    "shortname": "R",
+                                    "address": "/JUNO6v2/MAIN/ENV/R",
+                                    "index": 16552,
+                                    "meta": [
+                                        {
+                                            "3": ""
+                                        }
+                                    ],
+                                    "init": 0,
+                                    "min": 0,
+                                    "max": 1,
+                                    "step": 0.01
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "hslider",
+                    "label": "freq",
+                    "shortname": "freq",
+                    "address": "/JUNO6v2/freq",
+                    "index": 32,
+                    "init": 440,
+                    "min": 20,
+                    "max": 20000,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "gain",
+                    "shortname": "gain",
+                    "address": "/JUNO6v2/gain",
+                    "index": 4,
+                    "init": 0,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "gate",
+                    "shortname": "gate",
+                    "address": "/JUNO6v2/gate",
+                    "index": 60,
+                    "init": 0,
+                    "min": 0,
+                    "max": 1,
+                    "step": 1
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "identifier": "fr.grame.faust.juno6v2",
+    "name": "JUNO6v2",
+    "vendor": "Faust User",
+    "description": "",
+    "version": "2.75.15",
+    "apiVersion": "2.0.0",
+    "keywords": [],
+    "isInstrument": true,
+    "website": "",
+    "hasAudioInput": false,
+    "hasAudioOutput": true,
+    "hasMidiInput": true,
+    "hasMidiOutput": false,
+    "faustMeta": {
+        "poly": true,
+        "fft": false,
+        "effect": null
+    }
+}

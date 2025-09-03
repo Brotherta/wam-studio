@@ -1,0 +1,69 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple host that loads a non bundled plugin</title>
+  </head>
+
+  <body>
+    <main>
+      <audio
+        id="player"
+        src="CleanGuitarRiff.mp3"
+        controls
+        loop
+        crossorigin="anonymous"
+      ></audio>
+      <div id="mount"></div>
+    </main>
+    <script src="./utils/generateEmbedCode.js"></script>
+    <script type="module" src="host.js"></script>
+    <p>
+      <a href="host/index.html"
+        >See the same WAM with the standard, CSS based, GUI.</a
+      >
+    </p>
+    <h3>How to embed this WAM in your own application</h3>
+    <p>
+      First, this WAM has been generated in a folder. Put this folder somewhere,
+      it contains all the files for this wam and it is self contained.
+    </p>
+    <p>
+      Two versions are provided, one with the custom GUI that you designed with
+      the FAUST IDE, and one with a default GUI based on CSS. You can choose the
+      one you prefer to embed in your application. The URI of the WAM is the
+      only thing that changes between the two versions. You can further
+      customize the GUI of the first versions by looking at the Gui/gui.js file
+      and edit the HTML/CSS inside (this file defines the WAM as Web Component).
+    </p>
+    <div>
+      <ul id="urls"></ul>
+    </div>
+    <script>
+      const URIcustomGUI = window.location.href.replace(
+        "index.html",
+        "index.js"
+      );
+      document.getElementById("urls").innerHTML = `<li>URI of this WAM with custom GUI: <a href=${URIcustomGUI}>${URIcustomGUI}</a></li>`;
+      const URIStandardGUI = window.location.href.replace(
+        "index.html",
+        "indexGUIStandard.js"
+      );
+      document.getElementById(
+        "urls"
+      ).innerHTML += `<li>URI of this WAM with standard GUI: <a href=${URIStandardGUI}>${URIStandardGUI}</a></li>`;
+    </script>
+    <h3>Example of host code to embed this WAM</h3>
+    <p>
+      Here is an example of how to embed this WAM in your application. You can
+      copy/paste this code in your HTML file.
+    </p>
+    <div id="embedBox">
+      <label for="embedCode">Simple Code for Host:</label>
+      <button onclick="generateEmbedCode(URIcustomGUI)">Generate & Copy Embed Code</button>
+      <br>
+      <textarea id="embedCode" readonly rows="30" cols="100"></textarea>
+    </div>
+    
+  </body>
+</html>
