@@ -3,6 +3,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
+const { startRaspberryRuntime, getRaspberryRuntimeStatus } = require('./Raspberry_Communication/RaspberryRuntime');
 
 dotenv.config();
 
@@ -28,6 +29,16 @@ app.use(crossorigins, express.static(path.join(__dirname, 'dist/shareable')));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.use(express.json());
+
+app.post("/api/raspberry/lancement", (req, res) => {
+    const result = startRaspberryRuntime();
+    res.json(result);
+});
+
+app.get("/api/raspberry/status", (req, res) => {
+    const result = getRaspberryRuntimeStatus();
+    res.json(result);
+});
 
 if (HTTPS_DEV) {
     // HTTPS server

@@ -19,7 +19,7 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     -->
-	<link rel="stylesheet" href="style/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="style/bootstrap.min.css" crossorigin="anonymous">
 	<script src="libs/bootstrap.min.js"  crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 </head>
@@ -127,6 +127,14 @@
 			<div id="redo-btn" class="menu-item">
 				<span class="mytooltip">Redo</span>
 				<i class="redo-icon-off" style="width: 30px" id="redo-icon"></i>
+			</div>
+			<div id="search-raspberry-btn" class="menu-item">
+				<span class="mytooltip">Search Raspberry</span>
+				<i class="bi bi-search" style="width: 30px; color: #ffffff;"></i>
+			</div>
+			<div id="launch-raspberry-btn" class="menu-item">
+				<span class="mytooltip">Lancement</span>
+				<i class="bi bi-power" style="width: 30px; color: #ffffff;"></i>
 			</div>
 		</div>
 		<div id="right-controls">
@@ -393,6 +401,17 @@
 		<div id="playground-header" class="header-window">
 			<span class="title">Developper Playground</span>
 			<button id="playground-close-button" class="close-button">X</button>
+		</div>
+	</div>
+
+	<div id="search-raspberry-window" class="floating-window" hidden>
+		<div id="search-raspberry-header" class="header-window">
+			<span class="title">Search Raspberry</span>
+			<button id="search-raspberry-close-button" class="close-button">X</button>
+		</div>
+		<div class="settings-body">
+			<div id="search-raspberry-status">En attente...</div>
+			<ul id="search-raspberry-list"></ul>
 		</div>
 	</div>
 

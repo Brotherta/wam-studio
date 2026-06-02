@@ -25,7 +25,8 @@
     "jszip": "^3.10.1",
     "pixi-viewport": "5.0.1",
     "pixi.js": "7.2.4",
-    "undo-manager": "^1.1.1"
+    "undo-manager": "^1.1.1",
+    "ws": "^8.20.0"
   },
   "devDependencies": {
     "@types/jquery": "^3.5.14",

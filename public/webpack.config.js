@@ -4,6 +4,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const { startRaspberryRuntime, getRaspberryRuntimeStatus } = require('./Raspberry_Communication/RaspberryRuntime');
 
 module.exports = (env, argv) => {
     return ({
@@ -31,6 +32,17 @@ module.exports = (env, argv) => {
                     warnings: false,
                 },
                 progress: true,
+            },
+            setupMiddlewares: (middlewares, devServer) => {
+                devServer.app.post("/api/raspberry/lancement", (req, res) => {
+                    const result = startRaspberryRuntime();
+                    res.json(result);
+                });
+                devServer.app.get("/api/raspberry/status", (req, res) => {
+                    const result = getRaspberryRuntimeStatus();
+                    res.json(result);
+                });
+                return middlewares;
             },
             port: 5002, host: '0.0.0.0',
             https: false

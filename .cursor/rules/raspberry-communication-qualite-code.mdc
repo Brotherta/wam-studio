@@ -1,0 +1,53 @@
+---
+description: Code segmente, propre et lisible dans Raspberry_Communication
+globs: public/Raspberry_Communication/**/*
+alwaysApply: false
+---
+
+# Qualite du code — Raspberry_Communication
+
+Objectif : un code **segmente**, **propre** et **facile a lire** pour un humain qui reprend le projet (stage, maintenance, tests).
+
+## Segmentation (fichiers et responsabilites)
+
+- **Un fichier = un role clair** (ex. OSC, heartbeat, parc DHCP, parseur UI). Eviter les fichiers « fourre-tout » de plusieurs centaines de lignes.
+- **Regrouper par dossiers** avec des noms explicites (ex. `serveur/configuration/`, `serveur/osc/`, `serveur/websocket/`).
+- **Une fonction ou une classe = une tache** ; si une fonction depasse ~40–50 lignes ou enchaine plusieurs `if (type === ...)`, extraire un module ou un handler dedie.
+- **Point d'entree unique** par couche (ex. `RaspberryRuntime.js` reexporte le runtime ; `SearchRaspberryFeature.ts` orchestre l'UI).
+- Ne pas dupliquer `Raspberry_Communication` ; etendre les modules existants avant d'en creer de nouveaux sans raison.
+
+## Code propre
+
+- Noms de variables, fonctions et fichiers **explicites** (en francais ou anglais coherent avec le fichier voisin).
+- Pas de logique morte, pas de patch fragile (ex. reecriture de `prototype` en fin de fichier).
+- Imports relatifs corrects apres deplacement de fichiers.
+- Comportement preserve lors d'un decoupage : **refactor par petites etapes testables** (comme dans `Doc/DECOMPOSITION_ETAPES.md`).
+- Commentaires **seulement** pour expliquer une regle metier ou un choix technique non evident ; le code doit se comprendre par les noms.
+
+## Lisibilite humaine
+
+- Privilegier des **phrases et structures simples** plutot que des one-liners ou abstractions inutiles.
+- Constantes nommees (ports, delais) dans un fichier dedie, pas de « nombres magiques » disperses.
+- Messages utilisateur et logs en francais clair, sans jargon inutile.
+- Ordre logique dans un fichier : constantes / imports → etat → fonctions privees → API publique.
+
+## Arborescences (reference)
+
+```
+serveur/
+├── point-entree/
+├── configuration/
+├── reseau/
+├── osc/
+├── parc/
+├── presence/
+└── websocket/
+
+interface-wam-studio/
+├── connexion/
+├── messages/
+├── panneaux/
+└── utilitaires/
+```
+
+Voir `serveur/README.md` et `interface-wam-studio/README.md`.

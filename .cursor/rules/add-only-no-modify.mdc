@@ -1,0 +1,16 @@
+---
+description: Interdire modification/suppression hors Raspberry_Communication, autoriser modifications dedans
+alwaysApply: true
+---
+
+# Politique de protection des fichiers
+
+- Interdire toute modification, suppression, renommage, deplacement ou reformatage de code dans tous les fichiers situes hors de `public/Raspberry_Communication`.
+- Autoriser la modification, suppression, renommage, deplacement et reformatage des fichiers situes dans `public/Raspberry_Communication` si necessaire.
+- Autoriser les nouvelles implementations en priorite dans `public/Raspberry_Communication`.
+- Ne jamais dupliquer le dossier `Raspberry_Communication`; conserver un seul dossier source pour cette logique.
+- Utiliser des noms de variables simples, explicites et faciles a comprendre.
+- Privilegier un code lisible et comprehensible par tous, en evitant les formulations complexes inutiles.
+- **Segmenter** le code : plusieurs fichiers a responsabilite unique, dossiers thematiques, pas de monolithes.
+- Garder le code **propre** (pas de mort, pas de hack) et **lisible par un humain** (noms clairs, etapes de test documentees).
+- Pour le detail dans `public/Raspberry_Communication`, suivre la regle `raspberry-communication-qualite-code.mdc`.

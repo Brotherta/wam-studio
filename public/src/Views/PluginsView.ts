@@ -22,8 +22,30 @@ export default class PluginsView extends DraggableWindow {
     loadingZone = document.getElementById("loading-zone") as HTMLDivElement;
 
     constructor() {
-        super(document.getElementById("plugin-header") as HTMLDivElement, document.getElementById("plugin-window") as HTMLDivElement);
+        super(
+            document.getElementById("plugin-header") as HTMLDivElement,
+            document.getElementById("plugin-window") as HTMLDivElement
+        );
+
+        const raspberryButton = document.createElement("div");
+        raspberryButton.className = "new-track";
+
+        raspberryButton.innerHTML = `
+            <div class="new-track-text">
+                Add Raspberry Pi
+            </div>
+            <div class="icon">
+                <i class="plus-icon"></i>
+            </div>
+        `;
+
+        this.newPluginMarker.after(raspberryButton);
         this.newPluginMarker.hidden = true;
+
+        // Event click
+        raspberryButton.addEventListener("click", () => {
+            this.openRaspberryWindow();
+        });
     }
 
     /** If the window is opened or not. */
@@ -154,5 +176,60 @@ export default class PluginsView extends DraggableWindow {
         if (track.plugin?.instance) {
             this.loadingZone.appendChild(track.plugin.gui);
         }
+    }
+
+    openRaspberryWindow() {
+
+        const modal = document.createElement("div");
+        modal.style.position = "fixed";
+        modal.style.top = "50%";
+        modal.style.left = "50%";
+        modal.style.transform = "translate(-50%, -50%)";
+        modal.style.background = "white";
+        modal.style.padding = "20px";
+        modal.style.border = "1px solid #ccc";
+        modal.style.borderRadius = "8px";
+        modal.style.zIndex = "1000";
+        modal.style.width = "300px";
+
+        const title = document.createElement("h3");
+        title.innerText = "Select Raspberry Pi";
+
+        modal.appendChild(title);
+
+        const list = document.createElement("div");
+
+        for (let i = 1; i <= 5; i++) {
+
+            const row = document.createElement("div");
+            row.style.display = "flex";
+            row.style.justifyContent = "space-between";
+            row.style.alignItems = "center";
+            row.style.marginBottom = "10px";
+
+            const label = document.createElement("span");
+            label.innerText = `Raspberry Pi ${i}`;
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+
+            row.appendChild(label);
+            row.appendChild(checkbox);
+
+            list.appendChild(row);
+        }
+
+        modal.appendChild(list);
+
+        const closeButton = document.createElement("button");
+        closeButton.innerText = "Close";
+
+        closeButton.onclick = () => {
+            modal.remove();
+        };
+
+        modal.appendChild(closeButton);
+
+        document.body.appendChild(modal);
     }
 }

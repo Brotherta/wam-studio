@@ -1,0 +1,8 @@
+{
+  "subnetPrefix": "192.168.1.",
+  "iniPath": "C:\\OpenDHCPServer\\",
+  "activeNumbers": [
+    74,
+    75
+  ]
+}

@@ -18,6 +18,8 @@ export default class HostView {
     mergeBtn = document.getElementById("merge-btn") as HTMLDivElement;
     undoBtn = document.getElementById("undo-btn") as HTMLDivElement;
     redoBtn = document.getElementById("redo-btn") as HTMLDivElement;
+    searchRaspberryBtn = document.getElementById("search-raspberry-btn") as HTMLDivElement;
+    launchRaspberryBtn = document.getElementById("launch-raspberry-btn") as HTMLDivElement;
     metroBtn = document.getElementById("metro-btn") as HTMLDivElement;
     soundLoopBtn = document.getElementById("soundLoupBtn") as HTMLElement;
 

@@ -324,7 +324,18 @@ export default class WamAudioLoopBrowser extends HTMLElement {
     `;
 
         fetch(this.URL_SERVER + "/api/audioloops")
-            .then((response) => response.json())
+            .then(async (response) => {
+                if (!response.ok) {
+                    throw new Error(`Audio loops API error: ${response.status} ${response.statusText}`);
+                }
+                const contentType = response.headers.get("content-type") || "";
+                if (!contentType.includes("application/json")) {
+                    const previewText = await response.text();
+                    const preview = previewText.slice(0, 120);
+                    throw new Error(`Audio loops API returned non-JSON payload: ${preview}`);
+                }
+                return response.json();
+            })
             .then((data) => {
                 this.audioData = data;
 

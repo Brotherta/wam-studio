@@ -6,6 +6,7 @@ import { setTempo, SONGS_FILE_URL, ZOOM_LEVEL } from "../Env";
 import DraggableWindow from "../Utils/DraggableWindow";
 import HostView from "../Views/HostView";
 import { audioCtx } from "../index";
+import SearchRaspberryFeature from "../../Raspberry_Communication/SearchRaspberryFeature";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -29,6 +30,7 @@ export default class HostController {
    * List of draggable windows.
    */
   private windows: DraggableWindow[];
+  private searchRaspberryFeature: SearchRaspberryFeature;
 
   /**
    * Active HTML element when scrolling.
@@ -51,6 +53,7 @@ export default class HostController {
     this._app = app;
     this._view = app.hostView;
     this.windows = [];
+    this.searchRaspberryFeature = new SearchRaspberryFeature();
     this._timerIntervalPaused = false;
 
     this._view.host?.append(this._app.host.element)
@@ -61,6 +64,7 @@ export default class HostController {
     this.initializeVuMeter();
     this.bindEvents();
     this.bindNodeListeners();
+    this.searchRaspberryFeature.bindCloseButton();
     this._app.host.metronomeOn = false;  // Metronome is off by default
     console.log("Initial Metronome State: " + (this._app.host.metronomeOn ? "On" : "Off"));
     this._view.updateMetronomeBtn(false);
@@ -358,6 +362,12 @@ export default class HostController {
 
       this._app.hostView.setUndoButtonState(this._app.undoManager.hasUndo());
       this._app.hostView.setRedoButtonState(this._app.undoManager.hasRedo());
+    });
+    this._view.searchRaspberryBtn.addEventListener("click", () => {
+      this.searchRaspberryFeature.openWindow();
+    });
+    this._view.launchRaspberryBtn.addEventListener("click", () => {
+      this.searchRaspberryFeature.launchRuntime();
     });
 
     // ZOOM BUTTONS
