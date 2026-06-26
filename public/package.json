@@ -12,6 +12,7 @@
     "version:major": "npm version major"
   },
   "dependencies": {
+    "@adasp/latency-test": "1.2.1",
     "@pixi/app": "7.2.4",
     "@pixi/core": "7.2.4",
     "@popperjs/core": "^2.11.6",
