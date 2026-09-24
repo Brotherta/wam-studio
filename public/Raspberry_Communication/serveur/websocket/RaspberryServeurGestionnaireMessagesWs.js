@@ -1,4 +1,10 @@
 const { envoyerMessageOscEnUdp } = require("../osc/RaspberryServeurEnvoiOscUdp");
+const { resoudreMacDepuisCatalogue } = require("../../RaspberryCatalogStore");
+const { appliquerNumerosDepuisIni } = require("../../RaspberryParcStore");
+const {
+  demarrerAgentTransfertRuntime,
+  obtenirStatutAgentTransfertRuntime,
+} = require("../../AgentTransfertRuntime");
 
 /**
  * Route les messages WebSocket entrants (UI, Raspberry, OSC).
@@ -11,17 +17,19 @@ function creerGestionnaireMessagesWs(deps) {
     handleScanOpenDhcpIni,
     handleApplyRaspberryParc,
     handleAddRaspberryEntry,
-    mergeListenNumbers,
+    handleSyncRaspberryFromNetwork,
     saveParcFolder,
     scanIniFile,
     saveRaspberryParc,
     reloadParcFromDisk,
     actualiserReseau,
-    normalizeNumberList,
     addStaticHostToIni,
     getNumberFromIp,
     normalizeMac,
     resolveOpenDhcpFolderPath,
+    synchroniserRaspberryDepuisReseau,
+    decouvrirAppareilsSurSousReseau,
+    notifierParcModifie,
     construireConfig,
     construireStatutReseau,
     obtenirListeEnLigne,
@@ -44,12 +52,11 @@ function creerGestionnaireMessagesWs(deps) {
       const scan = etat.raspberryParc.iniPath
         ? scanIniFile(etat.raspberryParc.iniPath, etat.raspberryParc.subnetPrefix)
         : { ok: false, error: "", entries: [] };
-      if (scan.ok && scan.entries.length > 0) {
-        etat.raspberryParc.activeNumbers = mergeListenNumbers(etat.raspberryParc.activeNumbers, scan.entries);
-        saveRaspberryParc(etat.raspberryParc);
+      if (scan.ok) {
+        appliquerNumerosDepuisIni(etat.raspberryParc, scan.entries);
         reloadParcFromDisk();
       }
-      envoyerEtatParc(ws, etat.raspberryParc, scan, mergeListenNumbers);
+      envoyerEtatParc(ws, etat.raspberryParc, scan);
       return;
     }
 
@@ -60,12 +67,10 @@ function creerGestionnaireMessagesWs(deps) {
         raspberryParc: etat.raspberryParc,
         saveParcFolder,
         scanIniFile,
-        saveRaspberryParc,
         reloadParcFromDisk,
         refreshNetworkStatus: actualiserReseau,
         broadcastRaspList: diffuseur.diffuserListeRaspberry,
         broadcastNetworkStatus: diffuseur.diffuserStatutReseau,
-        mergeListenNumbers,
       });
       return;
     }
@@ -77,14 +82,11 @@ function creerGestionnaireMessagesWs(deps) {
         raspberryParc: etat.raspberryParc,
         saveParcFolder,
         scanIniFile,
-        saveRaspberryParc,
         reloadParcFromDisk,
         refreshNetworkStatus: actualiserReseau,
         broadcastRaspList: diffuseur.diffuserListeRaspberry,
         broadcastNetworkStatus: diffuseur.diffuserStatutReseau,
         broadcastSummary: diffuseur.diffuserResumeServeur,
-        normalizeNumberList,
-        mergeListenNumbers,
         buildRaspConfig: construireConfig,
       });
       return;
@@ -99,9 +101,6 @@ function creerGestionnaireMessagesWs(deps) {
         saveParcFolder,
         addStaticHostToIni,
         scanIniFile,
-        getNumberFromIp,
-        mergeListenNumbers,
-        saveRaspberryParc,
         reloadParcFromDisk,
         refreshNetworkStatus: actualiserReseau,
         broadcastRaspList: diffuseur.diffuserListeRaspberry,
@@ -113,6 +112,34 @@ function creerGestionnaireMessagesWs(deps) {
           type: "addRaspberryEntryResult",
           ok: false,
           error: error && error.message ? error.message : "Erreur lors de l'ajout.",
+        }));
+      });
+      return;
+    }
+
+    if (message.type === "syncRaspberryFromNetwork") {
+      handleSyncRaspberryFromNetwork({
+        ws,
+        message,
+        raspberryParc: etat.raspberryParc,
+        wsServerMain: etat.wsServerMain,
+        saveParcFolder,
+        synchroniserRaspberryDepuisReseau,
+        reloadParcFromDisk,
+        actualiserReseau,
+        notifierParcModifie,
+        scanIniFile,
+        resolveOpenDhcpFolderPath,
+        addStaticHostToIni,
+        getNumberFromIp,
+        saveRaspberryParc,
+        normalizeMac,
+        decouvrirAppareilsSurSousReseau,
+      }).catch((error) => {
+        ws.send(JSON.stringify({
+          type: "syncRaspberryFromNetworkResult",
+          ok: false,
+          error: error && error.message ? error.message : "Erreur lors de la synchronisation reseau.",
         }));
       });
       return;
@@ -131,6 +158,30 @@ function creerGestionnaireMessagesWs(deps) {
       return;
     }
 
+    if (message.type === "startAgentTransfert") {
+      const result = demarrerAgentTransfertRuntime();
+      ws.send(JSON.stringify({
+        type: "agentTransfertStartResult",
+        ok: result.started === true,
+        alreadyRunning: !!result.alreadyRunning,
+        port: result.port,
+        message: result.message || "",
+        running: obtenirStatutAgentTransfertRuntime().running,
+      }));
+      return;
+    }
+
+    if (message.type === "getAgentTransfertStatus") {
+      const statut = obtenirStatutAgentTransfertRuntime();
+      ws.send(JSON.stringify({
+        type: "agentTransfertStatus",
+        running: statut.running,
+        port: statut.port,
+        processusGere: statut.processusGere,
+      }));
+      return;
+    }
+
     if (message.type === "startControleur") {
       etat.metrics.startControleur += 1;
       etat.controllerClients.add(ws);
@@ -139,9 +190,8 @@ function creerGestionnaireMessagesWs(deps) {
       const scan = etat.raspberryParc.iniPath
         ? scanIniFile(etat.raspberryParc.iniPath, etat.raspberryParc.subnetPrefix)
         : { ok: false, error: "", entries: [] };
-      envoyerEtatParc(ws, etat.raspberryParc, scan, mergeListenNumbers);
+      envoyerEtatParc(ws, etat.raspberryParc, scan);
       diffuseur.diffuserListeRaspberry();
-      diffuseur.diffuserResumeServeur();
       return;
     }
 
@@ -165,15 +215,20 @@ function creerGestionnaireMessagesWs(deps) {
       ws.role = "raspberry";
       ws.raspIP = message.raspIP;
       const current = etat.raspberryClients.get(message.raspIP) || {};
+      const macBrute =
+        typeof message.macAddress === "string" && message.macAddress.length > 0
+          ? message.macAddress
+          : (current.macAddress || "");
+      const macAddress = resoudreMacDepuisCatalogue(message.raspIP, macBrute);
       etat.raspberryClients.set(message.raspIP, {
         ...current,
         ws,
-        macAddress: typeof message.macAddress === "string" ? message.macAddress : (current.macAddress || ""),
+        macAddress,
         info: typeof message.info === "string" ? message.info : (current.info || "Raspberry connecte"),
         lastHeartbeatMs: Date.now(),
       });
+
       diffuseur.diffuserListeRaspberry();
-      diffuseur.diffuserResumeServeur();
       return;
     }
 

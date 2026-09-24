@@ -7,8 +7,6 @@ const {
   loadRaspberryParc,
   saveRaspberryParc,
   buildExpectedListFromParc,
-  mergeListenNumbers,
-  normalizeNumberList,
 } = require("../../RaspberryParcStore");
 const {
   addStaticHostToIni,
@@ -22,7 +20,6 @@ const {
   INTERVALLE_HEARTBEAT_MS,
   DELAI_EXPIRATION_HEARTBEAT_MS,
   INTERVALLE_SONDAGE_RESEAU_MS,
-  INTERVALLE_RESUME_METRIQUES_MS,
 } = require("../configuration/RaspberryServeurConstantes");
 const { sonderListeRaspberryAttendus } = require("../reseau/RaspberryServeurSondageReseau");
 const {
@@ -30,6 +27,7 @@ const {
   handleScanOpenDhcpIni,
   handleApplyRaspberryParc,
   handleAddRaspberryEntry,
+  handleSyncRaspberryFromNetwork,
 } = require("../parc/RaspberryServeurHandlersParcOpenDhcp");
 const { portEstEnEcoute } = require("../reseau/RaspberryServeurVerificationPort");
 const {
@@ -39,12 +37,16 @@ const {
 } = require("../presence/RaspberryServeurListeEnLigne");
 const { creerDiffuseurControleurs } = require("../presence/RaspberryServeurDiffusionControleurs");
 const { demarrerBoucleHeartbeat } = require("../presence/RaspberryServeurBoucleHeartbeat");
+const { demarrerBoucleSondageReseau } = require("../presence/RaspberryServeurBouclesReseauEtResume");
 const {
-  demarrerBoucleSondageReseau,
-  demarrerBoucleResumeServeur,
-} = require("../presence/RaspberryServeurBouclesReseauEtResume");
+  DEFAULT_OPEN_DHCP_FOLDER,
+  synchroniserParcDepuisIni,
+  synchroniserRaspberryDepuisReseau,
+} = require("../parc/RaspberryServeurAutoEnregistrementOpenDhcp");
+const { decouvrirAppareilsSurSousReseau } = require("../reseau/RaspberryServeurDecouverteReseau");
 const { creerGestionnaireMessagesWs } = require("../websocket/RaspberryServeurGestionnaireMessagesWs");
 const { attacherGestionnairesConnexionWebSocket } = require("../websocket/RaspberryServeurConnexionsWebSocket");
+const { demarrerAgentTransfertRuntime } = require("../../AgentTransfertRuntime");
 
 function creerEtatServeurInitial() {
   const raspberryParc = loadRaspberryParc();
@@ -102,13 +104,16 @@ function construireStatutReseau() {
 async function actualiserReseau() {
   etat.metrics.networkProbeRuns += 1;
   const probes = await sonderListeRaspberryAttendus(etat.expectedRaspberryList);
-  probes.forEach((probe) => {
+
+  for (let i = 0; i < probes.length; i += 1) {
+    const probe = probes[i];
     const expected = etat.expectedRaspberryList.find((item) => item.ipAddress === probe.ipAddress);
     if (expected && probe.macAddress.length > 0) {
       expected.macAddress = probe.macAddress;
     }
     etat.networkStateMap.set(probe.ipAddress, probe);
-  });
+  }
+
   diffuseur.diffuserStatutReseau();
 }
 
@@ -116,8 +121,15 @@ const diffuseur = creerDiffuseurControleurs(
   etat,
   obtenirListeEnLigne,
   construireStatutReseau,
-  PORT_WEBSOCKET
+  PORT_WEBSOCKET,
+  scanIniFile
 );
+
+function notifierParcModifie() {
+  diffuseur.diffuserEtatParc();
+  diffuseur.diffuserListeRaspberry();
+  diffuseur.diffuserStatutReseau();
+}
 
 const { traiterMessageWebSocket } = creerGestionnaireMessagesWs({
   etat,
@@ -126,17 +138,19 @@ const { traiterMessageWebSocket } = creerGestionnaireMessagesWs({
   handleScanOpenDhcpIni,
   handleApplyRaspberryParc,
   handleAddRaspberryEntry,
-  mergeListenNumbers,
+  handleSyncRaspberryFromNetwork,
   saveParcFolder: enregistrerDossierParc,
   scanIniFile,
   saveRaspberryParc,
   reloadParcFromDisk: rechargerParcDepuisDisque,
   actualiserReseau,
-  normalizeNumberList,
   addStaticHostToIni,
   getNumberFromIp,
   normalizeMac,
   resolveOpenDhcpFolderPath,
+  synchroniserRaspberryDepuisReseau,
+  decouvrirAppareilsSurSousReseau,
+  notifierParcModifie,
   construireConfig,
   construireStatutReseau,
   obtenirListeEnLigne,
@@ -153,9 +167,23 @@ function attacherGestionnaireErreurServeur(server) {
   });
 }
 
+function preparerParcAuDemarrage() {
+  rechargerParcDepuisDisque();
+  if (!etat.raspberryParc.iniPath) {
+    etat.raspberryParc.iniPath = resolveOpenDhcpFolderPath(DEFAULT_OPEN_DHCP_FOLDER);
+    saveRaspberryParc(etat.raspberryParc);
+  }
+  synchroniserParcDepuisIni(
+    etat.raspberryParc,
+    scanIniFile,
+    saveRaspberryParc
+  );
+  rechargerParcDepuisDisque();
+}
+
 function startRaspberryRuntime() {
   etat.metrics.launchRequests += 1;
-  rechargerParcDepuisDisque();
+  preparerParcAuDemarrage();
 
   if (etat.wsServerMain) {
     return { started: true, alreadyRunning: true, port: PORT_WEBSOCKET };
@@ -185,7 +213,7 @@ function startRaspberryRuntime() {
 
   demarrerBoucleHeartbeat(etat, INTERVALLE_HEARTBEAT_MS, diffuseur);
   demarrerBoucleSondageReseau(etat, INTERVALLE_SONDAGE_RESEAU_MS, actualiserReseau, diffuseur);
-  demarrerBoucleResumeServeur(etat, INTERVALLE_RESUME_METRIQUES_MS, diffuseur);
+  demarrerAgentTransfertRuntime();
 
   return { started: true, alreadyRunning: false, port: PORT_WEBSOCKET };
 }

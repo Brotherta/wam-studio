@@ -1,15 +1,12 @@
 const { exec } = require("child_process");
+const { commandePing, pingAReussi } = require("./RaspberryServeurCommandesOs");
 
 /**
  * Exécute une commande shell (ping, arp) et renvoie la sortie texte, ou "" en cas d'erreur.
  */
 function executerCommandeReseau(commande) {
   return new Promise((resolve) => {
-    exec(commande, { windowsHide: true }, (error, stdout) => {
-      if (error) {
-        resolve("");
-        return;
-      }
+    exec(commande, { windowsHide: true }, (_error, stdout) => {
       resolve(stdout || "");
     });
   });
@@ -25,16 +22,16 @@ function extraireAdresseMacDepuisTexte(texte) {
 }
 
 /**
- * Sondage ping + ARP pour une IP (Windows : ping -n, arp -a).
+ * Sondage ping + ARP pour une IP (Windows : ping -n, Mac/Linux : ping -c).
  */
 async function sonderUneAdresseIpRaspberry(ipAddress) {
-  const pingResult = await executerCommandeReseau(`ping -n 1 -w 800 ${ipAddress}`);
+  const pingResult = await executerCommandeReseau(commandePing(ipAddress, 800));
   const arpResult = await executerCommandeReseau(`arp -a ${ipAddress}`);
   const macAddress = extraireAdresseMacDepuisTexte(arpResult);
   return {
     ipAddress,
     macAddress,
-    pingOk: pingResult.includes("TTL=") || pingResult.includes("TTL ="),
+    pingOk: pingAReussi(pingResult),
     arpSeen: macAddress.length > 0,
     checkedAtMs: Date.now(),
   };

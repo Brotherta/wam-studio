@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent transfert — Client de test</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="entete">
+        <div>
+          <h1>Agent de transfert Raspberry <span class="badge-phase">Phase 6</span></h1>
+          <p class="pied">Interface de developpement — upload HTTP, progression Socket.IO, SCP atomique.</p>
+        </div>
+        <div class="statut-ligne">
+          <span id="socket-statut" class="puce deconnecte">Socket...</span>
+          <span class="puce">transferId : <span id="transfer-id">—</span></span>
+        </div>
+      </header>
+
+      <div id="bandeau-succes" class="bandeau succes" role="status"></div>
+      <div id="bandeau-erreur" class="bandeau erreur" role="alert"></div>
+
+      <div class="grille">
+        <section class="carte">
+          <h2>Connexion SSH</h2>
+          <div class="champ">
+            <label for="authMode">Mode d'authentification</label>
+            <select id="authMode">
+              <option value="key">Cle privee</option>
+              <option value="password">Mot de passe</option>
+            </select>
+          </div>
+          <div class="champ">
+            <label for="sshHost">Adresse IP</label>
+            <input id="sshHost" type="text" placeholder="192.168.1.74" autocomplete="off" />
+          </div>
+          <div class="champ">
+            <label for="sshPort">Port</label>
+            <input id="sshPort" type="number" value="22" min="1" />
+          </div>
+          <div class="champ">
+            <label for="sshUsername">Login</label>
+            <input id="sshUsername" type="text" value="pi" autocomplete="username" />
+          </div>
+          <div id="bloc-cle">
+            <div class="champ">
+              <label for="privateKeyPath">Chemin cle privee</label>
+              <input id="privateKeyPath" type="text" placeholder="C:/Users/.../.ssh/id_rsa" />
+            </div>
+            <div class="champ">
+              <label for="passphrase">Passphrase (optionnelle)</label>
+              <input id="passphrase" type="password" autocomplete="off" />
+            </div>
+          </div>
+          <div id="bloc-password" class="cache">
+            <div class="champ">
+              <label for="sshPassword">Mot de passe</label>
+              <input id="sshPassword" type="password" autocomplete="current-password" />
+            </div>
+          </div>
+        </section>
+
+        <section class="carte">
+          <h2>Fichier & destination</h2>
+          <p class="detail-progression" style="margin-bottom: 0.75rem">
+            Dossier fixe : <code>/home/pi/modulePre/PureData/compositions/skini/sons/</code>
+          </p>
+          <div class="fichier-zone">
+            <input id="fichier" type="file" accept=".wav,.mp3,audio/wav,audio/mpeg" />
+            <div class="meta-fichier">
+              <div><strong>Nom :</strong> <span id="meta-nom">—</span></div>
+              <div><strong>Taille :</strong> <span id="meta-taille">—</span> octets</div>
+              <div><strong>Type :</strong> <span id="meta-type">—</span></div>
+            </div>
+          </div>
+          <div id="bloc-convention">
+            <div class="champ">
+              <label for="raspberryId">ID Raspberry</label>
+              <input id="raspberryId" type="number" value="74" min="1" />
+            </div>
+            <div class="champ">
+              <label for="sonNumber">Numero du son</label>
+              <input id="sonNumber" type="number" value="3" min="1" />
+            </div>
+            <div class="champ">
+              <label for="varianteIndex">Variante (optionnel)</label>
+              <input id="varianteIndex" type="number" min="1" placeholder="ex. 1" />
+            </div>
+            <p id="apercu-chemin" class="detail-progression">Chemin prevu : —</p>
+          </div>
+          <div class="actions">
+            <button id="btn-envoyer" type="button" class="btn-principal">Envoyer</button>
+            <button id="btn-annuler" type="button" class="btn-secondaire" disabled>Annuler</button>
+            <button id="btn-supprimer" type="button" class="btn-secondaire" disabled>Supprimer</button>
+          </div>
+        </section>
+      </div>
+
+      <section class="carte" style="margin-top: 1rem">
+        <h2>Progression & etat</h2>
+        <p>Etat courant : <span id="etat" class="etat-badge etat-neutre">—</span></p>
+
+        <div class="progression-bloc">
+          <h3>Upload HTTP</h3>
+          <progress id="barre-upload" class="barre" value="0" max="100"></progress>
+          <p id="detail-upload" class="detail-progression">En attente.</p>
+        </div>
+
+        <div class="progression-bloc">
+          <h3>SCP vers Raspberry</h3>
+          <progress id="barre-scp" class="barre scp" value="0" max="100"></progress>
+          <p id="detail-scp" class="detail-progression">En attente.</p>
+        </div>
+      </section>
+
+      <section class="carte" style="margin-top: 1rem">
+        <h2>Journal des evenements</h2>
+        <div id="journal" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

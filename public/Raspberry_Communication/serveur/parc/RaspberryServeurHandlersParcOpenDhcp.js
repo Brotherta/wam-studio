@@ -3,28 +3,30 @@
  *
  * Objectif : isoler la logique "parc" du runtime WebSocket.
  */
- 
-function construirePayloadEtatParc(raspberryParc, scanResult, mergeListenNumbers) {
+
+const { numbersFromIniEntries, appliquerNumerosDepuisIni } = require("../../RaspberryParcStore");
+
+function construirePayloadEtatParc(raspberryParc, scanResult) {
   const scan = scanResult || { ok: false, error: "", entries: [] };
   const catalog = scan.entries || [];
-  const listenNumbers = mergeListenNumbers(raspberryParc.activeNumbers, catalog);
+  const listenNumbers = numbersFromIniEntries(catalog);
   return {
     type: "raspberryParcState",
     subnetPrefix: raspberryParc.subnetPrefix,
     iniPath: raspberryParc.iniPath,
     iniFolder: raspberryParc.iniPath,
-    activeNumbers: raspberryParc.activeNumbers,
+    activeNumbers: listenNumbers,
     listenNumbers,
     scanOk: scan.ok,
     scanError: scan.error || "",
     catalog,
   };
 }
- 
-function envoyerEtatParc(ws, raspberryParc, scanResult, mergeListenNumbers) {
-  ws.send(JSON.stringify(construirePayloadEtatParc(raspberryParc, scanResult, mergeListenNumbers)));
+
+function envoyerEtatParc(ws, raspberryParc, scanResult) {
+  ws.send(JSON.stringify(construirePayloadEtatParc(raspberryParc, scanResult)));
 }
- 
+
 async function construireMapMacPourSelection({
   selectedNumbers,
   scanEntries,
@@ -39,7 +41,7 @@ async function construireMapMacPourSelection({
   (scanEntries || []).forEach((entry) => {
     scanByNumber.set(entry.number, entry);
   });
- 
+
   for (let i = 0; i < selectedNumbers.length; i += 1) {
     const number = selectedNumbers[i];
     const fromScan = scanByNumber.get(number);
@@ -47,47 +49,45 @@ async function construireMapMacPourSelection({
       macByNumber.set(number, normalizeMac(fromScan.mac));
       continue;
     }
- 
+
     const expected = expectedRaspberryList.find((item) => item.number === number);
     if (expected && expected.macAddress) {
       macByNumber.set(number, normalizeMac(expected.macAddress));
       continue;
     }
- 
+
     const ipAddress = buildIpFromNumber(subnetPrefix, number);
     const probedMac = await probeMacForIp(ipAddress);
     if (probedMac.length > 0) {
       macByNumber.set(number, probedMac);
     }
   }
- 
+
   return macByNumber;
 }
- 
+
 async function handleScanOpenDhcpIni({
   ws,
   message,
   raspberryParc,
   saveParcFolder,
   scanIniFile,
-  saveRaspberryParc,
   reloadParcFromDisk,
   refreshNetworkStatus,
   broadcastRaspList,
   broadcastNetworkStatus,
-  mergeListenNumbers,
 }) {
   const folderPath = typeof message.iniPath === "string" ? message.iniPath.trim() : raspberryParc.iniPath;
   saveParcFolder(folderPath);
   const scan = scanIniFile(raspberryParc.iniPath, raspberryParc.subnetPrefix);
-  if (scan.ok && scan.entries.length > 0) {
-    raspberryParc.activeNumbers = mergeListenNumbers(raspberryParc.activeNumbers, scan.entries);
-    saveRaspberryParc(raspberryParc);
+  if (scan.ok) {
+    appliquerNumerosDepuisIni(raspberryParc, scan.entries);
     reloadParcFromDisk();
     await refreshNetworkStatus();
     broadcastRaspList();
     broadcastNetworkStatus();
   }
+  const listenNumbers = numbersFromIniEntries(scan.entries || []);
   ws.send(JSON.stringify({
     type: "openDhcpScanResult",
     ok: scan.ok,
@@ -97,29 +97,25 @@ async function handleScanOpenDhcpIni({
     iniFilePath: scan.iniFilePath || "",
     iniFileName: scan.iniFileName || "",
     catalog: scan.entries || [],
-    listenNumbers: mergeListenNumbers(raspberryParc.activeNumbers, scan.entries || []),
+    listenNumbers,
   }));
-  envoyerEtatParc(ws, raspberryParc, scan, mergeListenNumbers);
+  envoyerEtatParc(ws, raspberryParc, scan);
 }
- 
+
 async function handleApplyRaspberryParc({
   ws,
   message,
   raspberryParc,
   saveParcFolder,
   scanIniFile,
-  saveRaspberryParc,
   reloadParcFromDisk,
   refreshNetworkStatus,
   broadcastRaspList,
   broadcastNetworkStatus,
   broadcastSummary,
-  normalizeNumberList,
-  mergeListenNumbers,
   buildRaspConfig,
 }) {
   const folderPath = typeof message.iniPath === "string" ? message.iniPath.trim() : raspberryParc.iniPath;
-  const selectedNumbers = normalizeNumberList(message.selectedNumbers);
   if (folderPath.length === 0) {
     ws.send(JSON.stringify({
       type: "raspberryParcApplyResult",
@@ -128,7 +124,7 @@ async function handleApplyRaspberryParc({
     }));
     return;
   }
- 
+
   saveParcFolder(folderPath);
   const scan = scanIniFile(raspberryParc.iniPath, raspberryParc.subnetPrefix);
   if (!scan.ok) {
@@ -139,27 +135,26 @@ async function handleApplyRaspberryParc({
     }));
     return;
   }
- 
-  raspberryParc.activeNumbers = selectedNumbers;
-  saveRaspberryParc(raspberryParc);
+
+  appliquerNumerosDepuisIni(raspberryParc, scan.entries);
   reloadParcFromDisk();
   await refreshNetworkStatus();
   broadcastRaspList();
   broadcastNetworkStatus();
   broadcastSummary();
- 
+
   ws.send(JSON.stringify({
     type: "raspberryParcApplyResult",
     ok: true,
     error: "",
-    updatedCount: selectedNumbers.length,
+    updatedCount: numbersFromIniEntries(scan.entries).length,
     activeNumbers: raspberryParc.activeNumbers,
     expectedList: buildRaspConfig(),
     iniPreserved: true,
   }));
-  envoyerEtatParc(ws, raspberryParc, scanIniFile(raspberryParc.iniPath, raspberryParc.subnetPrefix), mergeListenNumbers);
+  envoyerEtatParc(ws, raspberryParc, scanIniFile(raspberryParc.iniPath, raspberryParc.subnetPrefix));
 }
- 
+
 async function handleAddRaspberryEntry({
   ws,
   message,
@@ -168,9 +163,6 @@ async function handleAddRaspberryEntry({
   saveParcFolder,
   addStaticHostToIni,
   scanIniFile,
-  getNumberFromIp,
-  mergeListenNumbers,
-  saveRaspberryParc,
   reloadParcFromDisk,
   refreshNetworkStatus,
   broadcastRaspList,
@@ -181,7 +173,7 @@ async function handleAddRaspberryEntry({
   const folderPath = resolveOpenDhcpFolderPath(typeof message.iniPath === "string" ? message.iniPath.trim() : raspberryParc.iniPath);
   const macAddress = typeof message.macAddress === "string" ? normalizeMac(message.macAddress) : "";
   const ipAddress = typeof message.ipAddress === "string" ? message.ipAddress.trim() : "";
- 
+
   if (wsServerMain === null) {
     ws.send(JSON.stringify({
       type: "addRaspberryEntryResult",
@@ -190,7 +182,7 @@ async function handleAddRaspberryEntry({
     }));
     return;
   }
- 
+
   if (folderPath.length === 0) {
     ws.send(JSON.stringify({
       type: "addRaspberryEntryResult",
@@ -199,7 +191,7 @@ async function handleAddRaspberryEntry({
     }));
     return;
   }
- 
+
   saveParcFolder(folderPath);
   const added = addStaticHostToIni(folderPath, macAddress, ipAddress);
   if (!added.ok) {
@@ -210,18 +202,16 @@ async function handleAddRaspberryEntry({
     }));
     return;
   }
- 
-  const number = getNumberFromIp(added.ipAddress, raspberryParc.subnetPrefix);
-  if (number !== null) {
-    raspberryParc.activeNumbers = mergeListenNumbers(raspberryParc.activeNumbers, [{ number }]);
-    saveRaspberryParc(raspberryParc);
+
+  const scan = scanIniFile(folderPath, raspberryParc.subnetPrefix);
+  if (scan.ok) {
+    appliquerNumerosDepuisIni(raspberryParc, scan.entries);
     reloadParcFromDisk();
     await refreshNetworkStatus();
     broadcastRaspList();
     broadcastNetworkStatus();
   }
- 
-  const scan = scanIniFile(folderPath, raspberryParc.subnetPrefix);
+
   ws.send(JSON.stringify({
     type: "addRaspberryEntryResult",
     ok: true,
@@ -234,9 +224,87 @@ async function handleAddRaspberryEntry({
     folderPath: added.folderPath || folderPath,
     activeNumbers: raspberryParc.activeNumbers,
   }));
-  envoyerEtatParc(ws, raspberryParc, scan, mergeListenNumbers);
+  envoyerEtatParc(ws, raspberryParc, scan);
 }
- 
+
+async function handleSyncRaspberryFromNetwork({
+  ws,
+  message,
+  raspberryParc,
+  wsServerMain,
+  saveParcFolder,
+  synchroniserRaspberryDepuisReseau,
+  reloadParcFromDisk,
+  actualiserReseau,
+  notifierParcModifie,
+  scanIniFile,
+  resolveOpenDhcpFolderPath,
+  addStaticHostToIni,
+  getNumberFromIp,
+  saveRaspberryParc,
+  normalizeMac,
+  decouvrirAppareilsSurSousReseau,
+}) {
+  if (wsServerMain === null) {
+    ws.send(JSON.stringify({
+      type: "syncRaspberryFromNetworkResult",
+      ok: false,
+      error: "Serveur Raspberry non demarre. Cliquez d'abord sur le bouton de lancement.",
+    }));
+    return;
+  }
+
+  const folderPath = typeof message.iniPath === "string" ? message.iniPath.trim() : raspberryParc.iniPath;
+  if (folderPath.length > 0) {
+    saveParcFolder(folderPath);
+  }
+
+  try {
+    const sync = await synchroniserRaspberryDepuisReseau({
+      raspberryParc,
+      resolveOpenDhcpFolderPath,
+      scanIniFile,
+      addStaticHostToIni,
+      getNumberFromIp,
+      saveRaspberryParc,
+      reloadParcFromDisk,
+      normalizeMac,
+      decouvrirAppareilsSurSousReseau,
+    });
+
+    reloadParcFromDisk();
+    await actualiserReseau();
+    if (typeof notifierParcModifie === "function") {
+      notifierParcModifie();
+    }
+
+    const scan = scanIniFile(raspberryParc.iniPath, raspberryParc.subnetPrefix);
+    ws.send(JSON.stringify({
+      type: "syncRaspberryFromNetworkResult",
+      ok: true,
+      error: "",
+      subnetPrefix: raspberryParc.subnetPrefix,
+      appareilsTrouves: sync.appareilsTrouves,
+      raspberriesDetectes: sync.raspberriesDetectes,
+      addedCount: sync.ajoutes.length,
+      alreadyPresentCount: sync.dejaPresents.length,
+      ignoredCount: sync.ignores.length,
+      ajoutes: sync.ajoutes,
+      dejaPresents: sync.dejaPresents,
+      ignores: sync.ignores,
+      listenNumbers: numbersFromIniEntries(scan.entries || []),
+    }));
+    envoyerEtatParc(ws, raspberryParc, scan);
+  } catch (error) {
+    const details = error && error.message ? error.message : "Erreur inconnue";
+    ws.send(JSON.stringify({
+      type: "syncRaspberryFromNetworkResult",
+      ok: false,
+      error: `Synchronisation reseau impossible: ${details}`,
+    }));
+  }
+}
+
 module.exports = {
   construirePayloadEtatParc,
   envoyerEtatParc,
@@ -244,5 +312,5 @@ module.exports = {
   handleScanOpenDhcpIni,
   handleApplyRaspberryParc,
   handleAddRaspberryEntry,
+  handleSyncRaspberryFromNetwork,
 };
-

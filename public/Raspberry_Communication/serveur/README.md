@@ -16,6 +16,5 @@ serveur/
 **API publique** (depuis la racine `Raspberry_Communication/`) :
 
 - `RaspberryRuntime.js` → `startRaspberryRuntime()`, `getRaspberryRuntimeStatus()`
-- `RaspberryRuntimeCompatLegacy.js` — alias historique (même export)
 
-Voir aussi `../interface-wam-studio/README.md` pour la partie fenêtre WAM.
+**UI WAM** : `SearchRaspberryFeature.ts` → `Controllers/`, `Views/`, `Models/`.

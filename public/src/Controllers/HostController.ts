@@ -7,6 +7,7 @@ import DraggableWindow from "../Utils/DraggableWindow";
 import HostView from "../Views/HostView";
 import { audioCtx } from "../index";
 import SearchRaspberryFeature from "../../Raspberry_Communication/SearchRaspberryFeature";
+import WamPistesPontImpl from "../../Raspberry_Communication/Pont/WamPistesPontImpl";
 
 /**
  * Class to control the audio. It contains all the listeners for the audio controls.
@@ -54,6 +55,8 @@ export default class HostController {
     this._view = app.hostView;
     this.windows = [];
     this.searchRaspberryFeature = new SearchRaspberryFeature();
+    this.searchRaspberryFeature.brancherPontPistes(new WamPistesPontImpl(app));
+    this.searchRaspberryFeature.activerSurveillanceAutoPistes();
     this._timerIntervalPaused = false;
 
     this._view.host?.append(this._app.host.element)

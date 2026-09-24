@@ -1,0 +1,484 @@
+{
+  "entries": [
+    {
+      "ipAddress": "192.168.1.3",
+      "macAddress": "b8:27:eb:c8:0f:45",
+      "machineId": 3,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.4",
+      "macAddress": "b8:27:eb:3d:a2:13",
+      "machineId": 4,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.5",
+      "macAddress": "b8:27:eb:99:ec:2f",
+      "machineId": 5,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.6",
+      "macAddress": "b8:27:eb:a3:3e:3e",
+      "machineId": 6,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.7",
+      "macAddress": "b8:27:eb:31:93:c0",
+      "machineId": 7,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.8",
+      "macAddress": "b8:27:eb:3f:b6:40",
+      "machineId": 8,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.9",
+      "macAddress": "b8:27:eb:40:cd:59",
+      "machineId": 9,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.10",
+      "macAddress": "b8:27:eb:90:1b:2b",
+      "machineId": 10,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.11",
+      "macAddress": "b8:27:eb:43:29:83",
+      "machineId": 11,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.12",
+      "macAddress": "b8:27:eb:27:43:74",
+      "machineId": 12,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.13",
+      "macAddress": "b8:27:eb:37:d7:1e",
+      "machineId": 13,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.14",
+      "macAddress": "b8:27:eb:02:a6:f1",
+      "machineId": 14,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.15",
+      "macAddress": "b8:27:eb:15:24:95",
+      "machineId": 15,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.16",
+      "macAddress": "b8:27:eb:fd:16:64",
+      "machineId": 16,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.17",
+      "macAddress": "b8:27:eb:25:31:54",
+      "machineId": 17,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.18",
+      "macAddress": "b8:27:eb:30:93:b6",
+      "machineId": 18,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.19",
+      "macAddress": "b8:27:eb:02:a7:ae",
+      "machineId": 19,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.20",
+      "macAddress": "b8:27:eb:4f:74:68",
+      "machineId": 20,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.21",
+      "macAddress": "b8:27:eb:05:1e:a4",
+      "machineId": 21,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.22",
+      "macAddress": "b8:27:eb:62:79:34",
+      "machineId": 22,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.23",
+      "macAddress": "b8:27:eb:a4:95:9c",
+      "machineId": 23,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.24",
+      "macAddress": "b8:27:eb:bf:36:b6",
+      "machineId": 24,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.25",
+      "macAddress": "b8:27:eb:fb:89:be",
+      "machineId": 25,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.26",
+      "macAddress": "b8:27:eb:4f:de:2f",
+      "machineId": 26,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.27",
+      "macAddress": "b8:27:eb:42:8c:2e",
+      "machineId": 27,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.28",
+      "macAddress": "b8:27:eb:4a:dd:95",
+      "machineId": 28,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.29",
+      "macAddress": "b8:27:eb:f3:fd:cb",
+      "machineId": 29,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.30",
+      "macAddress": "b8:27:eb:87:18:2b",
+      "machineId": 30,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.31",
+      "macAddress": "b8:27:eb:c0:68:64",
+      "machineId": 31,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.32",
+      "macAddress": "b8:27:eb:77:59:57",
+      "machineId": 32,
+      "model": "3b+"
+    },
+    {
+      "ipAddress": "192.168.1.33",
+      "macAddress": "e4:5f:01:9d:e0:b4",
+      "machineId": 33,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.34",
+      "macAddress": "e4:5f:01:9d:e2:46",
+      "machineId": 34,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.35",
+      "macAddress": "b8:27:eb:74:98:cf",
+      "machineId": 35,
+      "model": "3b+"
+    },
+    {
+      "ipAddress": "192.168.1.36",
+      "macAddress": "b8:27:eb:dc:db:95",
+      "machineId": 36,
+      "model": "3b+"
+    },
+    {
+      "ipAddress": "192.168.1.37",
+      "macAddress": "e4:5f:01:9d:de:ed",
+      "machineId": 37,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.38",
+      "macAddress": "e4:5f:01:9d:df:df",
+      "machineId": 38,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.39",
+      "macAddress": "e4:5f:01:9d:e2:5f",
+      "machineId": 39,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.40",
+      "macAddress": "e4:5f:01:9d:de:d1",
+      "machineId": 40,
+      "model": "3b+"
+    },
+    {
+      "ipAddress": "192.168.1.41",
+      "macAddress": "dc:a6:32:61:7e:36",
+      "machineId": 41,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.42",
+      "macAddress": "e4:5f:01:9d:e0:5a",
+      "machineId": 42,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.43",
+      "macAddress": "dc:a6:32:61:7f:f8",
+      "machineId": 43,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.44",
+      "macAddress": "e4:5f:01:9d:e1:b7",
+      "machineId": 44,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.45",
+      "macAddress": "e4:5f:01:9d:db:f2",
+      "machineId": 45,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.46",
+      "macAddress": "dc:a6:32:61:7b:16",
+      "machineId": 46,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.47",
+      "macAddress": "dc:a6:32:61:75:23",
+      "machineId": 47,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.48",
+      "macAddress": "dc:a6:32:5f:c0:60",
+      "machineId": 48,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.49",
+      "macAddress": "e4:5f:01:9d:e2:a6",
+      "machineId": 49,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.50",
+      "macAddress": "e4:5f:01:9d:e1:08",
+      "machineId": 50,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.51",
+      "macAddress": "dc:a6:32:cb:b0:1a",
+      "machineId": 51,
+      "model": "4b-8giga"
+    },
+    {
+      "ipAddress": "192.168.1.52",
+      "macAddress": "dc:a6:32:cb:af:cf",
+      "machineId": 52,
+      "model": "4b-8giga"
+    },
+    {
+      "ipAddress": "192.168.1.53",
+      "macAddress": "e4:5f:01:9d:e3:81",
+      "machineId": 53,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.54",
+      "macAddress": "e4:5f:01:9d:e1:44",
+      "machineId": 54,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.55",
+      "macAddress": "e4:5f:01:9d:e0:3c",
+      "machineId": 55,
+      "model": "4b+"
+    },
+    {
+      "ipAddress": "192.168.1.56",
+      "macAddress": "b8:27:eb:9b:82:1d",
+      "machineId": 56,
+      "model": "3b+"
+    },
+    {
+      "ipAddress": "192.168.1.57",
+      "macAddress": "e4:5f:01:9d:e3:03",
+      "machineId": 57,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.58",
+      "macAddress": "b8:27:eb:66:e4:54",
+      "machineId": 58,
+      "model": "3b+"
+    },
+    {
+      "ipAddress": "192.168.1.59",
+      "macAddress": "b8:27:eb:64:a6:aa",
+      "machineId": 59,
+      "model": "3b+"
+    },
+    {
+      "ipAddress": "192.168.1.60",
+      "macAddress": "b8:27:eb:a6:97:18",
+      "machineId": 60,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.61",
+      "macAddress": "b8:27:eb:41:72:f9",
+      "machineId": 61,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.62",
+      "macAddress": "b8:27:eb:8d:a0:c1",
+      "machineId": 62,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.63",
+      "macAddress": "b8:27:eb:42:03:4b",
+      "machineId": 63,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.64",
+      "macAddress": "b8:27:eb:cc:2f:98",
+      "machineId": 64,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.65",
+      "macAddress": "e4:5f:01:f8:08:d1",
+      "machineId": 65,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.66",
+      "macAddress": "e4:5f:01:f8:0b:dd",
+      "machineId": 66,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.67",
+      "macAddress": "e4:5f:01:f8:0b:fe",
+      "machineId": 67,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.68",
+      "macAddress": "e4:5f:01:f8:0b:bf",
+      "machineId": 68,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.69",
+      "macAddress": "e4:5f:01:f8:0b:b9",
+      "machineId": 69,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.70",
+      "macAddress": "e4:5f:01:f8:0b:c8",
+      "machineId": 70,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.71",
+      "macAddress": "e4:5f:01:f8:0b:38",
+      "machineId": 71,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.72",
+      "macAddress": "e4:5f:01:f8:0c:01",
+      "machineId": 72,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.73",
+      "macAddress": "e4:5f:01:f8:0b:aa",
+      "machineId": 73,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.74",
+      "macAddress": "e4:5f:01:f8:0b:8c",
+      "machineId": 74,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.75",
+      "macAddress": "e4:5f:01:f8:0b:ad",
+      "machineId": 75,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.76",
+      "macAddress": "e4:5f:01:f8:0b:fb",
+      "machineId": 76,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.77",
+      "macAddress": "e4:5f:01:f8:0c:13",
+      "machineId": 77,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.78",
+      "macAddress": "e4:5f:01:f8:0b:cb",
+      "machineId": 78,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.79",
+      "macAddress": "e4:5f:01:f8:0b:d7",
+      "machineId": 79,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.80",
+      "macAddress": "e4:5f:01:f8:0b:f8",
+      "machineId": 80,
+      "model": "4b-2giga"
+    },
+    {
+      "ipAddress": "192.168.1.101",
+      "macAddress": "b8:27:eb:f0:dd:29",
+      "machineId": 101,
+      "model": "3a+"
+    },
+    {
+      "ipAddress": "192.168.1.102",
+      "macAddress": "b8:27:eb:af:7a:35",
+      "machineId": 102,
+      "model": "3a+"
+    }
+  ]
+}

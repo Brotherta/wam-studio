@@ -86,12 +86,27 @@ function mergeListenNumbers(activeNumbers, catalogEntries) {
   return normalizeNumberList([...(Array.isArray(activeNumbers) ? activeNumbers : []), ...fromCatalog]);
 }
 
+/** Numéros issus uniquement du scan INI Open DHCP (source de vérité pour la liste). */
+function numbersFromIniEntries(iniEntries) {
+  if (!Array.isArray(iniEntries)) {
+    return [];
+  }
+  return normalizeNumberList(iniEntries.map((entry) => entry.number));
+}
+
+function appliquerNumerosDepuisIni(raspberryParc, iniEntries) {
+  raspberryParc.activeNumbers = numbersFromIniEntries(iniEntries);
+  return saveRaspberryParc(raspberryParc);
+}
+
 module.exports = {
   DEFAULT_SUBNET_PREFIX,
   buildDefaultParc,
   buildExpectedListFromParc,
   buildIpFromNumber,
   mergeListenNumbers,
+  numbersFromIniEntries,
+  appliquerNumerosDepuisIni,
   getParcFilePath,
   loadRaspberryParc,
   normalizeNumberList,

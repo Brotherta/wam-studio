@@ -155,6 +155,23 @@ export default class ExporterController {
     }
 
     /**
+     * Exporte une piste en Blob WAV (timeline complete avec silences).
+     * Retourne null si la piste est vide ou introuvable.
+     */
+    public async exportTrackToWaveBlob(track: Track): Promise<Blob | null> {
+        if (track.regions.length === 0) {
+            return null;
+        }
+        const maxDuration = this._app.regionsController.getMaxDurationRegions();
+        if (maxDuration === 0) {
+            return null;
+        }
+        const { default: initializeWamHost } = await import("@webaudiomodules/sdk/src/initializeWamHost");
+        const buffer = await this.processTrack(track, maxDuration, initializeWamHost);
+        return bufferToWave(buffer);
+    }
+
+    /**
      * Export a given audio buffer as a WAV file.
      *
      * @param buffer - Audio buffer to export.

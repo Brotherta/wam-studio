@@ -7,6 +7,9 @@ import { RegionOf, RegionType } from "../Models/Region/Region";
 import SampleRegion from "../Models/Region/SampleRegion";
 import Track from "../Models/Track/Track";
 import { audioCtx } from "../index";
+import { appliquerIndicateurRaspberry } from "../../Raspberry_Communication/Services/RaspberryIndicateurPisteUi";
+import { raspberryTrackBindingStore } from "../../Raspberry_Communication/Services/RaspberryTrackBindingStore";
+import { declencherSynchronisationPistesRaspberry } from "../../Raspberry_Communication/Services/RaspberryPisteSynchronisation";
 
 
 /**
@@ -72,7 +75,12 @@ export interface ProjectData {
             type: string;
             content_name: string;
             start: number;
-        }[]
+        }[];
+        raspberry?: {
+            ip: string;
+            raspberryId: number;
+            sonNumber: number;
+        };
     }[];
 }
 
@@ -143,6 +151,8 @@ export default class Loader {
                 });
             }
 
+            const binding = raspberryTrackBindingStore.trouverParTrackId(track.id);
+
             tracks.push({
                 name: track.element.name,
                 color: track.color,
@@ -152,7 +162,8 @@ export default class Loader {
                 balance: track.balance,
                 plugin: pluginData,
                 regions: regions,
-                automations: automations
+                automations: automations,
+                ...(binding ? { raspberry: raspberryTrackBindingStore.versPersiste(binding) } : {}),
             });
         }
 
@@ -193,6 +204,7 @@ export default class Loader {
         let tracksJson = project.tracks
         this._app.hostController.stopAllTracks()
         this._app.tracksController.clearTracks()
+        raspberryTrackBindingStore.reinitialiser()
         this._app.host.playhead = 0
         this._app.host.volume=project.host.volume
         this._app.hostView.tempoSelector.tempo = project.host.tempo
@@ -219,6 +231,14 @@ export default class Loader {
             track.volume= trackJson.volume
             this._app.tracksController.setColor(track, trackJson.color)
 
+            if (trackJson.raspberry) {
+                const binding = raspberryTrackBindingStore.enregistrerDepuisPersiste(
+                    track.id,
+                    trackJson.raspberry
+                );
+                appliquerIndicateurRaspberry(track, binding);
+            }
+
             const pluginData = trackJson.plugin;
             console.log("Load Plugin",pluginData)
             if (pluginData) {
@@ -243,7 +263,7 @@ export default class Loader {
         }
 
         this._app.editorView.setLoading(false)
-        
+        declencherSynchronisationPistesRaspberry();
     }
 
     loadTrackRegions(track: Track, regions: ProjectData['tracks'][0]['regions'], contents: (id:string)=>XMLHttpRequest) {
