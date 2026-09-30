@@ -52,7 +52,14 @@ export function retirerProtectionNomPiste(piste: ElementPiste): void {
     Reflect.deleteProperty(element as unknown as Record<string, unknown>, "name");
   }
 
-  const input = element.trackNameInput;
+  const input = element.trackNameInput as HTMLInputElement & {
+    raspberryRestaurerNom?: () => void;
+  };
+  if (input?.raspberryRestaurerNom) {
+    input.removeEventListener("input", input.raspberryRestaurerNom);
+    input.removeEventListener("change", input.raspberryRestaurerNom);
+    delete input.raspberryRestaurerNom;
+  }
   if (input) {
     delete input.dataset.raspberryNomListener;
   }
@@ -141,11 +148,13 @@ function installerEcouteursChampNom(
       return;
     }
     input.dataset.raspberryNomListener = "1";
+    const champ = input as HTMLInputElement & { raspberryRestaurerNom?: () => void };
     const restaurerNom = () => {
       if (input.value !== nomAttendu) {
         ecrireNom(nomAttendu);
       }
     };
+    champ.raspberryRestaurerNom = restaurerNom;
     input.addEventListener("input", restaurerNom);
     input.addEventListener("change", restaurerNom);
   };

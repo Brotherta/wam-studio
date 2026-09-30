@@ -49,20 +49,21 @@ export class Ssh2ScpClient implements IScpClient {
         throw new Error("Transfert SCP annule.");
       }
 
-      sftp = await executerEtape("ouverture session SFTP", () => obtenirSftp(client));
+      const sessionSftp = await executerEtape("ouverture session SFTP", () => obtenirSftp(client));
+      sftp = sessionSftp;
       await executerEtape(
         "creation du dossier distant",
-        () => creerRepertoireRecursif(sftp, params.remoteDirectory),
+        () => creerRepertoireRecursif(sessionSftp, params.remoteDirectory),
         { cheminDistant: undefined }
       );
       await executerEtape("preparation fichier temporaire distant", () =>
-        supprimerSiExiste(sftp, params.remotePathPart)
+        supprimerSiExiste(sessionSftp, params.remotePathPart)
       );
 
       this.logger.info(`Upload SFTP vers ${params.remotePathPart}`);
       await executerEtape("envoi du fichier", () =>
         envoyerFichierAvecProgression({
-          sftp,
+          sftp: sessionSftp,
           cheminLocal: params.localPath,
           cheminDistant: params.remotePathPart,
           tailleTotale: params.tailleTotale,
@@ -76,7 +77,7 @@ export class Ssh2ScpClient implements IScpClient {
       }
 
       await executerEtape("finalisation du fichier distant", () =>
-        finaliserUploadAtomiqueDistant(sftp, params.remotePathPart, params.remotePathFinal)
+        finaliserUploadAtomiqueDistant(sessionSftp, params.remotePathPart, params.remotePathFinal)
       );
       this.logger.info(`Renommage atomique: ${params.remotePathFinal}`);
     } catch (error) {

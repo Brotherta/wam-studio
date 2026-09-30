@@ -1,9 +1,9 @@
 /**
  * Envoi des messages WebSocket vers les contrôleurs (UI WAM Studio).
  */
-const { construirePayloadEtatParc } = require("../parc/RaspberryServeurHandlersParcOpenDhcp");
+const { construirePayloadEtatParc } = require("../parc/RaspberryServeurHandlersParc");
 
-function creerDiffuseurControleurs(etat, obtenirListeEnLigne, construireStatutReseau, portWebSocket, scanIniFile) {
+function creerDiffuseurControleurs(etat, obtenirListeEnLigne, construireStatutReseau, portWebSocket) {
   function diffuserVersControleurs(payload) {
     const text = JSON.stringify(payload);
     if (payload.type === "raspList") {
@@ -17,10 +17,7 @@ function creerDiffuseurControleurs(etat, obtenirListeEnLigne, construireStatutRe
   }
 
   function diffuserEtatParc() {
-    const scan = etat.raspberryParc.iniPath
-      ? scanIniFile(etat.raspberryParc.iniPath, etat.raspberryParc.subnetPrefix)
-      : { ok: false, error: "", entries: [] };
-    diffuserVersControleurs(construirePayloadEtatParc(etat.raspberryParc, scan));
+    diffuserVersControleurs(construirePayloadEtatParc(etat.raspberryParc));
   }
 
   function diffuserListeRaspberry() {

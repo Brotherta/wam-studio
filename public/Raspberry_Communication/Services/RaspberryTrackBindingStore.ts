@@ -77,6 +77,7 @@ class RaspberryTrackBindingStore {
       ip: binding.raspberryIp,
       raspberryId: binding.raspberryId,
       sonNumber: binding.sonNumber,
+      liee: binding.liee !== false,
     };
   }
 

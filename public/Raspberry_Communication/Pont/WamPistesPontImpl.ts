@@ -5,7 +5,6 @@ import SampleRegion from "../../src/Models/Region/SampleRegion";
 import type { IWamPistesPont, PisteRaspberryCreee, PositionLibelleRegion, PositionMarqueurPiste, RegionAjouteePiste, RegionAudioPiste, RegionPisteRaspberry, SessionProjetLocale } from "../Interfaces/IWamPistesPont";
 import { creerBinding } from "../Models/RaspberryTrackBinding";
 import { appliquerIndicateurRaspberry } from "../Services/RaspberryIndicateurPisteUi";
-import { protegerNomPisteRaspberry } from "../Services/RaspberryNomPisteProtection";
 import { raspberryTrackBindingStore } from "../Services/RaspberryTrackBindingStore";
 import { enregistrerRegionSon, trouverSonPourRegion, type EntreeRegionSonPersiste } from "../Services/RaspberryRegionSonStore";
 import { formaterNomPisteRaspberry, lireNumeroRaspberryDepuisElementPiste, lireNumeroRaspberryDepuisNomPiste } from "../utils/agent-transfert/AgentTransfertHelpers";
@@ -102,6 +101,10 @@ export default class WamPistesPontImpl implements IWamPistesPont {
   public listerRegionsPistesRaspberry(): RegionPisteRaspberry[] {
     const resultat: RegionPisteRaspberry[] = [];
     for (const track of this.app.tracksController.tracks) {
+      const binding = raspberryTrackBindingStore.trouverParTrackId(track.id);
+      if (binding && binding.liee === false) {
+        continue;
+      }
       const raspberryId = lireNumeroRaspberryDepuisElementPiste(track.element);
       if (raspberryId === undefined) {
         continue;
@@ -476,7 +479,7 @@ export default class WamPistesPontImpl implements IWamPistesPont {
       if (!track) {
         continue;
       }
-      protegerNomPisteRaspberry({ element: track.element }, binding);
+      appliquerIndicateurRaspberry(track, binding);
     }
   }
 

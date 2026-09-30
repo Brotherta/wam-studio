@@ -22,7 +22,6 @@ export default class SearchRaspberryState {
   public readonly networkReachabilityTimeoutMs = 45000;
   public readonly reconnectDelayMs = 2000;
   public readonly wsServerPort = 8383;
-  public readonly defaultOpenDhcpFolder = "C:/OpenDHCPServer/";
 
   public raspberryMap = new Map<string, Raspberry>();
   public selectedRaspberryIp: string | null = null;

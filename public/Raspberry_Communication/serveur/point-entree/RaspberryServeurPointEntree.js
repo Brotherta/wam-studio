@@ -5,16 +5,8 @@
 const { WebSocketServer } = require("ws");
 const {
   loadRaspberryParc,
-  saveRaspberryParc,
   buildExpectedListFromParc,
 } = require("../../RaspberryParcStore");
-const {
-  addStaticHostToIni,
-  scanIniFile,
-  normalizeMac,
-  resolveOpenDhcpFolderPath,
-  getNumberFromIp,
-} = require("../../OpenDhcpIniManager");
 const {
   PORT_WEBSOCKET,
   INTERVALLE_HEARTBEAT_MS,
@@ -24,11 +16,8 @@ const {
 const { sonderListeRaspberryAttendus } = require("../reseau/RaspberryServeurSondageReseau");
 const {
   envoyerEtatParc,
-  handleScanOpenDhcpIni,
-  handleApplyRaspberryParc,
-  handleAddRaspberryEntry,
   handleSyncRaspberryFromNetwork,
-} = require("../parc/RaspberryServeurHandlersParcOpenDhcp");
+} = require("../parc/RaspberryServeurHandlersParc");
 const { portEstEnEcoute } = require("../reseau/RaspberryServeurVerificationPort");
 const {
   obtenirListeRaspberryEnLigne,
@@ -38,19 +27,15 @@ const {
 const { creerDiffuseurControleurs } = require("../presence/RaspberryServeurDiffusionControleurs");
 const { demarrerBoucleHeartbeat } = require("../presence/RaspberryServeurBoucleHeartbeat");
 const { demarrerBoucleSondageReseau } = require("../presence/RaspberryServeurBouclesReseauEtResume");
-const {
-  DEFAULT_OPEN_DHCP_FOLDER,
-  synchroniserParcDepuisIni,
-  synchroniserRaspberryDepuisReseau,
-} = require("../parc/RaspberryServeurAutoEnregistrementOpenDhcp");
+const { synchroniserRaspberryDepuisReseau } = require("../parc/RaspberryServeurSynchronisationParc");
 const { decouvrirAppareilsSurSousReseau } = require("../reseau/RaspberryServeurDecouverteReseau");
 const { creerGestionnaireMessagesWs } = require("../websocket/RaspberryServeurGestionnaireMessagesWs");
 const { attacherGestionnairesConnexionWebSocket } = require("../websocket/RaspberryServeurConnexionsWebSocket");
 const { demarrerAgentTransfertRuntime } = require("../../AgentTransfertRuntime");
+const { demarrerServeurSessionDisque } = require("../session/RaspberryServeurSessionHttp");
 
 function creerEtatServeurInitial() {
   const raspberryParc = loadRaspberryParc();
-  raspberryParc.iniPath = resolveOpenDhcpFolderPath(raspberryParc.iniPath);
   return {
     raspberryParc,
     expectedRaspberryList: buildExpectedListFromParc(raspberryParc),
@@ -80,13 +65,7 @@ const etat = creerEtatServeurInitial();
 
 function rechargerParcDepuisDisque() {
   etat.raspberryParc = loadRaspberryParc();
-  etat.raspberryParc.iniPath = resolveOpenDhcpFolderPath(etat.raspberryParc.iniPath);
   etat.expectedRaspberryList = buildExpectedListFromParc(etat.raspberryParc);
-}
-
-function enregistrerDossierParc(folderPath) {
-  etat.raspberryParc.iniPath = resolveOpenDhcpFolderPath(folderPath);
-  saveRaspberryParc(etat.raspberryParc);
 }
 
 function obtenirListeEnLigne() {
@@ -121,8 +100,7 @@ const diffuseur = creerDiffuseurControleurs(
   etat,
   obtenirListeEnLigne,
   construireStatutReseau,
-  PORT_WEBSOCKET,
-  scanIniFile
+  PORT_WEBSOCKET
 );
 
 function notifierParcModifie() {
@@ -135,19 +113,9 @@ const { traiterMessageWebSocket } = creerGestionnaireMessagesWs({
   etat,
   portWebSocket: PORT_WEBSOCKET,
   envoyerEtatParc,
-  handleScanOpenDhcpIni,
-  handleApplyRaspberryParc,
-  handleAddRaspberryEntry,
   handleSyncRaspberryFromNetwork,
-  saveParcFolder: enregistrerDossierParc,
-  scanIniFile,
-  saveRaspberryParc,
   reloadParcFromDisk: rechargerParcDepuisDisque,
   actualiserReseau,
-  addStaticHostToIni,
-  getNumberFromIp,
-  normalizeMac,
-  resolveOpenDhcpFolderPath,
   synchroniserRaspberryDepuisReseau,
   decouvrirAppareilsSurSousReseau,
   notifierParcModifie,
@@ -169,20 +137,11 @@ function attacherGestionnaireErreurServeur(server) {
 
 function preparerParcAuDemarrage() {
   rechargerParcDepuisDisque();
-  if (!etat.raspberryParc.iniPath) {
-    etat.raspberryParc.iniPath = resolveOpenDhcpFolderPath(DEFAULT_OPEN_DHCP_FOLDER);
-    saveRaspberryParc(etat.raspberryParc);
-  }
-  synchroniserParcDepuisIni(
-    etat.raspberryParc,
-    scanIniFile,
-    saveRaspberryParc
-  );
-  rechargerParcDepuisDisque();
 }
 
 function startRaspberryRuntime() {
   etat.metrics.launchRequests += 1;
+  demarrerServeurSessionDisque();
   preparerParcAuDemarrage();
 
   if (etat.wsServerMain) {

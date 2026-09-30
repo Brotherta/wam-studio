@@ -26,7 +26,7 @@ export function monterPanneauListePrincipal(hote: HoteNavigation): void {
   const syncButton = document.createElement("button");
   syncButton.type = "button";
   syncButton.innerText = "Synchroniser depuis le reseau";
-  syncButton.title = "Scanne 192.168.1.x, identifie les Raspberry par MAC et ecrit les reservations dans OpenDHCPServer.ini";
+  syncButton.title = "Ajoute a la liste WAM les Raspberry vus sur 192.168.1.x. Le DHCP n'est pas modifie.";
   syncButton.style.padding = "6px 10px";
   syncButton.style.cursor = "pointer";
   syncButton.style.borderRadius = "6px";

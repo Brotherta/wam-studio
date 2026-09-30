@@ -6,6 +6,7 @@ import {
   formaterNomAffichageRaspberry,
   formaterNomPisteRaspberry,
 } from "../utils/agent-transfert/AgentTransfertHelpers";
+import { extraireNumeroSonOscDepuisFichier } from "../utils/osc/OscPlayHelpers";
 import {
   collecterNumerosOccupes,
   construireNomSonAutomatique,
@@ -13,6 +14,7 @@ import {
 } from "../utils/osc/AttributionNumerosSons";
 import { enregistrerLibelleSon } from "./RaspberryLibellesSonsStore";
 import { nommerRegionApresEnregistrement } from "./RaspberryNomRegionService";
+import { trouverSonPourRegion } from "./RaspberryRegionSonStore";
 import RaspberryPisteLiaisonService from "./RaspberryPisteLiaisonService";
 import RaspberryPisteExportService, {
   type PlanNomFichierSon,
@@ -227,7 +229,6 @@ export default class RaspberryEnvoiAudioLotService {
         decoupage: options.decoupage,
         nomFichier: item.fichier.name,
         sonNumber: item.formulaire.sonNumber ?? null,
-        libelle,
       });
       nomsEnvoyes.push(`${nomAffiche} (/play ${item.formulaire.sonNumber ?? "?"})`);
     }
@@ -266,7 +267,6 @@ function enregistrerNomRegionApresEnvoi(params: {
   decoupage: boolean;
   nomFichier: string;
   sonNumber: number | null;
-  libelle?: string;
 }): void {
   const region =
     params.decoupage || params.regionsPiste.length === 1
@@ -275,15 +275,24 @@ function enregistrerNomRegionApresEnvoi(params: {
   if (!region) {
     return;
   }
+  const dejaSurLaPiste = trouverSonPourRegion(
+    params.raspberryId,
+    region.startMs,
+    region.regionId,
+    params.trackId,
+    region.durationMs,
+    params.index
+  );
+  const nomFichier = dejaSurLaPiste?.nomFichier || params.nomFichier;
+  const sonAffiche = extraireNumeroSonOscDepuisFichier(nomFichier);
   nommerRegionApresEnregistrement(params.pont, {
     trackId: params.trackId,
     regionId: region.regionId,
     raspberryId: params.raspberryId,
     startMs: region.startMs,
     durationMs: region.durationMs,
-    nomFichier: params.nomFichier,
-    sonNumber: params.sonNumber,
-    libelle: params.libelle,
-    indexOrdre: params.index,
+    nomFichier,
+    sonNumber: sonAffiche ?? dejaSurLaPiste?.sonNumber ?? params.sonNumber,
+    indexOrdre: dejaSurLaPiste?.indexOrdre ?? params.index,
   });
 }

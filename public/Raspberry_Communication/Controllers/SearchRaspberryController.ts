@@ -23,6 +23,10 @@ import {
   logTransfertInfo,
 } from "../utils/agent-transfert/AgentTransfertLogger";
 import {
+  brancherLectureRaspberryEnLigne,
+  rafraichirDisponibiliteCasesLiaison,
+} from "../Services/RaspberryIndicateurPisteUi";
+import {
   HotePanneauListe,
   rafraichirDetailsSiSelection,
   rafraichirListeRaspberry,
@@ -214,6 +218,14 @@ export default class SearchRaspberryController {
 
   public brancherPontPistes(pont: IWamPistesPont): void {
     this.pontPistes = pont;
+    brancherLectureRaspberryEnLigne((raspberryId) => {
+      for (const raspberry of this.state.raspberryMap.values()) {
+        if (extraireNumeroRaspberryDepuisIp(raspberry.ip) === raspberryId) {
+          return { ip: raspberry.ip, enLigne: raspberry.isOnline };
+        }
+      }
+      return null;
+    });
     this.liaisonPistes = new RaspberryPisteLiaisonService(pont);
     this.autoCreationPistes = new RaspberryPisteAutoCreationService(this.liaisonPistes);
     this.exportPistes = new RaspberryPisteExportService(pont);
@@ -440,7 +452,6 @@ export default class SearchRaspberryController {
         controleur.socket = socket;
       },
       afficherStatut: (text) => controleur.view.definirStatut(text),
-      lireCheminDossierIni: () => controleur.view.lireCheminDossierIni(),
       traiterMessageServeur: (raw) => controleur.traiterMessageServeur(raw),
       onApresConnexionServeur: () => {
         controleur.demarrageAutoAgentAbandonne = false;
@@ -862,10 +873,7 @@ export default class SearchRaspberryController {
 
   public synchroniserDepuisReseau(): void {
     this.view.definirStatut("Scan du reseau 192.168.1.x en cours (quelques secondes)...");
-    const envoye = this.envoyerMessage({
-      type: "syncRaspberryFromNetwork",
-      iniPath: this.view.lireCheminDossierIni(),
-    });
+    const envoye = this.envoyerMessage({ type: "syncRaspberryFromNetwork" });
     if (!envoye) {
       this.view.definirStatut("Connexion au serveur requise. Lancez le serveur Raspberry puis reessayez.");
     }
@@ -886,7 +894,6 @@ export default class SearchRaspberryController {
       rafraichirPanneauDetailsSiSelectionne: (ip) => controleur.rafraichirPanneauDetailsSiSelectionne(ip),
       synchroniserEtatParc: (payload) => controleur.synchroniserEtatParcDepuisServeur(payload),
       synchroniserListeAttendueDepuisIps: (ips) => etat.updateActiveExpectedFromIps(ips),
-      lireCheminDossierIni: () => controleur.view.lireCheminDossierIni(),
       renderList: () => controleur.rafraichirListe(),
       mettreAJourEtatAgentTransfert: (running, message) =>
         controleur.mettreAJourEtatAgentTransfert(running, message),
@@ -920,6 +927,7 @@ export default class SearchRaspberryController {
   private rafraichirListe(): void {
     this.state.refreshOnlineStateFromHeartbeat();
     rafraichirListeRaspberry(this.obtenirHoteListe());
+    rafraichirDisponibiliteCasesLiaison();
   }
 
   private rafraichirPanneauDetailsSiSelectionne(ip: string, options?: { forcer?: boolean }): void {

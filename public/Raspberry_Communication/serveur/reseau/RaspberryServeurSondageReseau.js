@@ -1,5 +1,13 @@
 const { exec } = require("child_process");
+const os = require("os");
 const { commandePing, pingAReussi } = require("./RaspberryServeurCommandesOs");
+
+function commandeLectureVoisin(ipAddress) {
+  if (os.platform() === "linux") {
+    return `ip neigh show ${ipAddress}`;
+  }
+  return `arp -a ${ipAddress}`;
+}
 
 /**
  * Exécute une commande shell (ping, arp) et renvoie la sortie texte, ou "" en cas d'erreur.
@@ -26,7 +34,7 @@ function extraireAdresseMacDepuisTexte(texte) {
  */
 async function sonderUneAdresseIpRaspberry(ipAddress) {
   const pingResult = await executerCommandeReseau(commandePing(ipAddress, 800));
-  const arpResult = await executerCommandeReseau(`arp -a ${ipAddress}`);
+  const arpResult = await executerCommandeReseau(commandeLectureVoisin(ipAddress));
   const macAddress = extraireAdresseMacDepuisTexte(arpResult);
   return {
     ipAddress,
@@ -41,7 +49,7 @@ async function sonderUneAdresseIpRaspberry(ipAddress) {
  * Interroge la table ARP pour une IP (sans ping).
  */
 async function lireAdresseMacDepuisArpPourIp(ipAddress) {
-  const arpResult = await executerCommandeReseau(`arp -a ${ipAddress}`);
+  const arpResult = await executerCommandeReseau(commandeLectureVoisin(ipAddress));
   return extraireAdresseMacDepuisTexte(arpResult);
 }
 

@@ -26,7 +26,6 @@ export type SearchRaspberryHoteApplicateurMessages = {
   rafraichirPanneauDetailsSiSelectionne: (ip: string) => void;
   synchroniserEtatParc: (payload: Record<string, unknown>) => void;
   synchroniserListeAttendueDepuisIps: (ips: string[]) => void;
-  lireCheminDossierIni: () => string;
   renderList: () => void;
   mettreAJourEtatAgentTransfert: (running: boolean, message?: string) => void;
 };

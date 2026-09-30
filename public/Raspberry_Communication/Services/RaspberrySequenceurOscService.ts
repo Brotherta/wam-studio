@@ -82,8 +82,9 @@ export default class RaspberrySequenceurOscService {
   public copierDepuisPistes(raspberries: Raspberry[]): EvenementSequenceurOsc[] {
     const regions = garderUnePisteParRaspberry(this.pont.listerRegionsPistesRaspberry());
     return regions.map((region) => {
+      const depuisAffiche = extraireNumeroSonOscDepuisFichier(region.nomAffiche);
       const depuisFichier = extraireNumeroSonOscDepuisFichier(region.nomFichier);
-      const sonNumber = region.sonNumber ?? depuisFichier;
+      const sonNumber = depuisAffiche ?? depuisFichier ?? region.sonNumber;
       const ip = trouverIpPourNumero(raspberries, region.raspberryId);
       const evenement: EvenementSequenceurOsc = {
         raspberryId: region.raspberryId,

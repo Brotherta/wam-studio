@@ -12,7 +12,6 @@ function getParcFilePath() {
 function buildDefaultParc() {
   return {
     subnetPrefix: DEFAULT_SUBNET_PREFIX,
-    iniPath: "",
     activeNumbers: [...DEFAULT_ACTIVE_NUMBERS],
   };
 }
@@ -45,7 +44,6 @@ function loadRaspberryParc() {
       subnetPrefix: typeof parsed.subnetPrefix === "string" && parsed.subnetPrefix.length > 0
         ? parsed.subnetPrefix
         : DEFAULT_SUBNET_PREFIX,
-      iniPath: typeof parsed.iniPath === "string" ? parsed.iniPath : "",
       activeNumbers: normalizeNumberList(parsed.activeNumbers),
     };
   } catch {
@@ -59,7 +57,6 @@ function saveRaspberryParc(parc) {
     subnetPrefix: typeof parc.subnetPrefix === "string" && parc.subnetPrefix.length > 0
       ? parc.subnetPrefix
       : DEFAULT_SUBNET_PREFIX,
-    iniPath: typeof parc.iniPath === "string" ? parc.iniPath : "",
     activeNumbers: normalizeNumberList(parc.activeNumbers),
   };
   fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
@@ -86,16 +83,28 @@ function mergeListenNumbers(activeNumbers, catalogEntries) {
   return normalizeNumberList([...(Array.isArray(activeNumbers) ? activeNumbers : []), ...fromCatalog]);
 }
 
-/** Numéros issus uniquement du scan INI Open DHCP (source de vérité pour la liste). */
-function numbersFromIniEntries(iniEntries) {
-  if (!Array.isArray(iniEntries)) {
-    return [];
+function numeroDepuisIp(ipAddress, subnetPrefix) {
+  const adresse = `${ipAddress || ""}`.trim();
+  const prefixe = `${subnetPrefix || ""}`;
+  if (adresse.length === 0 || prefixe.length === 0 || !adresse.startsWith(prefixe)) {
+    return null;
   }
-  return normalizeNumberList(iniEntries.map((entry) => entry.number));
+  const suffixe = adresse.slice(prefixe.length);
+  const numero = Number.parseInt(suffixe, 10);
+  if (!Number.isFinite(numero) || numero < 1 || numero > 254) {
+    return null;
+  }
+  if (`${prefixe}${numero}` !== adresse) {
+    return null;
+  }
+  return numero;
 }
 
-function appliquerNumerosDepuisIni(raspberryParc, iniEntries) {
-  raspberryParc.activeNumbers = numbersFromIniEntries(iniEntries);
+function ajouterNumerosAuParc(raspberryParc, numbers) {
+  raspberryParc.activeNumbers = normalizeNumberList([
+    ...(Array.isArray(raspberryParc.activeNumbers) ? raspberryParc.activeNumbers : []),
+    ...(Array.isArray(numbers) ? numbers : []),
+  ]);
   return saveRaspberryParc(raspberryParc);
 }
 
@@ -105,8 +114,8 @@ module.exports = {
   buildExpectedListFromParc,
   buildIpFromNumber,
   mergeListenNumbers,
-  numbersFromIniEntries,
-  appliquerNumerosDepuisIni,
+  numeroDepuisIp,
+  ajouterNumerosAuParc,
   getParcFilePath,
   loadRaspberryParc,
   normalizeNumberList,

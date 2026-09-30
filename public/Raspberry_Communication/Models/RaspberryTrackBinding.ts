@@ -8,21 +8,25 @@ export type RaspberryTrackBinding = {
   raspberryIp: string;
   raspberryId: number;
   sonNumber: number;
+  /** false = piste deliee : nom libre, ignoree par le sequenceur OSC. */
+  liee: boolean;
 };
 
 export type RaspberryTrackBindingPersiste = {
   ip: string;
   raspberryId: number;
   sonNumber: number;
+  liee?: boolean;
 };
 
 export function creerBinding(
   trackId: number,
   raspberryIp: string,
   raspberryId: number,
-  sonNumber: number
+  sonNumber: number,
+  liee = true
 ): RaspberryTrackBinding {
-  return { trackId, raspberryIp, raspberryId, sonNumber };
+  return { trackId, raspberryIp, raspberryId, sonNumber, liee };
 }
 
 export function bindingDepuisPersiste(
@@ -33,6 +37,7 @@ export function bindingDepuisPersiste(
     trackId,
     donnees.ip,
     donnees.raspberryId,
-    donnees.sonNumber ?? SON_NUMERO_DEFAUT
+    donnees.sonNumber ?? SON_NUMERO_DEFAUT,
+    donnees.liee !== false
   );
 }

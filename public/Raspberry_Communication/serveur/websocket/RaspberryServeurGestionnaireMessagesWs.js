@@ -1,6 +1,5 @@
 const { envoyerMessageOscEnUdp } = require("../osc/RaspberryServeurEnvoiOscUdp");
 const { resoudreMacDepuisCatalogue } = require("../../RaspberryCatalogStore");
-const { appliquerNumerosDepuisIni } = require("../../RaspberryParcStore");
 const {
   demarrerAgentTransfertRuntime,
   obtenirStatutAgentTransfertRuntime,
@@ -14,19 +13,9 @@ function creerGestionnaireMessagesWs(deps) {
     etat,
     portWebSocket,
     envoyerEtatParc,
-    handleScanOpenDhcpIni,
-    handleApplyRaspberryParc,
-    handleAddRaspberryEntry,
     handleSyncRaspberryFromNetwork,
-    saveParcFolder,
-    scanIniFile,
-    saveRaspberryParc,
     reloadParcFromDisk,
     actualiserReseau,
-    addStaticHostToIni,
-    getNumberFromIp,
-    normalizeMac,
-    resolveOpenDhcpFolderPath,
     synchroniserRaspberryDepuisReseau,
     decouvrirAppareilsSurSousReseau,
     notifierParcModifie,
@@ -45,95 +34,19 @@ function creerGestionnaireMessagesWs(deps) {
     }
 
     if (message.type === "getRaspberryParcState") {
-      const clientIniPath = typeof message.iniPath === "string" ? message.iniPath.trim() : "";
-      if (clientIniPath.length > 0) {
-        saveParcFolder(clientIniPath);
-      }
-      const scan = etat.raspberryParc.iniPath
-        ? scanIniFile(etat.raspberryParc.iniPath, etat.raspberryParc.subnetPrefix)
-        : { ok: false, error: "", entries: [] };
-      if (scan.ok) {
-        appliquerNumerosDepuisIni(etat.raspberryParc, scan.entries);
-        reloadParcFromDisk();
-      }
-      envoyerEtatParc(ws, etat.raspberryParc, scan);
-      return;
-    }
-
-    if (message.type === "scanOpenDhcpIni") {
-      handleScanOpenDhcpIni({
-        ws,
-        message,
-        raspberryParc: etat.raspberryParc,
-        saveParcFolder,
-        scanIniFile,
-        reloadParcFromDisk,
-        refreshNetworkStatus: actualiserReseau,
-        broadcastRaspList: diffuseur.diffuserListeRaspberry,
-        broadcastNetworkStatus: diffuseur.diffuserStatutReseau,
-      });
-      return;
-    }
-
-    if (message.type === "applyRaspberryParc") {
-      handleApplyRaspberryParc({
-        ws,
-        message,
-        raspberryParc: etat.raspberryParc,
-        saveParcFolder,
-        scanIniFile,
-        reloadParcFromDisk,
-        refreshNetworkStatus: actualiserReseau,
-        broadcastRaspList: diffuseur.diffuserListeRaspberry,
-        broadcastNetworkStatus: diffuseur.diffuserStatutReseau,
-        broadcastSummary: diffuseur.diffuserResumeServeur,
-        buildRaspConfig: construireConfig,
-      });
-      return;
-    }
-
-    if (message.type === "addRaspberryEntry") {
-      handleAddRaspberryEntry({
-        ws,
-        message,
-        raspberryParc: etat.raspberryParc,
-        wsServerMain: etat.wsServerMain,
-        saveParcFolder,
-        addStaticHostToIni,
-        scanIniFile,
-        reloadParcFromDisk,
-        refreshNetworkStatus: actualiserReseau,
-        broadcastRaspList: diffuseur.diffuserListeRaspberry,
-        broadcastNetworkStatus: diffuseur.diffuserStatutReseau,
-        normalizeMac,
-        resolveOpenDhcpFolderPath,
-      }).catch((error) => {
-        ws.send(JSON.stringify({
-          type: "addRaspberryEntryResult",
-          ok: false,
-          error: error && error.message ? error.message : "Erreur lors de l'ajout.",
-        }));
-      });
+      envoyerEtatParc(ws, etat.raspberryParc);
       return;
     }
 
     if (message.type === "syncRaspberryFromNetwork") {
       handleSyncRaspberryFromNetwork({
         ws,
-        message,
         raspberryParc: etat.raspberryParc,
         wsServerMain: etat.wsServerMain,
-        saveParcFolder,
         synchroniserRaspberryDepuisReseau,
         reloadParcFromDisk,
         actualiserReseau,
         notifierParcModifie,
-        scanIniFile,
-        resolveOpenDhcpFolderPath,
-        addStaticHostToIni,
-        getNumberFromIp,
-        saveRaspberryParc,
-        normalizeMac,
         decouvrirAppareilsSurSousReseau,
       }).catch((error) => {
         ws.send(JSON.stringify({
@@ -187,10 +100,7 @@ function creerGestionnaireMessagesWs(deps) {
       etat.controllerClients.add(ws);
       ws.send(JSON.stringify({ type: "raspConfig", raspConfig: construireConfig() }));
       ws.send(JSON.stringify({ type: "raspNetworkStatus", networkStatus: construireStatutReseau() }));
-      const scan = etat.raspberryParc.iniPath
-        ? scanIniFile(etat.raspberryParc.iniPath, etat.raspberryParc.subnetPrefix)
-        : { ok: false, error: "", entries: [] };
-      envoyerEtatParc(ws, etat.raspberryParc, scan);
+      envoyerEtatParc(ws, etat.raspberryParc);
       diffuseur.diffuserListeRaspberry();
       return;
     }

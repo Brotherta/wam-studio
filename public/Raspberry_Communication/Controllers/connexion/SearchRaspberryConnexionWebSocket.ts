@@ -9,7 +9,6 @@ export type HoteConnexionWebSocket = {
   lireSocket: () => WebSocket | null;
   ecrireSocket: (socket: WebSocket | null) => void;
   afficherStatut: (text: string) => void;
-  lireCheminDossierIni: () => string;
   traiterMessageServeur: (rawData: unknown) => Promise<void>;
   onApresConnexionServeur?: () => void;
 };
@@ -47,10 +46,7 @@ export function demarrerConnexionWebSocket(hote: HoteConnexionWebSocket): void {
     envoyerMessageWebSocket(hote, { type: "getRaspConfig" });
     envoyerMessageWebSocket(hote, { type: "requestRaspList" });
     envoyerMessageWebSocket(hote, { type: "getRaspNetworkStatus" });
-    envoyerMessageWebSocket(hote, {
-      type: "getRaspberryParcState",
-      iniPath: hote.lireCheminDossierIni(),
-    });
+    envoyerMessageWebSocket(hote, { type: "getRaspberryParcState" });
     hote.onApresConnexionServeur?.();
   });
 

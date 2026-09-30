@@ -89,18 +89,6 @@ export function appliquerPayloadMessageServeur(
     return;
   }
 
-  if (messageType === "openDhcpAutoAdded") {
-    const ip = typeof record.ipAddress === "string" ? record.ipAddress : "";
-    if (record.ok === true && ip.length > 0) {
-      hote.setStatus(`Raspberry ${ip} enregistre automatiquement dans Open DHCP.`);
-    }
-    hote.sendMessage({ type: "getRaspberryParcState", iniPath: hote.lireCheminDossierIni() });
-    hote.sendMessage({ type: "getRaspConfig" });
-    hote.sendMessage({ type: "requestRaspList" });
-    hote.sendMessage({ type: "getRaspNetworkStatus" });
-    return;
-  }
-
   if (messageType === "oscSent" && record.target && typeof record.target === "object") {
     const target = record.target as Record<string, unknown>;
     const ip = typeof target.ipAddress === "string" ? target.ipAddress : "";
@@ -181,7 +169,7 @@ export function appliquerPayloadMessageServeur(
       const dejaPresents = typeof record.alreadyPresentCount === "number" ? record.alreadyPresentCount : 0;
       const detectes = typeof record.raspberriesDetectes === "number" ? record.raspberriesDetectes : 0;
       hote.setStatus(
-        `Synchronisation terminee: ${detectes} Raspberry detecte(s), ${ajoutes} ajoute(s) au INI, ${dejaPresents} deja present(s).`
+        `Synchronisation terminee: ${detectes} Raspberry detecte(s), ${ajoutes} ajoute(s) a la liste, ${dejaPresents} deja present(s).`
       );
     }
     hote.synchroniserEtatParc(record);

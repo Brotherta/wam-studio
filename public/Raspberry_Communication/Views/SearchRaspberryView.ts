@@ -60,10 +60,6 @@ export default class SearchRaspberryView {
     this.launchButton.style.backgroundColor = actif ? "#1f8b4c" : "#a53333";
   }
 
-  public lireCheminDossierIni(): string {
-    return this.state.defaultOpenDhcpFolder;
-  }
-
   public lierBoutonFermer(onFermer: () => void): void {
     this.closeButton.addEventListener("click", onFermer);
   }
